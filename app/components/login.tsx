@@ -20,6 +20,7 @@ export default function Login() {
     });
   };
 
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };

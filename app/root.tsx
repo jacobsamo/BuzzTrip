@@ -1,3 +1,5 @@
+import stylesheet from "@/global.css";
+import { LinksFunction, LoaderFunctionArgs, json } from "@remix-run/cloudflare";
 import {
   Links,
   Meta,
@@ -7,13 +9,11 @@ import {
   useLoaderData,
   useRevalidator,
 } from "@remix-run/react";
-import stylesheet from "@/globals.css";
-import { LinksFunction, LoaderFunctionArgs, json } from "@remix-run/cloudflare";
-import { useEffect, useState } from "react";
 import {
   createBrowserClient,
   createServerClient,
 } from "@supabase/auth-helpers-remix";
+import { useEffect, useState } from "react";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
@@ -51,7 +51,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   );
 };
 
-export function Layout() {
+export default function Layout() {
   const { env, session } = useLoaderData<typeof loader>();
   const { revalidate } = useRevalidator();
 
