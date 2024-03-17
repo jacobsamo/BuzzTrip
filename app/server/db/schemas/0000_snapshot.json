@@ -1,0 +1,265 @@
+{
+  "id": "d66e4970-0fec-4925-8540-106a5bf88ef9",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "5",
+  "dialect": "pg",
+  "tables": {
+    "collection": {
+      "name": "collection",
+      "schema": "",
+      "columns": {
+        "uid": {
+          "name": "uid",
+          "type": "varchar(255)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "varchar(7)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "icon": {
+          "name": "icon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mapId": {
+          "name": "mapId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "collection_mapId_map_uid_fk": {
+          "name": "collection_mapId_map_uid_fk",
+          "tableFrom": "collection",
+          "tableTo": "map",
+          "columnsFrom": [
+            "mapId"
+          ],
+          "columnsTo": [
+            "uid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "map": {
+      "name": "map",
+      "schema": "",
+      "columns": {
+        "uid": {
+          "name": "uid",
+          "type": "varchar(255)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdBy": {
+          "name": "createdBy",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "marker": {
+      "name": "marker",
+      "schema": "",
+      "columns": {
+        "uid": {
+          "name": "uid",
+          "type": "varchar(255)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "varchar(7)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "icon": {
+          "name": "icon",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lat": {
+          "name": "lat",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lng": {
+          "name": "lng",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "collectionId": {
+          "name": "collectionId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mapId": {
+          "name": "mapId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "marker_collectionId_collection_uid_fk": {
+          "name": "marker_collectionId_collection_uid_fk",
+          "tableFrom": "marker",
+          "tableTo": "collection",
+          "columnsFrom": [
+            "collectionId"
+          ],
+          "columnsTo": [
+            "uid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "marker_mapId_map_uid_fk": {
+          "name": "marker_mapId_map_uid_fk",
+          "tableFrom": "marker",
+          "tableTo": "map",
+          "columnsFrom": [
+            "mapId"
+          ],
+          "columnsTo": [
+            "uid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "shared_map": {
+      "name": "shared_map",
+      "schema": "",
+      "columns": {
+        "mapId": {
+          "name": "mapId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "permissionLLevel": {
+          "name": "permissionLLevel",
+          "type": "permissionLLevel",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'viewer'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "shared_map_mapId_map_uid_fk": {
+          "name": "shared_map_mapId_map_uid_fk",
+          "tableFrom": "shared_map",
+          "tableTo": "map",
+          "columnsFrom": [
+            "mapId"
+          ],
+          "columnsTo": [
+            "uid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {
+    "permissionLLevel": {
+      "name": "permissionLLevel",
+      "values": {
+        "viewer": "viewer",
+        "editer": "editer",
+        "owner": "owner"
+      }
+    }
+  },
+  "schemas": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
