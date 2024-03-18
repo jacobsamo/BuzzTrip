@@ -12,7 +12,10 @@
     "typecheck": "tsc",
     "typegen": "wrangler types",
     "preview": "pnpm run build && wrangler pages dev ./build/client",
-    "build-cf-types": "wrangler types"
+    "build-cf-types": "wrangler types",
+    "db:types": "supabase gen types typescript --project-id aR980VvvJAwYpdnW > database.types.ts",
+    "db:push": "supabase db push",
+    "db:start": "supabase start"
   },
   "dependencies": {
     "@remix-run/cloudflare": "^2.8.1",
@@ -33,6 +36,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "supabase": "^1.148.6",
     "@cloudflare/workers-types": "^4.20240314.0",
     "@remix-run/dev": "^2.8.1",
     "@types/react": "^18.2.66",

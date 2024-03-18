@@ -2,8 +2,13 @@ node_modules
 
 /.cache
 /build
-.env
 
+#env
+.env
+.env.*
+!.env.example
+
+# cloudflrare
 .wrangler
 
 .dev.vars
