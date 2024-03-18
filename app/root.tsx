@@ -13,6 +13,7 @@ import {
   createBrowserClient,
   createServerClient,
 } from "@supabase/auth-helpers-remix";
+import { Database } from "database.types";
 import { useEffect, useState } from "react";
 
 export const links: LinksFunction = () => [
@@ -27,7 +28,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   const response = new Response();
 
-  const supabase = createServerClient(
+  const supabase = createServerClient<Database>(
     env.PUBLIC_SUPABASE_URL,
     env.PUBLIC_SUPABASE_ANON_KEY,
     {
