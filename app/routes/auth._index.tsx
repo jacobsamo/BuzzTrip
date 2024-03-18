@@ -1,10 +1,11 @@
+import { Button } from "@/components/ui/button";
 import { useOutletContext } from "@remix-run/react";
 import { SupabaseClient } from "@supabase/auth-helpers-remix";
 
 export function AuhLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative flex h-dvh w-full items-center justify-center">
-      <div className="bg-grey/20 dark:bg-grey/60 z-10 flex max-w-md flex-col items-center justify-center  gap-3 rounded-3xl p-3 text-center shadow backdrop-blur-sm">
+      <div className="z-10 flex max-w-md flex-col items-center justify-center  gap-3 rounded-3xl p-3 text-center shadow backdrop-blur-sm">
         {children}
       </div>
       {/* <img
@@ -33,7 +34,7 @@ export default function Index() {
     <>
       <div className="flex flex-col items-center p-4">
         <img
-          src="/icons/svg/icon-128.svg"
+          src="/logos/logo_x128.png"
           alt="Logo"
           width={128}
           height={128}

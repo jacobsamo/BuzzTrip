@@ -1,5 +1,10 @@
-import Login from "@/components/login";
-import type { MetaFunction } from "@remix-run/cloudflare";
+import getSupabaseServerClient from "@/server/supabaseServer";
+import {
+  json,
+  redirect,
+  type LoaderFunctionArgs,
+  type MetaFunction,
+} from "@remix-run/cloudflare";
 
 export const meta: MetaFunction = () => {
   return [
@@ -11,10 +16,26 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  try {
+    const client = getSupabaseServerClient(request);
+
+    const {
+      data: { user },
+    } = await client.auth.getUser();
+
+    console.log(user);
+
+    if (!user) {
+      return redirect("/auth");
+    }
+
+    return json({});
+  } catch (e) {
+    return json({});
+  }
+};
+
 export default function Index() {
-  return (
-    <div className="font-serif text-base">
-      <Login />
-    </div>
-  );
+  return <h1 className="text-3xl font-bold underline">Hello world!</h1>;
 }

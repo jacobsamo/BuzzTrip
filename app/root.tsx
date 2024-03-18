@@ -1,5 +1,8 @@
-import stylesheet from "@/global.css";
-import { LinksFunction, LoaderFunctionArgs, json } from "@remix-run/cloudflare";
+import {
+  LinksFunction,
+  LoaderFunctionArgs,
+  json,
+} from "@remix-run/cloudflare";
 import {
   Links,
   Meta,
@@ -15,11 +18,11 @@ import {
 } from "@supabase/auth-helpers-remix";
 import { Database } from "database.types";
 import { useEffect, useState } from "react";
+import stylesheet from "@/tailwind.css";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
-
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const env = {
     PUBLIC_SUPABASE_URL: process.env.PUBLIC_SUPABASE_URL!,
@@ -40,6 +43,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const {
     data: { session },
   } = await supabase.auth.getSession();
+
 
   return json(
     {
