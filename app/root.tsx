@@ -5,6 +5,7 @@ import {
 } from "@remix-run/cloudflare";
 import {
   Links,
+  LiveReload,
   Meta,
   Outlet,
   Scripts,
@@ -96,6 +97,7 @@ export default function Layout() {
         <Outlet context={{ supabase }} />
         <ScrollRestoration />
         <Scripts />
+        {/* <LiveReload /> */}
       </body>
     </html>
   );

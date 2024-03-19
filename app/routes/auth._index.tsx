@@ -1,28 +1,52 @@
-import { Button } from "@/components/ui/button";
 import { useOutletContext } from "@remix-run/react";
 import { SupabaseClient } from "@supabase/auth-helpers-remix";
+import { Database } from "database.types";
 
-export function AuhLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="relative flex h-dvh w-full items-center justify-center">
-      <div className="z-10 flex max-w-md flex-col items-center justify-center  gap-3 rounded-3xl p-3 text-center shadow backdrop-blur-sm">
-        {children}
-      </div>
-      {/* <img
-        src="/images/auth-background.webp"
-        alt="background image"
-        fill
-        className="absolute -z-50 h-full w-full object-cover object-center"
-      /> */}
-    </div>
-  );
-}
+// export function AuhLayout({ children }: { children: React.ReactNode }) {
+//   return (
+//     <div className="relative flex h-dvh w-full items-center justify-center">
+//       <div className="z-10 flex max-w-md flex-col items-center justify-center  gap-3 rounded-3xl p-3 text-center shadow backdrop-blur-sm">
+//         {children}
+//       </div>
+//       {/* <img
+//         src="/images/auth-background.webp"
+//         alt="background image"
+//         fill
+//         className="absolute -z-50 h-full w-full object-cover object-center"
+//       /> */}
+//     </div>
+//   );
+// }
 
-export default function Index() {
-  const { supabase } = useOutletContext<{ supabase: SupabaseClient }>();
+export default function Auth() {
+  const { supabase } = useOutletContext<{ supabase: SupabaseClient<Database> }>();
 
-  const signIn = async () => {
+  const handleEmailLogin = async () => {
+    await supabase.auth.signInWithPassword({
+      email: "jon@supabase.com",
+      password: "password",
+    });
+  };
+
+  const handleGitHubLogin = async () => {
     await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: {
+        redirectTo: "http://localhost:3000/auth/callback",
+      },
+    });
+  };
+
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
+  
+
+  const signIn = () => {
+    console.log("singing in:  ")
+     supabase.auth.signInWithOAuth({
       provider: "github",
       options: {
         redirectTo: "http://localhost:3000/auth/callback",
@@ -44,9 +68,7 @@ export default function Index() {
       </div>
 
       <div className="inline-flex gap-2">
-        <Button
-          LeadingIcon={
-            <svg
+      <svg
               xmlns="http://www.w3.org/2000/svg"
               preserveAspectRatio="xMidYMid"
               viewBox="0 0 256 262"
@@ -69,13 +91,24 @@ export default function Index() {
                 d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"
               ></path>
             </svg>
-          }
+        <button
+        
           aria-label="sign in with google"
           className="text-step--3 flex w-56 max-w-sm cursor-pointer items-center gap-2 rounded-lg bg-white px-2 py-6 text-center text-black"
-          onClick={() => signIn()}
+          onClick={() => {
+            console.log("singing in:  ")
+             supabase.auth.signInWithOAuth({
+              provider: "github",
+              options: {
+                redirectTo: "http://localhost:3000/auth/callback",
+              },
+            });
+          }}
         >
           Continue with Google
-        </Button>
+        </button>
+          <button onClick={() => console.log("clicked")}>Click</button>
+
       </div>
     </>
   );

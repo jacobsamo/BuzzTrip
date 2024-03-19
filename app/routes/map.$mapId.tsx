@@ -1,7 +1,8 @@
+import MapView from "@/components/layouts/map_view";
 import { json, type LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
 import { createServerClient } from "@supabase/auth-helpers-remix";
-import { Database } from "database.types";
+import { Database, Tables } from "database.types";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     const response = new Response()
@@ -11,8 +12,8 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       { request, response }
     )
   
-    const { data: collections } = await supabaseClient.from('collections').select('*').eq('mapId', params.mapId).returns<Database["public"]["Tables"]["collection"]>()
-    const { data: markers } = await supabaseClient.from('markers').select('*').eq('mapId', params.mapId)
+    const { data: collections } = await supabaseClient.from('collection').select('*').eq('mapId', params.mapId).returns<Tables<"collection">>()
+    const { data: markers } = await supabaseClient.from('marker').select('*').eq('mapId', params.mapId).returns<Tables<"marker">>()
   
     return json(
       { collections, markers },
@@ -25,9 +26,5 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 export default function Map() {
     const {collections, markers} = useLoaderData<typeof loader>();
 
-  return (
-    <>
-    
-    </>
-  );
+  return <MapView collections={collections} markers={markers} />
 }

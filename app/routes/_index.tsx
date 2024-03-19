@@ -8,10 +8,10 @@ import {
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "New Remix App" },
+    { title: "BuzzTrip" },
     {
       name: "description",
-      content: "Welcome to Remix! Using Vite and Cloudflare!",
+      content: "Plan the trip you've always dreamed of",
     },
   ];
 };
@@ -26,9 +26,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
     console.log(user);
 
-    if (!user) {
-      return redirect("/auth");
-    }
+    // if (!user) {
+    //   return redirect("/auth");
+    // }
 
     return json({});
   } catch (e) {
@@ -37,5 +37,12 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export default function Index() {
-  return <h1 className="text-3xl font-bold underline">Hello world!</h1>;
+
+
+
+  return(<>
+  <h1 className="text-3xl font-bold underline">Hello world!
+  </h1>
+    <button onClick={() => console.log("click")}>CLick</button>
+  </> );
 }
