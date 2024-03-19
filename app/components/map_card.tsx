@@ -1,6 +1,6 @@
 import { Link } from "@remix-run/react";
 import { MoreVertical, Share, Trash2 } from "lucide-react";
-import { MapModal } from "./modals/create_edit_map_modal";
+import MapModal  from "./modals/create_edit_map_modal";
 import { Button } from "./ui/button";
 import {
     DropdownMenu,
@@ -42,7 +42,9 @@ const MapCard = ({ map }: MapCardProps) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="center">
             <DropdownMenuItem>
-              <MapModal map={map} />
+              <MapModal 
+              // map={map} 
+              />
             </DropdownMenuItem>
             <DropdownMenuItem className="text-normal gap-2 text-sm font-normal">
               <Share /> Share

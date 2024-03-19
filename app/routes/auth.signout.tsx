@@ -1,12 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { useOutletContext } from "@remix-run/react";
+import { redirect, useOutletContext } from "@remix-run/react";
 import { SupabaseClient } from "@supabase/auth-helpers-remix";
 
 const SignOutPage = () => {
   const { supabase } = useOutletContext<{ supabase: SupabaseClient }>();
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
+  const handleLogout = () => {
+    console.log("signing out");
+    supabase.auth.signOut();
+     redirect("/auth");
   };
 
   return (

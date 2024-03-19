@@ -1,8 +1,8 @@
-import { redirect, type LoaderFunctionArgs } from '@remix-run/cloudflare'
+import { redirect } from '@remix-run/cloudflare'
 import { createServerClient } from '@supabase/auth-helpers-remix'
 
-// import type { Database } from 'db_types'
-
+import type { Database } from 'database.types'
+import type { LoaderFunctionArgs } from '@remix-run/cloudflare'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const response = new Response()
@@ -10,7 +10,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const code = url.searchParams.get('code')
 
   if (code) {
-    const supabaseClient = createServerClient(
+    const supabaseClient = createServerClient<Database>(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_ANON_KEY!,
       { request, response }

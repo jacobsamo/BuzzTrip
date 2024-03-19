@@ -24,11 +24,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       data: { user },
     } = await client.auth.getUser();
 
-    console.log(user);
+    console.log('uSER: ', user?.email);
 
-    // if (!user) {
-    //   return redirect("/auth");
-    // }
+    if (!user) {
+      return redirect("/auth");
+    }
 
     return json({});
   } catch (e) {
@@ -38,11 +38,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export default function Index() {
 
-
-
-  return(<>
-  <h1 className="text-3xl font-bold underline">Hello world!
-  </h1>
-    <button onClick={() => console.log("click")}>CLick</button>
-  </> );
+  return(
+    
+      <main className="p-2">
+        <span className="w-full justify-between">
+        <h1>Your maps</h1>
+          <h2>Create map</h2>
+        </span>
+      </main>
+    
+    );
 }

@@ -1,17 +1,17 @@
+import stylesheet from "@/tailwind.css?url";
 import {
   LinksFunction,
   LoaderFunctionArgs,
-  json,
+  json
 } from "@remix-run/cloudflare";
 import {
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
   useLoaderData,
-  useRevalidator,
+  useRevalidator
 } from "@remix-run/react";
 import {
   createBrowserClient,
@@ -19,11 +19,11 @@ import {
 } from "@supabase/auth-helpers-remix";
 import { Database } from "database.types";
 import { useEffect, useState } from "react";
-import stylesheet from "@/tailwind.css";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const env = {
     PUBLIC_SUPABASE_URL: process.env.PUBLIC_SUPABASE_URL!,
@@ -85,6 +85,7 @@ export default function Layout() {
     };
   }, [serverAccessToken, supabase, revalidate]);
 
+  
   return (
     <html lang="en">
       <head>
@@ -97,7 +98,6 @@ export default function Layout() {
         <Outlet context={{ supabase }} />
         <ScrollRestoration />
         <Scripts />
-        {/* <LiveReload /> */}
       </body>
     </html>
   );
