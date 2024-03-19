@@ -1,3 +1,6 @@
+import MapCard from "@/components/map_card";
+import MapModal from "@/components/modals/create_edit_map_modal";
+import { Map } from "@/lib/types";
 import getSupabaseServerClient from "@/server/supabaseServer";
 import {
   json,
@@ -5,6 +8,8 @@ import {
   type LoaderFunctionArgs,
   type MetaFunction,
 } from "@remix-run/cloudflare";
+import { useLoaderData } from "@remix-run/react";
+import { Tables } from "database.types";
 
 export const meta: MetaFunction = () => {
   return [
@@ -30,22 +35,41 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       return redirect("/auth");
     }
 
-    return json({});
+    const maps = await client.from("maps").select().eq("createdBy", user.id).returns<Map[]>();
+
+    return json({maps: maps.data});
   } catch (e) {
-    return json({});
+    return json({maps: null});
   }
 };
 
 export default function Index() {
+  const { maps } = useLoaderData<typeof loader>();
+
 
   return(
     
-      <main className="p-2">
-        <span className="w-full justify-between">
-        <h1>Your maps</h1>
-          <h2>Create map</h2>
-        </span>
-      </main>
+    <main className="p-2">
+    <span className="mx-auto flex w-full flex-row items-center justify-between">
+      <h2 className="text-2xl font-bold">Your Maps</h2>
+      <MapModal />
+    </span>
+
+    {maps && (
+      <div className="flex flex-wrap gap-2">
+        {maps.map((map) => (
+          <MapCard key={map.uid} map={map} />
+        ))}
+      </div>
+    )}
+
+    {!maps && (
+      <>
+        <h2>Current you have no maps</h2>
+        <MapModal />
+      </>
+    )}
+  </main>
     
     );
 }
