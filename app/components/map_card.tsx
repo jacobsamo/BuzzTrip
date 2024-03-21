@@ -8,7 +8,10 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from '@/components/ui/dialog'
+
 import { Tables } from "database.types";
+// import ConfirmDeleteModal from "./modals/comfirm_delete_modal";
 
 interface MapCardProps {
   map: Tables<"map">;
@@ -30,7 +33,7 @@ const MapCard = ({ map }: MapCardProps) => {
         />
         <div className="pl-2">
           <h3 className="font-bold">{map.title}</h3>
-          <p className="text-sm font-light">{new Date(map?.createdAt).toDateString()}</p>
+          <p className="text-sm font-light">{new Date(map.created_at).toDateString()}</p>
         </div>
 
         <DropdownMenu>
@@ -43,15 +46,16 @@ const MapCard = ({ map }: MapCardProps) => {
           <DropdownMenuContent align="center">
             <DropdownMenuItem>
               <MapModal 
-              // map={map} 
+                mode="edit"
+                map={map} 
               />
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-normal gap-2 text-sm font-normal">
+            {/* <DropdownMenuItem>
               <Share /> Share
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-normal gap-2 text-sm font-normal">
-              <Trash2 /> Delete
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
+            {/* <DropdownMenuItem>
+          
+            </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
       </Link>

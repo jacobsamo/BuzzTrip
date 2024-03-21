@@ -4,14 +4,15 @@ import { Database } from 'database.types';
  
 function getSupabaseServerClient(
   request: Request, 
+  response?: Response
 ) {
-  const response = new Response();
+  const res = response ?? new Response();
   return createServerClient<Database>(
     process.env.PUBLIC_SUPABASE_URL!,
     process.env.PUBLIC_SUPABASE_ANON_KEY!,
     {
       request,
-      response,
+      response: res,
     }
   );
 }

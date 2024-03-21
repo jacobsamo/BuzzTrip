@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogDescription,
     DialogHeader,
@@ -27,10 +28,14 @@ import { Plus } from "lucide-react";
 import * as React from "react";
 import { Select } from "../ui/select";
 import { Textarea } from "../ui/textarea";
+import { Map } from "@/lib/types";
 
+export interface MapModalProps {
+  mode: "create" | "edit";
+  map?: Map;
+}
 
-
-export default function MapModal() {
+export default function MapModal({mode = "create", map}: MapModalProps) {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -47,7 +52,7 @@ export default function MapModal() {
             <DialogTitle>Create Map</DialogTitle>
             <DialogDescription>Start your travel plans here</DialogDescription>
           </DialogHeader>
-          <ProfileForm />
+          <MapForm mode={mode} map={map}/>
         </DialogContent>
       </Dialog>
     );
@@ -65,7 +70,7 @@ export default function MapModal() {
           <DrawerTitle>Create Map</DrawerTitle>
           <DrawerDescription>Start your travel plans here</DrawerDescription>
         </DrawerHeader>
-        <ProfileForm  />
+        <MapForm mode={mode} map={map}/>
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -76,13 +81,13 @@ export default function MapModal() {
   );
 }
 
-function ProfileForm() {
+function MapForm({mode, map}: MapModalProps) {
  
   return (
     <Form
       className={cn("grid items-start gap-4")}
       method="post"
-      action="/api/map/create"
+      action={mode === "create" ? "/api/map/create" : `"/api/map/edit?id=${map?.uid}`}
       navigate={false}
     >
       <div className="grid gap-2">
@@ -102,7 +107,10 @@ function ProfileForm() {
         <Label htmlFor="location">Location</Label>
         <Select></Select>
       </div>    
-      <Button type="submit">Save changes</Button>
+      <DialogClose  type="submit" >
+      Save changes
+
+      </DialogClose>
     </Form>
   );
 }

@@ -13,7 +13,7 @@
     "typegen": "wrangler types",
     "preview": "pnpm run build && wrangler pages dev ./build/client",
     "build-cf-types": "wrangler types",
-    "db:types": "supabase gen types typescript --project-id aR980VvvJAwYpdnW > database.types.ts",
+    "db:types": "supabase gen types typescript --project-id xsxgqxgqjqfyrddqhuhr > database.types.ts",
     "db:push": "supabase db push",
     "db:start": "supabase start -x postgres-meta realtime studio",
     "db:stop": "supabase stop",

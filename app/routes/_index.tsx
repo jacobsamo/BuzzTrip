@@ -35,7 +35,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       return redirect("/auth");
     }
 
-    const maps = await client.from("maps").select().eq("createdBy", user.id).returns<Map[]>();
+    const maps = await client.from("map").select().eq("created_by", user.id).returns<Map[]>();
 
     return json({maps: maps.data});
   } catch (e) {

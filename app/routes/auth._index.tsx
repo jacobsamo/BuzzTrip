@@ -3,21 +3,6 @@ import { useOutletContext } from "@remix-run/react";
 import { SupabaseClient } from "@supabase/auth-helpers-remix";
 import { Database } from "database.types";
 
-// export function AuhLayout({ children }: { children: React.ReactNode }) {
-//   return (
-//     <div className="relative flex h-dvh w-full items-center justify-center">
-//       <div className="z-10 flex max-w-md flex-col items-center justify-center  gap-3 rounded-3xl p-3 text-center shadow backdrop-blur-sm">
-//         {children}
-//       </div>
-//       {/* <img
-//         src="/images/auth-background.webp"
-//         alt="background image"
-//         fill
-//         className="absolute -z-50 h-full w-full object-cover object-center"
-//       /> */}
-//     </div>
-//   );
-// }
 
 export default function Auth() {
   const { supabase } = useOutletContext<{ supabase: SupabaseClient<Database> }>();
@@ -34,7 +19,11 @@ export default function Auth() {
   };
 
   return (
-    <>
+    <main className=" w-full h-dvh items-center justify-center flex">
+
+`
+      <div className="z-10 flex max-w-md flex-col items-center justify-center  gap-3 rounded-3xl p-3 text-center shadow backdrop-blur-sm">
+    
       <div className="flex flex-col items-center p-4">
         <img
           src="/logos/logo_x128.png"
@@ -78,9 +67,8 @@ export default function Auth() {
         >
           Continue with Google
         </Button>
-          <button onClick={() => console.log("clicked")}>Click</button>
-
       </div>
-    </>
+      </div>
+    </main>
   );
 }
