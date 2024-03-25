@@ -1,5 +1,4 @@
 import getSupabaseServerClient from "@/server/supabaseServer";
-import { redirect } from "@remix-run/cloudflare";
 import { TablesInsert } from "database.types";
 import { getUser } from "../getUser";
 import { Map } from "../types";

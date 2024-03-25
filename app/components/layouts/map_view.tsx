@@ -38,3 +38,21 @@
 // };
 
 // export default MapView;
+
+
+import React from 'react'
+import { Collection, Marker } from '@/lib/types';
+
+
+interface MainLayoutProps {
+    markers: Marker[];
+    collections: Collection[];
+}
+
+const MapView = ({collections, markers}: MainLayoutProps) => {
+  return (
+    <div>MapView</div>
+  )
+}
+
+export default MapView

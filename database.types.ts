@@ -87,6 +87,7 @@ export type Database = {
           description: string
           lat: number
           lng: number
+          map_id: string | null
           title: string
           uid: string
         }
@@ -97,6 +98,7 @@ export type Database = {
           description: string
           lat: number
           lng: number
+          map_id?: string | null
           title: string
           uid?: string
         }
@@ -107,6 +109,7 @@ export type Database = {
           description?: string
           lat?: number
           lng?: number
+          map_id?: string | null
           title?: string
           uid?: string
         }
@@ -124,6 +127,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marker_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map"
+            referencedColumns: ["uid"]
           },
         ]
       }

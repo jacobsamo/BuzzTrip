@@ -12,8 +12,8 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       { request, response }
     )
   
-    const { data: collections } = await supabaseClient.from('collection').select('*').eq('mapId', params.mapId).returns<Tables<"collection">>()
-    const { data: markers } = await supabaseClient.from('marker').select('*').eq('mapId', params.mapId).returns<Tables<"marker">>()
+    const { data: collections } = await supabaseClient.from('collection').select('*').eq('map_id', params.mapId).returns<Tables<"collection">>()
+    const { data: markers } = await supabaseClient.from('marker').select('*').eq('map_id', params.mapId).returns<Tables<"marker">>()
   
     return json(
       { collections, markers },
