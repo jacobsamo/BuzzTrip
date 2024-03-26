@@ -11,17 +11,18 @@ import {
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from '@/components/ui/dialog'
 
 import { Tables } from "database.types";
+import { Map } from "@/lib/types";
 // import ConfirmDeleteModal from "./modals/comfirm_delete_modal";
 
 interface MapCardProps {
-  map: Tables<"map">;
+  map: Map & Tables<"shared_map">;
 }
 
 const MapCard = ({ map }: MapCardProps) => {
   return (
     <>
       <Link
-        to={`/maps/${map.uid}`}
+        to={`/map/${map.uid}`}
         className="relative flex h-32 w-full flex-row rounded-lg border bg-card bg-zinc-600 text-card-foreground"
       >
         <img

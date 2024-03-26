@@ -4,7 +4,7 @@ import { getUser } from "../getUser";
 import { Marker } from "../types";
 
 
-export async function createCollection(marker: Marker, request: Request) {
+export async function createMarker(marker: Marker, request: Request) {
     const supabase = getSupabaseServerClient(request);
     const user = await getUser(request);
 

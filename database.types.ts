@@ -11,25 +11,25 @@ export type Database = {
     Tables: {
       collection: {
         Row: {
-          color: string
-          description: string
-          icon: string
+          color: string | null
+          description: string | null
+          icon: string | null
           map_id: string
           title: string
           uid: string
         }
         Insert: {
-          color: string
-          description: string
-          icon: string
+          color?: string | null
+          description?: string | null
+          icon?: string | null
           map_id: string
           title: string
           uid?: string
         }
         Update: {
-          color?: string
-          description?: string
-          icon?: string
+          color?: string | null
+          description?: string | null
+          icon?: string | null
           map_id?: string
           title?: string
           uid?: string
@@ -40,6 +40,13 @@ export type Database = {
             columns: ["map_id"]
             isOneToOne: false
             referencedRelation: "map"
+            referencedColumns: ["uid"]
+          },
+          {
+            foreignKeyName: "collection_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "shared_map_view"
             referencedColumns: ["uid"]
           },
         ]
@@ -81,37 +88,73 @@ export type Database = {
       }
       marker: {
         Row: {
+          address: string | null
+          avg_price: number | null
           collection_id: string
+          color: string | null
           created_at: string
           created_by: string
-          description: string
+          description: string | null
+          icon: string | null
           lat: number
           lng: number
-          map_id: string | null
+          map_id: string
+          opening_times: string[] | null
+          phone: string | null
+          photos: Json | null
+          place_id: string | null
+          rating: number | null
+          reviews: Json | null
           title: string
+          types: string[] | null
           uid: string
+          website: string | null
         }
         Insert: {
+          address?: string | null
+          avg_price?: number | null
           collection_id: string
+          color?: string | null
           created_at?: string
           created_by: string
-          description: string
+          description?: string | null
+          icon?: string | null
           lat: number
           lng: number
-          map_id?: string | null
+          map_id: string
+          opening_times?: string[] | null
+          phone?: string | null
+          photos?: Json | null
+          place_id?: string | null
+          rating?: number | null
+          reviews?: Json | null
           title: string
+          types?: string[] | null
           uid?: string
+          website?: string | null
         }
         Update: {
+          address?: string | null
+          avg_price?: number | null
           collection_id?: string
+          color?: string | null
           created_at?: string
           created_by?: string
-          description?: string
+          description?: string | null
+          icon?: string | null
           lat?: number
           lng?: number
-          map_id?: string | null
+          map_id?: string
+          opening_times?: string[] | null
+          phone?: string | null
+          photos?: Json | null
+          place_id?: string | null
+          rating?: number | null
+          reviews?: Json | null
           title?: string
+          types?: string[] | null
           uid?: string
+          website?: string | null
         }
         Relationships: [
           {
@@ -133,6 +176,13 @@ export type Database = {
             columns: ["map_id"]
             isOneToOne: false
             referencedRelation: "map"
+            referencedColumns: ["uid"]
+          },
+          {
+            foreignKeyName: "marker_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "shared_map_view"
             referencedColumns: ["uid"]
           },
         ]
@@ -162,6 +212,13 @@ export type Database = {
             referencedColumns: ["uid"]
           },
           {
+            foreignKeyName: "shared_map_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "shared_map_view"
+            referencedColumns: ["uid"]
+          },
+          {
             foreignKeyName: "shared_map_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -172,7 +229,49 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      shared_map_view: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          image: string | null
+          map_id: string | null
+          permission: Database["public"]["Enums"]["permission_level"] | null
+          title: string | null
+          uid: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_map_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "map"
+            referencedColumns: ["uid"]
+          },
+          {
+            foreignKeyName: "shared_map_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "shared_map_view"
+            referencedColumns: ["uid"]
+          },
+          {
+            foreignKeyName: "shared_map_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never

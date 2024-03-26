@@ -1,6 +1,5 @@
 import MapCard from "@/components/map_card";
 import MapModal from "@/components/modals/create_edit_map_modal";
-import { Map } from "@/lib/types";
 import getSupabaseServerClient from "@/server/supabaseServer";
 import {
   json,
@@ -9,7 +8,6 @@ import {
   type MetaFunction,
 } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
-import { Tables } from "database.types";
 
 export const meta: MetaFunction = () => {
   return [
@@ -35,7 +33,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       return redirect("/auth");
     }
 
-    const maps = await client.from("map").select().eq("created_by", user.id).returns<Map[]>();
+    const maps = await client.from("shared_map_view").select().eq("user_id", user?.id);
 
     return json({maps: maps.data});
   } catch (e) {

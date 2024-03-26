@@ -1,57 +1,33 @@
-// "use client";
-// import { Tables } from "database.types";
-// import { PlusIcon } from "lucide-react";
-// import Map from "../map";
-
-// interface MainLayoutProps {
-//   markers: Tables<"marker">[];
-//   collections: Tables<"collection">[];
-// }
-
-// const MapView = ({collections, markers}: MainLayoutProps) => {
-
-
-//   return (
-//     <>
-//       <Map  />
-
-//       <MainDrawer>
-//         {activeLocation === null && (
-//           <>
-//             <Main />
-//             <EditCollectionDialog
-//               Trigger={
-//                 <>
-//                   <PlusIcon />
-//                 </>
-//               }
-//             />
-//           </>
-//         )}
-
-//         {activeLocation !== null && !addCollectionOpen && <ActiveLocation />}
-
-//         {addCollectionOpen && <AddToCollection />}
-//       </MainDrawer>
-//     </>
-//   );
-// };
-
-// export default MapView;
-
-
 import React from 'react'
 import { Collection, Marker } from '@/lib/types';
+import Map from '../map';
+import { MapProvider } from '../providers/map_provider';
+import Main from './main';
+import MainDrawer from '../main_drawer';
 
 
 interface MainLayoutProps {
-    markers: Marker[];
-    collections: Collection[];
+    markers: Marker[] | null;
+    collections: Collection[] | null;
+    env: {
+        GOOGLE_MAPS_API_KEY: string;
+        GOOGLE_MAPS_MAPID: string;
+    }
 }
 
-const MapView = ({collections, markers}: MainLayoutProps) => {
+const MapView = ({collections, markers, env}: MainLayoutProps) => {
   return (
-    <div>MapView</div>
+    <main>
+      <MapProvider initialCollections={collections} initialMarkers={markers} env={env}>
+
+      <Map />
+      
+      <MainDrawer>
+        <Main />
+
+      </MainDrawer>
+      </MapProvider>
+    </main>
   )
 }
 

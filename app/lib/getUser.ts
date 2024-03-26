@@ -1,4 +1,4 @@
-import useSupabase, { getSupabaseBrowserClient } from "@/server/supabaseClient";
+import useSupabase from "@/server/supabaseClient";
 import getSupabaseServerClient from "@/server/supabaseServer";
 
 export const useUser = () => {

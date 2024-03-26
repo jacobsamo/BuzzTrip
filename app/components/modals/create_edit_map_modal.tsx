@@ -1,41 +1,41 @@
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-    Drawer,
-    DrawerClose,
-    DrawerContent,
-    DrawerDescription,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 // import getSupabaseServerClient from "@/server/supabaseServer";
+import { Map } from "@/lib/types";
 import { Form } from "@remix-run/react";
 import { Plus } from "lucide-react";
 import * as React from "react";
 import { Select } from "../ui/select";
 import { Textarea } from "../ui/textarea";
-import { Map } from "@/lib/types";
 
 export interface MapModalProps {
-  mode: "create" | "edit";
-  map?: Map;
+  mode?: "create" | "edit";
+  map?: Map | null;
 }
 
-export default function MapModal({mode = "create", map}: MapModalProps) {
+export default function MapModal({mode = "create", map = null}: MapModalProps) {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 

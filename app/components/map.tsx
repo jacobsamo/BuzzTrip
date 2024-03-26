@@ -10,10 +10,13 @@ import {
   PlaceAutocompleteInput
 } from "./search";
 import { IconProps } from "@/components/ui/icon";
+import { useMapContext } from "./providers/map_provider";
+import MarkerPin from "./MarkerPin";
+
 
 
 const Map = () => {
-
+  const {activeLocation, markers, env} = useMapContext();
 
   const mapOptions = {
     center: {
@@ -25,7 +28,7 @@ const Map = () => {
 
   return (
     <APIProvider
-      apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY! as string}
+      apiKey={env.GOOGLE_MAPS_API_KEY! as string}
       region="au"
       language="en"
       libraries={["places", "marker"]}
@@ -35,12 +38,12 @@ const Map = () => {
         <GoogleMap
           defaultCenter={mapOptions.center}
           defaultZoom={mapOptions.zoom}
-          mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID!}
+          mapId={env.GOOGLE_MAPS_MAPID!}
           disableDefaultUI={true}
           onDblclick={(e) => console.log("Double click map event: ", e)}
           onClick={(e) => console.log("Click map event: ", e)}
         >
-          {/* {activeLocation && (
+          {activeLocation && (
             <AdvancedMarker
               key={activeLocation.title}
               position={activeLocation.latlng}
@@ -49,8 +52,7 @@ const Map = () => {
             </AdvancedMarker>
           )}
 
-          {markers.length > 0 &&
-            markers &&
+          {markers &&
             markers.map((marker) => (
               <AdvancedMarker
                 key={marker.uid}
@@ -58,12 +60,12 @@ const Map = () => {
                 onClick={(e) => console.log("Marker clicked: ", e)}
               >
                 <MarkerPin
-                  backgroundColor={marker.color}
-                  name={marker.icon as IconProps["name"]}
+                  // backgroundColor={marker.color}
+                  name="MdOutlineLocationOn"
                   size={16}
                 />
               </AdvancedMarker>
-            ))} */}
+            ))}
         </GoogleMap>
       </div>
     </APIProvider>
