@@ -1,19 +1,23 @@
 import { Edit } from "lucide-react";
-import { useState } from "react";
 import MarkerCard from "../marker_card";
+import CollectionModal from "../modals/create_edit_collection_modal";
 import { useMapContext } from "../providers/map_provider";
 import { Button } from "../ui/button";
-import Icon from "../ui/icon";
+import Icon, { IconProps } from "../ui/icon";
 import ActiveLocation from "./active_location";
-
-// const MarkerCard = dynamic(() => import("../Markers/MarkerCard"));
+import AddToCollection from "./add_to_collection";
 
 const Main = () => {
-  const {markers, setMarkers, collections, setCollections, activeLocation, setActiveLocation} = useMapContext();
+  const {markers, setMarkers, collections, setCollections, activeLocation, setActiveLocation, map, addToCollectionOpen} = useMapContext();
 
   return (
-    <div>
-        {activeLocation !== null  && <ActiveLocation />}
+    <div className="h-full">
+        {activeLocation !== null && !addToCollectionOpen  && <ActiveLocation />}
+
+        {addToCollectionOpen && <AddToCollection />}
+
+        
+        {!addToCollectionOpen && <CollectionModal map_id={map.uid} /> }
     {activeLocation === null && (
         <>
         {collections ? (
@@ -21,7 +25,7 @@ const Main = () => {
               {collections.map((collection) => (
                 <div key={collection.uid}>
                   <div className="flex h-fit flex-row items-center gap-2">
-                    <Icon name={"MdOutlineFolder"} size={24} color="#000" />
+                    <Icon name={collection.icon as IconProps["name"]} size={24} color="#000" />
                     <h1>{collection.title}</h1>
                     <Button
                       aria-label="edit collection"

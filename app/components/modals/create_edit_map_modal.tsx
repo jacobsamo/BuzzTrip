@@ -44,12 +44,12 @@ export default function MapModal({mode = "create", map = null}: MapModalProps) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button variant="outline">
-            <Plus /> Create Map
+            <Plus /> {mode == "create" ? "Create" : "Edit"} Map
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Create Map</DialogTitle>
+            <DialogTitle>{mode == "create" ? "Create" : "Edit"} Map</DialogTitle>
             <DialogDescription>Start your travel plans here</DialogDescription>
           </DialogHeader>
           <MapForm mode={mode} map={map}/>
@@ -62,12 +62,12 @@ export default function MapModal({mode = "create", map = null}: MapModalProps) {
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button variant="outline">
-          <Plus /> Create Map
+          <Plus /> {mode == "create" ? "Create" : "Edit"} Map
         </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle>Create Map</DrawerTitle>
+          <DrawerTitle>{mode == "create" ? "Create" : "Edit"} Map</DrawerTitle>
           <DrawerDescription>Start your travel plans here</DrawerDescription>
         </DrawerHeader>
         <MapForm mode={mode} map={map}/>

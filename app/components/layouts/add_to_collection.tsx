@@ -1,13 +1,15 @@
-import { PlusIcon } from "lucide-react";
-// import EditCollectionDialog from "../Collections/EditCollection";
-
-
+import { cn } from "@/lib/utils";
+import { useState } from "react";
+import CollectionModal from "../modals/create_edit_collection_modal";
 import { useMapContext } from "../providers/map_provider";
+import { Button } from "../ui/button";
 import { DrawerHeader } from "../ui/drawer";
+import Icon, { IconProps } from "../ui/icon";
 
 const AddToCollection = () => {
-  const {markers, setMarkers, collections, setCollections, activeLocation, setActiveLocation} = useMapContext();
-
+  const {markers, setMarkers, collections, setCollections, activeLocation, setActiveLocation, map} = useMapContext();
+  const [selected, setSelected] = useState<string>('');
+  
 
   const collectionsMarkerCount = collections ? collections.map((collection) => {
     return {
@@ -19,6 +21,37 @@ const AddToCollection = () => {
   }) : 0;
 
   if (activeLocation === null) return null;
+
+
+    // Function to handle icon selection
+    const handleCollectionSelected = (icon: string) => {
+      setSelected(icon);
+    };
+  
+    // Function to handle form submission
+    const handleSubmit = (event) => {
+      const marker = {
+        ...activeLocation,
+        collection_id: selected,
+      }
+      
+  
+      
+
+      console.log('Values: ', marker);
+      // Perform your form submission
+      // Example: You can use fetch to submit the form data
+      fetch(
+        '/api/marker/create',
+        {
+          method: 'POST',
+          body: JSON.stringify(marker),
+        }
+      )
+  
+      // Update collections state
+      setMarkers((prev) => [...(prev || []), marker]);
+    };
 
   // const onSubmit = async (data: { selected: string }) => {
   //   if (!data.selected) {
@@ -53,7 +86,7 @@ const AddToCollection = () => {
   // };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="relative flex flex-col gap-2 h-full">
       <DrawerHeader className="flex flex-row  gap-1">
         {activeLocation.photos !== undefined && (
           <img
@@ -72,30 +105,24 @@ const AddToCollection = () => {
 
       <span className="flex w-full flex-row justify-between">
         <h2 className="font-bold">Collections</h2>
-        {/* <EditCollectionDialog
-          Trigger={
-            <>
-              <PlusIcon /> New Collection
-            </>
-          }
-        /> */}
+        <CollectionModal map_id={map!.uid}  />
       </span>
 
-      {/* <form
-        onSubmit={handleSubmit(onSubmit)}
+      <form
+        onSubmit={handleSubmit}
         className="my-4 flex flex-col items-start"
       >
-        {collections.map((collection, index) => {
-          const selected = watch("selected") == collection.uid;
+        {collections && collections.map((collection, index) => {
+          const selectedCollection = collection.uid === selected;
 
           return (
             <Button
-              onClick={() => setValue("selected", collection.uid)}
+              onClick={() => handleCollectionSelected(collection.uid)}
               key={index}
               className={cn(
                 "group h-fit w-full flex-row items-start justify-start gap-2",
                 {
-                  "scale-105 border border-gray-500 shadow-lg": selected,
+                  "scale-105 border border-gray-500 shadow-lg": selectedCollection,
                 }
               )}
               type="button"
@@ -106,11 +133,11 @@ const AddToCollection = () => {
                 <h2>{collection.title}</h2>
                 <p>
                   Markers:
-                  {
+                  {/* {
                     collectionsMarkerCount.find(
                       (col) => collection.uid == col.uid
                     )?.markerCount
-                  }
+                  } */}
                 </p>
               </div>
             </Button>
@@ -119,12 +146,12 @@ const AddToCollection = () => {
 
         <Button
           aria-label="Add to list"
-          className="absolute bottom-2 mx-auto w-1/2"
+          className="mt-2"
           type="submit"
         >
           Done
         </Button>
-      </form> */}
+      </form>
     </div>
   );
 };

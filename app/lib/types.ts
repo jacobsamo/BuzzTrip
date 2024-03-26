@@ -8,4 +8,6 @@ export type Collection = Tables<"collection">;
 
 export type Marker = Tables<"marker">;
 
+export type SharedMap = Tables<"map"> & Tables<"shared_map">;
+
 export type Location = z.infer<typeof locationSchema>;

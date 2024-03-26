@@ -1,5 +1,5 @@
-import { Location, Marker, Map, Collection } from '@/lib/types';
-import React, { createContext, useState, useContext } from 'react';
+import { Collection, Location, Map, Marker } from '@/lib/types';
+import React, { createContext, useContext, useState } from 'react';
 
 export type MapEnv = {
     GOOGLE_MAPS_API_KEY: string;
@@ -16,6 +16,8 @@ export type MapContextValue = {
     setCollections: React.Dispatch<React.SetStateAction<Collection[] | null>>;
     activeLocation: Location | null;
     setActiveLocation: React.Dispatch<React.SetStateAction<Location | null>>;
+    addToCollectionOpen: boolean;
+    setAddToCollectionOpen: React.Dispatch<React.SetStateAction<boolean>>;
     env: MapEnv
 };
 
@@ -34,8 +36,8 @@ export const useMapContext = (): MapContextValue => {
 
 export interface MapProviderProps { 
     children: React.ReactNode,
+    initialMap: Map,
     initialMarkers?: Marker[] | null,
-    initialMap?: Map | null,
     initialCollections?: Collection[] | null,
     initialActiveLocation?: Location | null,
     env: MapEnv
@@ -43,12 +45,13 @@ export interface MapProviderProps {
 
 
 // Context provider component
-export const MapProvider = ({ children, env, initialMarkers = null, initialMap = null, initialCollections = null, initialActiveLocation = null }: MapProviderProps) => {
+export const MapProvider = ({ children, env, initialMarkers = null, initialMap, initialCollections = null, initialActiveLocation = null }: MapProviderProps) => {
     // State variables
     const [markers, setMarkers] = useState<Marker[] | null>(initialMarkers);
     const [map, setMap] = useState<Map | null>(initialMap);
     const [collections, setCollections] = useState<Collection[] | null>(initialCollections);
     const [activeLocation, setActiveLocation] = useState<Location | null>(initialActiveLocation);
+    const [addToCollectionOpen, setAddToCollectionOpen] = useState<boolean>(false);
 
     // Context value
     const contextValue: MapContextValue = {
@@ -60,6 +63,8 @@ export const MapProvider = ({ children, env, initialMarkers = null, initialMap =
         setCollections,
         activeLocation,
         setActiveLocation,
+        addToCollectionOpen,
+        setAddToCollectionOpen,
         env
     };
 

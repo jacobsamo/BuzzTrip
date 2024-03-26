@@ -13,10 +13,8 @@ export const locationSchema = z.object({
     title: z.string(),
     description: z.string().nullable(),
     address: z.string().nullable(),
-    latlng: z.object({
-        lat: z.number(),
-        lng: z.number(),
-    }),
+    lat: z.number(),
+    lng: z.number(),
     icon: z.string().nullable(),
     photos: z.string().array().nullable(),
     reviews: reviewSchema.array().nullable(),
@@ -26,4 +24,13 @@ export const locationSchema = z.object({
     website: z.string().nullable(),
     phone: z.string().nullable(),
     opening_times: z.string().array().nullable(),
+});
+
+
+export const collectionSchema = z.object({
+    color: z.string().nullable(),
+    description: z.string().nullable(),
+    icon: z.string().nullable(),
+    map_id: z.string(),
+    title: z.string(),
 });

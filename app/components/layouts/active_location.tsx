@@ -1,12 +1,8 @@
-"use client";
-// import dynamic from "next/dynamic";
 import { useState } from "react";
-// import AddToCollectionButton from "../Collections/open_add_to_collection";
 import { useMapContext } from "../providers/map_provider";
 import Icon from "../ui/icon";
 import { Plus } from "lucide-react";
-
-// const MarkerCard = dynamic(() => import("../Markers/MarkerCard"));
+import AddToCollectionButton from "../open_add_to_collection";
 
 const ActiveLocation = () => {
   const {markers, setMarkers, collections, setCollections, activeLocation, setActiveLocation} = useMapContext();
@@ -23,13 +19,12 @@ const ActiveLocation = () => {
             <h1 className="text-2xl text-gray-900">{activeLocation.title}</h1>
           </span>
           <span>
-            {/* <AddToCollectionButton /> */}
-            <Plus />
+            <AddToCollectionButton />
           </span>
         </div>
         <p className="text-base text-gray-900">{activeLocation.address}</p>
         <p className="text-base text-gray-900">
-          {activeLocation.latlng.lat}, {activeLocation.latlng.lng}
+          {activeLocation.lat}, {activeLocation.lng}
         </p>
         <div className="flex max-h-40 flex-row gap-2 overflow-x-scroll">
           {activeLocation.photos?.slice(0, 5).map((photo) => (

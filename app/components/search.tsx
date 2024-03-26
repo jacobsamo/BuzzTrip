@@ -40,10 +40,8 @@ export const PlaceAutocompleteInput = () => {
 
       const location: Location = {
         id: place.place_id ?? '',
-        latlng: {
-            lat: place.geometry.location.lat(),
-            lng: place.geometry.location.lng()
-        },
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng(),
         icon: "MdOutlineLocationOn",
         title: place.name
           ? place.name
@@ -68,7 +66,6 @@ export const PlaceAutocompleteInput = () => {
         opening_times: place.opening_hours?.weekday_text ?? null,
       };
 
-    
 
       if (place.geometry.viewport) {
         bounds.union(place.geometry.viewport);

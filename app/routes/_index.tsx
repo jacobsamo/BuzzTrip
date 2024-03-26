@@ -1,5 +1,6 @@
 import MapCard from "@/components/map_card";
 import MapModal from "@/components/modals/create_edit_map_modal";
+import { SharedMap } from "@/lib/types";
 import getSupabaseServerClient from "@/server/supabaseServer";
 import {
   json,
@@ -35,7 +36,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
     const maps = await client.from("shared_map_view").select().eq("user_id", user?.id);
 
-    return json({maps: maps.data});
+    return json({maps: maps.data as SharedMap[] | null});
   } catch (e) {
     return json({maps: null});
   }

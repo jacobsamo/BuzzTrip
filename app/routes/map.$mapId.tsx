@@ -34,12 +34,10 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   
     const { data: collections } = await supabaseClient.from('collection').select('*').eq('map_id', params.mapId).returns<Collection[]>()
     const { data: markers } = await supabaseClient.from('marker').select('*').eq('map_id', params.mapId).returns<Marker[]>()
-    console.log('Collections, markers: ', {
-      collections,
-      markers
-    });
+    const {data: map} = await supabaseClient.from("map").select().eq("uid", params.mapId).single();
+
     return json(
-      { collections, markers, env },
+      { collections, markers, env, map },
       {
         headers: response.headers,
       }
@@ -47,10 +45,10 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   }
 
 export default function Map() {
-    const {collections, markers, env} = useLoaderData<typeof loader>();
+    const {collections, markers, env, map} = useLoaderData<typeof loader>();
 
   return <GlobalProvider>
 
-      <MapView collections={collections} markers={markers} env={env} />
+      <MapView collections={collections} markers={markers} env={env} map={map!}/>
   </GlobalProvider> 
 }
