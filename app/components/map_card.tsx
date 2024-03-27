@@ -20,13 +20,12 @@ interface MapCardProps {
 
 const MapCard = ({ map }: MapCardProps) => {
   return (
-    <>
       <Link
         to={`/map/${map.uid}`}
         className="relative flex h-32 w-full flex-row rounded-lg border bg-card bg-zinc-600 text-card-foreground"
       >
         <img
-          src={map.image ?? "/images/banner.jpg"}
+          src={map.image ?? ""}
           alt={map.title}
           width={100}
           height={112}
@@ -60,7 +59,6 @@ const MapCard = ({ map }: MapCardProps) => {
           </DropdownMenuContent>
         </DropdownMenu>
       </Link>
-    </>
   );
 };
 

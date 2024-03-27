@@ -1,10 +1,9 @@
 import getSupabaseServerClient from "@/server/supabaseServer";
 import { TablesInsert } from "database.types";
 import { getUser } from "../getUser";
-import { Collection } from "../types";
 
 
-export async function createCollection(collection: Collection, request: Request) {
+export async function createCollection(collection: TablesInsert<"collection">, request: Request) {
     const supabase = getSupabaseServerClient(request);
     const user = await getUser(request);
 

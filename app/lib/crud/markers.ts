@@ -1,10 +1,9 @@
 import getSupabaseServerClient from "@/server/supabaseServer";
 import { TablesInsert } from "database.types";
 import { getUser } from "../getUser";
-import { Marker } from "../types";
 
 
-export async function createMarker(marker: Marker, request: Request) {
+export async function createMarker(marker: TablesInsert<"marker">, request: Request) {
     const supabase = getSupabaseServerClient(request);
     const user = await getUser(request);
 

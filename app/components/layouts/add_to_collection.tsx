@@ -5,9 +5,14 @@ import { useMapContext } from "../providers/map_provider";
 import { Button } from "../ui/button";
 import { DrawerHeader } from "../ui/drawer";
 import Icon, { IconProps } from "../ui/icon";
+import { Tables, TablesInsert } from "database.types";
+import { useUser } from "@/lib/getUser";
+import { toast } from "sonner";
+import { Marker } from "@/lib/types";
+import clsx from "clsx";
 
 const AddToCollection = () => {
-  const {markers, setMarkers, collections, setCollections, activeLocation, setActiveLocation, map} = useMapContext();
+  const {markers, setMarkers, collections, setCollections, activeLocation, setActiveLocation, map, setAddToCollectionOpen} = useMapContext();
   const [selected, setSelected] = useState<string>('');
   
 
@@ -30,27 +35,44 @@ const AddToCollection = () => {
   
     // Function to handle form submission
     const handleSubmit = (event) => {
+      event.preventDefault();
       const marker = {
         ...activeLocation,
         collection_id: selected,
+        map_id: map!.uid,
+        color: "#ef233c",
       }
-      
-  
-      
 
-      console.log('Values: ', marker);
       // Perform your form submission
       // Example: You can use fetch to submit the form data
-      fetch(
+      const createMarker = fetch(
         '/api/marker/create',
         {
           method: 'POST',
           body: JSON.stringify(marker),
         }
       )
-  
+
+      toast.promise(createMarker, {
+        loading: 'Adding to list...',
+        success: (res) => {
+
+          console.log("res:", res)
+          res.json().then((data: Marker) => {
+            console.log("data:", data)
+            setMarkers((prev) => [...(prev || []), data]);
+            return data
+          });
+
+          return 'Added to list';
+        },
+        error: (err) => {
+          console.error(err);
+          return 'Something went wrong';
+        },
+      });
+      setAddToCollectionOpen(false);
       // Update collections state
-      setMarkers((prev) => [...(prev || []), marker]);
     };
 
   // const onSubmit = async (data: { selected: string }) => {
@@ -133,11 +155,11 @@ const AddToCollection = () => {
                 <h2>{collection.title}</h2>
                 <p>
                   Markers:
-                  {/* {
-                    collectionsMarkerCount.find(
+                  {
+                    typeof collectionsMarkerCount == "object" && collectionsMarkerCount.find(
                       (col) => collection.uid == col.uid
                     )?.markerCount
-                  } */}
+                  }
                 </p>
               </div>
             </Button>

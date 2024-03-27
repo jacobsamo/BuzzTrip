@@ -9,7 +9,7 @@ export const reviewSchema = z.object({
 });
 
 export const locationSchema = z.object({
-    id: z.union([z.string(), z.number()]),
+    place_id: z.string(),
     title: z.string(),
     description: z.string().nullable(),
     address: z.string().nullable(),
@@ -27,6 +27,16 @@ export const locationSchema = z.object({
 });
 
 
+export const markerSchema = locationSchema.extend({
+    map_id: z.string(),
+    collection_id: z.string(),
+    color: z.string().nullable(),
+    icon: z.string().nullable(),
+    created_by: z.string(),
+})
+
+
+
 export const collectionSchema = z.object({
     color: z.string().nullable(),
     description: z.string().nullable(),
@@ -34,3 +44,5 @@ export const collectionSchema = z.object({
     map_id: z.string(),
     title: z.string(),
 });
+
+

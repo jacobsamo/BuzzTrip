@@ -38,7 +38,7 @@ const Main = () => {
                     </Button>
                   </div>
                   <ul className="ml-4">
-                    {markers && markers.map((marker) => (
+                    {markers!.map((marker) => (
                       <>
                         {marker.uid === collection.uid && (
                           <li key={marker.uid}>

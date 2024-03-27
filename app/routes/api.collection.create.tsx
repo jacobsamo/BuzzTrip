@@ -10,13 +10,13 @@ export const action = async ({
   }: ActionFunctionArgs) => {
     try {
       const formData = await request.formData();
-    const values = Object.fromEntries(formData);
+      const values = Object.fromEntries(formData);
 
-    const collection = collectionSchema.parse(values);
+      const collection = collectionSchema.parse(values);
     
-    await createCollection(collection, request);
+      await createCollection(collection, request);
     
-    return redirect(`/map/"${collection.map_id}`);
+      return redirect(`/map/"${collection.map_id}`);
 
     } catch (error) {
       console.error("Error on /recipes/[id]/edit", error);

@@ -10,7 +10,7 @@ const AddToCollectionButton = () => {
 
   const openView = () => {
     setAddToCollectionOpen(true);
-    setSnap(70);
+    setSnap(0.75);
     return;
   };
 

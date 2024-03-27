@@ -19,6 +19,7 @@ import {
 } from "@supabase/auth-helpers-remix";
 import { Database } from "database.types";
 import { useEffect, useState } from "react";
+import { Toaster } from "sonner";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
@@ -97,6 +98,7 @@ export default function Layout() {
       <body>
         <Outlet context={{ supabase }} />
         <ScrollRestoration />
+        <Toaster position="top-center" richColors={true}  />
         <Scripts />
       </body>
     </html>

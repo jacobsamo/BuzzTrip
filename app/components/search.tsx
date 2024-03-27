@@ -39,7 +39,7 @@ export const PlaceAutocompleteInput = () => {
       }
 
       const location: Location = {
-        id: place.place_id ?? '',
+        place_id: place.place_id ?? '',
         lat: place.geometry.location.lat(),
         lng: place.geometry.location.lng(),
         icon: "MdOutlineLocationOn",
