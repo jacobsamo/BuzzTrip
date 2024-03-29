@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { useGlobalContext } from "./providers/global_provider";
 import { useMapContext } from "./providers/map_provider";
 

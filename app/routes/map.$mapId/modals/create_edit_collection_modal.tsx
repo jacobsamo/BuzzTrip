@@ -23,11 +23,11 @@ import { Label } from "@/components/ui/label";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Collection } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { Form } from "@remix-run/react";
+import { Form, useSubmit } from "@remix-run/react";
 import { Plus } from "lucide-react";
 import * as React from "react";
-import Icon, { IconProps } from "../ui/icon";
-import { Textarea } from "../ui/textarea";
+import Icon, { IconProps } from "@/components/ui/icon";
+import { Textarea } from "@/components/ui/textarea";
 
 
 interface CollectionModalProps {
@@ -92,10 +92,12 @@ export default function CollectionModal({mode = "create", collection = null, tri
 }
 
 import { useState } from 'react'; // Import useState hook
-import { useMapContext } from "../providers/map_provider";
+import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
+import { INTENTS } from "@/routes/map.$mapId/intents";
 
 function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
     const {collections, setCollections} = useMapContext()
+    const submit = useSubmit();
 
   // State to store selected icon
   const [selectedIcon, setSelectedIcon] = useState<string>('MdOutlineFolder');
@@ -117,28 +119,27 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
     formData.append('color', '#000000');
     formData.append('map_id', map_id);
 
-    const values = Object.fromEntries(formData.entries()) as Collection;
 
     // Perform your form submission
     // Example: You can use fetch to submit the form data
-    fetch(
-      mode === 'create' ? '/api/collection/create' : `/api/collection/edit?id=${collection?.uid}`,
-      {
-        method: 'POST',
-        body: formData,
-      }
-    )
+    submit(formData, {
+      method: "post",
+      fetcherKey: `collection`,
+      navigate: false,
+      unstable_flushSync: true,
+    });
+  
 
     // Update collections state
-    setCollections((prev) => [...(prev || []), values]);
+    // setCollections((prev) => [...(prev || []), values]);
   };
 
   return (
     <>
       <Form
+        method="post"
         className={cn('grid items-start gap-4')}
         onSubmit={handleSubmit} // Listen to form submission event
-        navigate={false}
       >
         <Label htmlFor="title">Title</Label>
         <Input placeholder="Title" name="title" />
@@ -164,8 +165,9 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
         <Textarea placeholder="Description" name="description" />
         
         <DialogClose asChild>
-            <DrawerClose>
-                <Button aria-label="Create collection" type="submit">
+            <DrawerClose asChild>
+                <Button aria-label="Create collection" type="submit"     name="intent" 
+                value={INTENTS.createCollection}>
                 Submit
                 </Button>
             </DrawerClose>

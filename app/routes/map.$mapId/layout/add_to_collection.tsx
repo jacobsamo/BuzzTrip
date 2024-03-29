@@ -1,20 +1,22 @@
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import CollectionModal from "../modals/create_edit_collection_modal";
-import { useMapContext } from "../providers/map_provider";
-import { Button } from "../ui/button";
-import { DrawerHeader } from "../ui/drawer";
-import Icon, { IconProps } from "../ui/icon";
+import CollectionModal from "@/routes/map.$mapId/modals/create_edit_collection_modal";
+import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
+import { Button } from "@/components/ui/button";
+import { DrawerHeader } from "@/components/ui/drawer";
+import Icon, { IconProps } from "@/components/ui/icon";
 import { Tables, TablesInsert } from "database.types";
 import { useUser } from "@/lib/getUser";
 import { toast } from "sonner";
 import { Marker } from "@/lib/types";
 import clsx from "clsx";
+import { INTENTS } from "@/routes/map.$mapId/intents";
+import { Form, useSubmit } from "@remix-run/react";
 
 const AddToCollection = () => {
   const {markers, setMarkers, collections, setCollections, activeLocation, setActiveLocation, map, setAddToCollectionOpen} = useMapContext();
   const [selected, setSelected] = useState<string>('');
-  
+  const submit = useSubmit();
 
   const collectionsMarkerCount = collections ? collections.map((collection) => {
     return {
@@ -41,71 +43,39 @@ const AddToCollection = () => {
         collection_id: selected,
         map_id: map!.uid,
         color: "#ef233c",
+        intent: INTENTS.createMarker,
       }
 
-      // Perform your form submission
-      // Example: You can use fetch to submit the form data
-      const createMarker = fetch(
-        '/api/marker/create',
-        {
-          method: 'POST',
-          body: JSON.stringify(marker),
-        }
-      )
-
-      toast.promise(createMarker, {
-        loading: 'Adding to list...',
-        success: (res) => {
-
-          console.log("res:", res)
-          res.json().then((data: Marker) => {
-            console.log("data:", data)
-            setMarkers((prev) => [...(prev || []), data]);
-            return data
-          });
-
-          return 'Added to list';
-        },
-        error: (err) => {
-          console.error(err);
-          return 'Something went wrong';
-        },
+      submit(JSON.stringify(marker), {
+        method: "post",
+        fetcherKey: `marker`,
+        navigate: false,
+        unstable_flushSync: true,
+ 
       });
+
+      // toast.promise(createMarker, {
+      //   loading: 'Adding to list...',
+      //   success: (res) => {
+
+      //     console.log("res:", res)
+      //     res.json().then((data: Marker) => {
+      //       console.log("data:", data)
+      //       setMarkers((prev) => [...(prev || []), data]);
+      //       return data
+      //     });
+
+      //     return 'Added to list';
+      //   },
+      //   error: (err) => {
+      //     console.error(err);
+      //     return 'Something went wrong';
+      //   },
+      // });
       setAddToCollectionOpen(false);
-      // Update collections state
+      setActiveLocation(null);
     };
 
-  // const onSubmit = async (data: { selected: string }) => {
-  //   if (!data.selected) {
-  //     setActiveLocation(null);
-  //     return;
-  //   }
-
-  //   const newMarker = {
-  //     title: activeLocation.title,
-  //     description: activeLocation.description,
-  //     icon: activeLocation.icon,
-  //     lat: activeLocation.latlng.lat,
-  //     lng: activeLocation.latlng.lng,
-  //     uid: data.selected,
-  //   };
-
-  //   const req = await fetch("/api/markers/create", {
-  //     method: "POST",
-  //     body: JSON.stringify(newMarker as Partial<Marker>),
-  //   });
-
-  //   if (req.status == 200) {
-  //     const res = await req.json();
-
-  //     setMarker([...markers, res.activeLocation]);
-  //     setActiveLocation(null);
-  //     setSearchString("");
-  //     toast.success("Added to list");
-  //   } else {
-  //     toast.error("Something went wrong");
-  //   }
-  // };
 
   return (
     <div className="relative flex flex-col gap-2 h-full">
@@ -130,9 +100,10 @@ const AddToCollection = () => {
         <CollectionModal map_id={map!.uid}  />
       </span>
 
-      <form
-        onSubmit={handleSubmit}
+      <Form
+        method="POST"
         className="my-4 flex flex-col items-start"
+        onSubmit={handleSubmit}
       >
         {collections && collections.map((collection, index) => {
           const selectedCollection = collection.uid === selected;
@@ -141,6 +112,8 @@ const AddToCollection = () => {
             <Button
               onClick={() => handleCollectionSelected(collection.uid)}
               key={index}
+              // name="collection_id"
+              // value={collection.uid}
               className={cn(
                 "group h-fit w-full flex-row items-start justify-start gap-2",
                 {
@@ -170,10 +143,12 @@ const AddToCollection = () => {
           aria-label="Add to list"
           className="mt-2"
           type="submit"
+          // name="intent" 
+          // value={INTENTS.createMarker}
         >
           Done
         </Button>
-      </form>
+      </Form>
     </div>
   );
 };

@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useMapContext } from "../providers/map_provider";
-import Icon from "../ui/icon";
+import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
+import Icon from "@/components/ui/icon";
 import { Plus } from "lucide-react";
-import AddToCollectionButton from "../open_add_to_collection";
+import AddToCollectionButton from "@/routes/map.$mapId/open_add_to_collection";
 
 const ActiveLocation = () => {
   const {markers, setMarkers, collections, setCollections, activeLocation, setActiveLocation} = useMapContext();

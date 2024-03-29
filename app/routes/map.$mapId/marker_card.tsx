@@ -1,7 +1,7 @@
 import { Marker } from "@/lib/types";
 import { Edit } from "lucide-react";
-import { IconProps } from "./ui/Icon";
-import { Button } from "./ui/button";
+import { IconProps } from "@/components/ui/Icon";
+import { Button } from "@/components/ui/button";
 // import EditMarker from "./EditMarker";
 import MarkerPin from "./MarkerPin";
 

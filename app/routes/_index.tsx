@@ -1,5 +1,5 @@
-import MapCard from "@/components/map_card";
-import MapModal from "@/components/modals/create_edit_map_modal";
+import MapCard from "@/routes/home/map_card";
+import MapModal from "@/routes/home/modals/create_edit_map_modal";
 import { SharedMap } from "@/lib/types";
 import getSupabaseServerClient from "@/server/supabaseServer";
 import {
@@ -21,54 +21,30 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  try {
-    const client = getSupabaseServerClient(request);
+  const client = getSupabaseServerClient(request);
 
-    const {
-      data: { user },
-    } = await client.auth.getUser();
+  const {
+    data: { user },
+  } = await client.auth.getUser();
 
-    console.log('uSER: ', user?.email);
-
-    if (!user) {
-      return redirect("/auth");
-    }
-
-    const maps = await client.from("shared_map_view").select().eq("user_id", user?.id);
-
-    return json({maps: maps.data as SharedMap[] | null});
-  } catch (e) {
-    return json({maps: null});
+  if (user) {
+    return redirect("/home");
   }
+
+
+  return json({});
 };
 
 export default function Index() {
-  const { maps } = useLoaderData<typeof loader>();
+  return (
+    <>
+      <h1>Welcome to BuzzTrip</h1>
+      <p>Plan the trip you've always dreamed of.</p>
 
 
-  return(
-    
-    <main className="p-2">
-    <span className="mx-auto flex w-full flex-row items-center justify-between">
-      <h2 className="text-2xl font-bold">Your Maps</h2>
-      <MapModal />
-    </span>
-
-    {maps && (
-      <div className="flex flex-wrap gap-2">
-        {maps.map((map) => (
-          <MapCard key={map.uid} map={map} />
-        ))}
-      </div>
-    )}
-
-    {!maps && (
-      <>
-        <h2>Current you have no maps</h2>
-        <MapModal />
-      </>
-    )}
-  </main>
-    
-    );
+      <section>
+        <p>BuzzTrip is a quick and easy solution to planning trips with you and your crew. sign up to get started`</p>
+      </section>
+    </>
+  )
 }

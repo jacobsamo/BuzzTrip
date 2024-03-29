@@ -1,7 +1,7 @@
 import type { Collection, Marker, Map as TMap } from '@/lib/types';
-import MainDrawer from '../main_drawer';
-import Map from '../map';
-import { MapProvider } from '../providers/map_provider';
+import MainDrawer from '@/routes/map.$mapId/main_drawer';
+import Map from '@/routes/map.$mapId/map';
+import { MapProvider } from '@/routes/map.$mapId/providers/map_provider';
 import Main from './main';
 
 interface MainLayoutProps {

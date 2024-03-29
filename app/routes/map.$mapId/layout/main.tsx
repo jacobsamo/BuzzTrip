@@ -1,9 +1,9 @@
 import { Edit } from "lucide-react";
-import MarkerCard from "../marker_card";
-import CollectionModal from "../modals/create_edit_collection_modal";
-import { useMapContext } from "../providers/map_provider";
-import { Button } from "../ui/button";
-import Icon, { IconProps } from "../ui/icon";
+import MarkerCard from "@/routes/map.$mapId/marker_card";
+import CollectionModal from "@/routes/map.$mapId/modals/create_edit_collection_modal";
+import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
+import { Button } from "@/components/ui/button";
+import Icon, { IconProps } from "@/components/ui/icon";
 import ActiveLocation from "./active_location";
 import AddToCollection from "./add_to_collection";
 
