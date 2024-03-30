@@ -1,12 +1,10 @@
-import { useState } from "react";
-import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
 import Icon from "@/components/ui/icon";
-import { Plus } from "lucide-react";
 import AddToCollectionButton from "@/routes/map.$mapId/open_add_to_collection";
+import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
+import { BookmarkCheck } from "lucide-react";
 
 const ActiveLocation = () => {
-  const {markers, setMarkers, collections, setCollections, activeLocation, setActiveLocation} = useMapContext();
-  const [snap, setSnap] = useState<number | string | null>("15%");
+  const {markers, activeLocation} = useMapContext();
 
   if (activeLocation === null) return null;
 
@@ -19,7 +17,8 @@ const ActiveLocation = () => {
             <h1 className="text-2xl text-gray-900">{activeLocation.title}</h1>
           </span>
           <span>
-            <AddToCollectionButton />
+            {markers?.find(marker => marker.place_id === activeLocation.place_id) ?   <BookmarkCheck className="w-8 h-8" /> : <AddToCollectionButton />}
+          
           </span>
         </div>
         <p className="text-base text-gray-900">{activeLocation.address}</p>
@@ -27,7 +26,7 @@ const ActiveLocation = () => {
           {activeLocation.lat}, {activeLocation.lng}
         </p>
         <div className="flex max-h-40 flex-row gap-2 overflow-x-scroll">
-          {activeLocation.photos?.slice(0, 5).map((photo) => (
+          {activeLocation.photos?.map((photo) => (
             <>
               <img
                 src={photo}

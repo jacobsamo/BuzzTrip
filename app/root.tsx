@@ -98,7 +98,7 @@ export default function Layout() {
       <body>
         <Outlet context={{ supabase }} />
         <ScrollRestoration />
-        <Toaster position="top-center" richColors={true}  />
+        <Toaster position="top-center" richColors={true} />
         <Scripts />
       </body>
     </html>

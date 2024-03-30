@@ -1,22 +1,21 @@
-import { cn } from "@/lib/utils";
-import { useState } from "react";
-import CollectionModal from "@/routes/map.$mapId/modals/create_edit_collection_modal";
-import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
 import { Button } from "@/components/ui/button";
 import { DrawerHeader } from "@/components/ui/drawer";
 import Icon, { IconProps } from "@/components/ui/icon";
-import { Tables, TablesInsert } from "database.types";
-import { useUser } from "@/lib/getUser";
-import { toast } from "sonner";
-import { Marker } from "@/lib/types";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 import { INTENTS } from "@/routes/map.$mapId/intents";
-import { Form, useSubmit } from "@remix-run/react";
+import CollectionModal from "@/routes/map.$mapId/modals/create_edit_collection_modal";
+import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
+import { useFetcher, useSubmit } from "@remix-run/react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useGlobalContext } from "../providers/global_provider";
 
 const AddToCollection = () => {
-  const {markers, setMarkers, collections, setCollections, activeLocation, setActiveLocation, map, setAddToCollectionOpen} = useMapContext();
-  const [selected, setSelected] = useState<string>('');
+  const fetcher = useFetcher();
   const submit = useSubmit();
+  const {markers, setMarkers, collections, activeLocation, setActiveLocation, map, setAddToCollectionOpen} = useMapContext();
+  const {setSnap} = useGlobalContext();
+  const [selected, setSelected] = useState<string>('');
 
   const collectionsMarkerCount = collections ? collections.map((collection) => {
     return {
@@ -44,36 +43,27 @@ const AddToCollection = () => {
         map_id: map!.uid,
         color: "#ef233c",
         intent: INTENTS.createMarker,
+        reviews: JSON.stringify(activeLocation.reviews),
+        photos: JSON.stringify(activeLocation.photos),
+        types: JSON.stringify(activeLocation.types),
+        opening_times: JSON.stringify(activeLocation.opening_times),
+
       }
 
-      submit(JSON.stringify(marker), {
+      console.log("marker:", marker);
+      submit(marker, {
         method: "post",
         fetcherKey: `marker`,
         navigate: false,
         unstable_flushSync: true,
- 
+        replace: true,
       });
 
-      // toast.promise(createMarker, {
-      //   loading: 'Adding to list...',
-      //   success: (res) => {
-
-      //     console.log("res:", res)
-      //     res.json().then((data: Marker) => {
-      //       console.log("data:", data)
-      //       setMarkers((prev) => [...(prev || []), data]);
-      //       return data
-      //     });
-
-      //     return 'Added to list';
-      //   },
-      //   error: (err) => {
-      //     console.error(err);
-      //     return 'Something went wrong';
-      //   },
-      // });
       setAddToCollectionOpen(false);
       setActiveLocation(null);
+      setSnap(0.2);
+      setMarkers([...markers, marker]);
+      toast.success("Location added to collection");
     };
 
 
@@ -100,7 +90,7 @@ const AddToCollection = () => {
         <CollectionModal map_id={map!.uid}  />
       </span>
 
-      <Form
+      <fetcher.Form
         method="POST"
         className="my-4 flex flex-col items-start"
         onSubmit={handleSubmit}
@@ -148,7 +138,7 @@ const AddToCollection = () => {
         >
           Done
         </Button>
-      </Form>
+      </fetcher.Form>
     </div>
   );
 };

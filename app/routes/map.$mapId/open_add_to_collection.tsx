@@ -18,9 +18,10 @@ const AddToCollectionButton = () => {
     <Button
       aria-label="Add to collection"
       variant="ghost"
+      size={"icon"}
       onClick={() => openView()}
     >
-      <Plus />
+      <Plus className="w-8 h-8" />
     </Button>
   );
 };

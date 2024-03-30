@@ -56,12 +56,13 @@ export async function deleteMap(map_id: string, request: Request) {
     const {data: map} = await supabase.from("shared_map_view").select().eq("user_id", map_id).single()
 
 
-    if (map?.permission !== "admin" || map?.permission !== "owner") {
-        return new Error("you don't have the right permissions");
-    }
-    
-    // should cacade delete all items with a matching map_id
-    await supabase.from("map").delete().eq("uid", map_id)
+    if (map?.permission === "admin" || map?.permission === "owner") {
+        
+        // should cacade delete all items with a matching map_id
+        await supabase.from("map").delete().eq("uid", map_id)
+        
+        return {message: "deleted map successfully"}
 
-    return {message: "deleted map successfully"}
+    }
+    return new Error("you don't have the right permissions");
 }

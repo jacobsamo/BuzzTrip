@@ -1,4 +1,3 @@
-"use client";
 import { Input } from "@/components//ui/input";
 // import { activeLocationAtom, searchStringAtom } from "@/lib/atoms";
 import { Location } from "@/lib/types";
@@ -20,7 +19,7 @@ export const PlaceAutocompleteInput = () => {
     if (!places || !inputRef.current) return;
 
     const options: google.maps.places.AutocompleteOptions = {
-      fields: ["geometry", "name", "formatted_address", "geometry/location"],
+      fields: ["geometry", "name", "formatted_address", "place_id", "photos", "rating", "price_level", "types", "website", "formatted_phone_number", "opening_hours", "reviews"],
     };
 
     setPlaceAutocomplete(new places.Autocomplete(inputRef.current, options));

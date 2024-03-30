@@ -12,6 +12,7 @@ import { getUser } from "@/lib/getUser";
 import { markerSchema, collectionSchema } from "@/lib/schemas";
 import { createCollection } from "@/lib/crud/collections";
 import { createMarker } from "@/lib/crud/markers";
+import { convertFormDataToObject } from "@/lib/utils";
 
 export const meta: MetaFunction = () => {
   return [
@@ -36,7 +37,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     }
 
     if (!params.mapId) {
-      return redirect('/')
+      return redirect('/home')
     }
   
     const { data: collections } = await supabaseClient.from('collection').select('*').eq('map_id', params.mapId).returns<Collection[]>()
@@ -52,53 +53,51 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   }
 
 export const action = async ({ request, params }: LoaderFunctionArgs) => {
-    try {
-        const formData = await request.formData();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const jsonData = await request.json() as any;
+  try {
+    const formData = await request.formData();
+    const values = Object.fromEntries(formData.entries());
+    
+    const intent = values!.intent;
+    
+    console.log("intent: ", intent);
+    const user = await getUser(request);
+    
+    if (!intent) throw badRequest("Missing intent");
+    
+    if (!user) throw badRequest("Unauthorized");
+    formData.delete("intent");
+    
+    switch (intent) {
+      case INTENTS.createCollection: {
+        const collection = collectionSchema.parse(values);
+        await createCollection(collection, request);
+        break;
+      }  
+      case INTENTS.createMarker: { 
+        const parsed = convertFormDataToObject(formData);
+
+        const data = {...parsed, created_by: user.id};
+
+        const marker = markerSchema.parse(data);
         
-        const values = Object.fromEntries(formData.entries());
+        await createMarker(marker, request);
+        break;
+      }    
+      default: {
+        throw badRequest(`Unknown intent: ${intent}`);
+      }    
+    } 
+    
+    return json({ ok: true });
+  } catch (error) {
+    console.error("Error on /map/$map_id", error);
   
-
-        const intent = formData.get("intent") || jsonData.intent;
-        const user = await getUser(request);
-    
-        if (!intent) throw badRequest("Missing intent");
-
-        if (!user) throw badRequest("Unauthorized");
-
-        switch (intent) {
-            case INTENTS.createCollection: {
-                const collection = collectionSchema.parse(values);
-                await createCollection(collection, request);
-                break;
-            }  
-            case INTENTS.createMarker: {
-
-                jsonData.remove(intent)
-
-                const data = {...jsonData, created_by: user.id}
-                
-                const marker = markerSchema.parse(data);
-
-                await createMarker(marker, request);
-                break;
-            }    
-            default: {
-                throw badRequest(`Unknown intent: ${intent}`);
-            }    
-        } 
-        
-        return { ok: true };
-      } catch (error) {
-        console.error("Error on /recipes/[id]/edit", error);
-    
-        if (error instanceof z.ZodError) {
-          throw new Error(error.issues.map((issue) => issue.message).join("\n"));
-        }
-    
-        throw new Error("Unexpected issue occurred. Please try again.");
-      }
+    if (error instanceof z.ZodError) {
+      throw new Error(error.issues.map((issue) => issue.message).join("\n"));
+    }
+  
+    throw new Error(`Unexpected issue occurred. Please try again. error: ${error}`);
+  }
 }
 
 

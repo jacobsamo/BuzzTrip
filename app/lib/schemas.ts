@@ -31,7 +31,6 @@ export const markerSchema = locationSchema.extend({
     map_id: z.string(),
     collection_id: z.string(),
     color: z.string().nullable(),
-    icon: z.string().nullable(),
     created_by: z.string(),
 })
 
