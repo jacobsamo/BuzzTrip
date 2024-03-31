@@ -50,7 +50,6 @@ const AddToCollection = () => {
 
       }
 
-      console.log("marker:", marker);
       submit(marker, {
         method: "post",
         fetcherKey: `marker`,

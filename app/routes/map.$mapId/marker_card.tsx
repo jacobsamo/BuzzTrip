@@ -1,9 +1,7 @@
 import { Marker } from "@/lib/types";
-import { Edit } from "lucide-react";
-import { IconProps } from "@/components/ui/Icon";
-import { Button } from "@/components/ui/button";
 // import EditMarker from "./EditMarker";
 import MarkerPin from "./MarkerPin";
+import MarkerModal from "./modals/create_edit_marker_modal";
 
 const MarkerCard = ({ marker }: { marker: Marker }) => {
   return (
@@ -14,14 +12,10 @@ const MarkerCard = ({ marker }: { marker: Marker }) => {
       />
       <h1>{marker.title}</h1>
 
-      {/* <EditMarker
+      <MarkerModal
+        mode="edit"
         marker={marker}
-        Trigger={
-          <Button aria-label="Add to collection" variant="ghost">
-            <Edit />
-          </Button>
-        }
-      /> */}
+      />
     </div>
   );
 };

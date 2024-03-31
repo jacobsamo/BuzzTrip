@@ -59,7 +59,6 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
     
     const intent = values!.intent;
     
-    console.log("intent: ", intent);
     const user = await getUser(request);
     
     if (!intent) throw badRequest("Missing intent");

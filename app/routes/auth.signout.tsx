@@ -6,7 +6,6 @@ const SignOutPage = () => {
   const { supabase } = useOutletContext<{ supabase: SupabaseClient }>();
 
   const handleLogout = () => {
-    console.log("signing out");
     supabase.auth.signOut();
      redirect("/auth");
   };

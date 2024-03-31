@@ -17,7 +17,7 @@ const Main = () => {
         {addToCollectionOpen && <AddToCollection />}
 
         
-        {!addToCollectionOpen && <CollectionModal map_id={map.uid} /> }
+        {!addToCollectionOpen && <CollectionModal map_id={map!.uid} /> }
     {activeLocation === null && (
         <>
         {collections ? (
@@ -27,15 +27,7 @@ const Main = () => {
                   <div className="flex h-fit flex-row items-center gap-2">
                     <Icon name={collection.icon as IconProps["name"]} size={24} color="#000" />
                     <h1>{collection.title}</h1>
-                    <Button
-                      aria-label="edit collection"
-                      onClick={() =>
-                        console.log("Edit collection: ", collection.title)
-                      }
-                      variant="ghost"
-                    >
-                      <Edit />
-                    </Button>
+                    <CollectionModal mode="edit" collection={collection} map_id={map!.uid} />
                   </div>
                   <ul className="ml-4">
                     {markers!.map((marker) => (

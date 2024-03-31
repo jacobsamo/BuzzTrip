@@ -119,6 +119,13 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
     formData.append('color', '#000000');
     formData.append('map_id', map_id);
 
+    if (mode === 'edit') {
+      formData.append('uid', collection!.uid);
+      formData.append('intent', INTENTS.updateCollection);
+    } else {
+      formData.append('intent', INTENTS.createCollection);
+    }
+
 
     // Perform your form submission
     // Example: You can use fetch to submit the form data
@@ -128,10 +135,19 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
       navigate: false,
       unstable_flushSync: true,
     });
-  
-
-    // Update collections state
-    // setCollections((prev) => [...(prev || []), values]);
+    
+    const values = Object.fromEntries(formData.entries()) as Collection;
+    if (mode === 'edit') {
+      // Update collections state
+      setCollections((prev) => {
+        const index = prev.findIndex((c) => c.uid === collection!.uid);
+        prev[index] = values;
+        return [...prev];
+      });
+      return;
+    } else {
+      setCollections((prev) => [values, ...(prev || [])]);
+    }
   };
 
   return (
@@ -166,9 +182,8 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
         
         <DialogClose asChild>
             <DrawerClose asChild>
-                <Button aria-label="Create collection" type="submit"     name="intent" 
-                value={INTENTS.createCollection}>
-                Submit
+                <Button aria-label="Create collection" type="submit">
+                  Submit
                 </Button>
             </DrawerClose>
         </DialogClose>

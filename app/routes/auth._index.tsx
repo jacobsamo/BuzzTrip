@@ -9,7 +9,6 @@ export default function Auth() {
   
 
   const signIn = () => {
-    console.log("singing in:  ")
      supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

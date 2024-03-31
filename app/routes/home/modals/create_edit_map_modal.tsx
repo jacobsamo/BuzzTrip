@@ -103,10 +103,10 @@ function MapForm({mode, map}: MapModalProps) {
         />
       </div>
 
-      <div className="grid gap-2">
+      {/* <div className="grid gap-2">
         <Label htmlFor="location">Location</Label>
         <Select></Select>
-      </div>    
+      </div>     */}
 
 
       {mode == "edit" && map && <input type="hidden" name="map_id" value={map?.uid ?? ""} />}
@@ -115,7 +115,7 @@ function MapForm({mode, map}: MapModalProps) {
             <DrawerClose asChild>
                 <Button aria-label="create map" type="submit" name="intent" 
                 value={mode === "create" ? INTENTS.createMap : INTENTS.editMap}>
-                Save changes
+                Create Map
                 </Button>
             </DrawerClose>
         </DialogClose>

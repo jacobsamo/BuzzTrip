@@ -33,7 +33,7 @@ export const PlaceAutocompleteInput = () => {
     placeAutocomplete.addListener("place_changed", () => {
       const place = placeAutocomplete.getPlace();
       if (!place.geometry || !place.geometry.location) {
-        console.log("Returned place contains no geometry");
+        console.warn("Returned place contains no geometry");
         return;
       }
 

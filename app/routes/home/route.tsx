@@ -38,8 +38,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       data: { user },
     } = await client.auth.getUser();
 
-    console.log('uSER: ', user?.email);
-
     if (!user) {
       return redirect("/auth");
     }
