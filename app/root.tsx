@@ -11,6 +11,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useLocation,
   useRevalidator
 } from "@remix-run/react";
 import {
@@ -20,6 +21,7 @@ import {
 import { Database } from "database.types";
 import { useEffect, useState } from "react";
 import { Toaster } from "sonner";
+import posthog from "posthog-js";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
@@ -82,6 +84,11 @@ export default function Layout() {
     };
   }, [serverAccessToken, supabase, revalidate]);
 
+
+  const location = useLocation();
+  useEffect(() => {
+    posthog.capture('$pageview');
+  }, [location]);
   
   return (
     <html lang="en">
