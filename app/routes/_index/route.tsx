@@ -9,6 +9,8 @@ import {
   type MetaFunction,
 } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
+import Nav from "./nav";
+import Hero from "./hero";
 
 export const meta: MetaFunction = () => {
   return [
@@ -38,13 +40,11 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
 export default function Index() {
   return (
     <>
-      <h1>Welcome to BuzzTrip</h1>
-      <p>Plan the trip you've always dreamed of.</p>
-
-
-      <section>
-        <p>BuzzTrip is a quick and easy solution to planning trips with you and your crew. sign up to get started`</p>
-      </section>
+    <Nav />
+    <main>
+      <Hero />
+    </main>
+    
     </>
   )
 }
