@@ -3,12 +3,14 @@ import { DrawerHeader } from "@/components/ui/drawer";
 import Icon, { IconProps } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 import { INTENTS } from "@/routes/map.$mapId/intents";
-import CollectionModal from "@/routes/map.$mapId/modals/create_edit_collection_modal";
 import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
 import { useFetcher, useSubmit } from "@remix-run/react";
-import { useState } from "react";
+import { lazy, useState } from "react";
 import { toast } from "sonner";
 import { useGlobalContext } from "../providers/global_provider";
+
+const CollectionModal = lazy(() => import('../modals/create_edit_collection_modal'))
+
 
 const AddToCollection = () => {
   const fetcher = useFetcher();

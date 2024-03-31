@@ -1,4 +1,3 @@
-import React from 'react'
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from '../ui/dialog'
 import { Trash2 } from 'lucide-react'
 import { Form } from '@remix-run/react'
@@ -7,7 +6,7 @@ import { Button } from '../ui/button'
 interface ConfirmDeleteModalProps {
   id?: string,
     type?: "map" | "marker" | "collection"
-  }
+}
 
 const ConfirmDeleteModal = ({id, type = "map"}: ConfirmDeleteModalProps) => {
   return (
