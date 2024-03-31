@@ -47,7 +47,6 @@
     "lucide-react": "^0.363.0",
     "miniflare": "^3.20240320.0",
     "next-themes": "^0.3.0",
-    "posthog-js": "^1.116.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",

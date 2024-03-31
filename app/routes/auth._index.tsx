@@ -12,7 +12,7 @@ export default function Auth() {
      supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: process.env.NODE_ENV === "development" ? "http://localhost:5173/auth/callback" : "https://buzztrip.co/auth/callback",
+        redirectTo: "http://localhost:5173/auth/callback",
       },
     });
   };
