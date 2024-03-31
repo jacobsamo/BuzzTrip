@@ -1,18 +1,14 @@
-"use client";
 import {
   APIProvider,
   AdvancedMarker,
   Map as GoogleMap,
   Pin
 } from "@vis.gl/react-google-maps";
-import React from "react";
-import {
-  PlaceAutocompleteInput
-} from "./search";
-import { IconProps } from "@/components/ui/icon";
+import { lazy, memo } from "react";
 import { useMapContext } from "./providers/map_provider";
-import MarkerPin from "./MarkerPin";
 
+const PlaceAutocompleteInput = lazy(() => import('./search'))
+const MarkerPin = lazy(() => import('./MarkerPin')) 
 
 
 const Map = () => {
@@ -46,7 +42,10 @@ const Map = () => {
           {activeLocation && (
             <AdvancedMarker
               key={activeLocation.title}
-              position={activeLocation.latlng}
+              position={{
+                lat: activeLocation.lat,
+                lng: activeLocation.lng
+              }}
             >
               <Pin />
             </AdvancedMarker>
@@ -72,4 +71,4 @@ const Map = () => {
   );
 };
 
-export default React.memo(Map);
+export default memo(Map);

@@ -1,13 +1,11 @@
 import { Input } from "@/components//ui/input";
-// import { activeLocationAtom, searchStringAtom } from "@/lib/atoms";
 import { Location } from "@/lib/types";
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
-// import { useAtom } from "jotai";
 import { SearchIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useMapContext } from "./providers/map_provider";
 
-export const PlaceAutocompleteInput = () => {
+const PlaceAutocompleteInput = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [placeAutocomplete, setPlaceAutocomplete] =
     useState<google.maps.places.Autocomplete | null>(null);
@@ -93,3 +91,6 @@ export const PlaceAutocompleteInput = () => {
     </div>
   );
 };
+
+
+export default PlaceAutocompleteInput

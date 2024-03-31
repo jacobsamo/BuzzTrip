@@ -1,5 +1,5 @@
 import { Collection, Location, Map, Marker } from '@/lib/types';
-import React, { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 export type MapEnv = {
     GOOGLE_MAPS_API_KEY: string;

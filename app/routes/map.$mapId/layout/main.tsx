@@ -1,11 +1,12 @@
-import { Edit } from "lucide-react";
-import MarkerCard from "@/routes/map.$mapId/marker_card";
-import CollectionModal from "@/routes/map.$mapId/modals/create_edit_collection_modal";
-import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
-import { Button } from "@/components/ui/button";
 import Icon, { IconProps } from "@/components/ui/icon";
-import ActiveLocation from "./active_location";
-import AddToCollection from "./add_to_collection";
+import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
+import { lazy } from "react";
+
+const ActiveLocation = lazy(() => import('./active_location'))
+const AddToCollection = lazy(() => import('./add_to_collection'))
+const CollectionModal = lazy(() => import('../modals/create_edit_collection_modal'))
+const MarkerCard = lazy(() => import('../marker_card'))
+
 
 const Main = () => {
   const {markers, setMarkers, collections, setCollections, activeLocation, setActiveLocation, map, addToCollectionOpen} = useMapContext();
