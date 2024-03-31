@@ -1,9 +1,12 @@
 import type { Collection, Marker, Map as TMap } from '@/lib/types';
-import { lazy, Suspense } from 'react';
+import { lazy } from 'react';
 import { MapProvider } from '../providers/map_provider';
+import Map from '../map';
+import Main from './main';
+import MainDrawer from '@/routes/map.$mapId/main_drawer';
 
-const MainDrawer = lazy(() => import('@/routes/map.$mapId/main_drawer'));
-const Map = lazy(() => import('@/routes/map.$mapId/map'));
+// const MainDrawer = lazy(() => import('@/routes/map.$mapId/main_drawer'));
+// const Map = lazy(() => import('@/routes/map.$mapId/map'));
 const Main = lazy(() => import('./main'));
 
 interface MainLayoutProps {
@@ -19,17 +22,11 @@ interface MainLayoutProps {
 const MapView = ({ collections, markers, env, map }: MainLayoutProps) => {
   return (
     <main>
-        <MapProvider initialCollections={collections} initialMarkers={markers} env={env} initialMap={map}>
-          <Suspense fallback={<div>Loading Map...</div>}>
+        <MapProvider initialCollections={collections} initialMarkers={markers} env={env} initialMap={map}>  
             <Map />
-          </Suspense>
-          <Suspense fallback={<div>Loading Main Drawer...</div>}>
             <MainDrawer>
-              <Suspense fallback={<div>Loading Main...</div>}>
                 <Main />
-              </Suspense>
             </MainDrawer>
-          </Suspense>
         </MapProvider>
     </main>
   )
