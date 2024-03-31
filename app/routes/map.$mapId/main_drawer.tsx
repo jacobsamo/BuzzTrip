@@ -1,13 +1,11 @@
-"use client";
-import { activeSnapPoint } from "@/lib/atoms";
-import * as React from "react";
 
 import { Drawer } from "vaul";
 import { useGlobalContext } from "./providers/global_provider";
+import type { ComponentProps, ReactNode } from "react";
 
 interface MainDrawerProps {
-  children: React.ReactNode;
-  options?: React.ComponentProps<typeof Drawer.Root>;
+  children: ReactNode;
+  options?: ComponentProps<typeof Drawer.Root>;
 }
 
 export default function MainDrawer({ children, options }: MainDrawerProps) {

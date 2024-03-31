@@ -1,7 +1,9 @@
-import Icon from "@/components/ui/icon";
-import AddToCollectionButton from "@/routes/map.$mapId/open_add_to_collection";
 import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
 import { BookmarkCheck } from "lucide-react";
+import { lazy } from "react";
+
+const AddToCollectionButton = lazy(() => import('@/routes/map.$mapId/open_add_to_collection'))
+const Icon = lazy(() => import("@/components/ui/icon"))
 
 const ActiveLocation = () => {
   const {markers, activeLocation} = useMapContext();
