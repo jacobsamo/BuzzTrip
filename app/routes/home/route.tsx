@@ -30,9 +30,9 @@ export const meta: MetaFunction = () => {
 };
 
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request, context }: LoaderFunctionArgs) => {
   try {
-    const client = getSupabaseServerClient(request);
+    const client = getSupabaseServerClient(request, context);
 
     const {
       data: { user },
@@ -52,12 +52,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const action = async ({
     request,
+    context
   }: ActionFunctionArgs) => {
     try {
         const formData = await request.formData();
 
         const intent = formData.get("intent");
-        const user = await getUser(request);
+        const user = await getUser(request, context);
     
         if (!intent) throw badRequest("Missing intent");
 
@@ -67,7 +68,7 @@ export const action = async ({
             case INTENTS.createMap: {
                 const {title, description} = Object.fromEntries(formData);
 
-                await createMap({title: title.toString(), description: description.toString()}, request);
+                await createMap({title: title.toString(), description: description.toString()}, request, context);
                 break;
             }  
             case INTENTS.editMap: {
@@ -76,7 +77,7 @@ export const action = async ({
             case INTENTS.deleteMap: {
                 const {map_id} = Object.entries(formData);
 
-                await deleteMap(map_id);
+                await deleteMap(map_id, request, context);
 
                 break;
             } 

@@ -1,11 +1,12 @@
 import getSupabaseServerClient from "@/server/supabaseServer";
 import { TablesInsert } from "database.types";
 import { getUser } from "../getUser";
+import { AppLoadContext } from "@remix-run/cloudflare";
 
 
-export async function createMarker(marker: TablesInsert<"marker">, request: Request) {
-    const supabase = getSupabaseServerClient(request);
-    const user = await getUser(request);
+export async function createMarker(marker: TablesInsert<"marker">, request: Request, context: AppLoadContext) {
+    const supabase = getSupabaseServerClient(request, context);
+    const user = await getUser(request, context);
 
     if (!user) {
         return new Error("UNAUTHORIZED: user not found.")

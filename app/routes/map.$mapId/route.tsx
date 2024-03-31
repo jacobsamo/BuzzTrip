@@ -2,7 +2,7 @@ import MapView from "@/routes/map.$mapId/layout/map_view";
 import { GlobalProvider } from "@/routes/map.$mapId/providers/global_provider";
 import { Collection, Marker } from "@/lib/types";
 import { json, MetaFunction, redirect, type LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useOutletContext } from "@remix-run/react";
 import { createServerClient } from "@supabase/auth-helpers-remix";
 import { Database, Json, Tables } from "database.types";
 import { INTENTS } from "./intents";
@@ -24,16 +24,18 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+export const loader = async ({ request, params, context }: LoaderFunctionArgs) => {
+    const env: any = context.cloudflare.env;
+
     const response = new Response()
     const supabaseClient = createServerClient<Database>(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_ANON_KEY!,
+      env.SUPABASE_URL!,
+      env.SUPABASE_ANON_KEY!,
       { request, response }
     )
-    const env = {
-      GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY!,
-      GOOGLE_MAPS_MAPID: process.env.GOOGLE_MAPS_MAPID!,
+    const mapEnvs = {
+      GOOGLE_MAPS_API_KEY: env.GOOGLE_MAPS_API_KEY! as string,
+      GOOGLE_MAPS_MAPID: env.GOOGLE_MAPS_MAPID! as string,
     }
 
     if (!params.mapId) {
@@ -45,21 +47,21 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     const {data: map} = await supabaseClient.from("map").select().eq("uid", params.mapId).single();
 
     return json(
-      { collections, markers, env, map },
+      { collections, markers, mapEnvs, map },
       {
         headers: response.headers,
       }
     )
   }
 
-export const action = async ({ request, params }: LoaderFunctionArgs) => {
+export const action = async ({ request, params, context }: LoaderFunctionArgs) => {
   try {
     const formData = await request.formData();
     const values = Object.fromEntries(formData.entries());
     
     const intent = values!.intent;
     
-    const user = await getUser(request);
+    const user = await getUser(request, context);
     
     if (!intent) throw badRequest("Missing intent");
     
@@ -69,7 +71,7 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
     switch (intent) {
       case INTENTS.createCollection: {
         const collection = collectionSchema.parse(values);
-        await createCollection(collection, request);
+        await createCollection(collection, request, context);
         break;
       }  
       case INTENTS.createMarker: { 
@@ -79,7 +81,7 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
 
         const marker = markerSchema.parse(data);
         
-        await createMarker(marker, request);
+        await createMarker(marker, request, context);
         break;
       }    
       default: {
@@ -101,11 +103,11 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
 
 
 export default function Map() {
-    const {collections, markers, env, map} = useLoaderData<typeof loader>();
+    const {collections, markers, mapEnvs, map} = useLoaderData<typeof loader>();
 
   return (
         <GlobalProvider>
-            <MapView collections={collections} markers={markers} env={env} map={map!}/>
+            <MapView collections={collections} markers={markers} env={mapEnvs} map={map!}/>
         </GlobalProvider> 
     );
 }

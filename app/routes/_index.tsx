@@ -20,8 +20,8 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const client = getSupabaseServerClient(request);
+export const loader = async ({ request, context }: LoaderFunctionArgs) => {
+  const client = getSupabaseServerClient(request, context);
 
   const {
     data: { user },

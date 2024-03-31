@@ -1,33 +1,37 @@
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
 } from "@/components/ui/dialog";
 import {
-    Drawer,
-    DrawerClose,
-    DrawerContent,
-    DrawerDescription,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger
 } from "@/components/ui/drawer";
+import Icon, { IconProps } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Collection } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { INTENTS } from "@/routes/map.$mapId/intents";
+import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
 import { Form, useSubmit } from "@remix-run/react";
 import { Plus } from "lucide-react";
 import * as React from "react";
-import Icon, { IconProps } from "@/components/ui/icon";
-import { Textarea } from "@/components/ui/textarea";
+import { useState } from 'react'; // Import useState hook
+
 
 
 interface CollectionModalProps {
@@ -90,10 +94,6 @@ export default function CollectionModal({mode = "create", collection = null, tri
     </Drawer>
   );
 }
-
-import { useState } from 'react'; // Import useState hook
-import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
-import { INTENTS } from "@/routes/map.$mapId/intents";
 
 function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
     const {collections, setCollections} = useMapContext()

@@ -1,14 +1,9 @@
-import useSupabase from "@/server/supabaseClient";
 import getSupabaseServerClient from "@/server/supabaseServer";
+import { AppLoadContext } from "@remix-run/cloudflare";
 
-export const useUser = () => {
-    const supabase = useSupabase();
-    const user = supabase.auth.getUser();
-    return user;
-}
 
-export const getUser = async (request: Request) => {
-    const supabase = getSupabaseServerClient(request);
+export const getUser = async (request: Request, context: AppLoadContext) => {
+    const supabase = getSupabaseServerClient(request, context);
     const { data: {
         user
     }, error } = await supabase.auth.getUser();

@@ -2,12 +2,13 @@ import getSupabaseServerClient from "@/server/supabaseServer";
 import { TablesInsert } from "database.types";
 import { getUser } from "../getUser";
 import { Map } from "../types";
+import { AppLoadContext } from "@remix-run/cloudflare";
 
 type CreateMapType = Pick<Map, "title" | "description">;
 
-export async function createMap(map: CreateMapType, request: Request) {
-    const supabase = getSupabaseServerClient(request);
-    const user = await getUser(request);
+export async function createMap(map: CreateMapType, request: Request, context: AppLoadContext) {
+    const supabase = getSupabaseServerClient(request, context);
+    const user = await getUser(request, context);
 
     if (!user) {
         return new Error("UNAUTHORIZED: user not found.")
@@ -45,9 +46,9 @@ export async function createMap(map: CreateMapType, request: Request) {
 }
 
 
-export async function deleteMap(map_id: string, request: Request) {
-    const supabase = getSupabaseServerClient(request);
-    const user = await getUser(request);
+export async function deleteMap(map_id: string, request: Request, context: AppLoadContext) {
+    const supabase = getSupabaseServerClient(request, context);
+    const user = await getUser(request, context);
 
     if (!user) {
         return new Error("UNAUTHORIZED: user not found.")

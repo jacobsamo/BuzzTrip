@@ -1,15 +1,18 @@
 import { createServerClient } from '@supabase/auth-helpers-remix';
 import { Database } from 'database.types';
+import { AppLoadContext } from '@remix-run/cloudflare';
 
  
 function getSupabaseServerClient(
   request: Request, 
-  response?: Response
+  context: AppLoadContext,
+  response?: Response,
 ) {
+  const env: any = context.cloudflare.env;
   const res = response ?? new Response();
   return createServerClient<Database>(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
+    env.SUPABASE_URL!,
+    env.SUPABASE_ANON_KEY!,
     {
       request,
       response: res,
