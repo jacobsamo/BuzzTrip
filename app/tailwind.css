@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media screen and (max-width: 599px) {
+    input, select, textarea {
+      font-size: 16px;
+    }
+}
