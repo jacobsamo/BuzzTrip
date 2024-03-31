@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils";
 import { INTENTS } from "@/routes/map.$mapId/intents";
 import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
 import { Form, useSubmit } from "@remix-run/react";
-import { Plus } from "lucide-react";
+import { Edit, Plus } from "lucide-react";
 import * as React from "react";
 import { useState } from 'react'; // Import useState hook
 
@@ -58,7 +58,9 @@ export default function CollectionModal({mode = "create", collection = null, tri
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button variant="outline">
-            <Plus /> {triggerType =="text" && mode == "create" ? "Create Collection" : "Edit Collection"}
+             {triggerType =="text" && mode == "create" ? (<>
+              <Plus /> Create Collection
+             </>) : <Edit />}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
@@ -76,7 +78,9 @@ export default function CollectionModal({mode = "create", collection = null, tri
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button variant="outline">
-          <Plus /> {triggerType =="text" && mode == "create" ? "Create Collection" : "Edit Collection"}
+        {triggerType =="text" && mode == "create" ? (<>
+              <Plus /> Create Collection
+             </>) : <Edit />}
         </Button>
       </DrawerTrigger>
       <DrawerContent>
@@ -100,7 +104,7 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
     const submit = useSubmit();
 
   // State to store selected icon
-  const [selectedIcon, setSelectedIcon] = useState<string>('MdOutlineFolder');
+  const [selectedIcon, setSelectedIcon] = useState<string>(collection?.icon ?? 'MdOutlineFolder');
 
   // Function to handle icon selection
   const handleIconSelection = (icon: string) => {
@@ -158,7 +162,7 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
         onSubmit={handleSubmit} // Listen to form submission event
       >
         <Label htmlFor="title">Title</Label>
-        <Input placeholder="Title" name="title" />
+        <Input placeholder="Title" name="title" defaultValue={collection?.title} />
 
         <div className="flex flex-wrap gap-2">
           {iconsList.map((icon, index) => (
@@ -178,7 +182,7 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
         </div>
 
         <Label htmlFor="description">Description</Label>
-        <Textarea placeholder="Description" name="description" />
+        <Textarea placeholder="Description" name="description" defaultValue={collection?.description ?? ''} />
         
         <DialogClose asChild>
             <DrawerClose asChild>

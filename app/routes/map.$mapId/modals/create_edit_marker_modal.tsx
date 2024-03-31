@@ -24,7 +24,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { Marker } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Form } from "@remix-run/react";
-import { Plus } from "lucide-react";
+import { Edit, Plus } from "lucide-react";
 import * as React from "react";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,7 +44,9 @@ export default function MarkerModal({mode = "create", marker = null}: MarkerModa
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button variant="outline">
-            <Plus /> {mode == "create" ? "Create" : "Edit"} Marker
+          {mode == "create" ? (<>
+              <Plus /> Marker
+             </>) : <Edit />}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
@@ -62,7 +64,9 @@ export default function MarkerModal({mode = "create", marker = null}: MarkerModa
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button variant="outline">
-          <Plus /> {mode == "create" ? "Create" : "Edit"} Marker
+        {mode == "create" ? (<>
+              <Plus /> Marker
+             </>) : <Edit />}
         </Button>
       </DrawerTrigger>
       <DrawerContent>
@@ -92,7 +96,7 @@ function MarkerForm({mode, marker}: MarkerModalProps) {
     >
       <div className="grid gap-2">
         <Label htmlFor="title">Title</Label>
-        <Input type="text" id="title" name="title" placeholder="Roadtrip" />
+        <Input type="text" id="title" name="title" placeholder="Roadtrip" defaultValue={marker?.title} />
       </div>
       <div className="grid gap-2">
         <Label htmlFor="description">Description</Label>
@@ -100,13 +104,14 @@ function MarkerForm({mode, marker}: MarkerModalProps) {
           id="description"
           name="description"
           placeholder="epic roadtrip!!"
+          defaultValue={marker?.description ?? ''}
         />
       </div>
 
-      <div className="grid gap-2">
+      {/* <div className="grid gap-2">
         <Label htmlFor="location">Location</Label>
         <Select></Select>
-      </div>    
+      </div>     */}
       <DialogClose  type="submit" >
       Save changes
 
