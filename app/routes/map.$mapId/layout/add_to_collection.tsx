@@ -23,14 +23,12 @@ const AddToCollection = () => {
     return {
       uid: collection.uid,
       markerCount: markers ? markers.filter(
-        (activeLocation) => activeLocation.uid == collection.uid
+        (marker) => marker.collection_id == collection.uid
       ).length : 0,
     };
   }) : 0;
 
   if (activeLocation === null) return null;
-
-
     // Function to handle icon selection
     const handleCollectionSelected = (icon: string) => {
       setSelected(icon);
@@ -44,15 +42,18 @@ const AddToCollection = () => {
         collection_id: selected,
         map_id: map!.uid,
         color: "#ef233c",
-        intent: INTENTS.createMarker,
         reviews: JSON.stringify(activeLocation.reviews),
         photos: JSON.stringify(activeLocation.photos),
         types: JSON.stringify(activeLocation.types),
         opening_times: JSON.stringify(activeLocation.opening_times),
-
       }
 
-      submit(marker, {
+      if (marker.collection_id === '' || marker.collection_id == null) {
+        toast.error("Please select a collection");
+        return;
+      }
+
+      submit({intent: INTENTS.createMarker, ...marker}, {
         method: "post",
         fetcherKey: `marker`,
         navigate: false,
@@ -63,7 +64,7 @@ const AddToCollection = () => {
       setAddToCollectionOpen(false);
       setActiveLocation(null);
       setSnap(0.2);
-      setMarkers([...markers, marker]);
+      setMarkers([marker, ...markers]);
       toast.success("Location added to collection");
     };
 
@@ -139,7 +140,16 @@ const AddToCollection = () => {
         >
           Done
         </Button>
+      <Button
+        onClick={() => setAddToCollectionOpen(false)}
+        className="mt-auto"
+        variant="ghost"
+        type="button"
+      >
+        Cancel
+      </Button>
       </fetcher.Form>
+
     </div>
   );
 };

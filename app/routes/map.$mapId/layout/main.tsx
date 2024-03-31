@@ -9,16 +9,22 @@ const MarkerCard = lazy(() => import('../marker_card'))
 
 
 const Main = () => {
-  const {markers, setMarkers, collections, setCollections, activeLocation, setActiveLocation, map, addToCollectionOpen} = useMapContext();
+  const {markers, collections, activeLocation, map, addToCollectionOpen} = useMapContext();
 
   return (
-    <div className="h-full">
+    <div className="h-full p-2">
         {activeLocation !== null && !addToCollectionOpen  && <ActiveLocation />}
 
         {addToCollectionOpen && <AddToCollection />}
 
-        
-        {!addToCollectionOpen && <CollectionModal map_id={map!.uid} /> }
+    
+
+        {!addToCollectionOpen && !activeLocation && (
+          <div className="flex flex-row justify-end mb-4">
+            <CollectionModal map_id={map!.uid} /> 
+          </div>
+        )}
+    
     {activeLocation === null && (
         <>
         {collections ? (
@@ -31,9 +37,9 @@ const Main = () => {
                     <CollectionModal mode="edit" collection={collection} map_id={map!.uid} />
                   </div>
                   <ul className="ml-4">
-                    {markers!.map((marker) => (
+                    {markers && markers.map((marker) => (
                       <>
-                        {marker.uid === collection.uid && (
+                        {marker.collection_id === collection.uid && (
                           <li key={marker.uid}>
                             <MarkerCard marker={marker} />
                           </li>
