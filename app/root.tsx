@@ -1,9 +1,5 @@
 import stylesheet from "@/tailwind.css?url";
-import {
-  LinksFunction,
-  LoaderFunctionArgs,
-  json
-} from "@remix-run/cloudflare";
+import { LinksFunction, LoaderFunctionArgs, json } from "@remix-run/cloudflare";
 import {
   Links,
   Meta,
@@ -11,7 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
-  useRevalidator
+  useRevalidator,
 } from "@remix-run/react";
 import {
   createBrowserClient,
@@ -41,7 +37,6 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
   const {
     data: { session },
   } = await supabase.auth.getSession();
-
 
   return json(
     {
@@ -82,12 +77,14 @@ export default function Layout() {
     };
   }, [serverAccessToken, supabase, revalidate]);
 
-  
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1"
+        />
         <Meta />
         <Links />
       </head>

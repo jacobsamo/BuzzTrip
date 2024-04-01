@@ -1,4 +1,3 @@
-
 import { Drawer } from "vaul";
 import { useGlobalContext } from "./providers/global_provider";
 import type { ComponentProps, ReactNode } from "react";
@@ -9,7 +8,7 @@ interface MainDrawerProps {
 }
 
 export default function MainDrawer({ children, options }: MainDrawerProps) {
-  const {snap, setSnap} = useGlobalContext();
+  const { snap, setSnap } = useGlobalContext();
 
   return (
     <Drawer.Root

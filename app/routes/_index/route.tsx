@@ -33,18 +33,16 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
     return redirect("/home");
   }
 
-
   return json({});
 };
 
 export default function Index() {
   return (
     <>
-    <Nav />
-    <main>
-      <Hero />
-    </main>
-    
+      <Nav />
+      <main>
+        <Hero />
+      </main>
     </>
-  )
+  );
 }

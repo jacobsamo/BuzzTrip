@@ -12,10 +12,7 @@ const MarkerCard = ({ marker }: { marker: Marker }) => {
       />
       <h1>{marker.title}</h1>
 
-      <MarkerModal
-        mode="edit"
-        marker={marker}
-      />
+      <MarkerModal mode="edit" marker={marker} />
     </div>
   );
 };

@@ -2,11 +2,13 @@ import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
 import { BookmarkCheck } from "lucide-react";
 import { lazy } from "react";
 
-const AddToCollectionButton = lazy(() => import('@/routes/map.$mapId/open_add_to_collection'))
-const Icon = lazy(() => import("@/components/ui/icon"))
+const AddToCollectionButton = lazy(
+  () => import("@/routes/map.$mapId/open_add_to_collection")
+);
+const Icon = lazy(() => import("@/components/ui/icon"));
 
 const ActiveLocation = () => {
-  const {markers, activeLocation} = useMapContext();
+  const { markers, activeLocation } = useMapContext();
 
   if (activeLocation === null) return null;
 
@@ -19,8 +21,13 @@ const ActiveLocation = () => {
             <h1 className="text-2xl text-gray-900">{activeLocation.title}</h1>
           </span>
           <span>
-            {markers?.find(marker => marker.place_id === activeLocation.place_id) ?   <BookmarkCheck className="w-8 h-8" /> : <AddToCollectionButton />}
-          
+            {markers?.find(
+              (marker) => marker.place_id === activeLocation.place_id
+            ) ? (
+              <BookmarkCheck className="w-8 h-8" />
+            ) : (
+              <AddToCollectionButton />
+            )}
           </span>
         </div>
         <p className="text-base text-gray-900">{activeLocation.address}</p>
