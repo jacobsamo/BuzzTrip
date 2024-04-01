@@ -24,7 +24,7 @@ const ActiveLocation = () => {
             {markers?.find(
               (marker) => marker.place_id === activeLocation.place_id
             ) ? (
-              <BookmarkCheck className="w-8 h-8" />
+              <BookmarkCheck className="h-8 w-8" />
             ) : (
               <AddToCollectionButton />
             )}
