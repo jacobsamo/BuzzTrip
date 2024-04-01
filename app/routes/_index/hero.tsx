@@ -5,7 +5,7 @@ import { Link } from '@remix-run/react';
 export default function Hero() {
   return (
     <section
-      className="flex size-full w-full items-start justify-center bg-[url('https://tailframes.com/images/squares-bg.webp')] bg-cover bg-center bg-no-repeat"
+      className="flex size-full w-full items-start justify-center bg-cover bg-center bg-no-repeat"
 >
       <div
         className="flex max-w-screen-2xl flex-1 grow flex-col items-start justify-start gap-12 px-3 py-12 md:px-24 md:pt-24 xl:flex-row"

@@ -36,14 +36,15 @@ const MapCard = ({ map }: MapCardProps) => {
           <p className="text-sm font-light">{new Date(map.created_at).toDateString()}</p>
         </div>
 
+      <div className="z-50">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="absolute right-0">
+            <Button variant="ghost" size="icon" className="absolute right-0" >
               <MoreVertical className="h-6 w-6" />
               <span className="sr-only">More</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="center">
+          <DropdownMenuContent align="center" className="z-50">
             <DropdownMenuItem>
               <MapModal 
                 mode="edit"
@@ -51,13 +52,14 @@ const MapCard = ({ map }: MapCardProps) => {
               />
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <ShareModal />
+              <ShareModal map_id={map.uid} />
             </DropdownMenuItem>
             {/* <DropdownMenuItem>
           
             </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
       </Link>
   );
 };

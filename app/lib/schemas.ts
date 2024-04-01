@@ -9,7 +9,7 @@ export const reviewSchema = z.object({
 });
 
 export const locationSchema = z.object({
-    place_id: z.string(),
+    place_id: z.string().nullable(),
     title: z.string(),
     description: z.string().nullable(),
     address: z.string().nullable(),
