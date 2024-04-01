@@ -154,6 +154,9 @@ devDependencies:
   postcss:
     specifier: ^8.4.38
     version: 8.4.38
+  prettier:
+    specifier: 3.2.5
+    version: 3.2.5
   prettier-plugin-tailwindcss:
     specifier: ^0.5.13
     version: 0.5.13(prettier@3.2.5)

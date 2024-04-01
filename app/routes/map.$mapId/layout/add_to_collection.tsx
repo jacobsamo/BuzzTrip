@@ -84,7 +84,7 @@ const AddToCollection = () => {
   };
 
   return (
-    <div className="relative flex flex-col gap-2 h-full">
+    <div className="relative flex h-full flex-col gap-2">
       <DrawerHeader className="flex flex-row  gap-1">
         {activeLocation.photos !== undefined && (
           <img

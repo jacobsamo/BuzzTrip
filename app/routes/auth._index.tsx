@@ -18,7 +18,7 @@ export default function Auth() {
   };
 
   return (
-    <main className=" w-full h-dvh items-center justify-center flex">
+    <main className=" flex h-dvh w-full items-center justify-center">
       `
       <div className="z-10 flex max-w-md flex-col items-center justify-center  gap-3 rounded-3xl p-3 text-center shadow backdrop-blur-sm">
         <div className="flex flex-col items-center p-4">

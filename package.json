@@ -73,6 +73,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "node-fetch": "^3.3.2",
     "postcss": "^8.4.38",
+    "prettier": "3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.13",
     "supabase": "^1.151.1",
     "supabase-to-zod": "^1.0.5",
