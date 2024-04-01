@@ -63,7 +63,7 @@ const AddToCollection = () => {
 
       setAddToCollectionOpen(false);
       setActiveLocation(null);
-      setSnap(0.2);
+      setSnap(0.5);
       setMarkers([marker, ...markers]);
       toast.success("Location added to collection");
     };

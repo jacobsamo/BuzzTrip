@@ -12,7 +12,7 @@ const MarkerPin = lazy(() => import('./MarkerPin'))
 
 
 const Map = () => {
-  const {activeLocation, markers, env} = useMapContext();
+  const {activeLocation, markers, env, setActiveLocation} = useMapContext();
 
   const mapOptions = {
     center: {
@@ -29,7 +29,8 @@ const Map = () => {
       language="en"
       libraries={["places", "marker"]}
     >
-      <div style={{ height: "100vh", width: "100%" }}>
+      {/*TODO: make it so it fills just the screen not any larger to stop scrolling */}
+      <div style={{ height: "100%", width: "100%" }}>
         <PlaceAutocompleteInput />
         <GoogleMap
           defaultCenter={mapOptions.center}
@@ -56,7 +57,8 @@ const Map = () => {
               <AdvancedMarker
                 key={marker.uid}
                 position={{ lat: marker.lat, lng: marker.lng }}
-                onClick={(e) => console.log("Marker clicked: ", e)}
+                title={marker.title}
+                onClick={(e) => setActiveLocation(marker)}
               >
                 <MarkerPin
                   // backgroundColor={marker.color}

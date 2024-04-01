@@ -46,7 +46,7 @@ export default function ShareModal({map_id}: ShareMapProps) {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Delete Map</DialogTitle>
-            <DialogDescription>THIS CAN't BE REVERSED</DialogDescription>
+            <DialogDescription>THIS CAN'T BE REVERSED</DialogDescription>
           </DialogHeader>
           <Form
           method="post"

@@ -12,6 +12,7 @@ import { z } from "zod";
 import { INTENTS } from "./intents";
 import { getUser } from "@/lib/getUser";
 import { badRequest } from "@/lib/bad-request";
+import { User } from "@supabase/auth-helpers-remix";
 
 
 
@@ -32,7 +33,7 @@ export const meta: MetaFunction = () => {
 
 export const loader = async ({ request, context }: LoaderFunctionArgs) => {
   try {
-    const client = getSupabaseServerClient(request, context);
+    const supabase = getSupabaseServerClient(request, context);
 
     const {
       data: { user },
@@ -42,11 +43,24 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
       return redirect("/auth");
     }
 
-    const maps = await client.from("shared_map_view").select().eq("user_id", user?.id);
+    const {data: maps} = await supabase.from("shared_map_view").select().eq("user_id", user?.id);
 
-    return json({maps: maps.data as SharedMap[] | null});
+    const url = new URL(request.url);
+    const q = url.searchParams.get("q");
+    let foundUsers: User[] | undefined = undefined;
+    if (q) {
+      const {data: {
+          users
+      }} = await supabase.auth.admin.listUsers() 
+  
+      foundUsers = users.filter(user => user.email?.includes(q)).splice(0, 4);
+      console.log("found users: ", foundUsers)
+      console.log("users: ", users)
+    }
+
+    return json({maps: maps as SharedMap[] | null, users: foundUsers, q});
   } catch (e) {
-    return json({maps: null});
+    return json({maps: null, users: undefined, q: ''});
   }
 };
 
@@ -75,7 +89,7 @@ export const action = async ({
                 break;
             } 
             case INTENTS.deleteMap: {
-                const {map_id} = Object.entries(formData);
+                const {map_id} = Object.entries(formData.entries());
 
                 await deleteMap(map_id, request, context);
 
