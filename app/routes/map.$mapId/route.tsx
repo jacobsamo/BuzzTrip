@@ -5,7 +5,12 @@ import { getUser } from "@/lib/getUser";
 import { collectionSchema, markerSchema } from "@/lib/schemas";
 import { convertFormDataToObject } from "@/lib/utils";
 import { GlobalProvider } from "@/routes/map.$mapId/providers/global_provider";
-import { json, MetaFunction, redirect, type LoaderFunctionArgs } from "@remix-run/cloudflare";
+import {
+  json,
+  MetaFunction,
+  redirect,
+  type LoaderFunctionArgs,
+} from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
 import { createServerClient } from "@supabase/auth-helpers-remix";
 import { Database } from "database.types";
@@ -25,37 +30,57 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader = async ({ request, params, context }: LoaderFunctionArgs) => {
+export const loader = async ({
+  request,
+  params,
+  context,
+}: LoaderFunctionArgs) => {
   const env: any = context.cloudflare.env;
 
-  const response = new Response()
+  const response = new Response();
   const supabaseClient = createServerClient<Database>(
     env.SUPABASE_URL!,
     env.SUPABASE_ANON_KEY!,
     { request, response }
-  )
+  );
   const mapEnvs = {
     GOOGLE_MAPS_API_KEY: env.GOOGLE_MAPS_API_KEY! as string,
     GOOGLE_MAPS_MAPID: env.GOOGLE_MAPS_MAPID! as string,
-  }
+  };
 
   if (!params.mapId) {
-    return redirect('/home')
+    return redirect("/home");
   }
 
-  const { data: collections } = await supabaseClient.from('collection').select('*').eq('map_id', params.mapId).returns<Collection[]>()
-  const { data: markers } = await supabaseClient.from('marker').select('*').eq('map_id', params.mapId).returns<Marker[]>()
-  const {data: map} = await supabaseClient.from("map").select().eq("uid", params.mapId).single();
+  const { data: collections } = await supabaseClient
+    .from("collection")
+    .select("*")
+    .eq("map_id", params.mapId)
+    .returns<Collection[]>();
+  const { data: markers } = await supabaseClient
+    .from("marker")
+    .select("*")
+    .eq("map_id", params.mapId)
+    .returns<Marker[]>();
+  const { data: map } = await supabaseClient
+    .from("map")
+    .select()
+    .eq("uid", params.mapId)
+    .single();
 
   return json(
     { collections, markers, mapEnvs, map },
     {
       headers: response.headers,
     }
-  )
-}
+  );
+};
 
-export const action = async ({ request, params, context }: LoaderFunctionArgs) => {
+export const action = async ({
+  request,
+  params,
+  context,
+}: LoaderFunctionArgs) => {
   try {
     const formData = await request.formData();
     const values = Object.fromEntries(formData.entries());
@@ -78,7 +103,7 @@ export const action = async ({ request, params, context }: LoaderFunctionArgs) =
       case INTENTS.createMarker: {
         const parsed = convertFormDataToObject(formData);
 
-        const data = {...parsed, created_by: user.id};
+        const data = { ...parsed, created_by: user.id };
 
         const marker = markerSchema.parse(data);
 
@@ -98,17 +123,24 @@ export const action = async ({ request, params, context }: LoaderFunctionArgs) =
       throw new Error(error.issues.map((issue) => issue.message).join("\n"));
     }
 
-    throw new Error(`Unexpected issue occurred. Please try again. error: ${error}`);
+    throw new Error(
+      `Unexpected issue occurred. Please try again. error: ${error}`
+    );
   }
-}
+};
 
 export default function Map() {
-  const {collections, markers, mapEnvs, map} = useLoaderData<typeof loader>();
+  const { collections, markers, mapEnvs, map } = useLoaderData<typeof loader>();
 
   return (
     <GlobalProvider>
       <Suspense fallback={<div>Loading...</div>}>
-        <MapView collections={collections} markers={markers} env={mapEnvs} map={map!}/>
+        <MapView
+          collections={collections}
+          markers={markers}
+          env={mapEnvs}
+          map={map!}
+        />
       </Suspense>
     </GlobalProvider>
   );

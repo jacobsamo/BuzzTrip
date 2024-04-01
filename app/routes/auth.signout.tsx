@@ -7,7 +7,7 @@ const SignOutPage = () => {
 
   const handleLogout = () => {
     supabase.auth.signOut();
-     redirect("/auth");
+    redirect("/auth");
   };
 
   return (

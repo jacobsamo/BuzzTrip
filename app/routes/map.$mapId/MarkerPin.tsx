@@ -1,4 +1,4 @@
-import Icon, {type IconProps} from "@/components/ui/icon";
+import Icon, { type IconProps } from "@/components/ui/icon";
 
 interface MarkerPinProps extends IconProps {
   backgroundColor?: string;

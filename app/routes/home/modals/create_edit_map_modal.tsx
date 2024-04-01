@@ -36,7 +36,10 @@ export interface MapModalProps {
   map?: Map | null;
 }
 
-export default function MapModal({mode = "create", map = null}: MapModalProps) {
+export default function MapModal({
+  mode = "create",
+  map = null,
+}: MapModalProps) {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -50,10 +53,12 @@ export default function MapModal({mode = "create", map = null}: MapModalProps) {
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>{mode == "create" ? "Create" : "Edit"} Map</DialogTitle>
+            <DialogTitle>
+              {mode == "create" ? "Create" : "Edit"} Map
+            </DialogTitle>
             <DialogDescription>Start your travel plans here</DialogDescription>
           </DialogHeader>
-          <MapForm mode={mode} map={map}/>
+          <MapForm mode={mode} map={map} />
         </DialogContent>
       </Dialog>
     );
@@ -71,7 +76,7 @@ export default function MapModal({mode = "create", map = null}: MapModalProps) {
           <DrawerTitle>{mode == "create" ? "Create" : "Edit"} Map</DrawerTitle>
           <DrawerDescription>Start your travel plans here</DrawerDescription>
         </DrawerHeader>
-        <MapForm mode={mode} map={map}/>
+        <MapForm mode={mode} map={map} />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -82,8 +87,7 @@ export default function MapModal({mode = "create", map = null}: MapModalProps) {
   );
 }
 
-function MapForm({mode, map}: MapModalProps) {
- 
+function MapForm({ mode, map }: MapModalProps) {
   return (
     <Form
       className={cn("grid items-start gap-4")}
@@ -108,17 +112,22 @@ function MapForm({mode, map}: MapModalProps) {
         <Select></Select>
       </div>     */}
 
-
-      {mode == "edit" && map && <input type="hidden" name="map_id" value={map?.uid ?? ""} />}
+      {mode == "edit" && map && (
+        <input type="hidden" name="map_id" value={map?.uid ?? ""} />
+      )}
 
       <DialogClose asChild>
-            <DrawerClose asChild>
-                <Button aria-label="create map" type="submit" name="intent" 
-                value={mode === "create" ? INTENTS.createMap : INTENTS.editMap}>
-                Create Map
-                </Button>
-            </DrawerClose>
-        </DialogClose>
+        <DrawerClose asChild>
+          <Button
+            aria-label="create map"
+            type="submit"
+            name="intent"
+            value={mode === "create" ? INTENTS.createMap : INTENTS.editMap}
+          >
+            Create Map
+          </Button>
+        </DrawerClose>
+      </DialogClose>
     </Form>
   );
 }

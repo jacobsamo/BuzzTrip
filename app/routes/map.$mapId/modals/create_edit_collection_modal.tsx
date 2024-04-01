@@ -6,7 +6,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Drawer,
@@ -16,7 +16,7 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger
+  DrawerTrigger,
 } from "@/components/ui/drawer";
 import Icon, { IconProps } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
@@ -30,26 +30,29 @@ import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
 import { Form, useSubmit } from "@remix-run/react";
 import { Edit, Plus } from "lucide-react";
 import * as React from "react";
-import { useState } from 'react'; // Import useState hook
-
-
+import { useState } from "react"; // Import useState hook
 
 interface CollectionModalProps {
-    triggerType?: "icon" | "text";
-    mode?: "create" | "edit";
-    collection?: Collection | null;
-    map_id: string;
+  triggerType?: "icon" | "text";
+  mode?: "create" | "edit";
+  collection?: Collection | null;
+  map_id: string;
 }
-  
-  const iconsList: IconProps["name"][] = [
-    "MdOutlineFolder",
-    "MdOutlineLocationOn",
-    "MdOutlineHiking",
-    "MdOutlineBed",
-    "MdOutlineDirections",
-  ];
 
-export default function CollectionModal({mode = "create", collection = null, triggerType = "text", map_id}: CollectionModalProps) {
+const iconsList: IconProps["name"][] = [
+  "MdOutlineFolder",
+  "MdOutlineLocationOn",
+  "MdOutlineHiking",
+  "MdOutlineBed",
+  "MdOutlineDirections",
+];
+
+export default function CollectionModal({
+  mode = "create",
+  collection = null,
+  triggerType = "text",
+  map_id,
+}: CollectionModalProps) {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -58,17 +61,23 @@ export default function CollectionModal({mode = "create", collection = null, tri
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button variant="outline">
-             {triggerType =="text" && mode == "create" ? (<>
-              <Plus /> Create Collection
-             </>) : <Edit />}
+            {triggerType == "text" && mode == "create" ? (
+              <>
+                <Plus /> Create Collection
+              </>
+            ) : (
+              <Edit />
+            )}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>{mode == "create" ? "Create" : "Edit"} Collection</DialogTitle>
+            <DialogTitle>
+              {mode == "create" ? "Create" : "Edit"} Collection
+            </DialogTitle>
             <DialogDescription>Start your travel plans here</DialogDescription>
           </DialogHeader>
-          <CollectionForm mode={mode} collection={collection} map_id={map_id}/>
+          <CollectionForm mode={mode} collection={collection} map_id={map_id} />
         </DialogContent>
       </Dialog>
     );
@@ -78,17 +87,23 @@ export default function CollectionModal({mode = "create", collection = null, tri
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button variant="outline">
-        {triggerType =="text" && mode == "create" ? (<>
+          {triggerType == "text" && mode == "create" ? (
+            <>
               <Plus /> Create Collection
-             </>) : <Edit />}
+            </>
+          ) : (
+            <Edit />
+          )}
         </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle>{mode == "create" ? "Create" : "Edit"} Collection</DrawerTitle>
+          <DrawerTitle>
+            {mode == "create" ? "Create" : "Edit"} Collection
+          </DrawerTitle>
           <DrawerDescription>Start your travel plans here</DrawerDescription>
         </DrawerHeader>
-        <CollectionForm mode={mode} collection={collection} map_id={map_id}/>
+        <CollectionForm mode={mode} collection={collection} map_id={map_id} />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -100,11 +115,13 @@ export default function CollectionModal({mode = "create", collection = null, tri
 }
 
 function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
-    const {collections, setCollections} = useMapContext()
-    const submit = useSubmit();
+  const { collections, setCollections } = useMapContext();
+  const submit = useSubmit();
 
   // State to store selected icon
-  const [selectedIcon, setSelectedIcon] = useState<string>(collection?.icon ?? 'MdOutlineFolder');
+  const [selectedIcon, setSelectedIcon] = useState<string>(
+    collection?.icon ?? "MdOutlineFolder"
+  );
 
   // Function to handle icon selection
   const handleIconSelection = (icon: string) => {
@@ -119,17 +136,16 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
     const formData = new FormData(event.target);
 
     // Append selected icon value to FormData
-    formData.append('icon', selectedIcon);
-    formData.append('color', '#000000');
-    formData.append('map_id', map_id);
+    formData.append("icon", selectedIcon);
+    formData.append("color", "#000000");
+    formData.append("map_id", map_id);
 
-    if (mode === 'edit') {
-      formData.append('uid', collection!.uid);
-      formData.append('intent', INTENTS.updateCollection);
+    if (mode === "edit") {
+      formData.append("uid", collection!.uid);
+      formData.append("intent", INTENTS.updateCollection);
     } else {
-      formData.append('intent', INTENTS.createCollection);
+      formData.append("intent", INTENTS.createCollection);
     }
-
 
     // Perform your form submission
     // Example: You can use fetch to submit the form data
@@ -139,9 +155,9 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
       navigate: false,
       unstable_flushSync: true,
     });
-    
+
     const values = Object.fromEntries(formData.entries()) as Collection;
-    if (mode === 'edit') {
+    if (mode === "edit") {
       // Update collections state
       setCollections((prev) => {
         const index = prev.findIndex((c) => c.uid === collection!.uid);
@@ -158,11 +174,15 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
     <>
       <Form
         method="post"
-        className={cn('grid items-start gap-4')}
+        className={cn("grid items-start gap-4")}
         onSubmit={handleSubmit} // Listen to form submission event
       >
         <Label htmlFor="title">Title</Label>
-        <Input placeholder="Title" name="title" defaultValue={collection?.title} />
+        <Input
+          placeholder="Title"
+          name="title"
+          defaultValue={collection?.title}
+        />
 
         <div className="flex flex-wrap gap-2">
           {iconsList.map((icon, index) => (
@@ -182,19 +202,20 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
         </div>
 
         <Label htmlFor="description">Description</Label>
-        <Textarea placeholder="Description" name="description" defaultValue={collection?.description ?? ''} />
-        
+        <Textarea
+          placeholder="Description"
+          name="description"
+          defaultValue={collection?.description ?? ""}
+        />
+
         <DialogClose asChild>
-            <DrawerClose asChild>
-                <Button aria-label="Create collection" type="submit">
-                  Submit
-                </Button>
-            </DrawerClose>
+          <DrawerClose asChild>
+            <Button aria-label="Create collection" type="submit">
+              Submit
+            </Button>
+          </DrawerClose>
         </DialogClose>
       </Form>
     </>
   );
 }
-
-
-

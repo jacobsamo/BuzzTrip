@@ -4,9 +4,8 @@ import { useGlobalContext } from "./providers/global_provider";
 import { useMapContext } from "./providers/map_provider";
 
 const AddToCollectionButton = () => {
-  const {setAddToCollectionOpen} = useMapContext();
-  const {snap, setSnap} = useGlobalContext();
-
+  const { setAddToCollectionOpen } = useMapContext();
+  const { snap, setSnap } = useGlobalContext();
 
   const openView = () => {
     setAddToCollectionOpen(true);
