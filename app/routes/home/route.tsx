@@ -1,7 +1,10 @@
-import { createMap, deleteMap, editMap } from "@/lib/crud/maps";
+import { badRequest } from "@/lib/bad-request";
+import { createMap, deleteMap, shareMap } from "@/lib/crud/maps";
+import { getUser } from "@/lib/getUser";
+import { sharedMapSchema } from "@/lib/schemas";
 import { SharedMap } from "@/lib/types";
-import MapModal from "@/routes/home/modals/create_edit_map_modal";
 import MapCard from "@/routes/home/map_card";
+import MapModal from "@/routes/home/modals/create_edit_map_modal";
 import getSupabaseServerClient from "@/server/supabaseServer";
 import {
   ActionFunctionArgs,
@@ -11,11 +14,9 @@ import {
   type MetaFunction,
 } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
+import { createClient, UserMetadata } from "@supabase/supabase-js";
 import { z } from "zod";
 import { INTENTS } from "./intents";
-import { getUser } from "@/lib/getUser";
-import { badRequest } from "@/lib/bad-request";
-import { User } from "@supabase/auth-helpers-remix";
 
 export const meta: MetaFunction = () => {
   return [
@@ -33,7 +34,7 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
 
     const {
       data: { user },
-    } = await client.auth.getUser();
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return redirect("/auth");
@@ -45,16 +46,34 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
       .eq("user_id", user?.id);
 
     const url = new URL(request.url);
-    const q = url.searchParams.get("q");
-    let foundUsers: User[] | undefined = undefined;
+    const q = url.searchParams.get("q")?.toLocaleLowerCase();
+    let foundUsers: {id: string, email: string | undefined, metadata: UserMetadata}[] | undefined = undefined;
     if (q) {
+      const env = context.cloudflare.env as any;
+      const supabaseAdmin = createClient(
+        env.SUPABASE_URL,
+        env.PRIVATE_SUPABASE_SERVICE_ROLE,
+        {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false,
+          },
+        }
+      );
       const {
         data: { users },
-      } = await supabase.auth.admin.listUsers();
+      } = await supabaseAdmin.auth.admin.listUsers();
 
-      foundUsers = users.filter((user) => user.email?.includes(q)).splice(0, 4);
-      console.log("found users: ", foundUsers);
-      console.log("users: ", users);
+      foundUsers = users
+        .filter((user) => user.email?.includes(q))
+        .splice(0, 4)
+        .map((user) => {
+          return {
+            id: user.id,
+            email: user.email,
+            metadata: user.user_metadata,
+          };
+        });
     }
 
     return json({ maps: maps as SharedMap[] | null, users: foundUsers, q });
@@ -89,13 +108,19 @@ export const action = async ({ request, context }: ActionFunctionArgs) => {
         break;
       }
       case INTENTS.deleteMap: {
-        const { map_id } = Object.entries(formData.entries());
+        const { map_id } = Object.fromEntries(formData);
 
-        await deleteMap(map_id, request, context);
+        await deleteMap(map_id.toString(), request, context);
 
         break;
       }
       case INTENTS.shareMap: {
+        const values = Object.fromEntries(formData);
+
+        const sharedMap = sharedMapSchema.parse(values);
+
+        await shareMap(sharedMap, request, context);
+
         break;
       }
       case INTENTS.editPermissions: {

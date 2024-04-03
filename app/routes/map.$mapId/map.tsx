@@ -28,8 +28,6 @@ const Map = () => {
       language="en"
       libraries={["places", "marker"]}
     >
-      {/*TODO: make it so it fills just the screen not any larger to stop scrolling */}
-      <div style={{ height: "100%", width: "100%" }}>
         <PlaceAutocompleteInput />
         <GoogleMap
           defaultCenter={mapOptions.center}
@@ -38,6 +36,7 @@ const Map = () => {
           disableDefaultUI={true}
           onDblclick={(e) => console.log("Double click map event: ", e)}
           onClick={(e) => console.log("Click map event: ", e)}
+          gestureHandling="greedy"
         >
           {activeLocation && (
             <AdvancedMarker
@@ -67,7 +66,6 @@ const Map = () => {
               </AdvancedMarker>
             ))}
         </GoogleMap>
-      </div>
     </APIProvider>
   );
 };

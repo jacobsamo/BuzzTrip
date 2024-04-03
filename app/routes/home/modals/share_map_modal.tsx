@@ -20,15 +20,22 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { Form, useLoaderData, useSubmit } from "@remix-run/react";
 import { Share } from "lucide-react";
 import * as React from "react";
+import { useEffect } from "react";
+import { toast } from "sonner";
 import { INTENTS } from "../intents";
 import { loader } from "../route";
-import { toast } from "sonner";
 
 export interface ShareMapProps {
   map_id: string;
@@ -88,12 +95,21 @@ function ShareMapForm({ map_id }: ShareMapProps) {
   const { q, users } = useLoaderData<typeof loader>();
   // need to do fetching of data to search for users
 
-  const handleSubmit = (event) => {
+  useEffect(() => {
+    console.log(selectedUser);
+  }, [selectedUser]);
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    formData.append("map_id", map_id);
+    formData.append("intent", INTENTS.shareMap);
 
     if (selectedUser !== undefined) formData.append("user_id", selectedUser);
-    else toast.error("Must select a user");
+    else {
+      toast.error("Must select a user");
+      return;
+    }
 
     submit(formData, {
       method: "post",
@@ -147,8 +163,11 @@ function ShareMapForm({ map_id }: ShareMapProps) {
       >
         <div className="grid gap-2"></div>
 
-        <Label htmlFor="permissionLevel">Access Type</Label>
-        <Select name="permissionLevel" defaultValue="editor">
+        <Label htmlFor="permission">Access Type</Label>
+        <Select name="permission" defaultValue="editor">
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select a fruit" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="viewer">Viewer</SelectItem>
             <SelectItem value="editor">Editor</SelectItem>

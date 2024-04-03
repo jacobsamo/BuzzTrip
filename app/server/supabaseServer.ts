@@ -19,4 +19,21 @@ function getSupabaseServerClient(
   );
 }
 
+export function getSupabaseServerAdminClient(
+  request: Request,
+  context: AppLoadContext,
+  response?: Response
+) {
+  const env: any = context.cloudflare.env;
+  const res = response ?? new Response();
+  return createServerClient<Database>(
+    env.SUPABASE_URL!,
+    env.PRIVATE_SUPABASE_SERVICE_ROLE!,
+    {
+      request,
+      response: res,
+    }
+  );
+}
+
 export default getSupabaseServerClient;
