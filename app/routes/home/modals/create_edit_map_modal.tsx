@@ -23,7 +23,6 @@ import { Label } from "@/components/ui/label";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 // import getSupabaseServerClient from "@/server/supabaseServer";
-import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Map } from "@/lib/types";
 import { Form } from "@remix-run/react";
@@ -96,7 +95,7 @@ function MapForm({ mode, map }: MapModalProps) {
     >
       <div className="grid gap-2">
         <Label htmlFor="title">Title</Label>
-        <Input type="text" id="title" name="title" placeholder="Roadtrip" />
+        <Input type="text" id="title" name="title" placeholder="Roadtrip" defaultValue={map?.title ?? ''} />
       </div>
       <div className="grid gap-2">
         <Label htmlFor="description">Description</Label>
@@ -104,6 +103,7 @@ function MapForm({ mode, map }: MapModalProps) {
           id="description"
           name="description"
           placeholder="epic roadtrip!!"
+          defaultValue={map?.description ?? ''}
         />
       </div>
 

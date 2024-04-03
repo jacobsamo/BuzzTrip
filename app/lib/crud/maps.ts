@@ -81,3 +81,32 @@ export async function deleteMap(
   }
   return new Error("you don't have the right permissions");
 }
+
+
+export async function shareMap(
+  sharedMap: TablesInsert<"shared_map">,
+  request: Request,
+  context: AppLoadContext
+) {
+  const supabase = getSupabaseServerClient(request, context);
+  const user = await getUser(request, context);
+
+  if (!user) {
+    return new Error("UNAUTHORIZED: user not found.");
+  }
+
+
+  const { data: createdSharedMap, error: createSharedMapError } = await supabase
+    .from("shared_map")
+    .insert(sharedMap)
+    .select();
+
+  if (!createdSharedMap || createSharedMapError) {
+    return new Error("Error creating new map.", {
+      cause: createSharedMapError,
+    });
+  }
+
+
+  return { sharedMap: createdSharedMap[0] };
+}
