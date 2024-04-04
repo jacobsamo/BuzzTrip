@@ -12,6 +12,8 @@ export type MapContextValue = {
   setMarkers: React.Dispatch<React.SetStateAction<Marker[] | null>>;
   map: Map | null;
   setMap: React.Dispatch<React.SetStateAction<Map | null>>;
+  searchValue: string;
+  setSearchValue: React.Dispatch<React.SetStateAction<string>>;
   collections: Collection[] | null;
   setCollections: React.Dispatch<React.SetStateAction<Collection[] | null>>;
   activeLocation: Location | null;
@@ -63,12 +65,16 @@ export const MapProvider = ({
   const [addToCollectionOpen, setAddToCollectionOpen] =
     useState<boolean>(false);
 
+  const [searchValue, setSearchValue] = useState<string>("");
+
   // Context value
   const contextValue: MapContextValue = {
     markers,
     setMarkers,
     map,
     setMap,
+    searchValue,
+    setSearchValue,
     collections,
     setCollections,
     activeLocation,
