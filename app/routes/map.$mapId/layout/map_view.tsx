@@ -21,7 +21,7 @@ interface MainLayoutProps {
 
 const MapView = ({ collections, markers, env, map }: MainLayoutProps) => {
   return (
-    <main className="overflow-hidden">
+    <main className="w-full h-full">
       <MapProvider
         initialCollections={collections}
         initialMarkers={markers}

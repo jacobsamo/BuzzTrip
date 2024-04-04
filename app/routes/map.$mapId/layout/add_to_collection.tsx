@@ -17,6 +17,7 @@ const AddToCollection = () => {
   const fetcher = useFetcher();
   const submit = useSubmit();
   const {
+    setSearchValue,
     markers,
     setMarkers,
     collections,
@@ -80,6 +81,7 @@ const AddToCollection = () => {
     setActiveLocation(null);
     setSnap(0.5);
     setMarkers([marker, ...markers]);
+    setSearchValue("");
     toast.success("Location added to collection");
   };
 

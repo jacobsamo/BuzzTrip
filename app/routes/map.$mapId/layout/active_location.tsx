@@ -34,15 +34,15 @@ const ActiveLocation = () => {
         <p className="text-base text-gray-900">
           {activeLocation.lat}, {activeLocation.lng}
         </p>
-        <div className="flex max-h-40 flex-row gap-2 overflow-x-scroll">
-          {activeLocation.photos?.map((photo) => (
-            <>
+        <div className="flex h-44 w-fit flex-row gap-2 overflow-x-auto">
+          {activeLocation.photos && activeLocation.photos.map((photo) => (
+              // eslint-disable-next-line jsx-a11y/img-redundant-alt
               <img
+                key={photo}
                 src={photo}
                 alt="location photo"
                 className="h-40 w-40 rounded-md object-cover object-center"
               />
-            </>
           ))}
         </div>
       </div>

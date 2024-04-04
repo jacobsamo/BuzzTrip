@@ -20,7 +20,7 @@ const Main = () => {
       {addToCollectionOpen && <AddToCollection />}
 
       {!addToCollectionOpen && !activeLocation && (
-        <div className="mb-4 flex flex-row justify-end">
+        <div key="collection-modal" className="mb-4 flex flex-row justify-end">
           <CollectionModal map_id={map!.uid} />
         </div>
       )}
@@ -44,7 +44,7 @@ const Main = () => {
                       map_id={map!.uid}
                     />
                   </div>
-                  <ul className="ml-4">
+                  <ul key={`markers-${collection.uid}`} className="ml-4">
                     {markers &&
                       markers.map((marker) => (
                         <>
