@@ -26,12 +26,17 @@ export const locationSchema = z.object({
   opening_times: z.string().array().nullable(),
 });
 
-export const markerSchema = locationSchema.extend({
+export const markerEditSchema = z.object({
+  uid: z.string(),
+  title: z.string(),
+  color: z.string().nullable(),
+  description: z.string().nullable(),
   map_id: z.string(),
   collection_id: z.string(),
-  color: z.string().nullable(),
   created_by: z.string(),
-});
+})
+
+export const markerSchema = locationSchema.extend(markerEditSchema.shape);
 
 export const collectionSchema = z.object({
   color: z.string().nullable(),

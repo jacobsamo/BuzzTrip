@@ -4,6 +4,7 @@ import MarkerPin from "./MarkerPin";
 import MarkerModal from "./modals/create_edit_marker_modal";
 import { useMapContext } from "./providers/map_provider";
 import { useMap } from "@vis.gl/react-google-maps";
+import { IconProps } from "@/components/ui/icon";
 
 const MarkerCard = ({ marker }: { marker: Marker }) => {
   const { setActiveLocation } = useMapContext();
@@ -13,14 +14,13 @@ const MarkerCard = ({ marker }: { marker: Marker }) => {
     <div className="flex flex-row justify-between">
       <button
         onClick={() => {
-          map!.panTo({ lat: marker.lat, lng: marker.lng });
+          if (map) map!.panTo({ lat: marker.lat, lng: marker.lng });
           setActiveLocation(marker);
         }}
-        className="inline-flex gap-2 items-center"
+        className="inline-flex items-center gap-2"
       >
         <MarkerPin
-          name="MdLocationOn"
-          // backgroundColor={marker.color || "#E65200"}
+            marker={marker}
         />
         <h1>{marker.title}</h1>
       </button>

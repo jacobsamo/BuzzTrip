@@ -33,11 +33,11 @@ const Main = () => {
 
       {addToCollectionOpen && <AddToCollection />}
 
-      {/* {!addToCollectionOpen && !activeLocation && (
+      {!addToCollectionOpen && !activeLocation && (
         <div key="collection-modal" className="mb-4 flex flex-row justify-end">
           <CollectionModal map_id={map!.uid} />
         </div>
-      )} */}
+      )}
 
       {activeLocation === null && (
         <>
