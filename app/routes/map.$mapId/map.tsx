@@ -15,7 +15,6 @@ const MarkerPin = lazy(() => import("./MarkerPin"));
 
 const Map = () => {
   const { activeLocation, markers, env, setActiveLocation } = useMapContext();
-  const map = useMap();
 
   const mapOptions = {
     center: {
@@ -67,13 +66,12 @@ const Map = () => {
               position={{ lat: marker.lat, lng: marker.lng }}
               title={marker.title}
               onClick={() => {
-                map!.panTo({ lat: marker.lat, lng: marker.lng });
+                // map!.panTo({ lat: marker.lat, lng: marker.lng });
                 setActiveLocation(marker);
               }}
             >
               <MarkerPin
-                // backgroundColor={marker.color}
-                name="MdOutlineLocationOn"
+                marker={marker}
                 size={16}
               />
             </AdvancedMarker>

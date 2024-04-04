@@ -1,3 +1,4 @@
+import ConfirmDeleteModal from "@/components/modals/comfirm_delete_modal";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { iconsList } from "@/lib/data";
 import { Collection } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { INTENTS } from "@/routes/map.$mapId/intents";
@@ -38,14 +40,6 @@ interface CollectionModalProps {
   collection?: Collection | null;
   map_id: string;
 }
-
-const iconsList: IconProps["name"][] = [
-  "MdOutlineFolder",
-  "MdOutlineLocationOn",
-  "MdOutlineHiking",
-  "MdOutlineBed",
-  "MdOutlineDirections",
-];
 
 export default function CollectionModal({
   mode = "create",
@@ -114,6 +108,14 @@ export default function CollectionModal({
   );
 }
 
+const Close = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <DialogClose asChild>
+      <DrawerClose asChild>{children}</DrawerClose>
+    </DialogClose>
+  );
+};
+
 function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
   const { setCollections } = useMapContext();
   const submit = useSubmit();
@@ -170,11 +172,38 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
     }
   };
 
+  const handleDelete = (event) => {
+    event.preventDefault();
+
+    // Create FormData object
+    const formData = new FormData();
+    formData.append("intent", INTENTS.deleteCollection);
+    formData.append("uid", collection!.uid);
+
+    const values = Object.entries(formData);
+    console.log("Delete: ", values);
+
+    // Perform your form submission
+    submit(formData, {
+      method: "delete",
+      fetcherKey: `collection:${collection?.uid}`,
+      navigate: false,
+      unstable_flushSync: true,
+    });
+
+    // Delete the collection
+    setCollections((prev) => {
+      const index = prev.findIndex((c) => c.uid === collection!.uid);
+      prev.splice(index, 1);
+      return [...prev];
+    });
+  };
+
   return (
-    <>
+    <div>
       <Form
         method="post"
-        className={cn("grid items-start gap-4")}
+        className={cn("flex flex-col gap-4")}
         onSubmit={handleSubmit} // Listen to form submission event
       >
         <Label htmlFor="title">Title</Label>
@@ -208,14 +237,16 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
           defaultValue={collection?.description ?? ""}
         />
 
-        <DialogClose asChild>
-          <DrawerClose asChild>
-            <Button aria-label="Create collection" type="submit">
-              Submit
-            </Button>
-          </DrawerClose>
-        </DialogClose>
+        <Close>
+          <Button aria-label="Create collection" type="submit">
+            Submit
+          </Button>
+        </Close>
       </Form>
-    </>
+
+      {mode === "edit" && collection && (
+        <ConfirmDeleteModal type="collection" handleDelete={handleDelete} />
+      )}
+    </div>
   );
 }

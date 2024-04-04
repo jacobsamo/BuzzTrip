@@ -1,8 +1,16 @@
 import { badRequest } from "@/lib/bad-request";
-import { createCollection } from "@/lib/crud/collections";
-import { createMarker } from "@/lib/crud/markers";
+import {
+  createCollection,
+  editCollection,
+  deleteCollection,
+} from "@/lib/crud/collections";
+import { createMarker, editMarker, deleteMarker } from "@/lib/crud/markers";
 import { getUser } from "@/lib/getUser";
-import { collectionSchema, markerSchema } from "@/lib/schemas";
+import {
+  collectionSchema,
+  markerEditSchema,
+  markerSchema,
+} from "@/lib/schemas";
 import { convertFormDataToObject } from "@/lib/utils";
 import { GlobalProvider } from "@/routes/map.$mapId/providers/global_provider";
 import {
@@ -77,10 +85,7 @@ export const loader = async ({
   );
 };
 
-export const action = async ({
-  request,
-  context,
-}: LoaderFunctionArgs) => {
+export const action = async ({ request, context }: LoaderFunctionArgs) => {
   try {
     const formData = await request.formData();
     const values = Object.fromEntries(formData.entries());
@@ -100,6 +105,26 @@ export const action = async ({
         await createCollection(collection, request, context);
         break;
       }
+      case INTENTS.updateCollection: {
+        const collection = collectionSchema
+          .extend({
+            uid: z.string(),
+            map_id: z.string(),
+          })
+          .parse(values);
+
+        await editCollection(collection.uid, collection, request, context);
+        break;
+      }
+      case INTENTS.deleteCollection: {
+        const { uid } = values;
+        if (!uid) throw badRequest("Missing uid");
+
+        await deleteCollection(uid.toString(), request, context);
+
+        break;
+      }
+
       case INTENTS.createMarker: {
         const parsed = convertFormDataToObject(formData);
 
@@ -108,6 +133,31 @@ export const action = async ({
         const marker = markerSchema.parse(data);
 
         await createMarker(marker, request, context);
+        break;
+      }
+      case INTENTS.updateMarker: {
+        const parsed = convertFormDataToObject(formData);
+        console.log("Edit: ", parsed);
+
+        const data = { ...parsed, created_by: user.id };
+
+        const marker = markerEditSchema
+          .extend({
+            uid: z.string(),
+            map_id: z.string(),
+          })
+          .parse(data);
+
+        await editMarker(marker.uid, marker, request, context);
+
+        break;
+      }
+      case INTENTS.deleteMarker: {
+        const { uid } = values;
+        if (!uid) throw badRequest("Missing uid");
+
+        await deleteMarker(uid.toString(), request, context);
+
         break;
       }
       default: {

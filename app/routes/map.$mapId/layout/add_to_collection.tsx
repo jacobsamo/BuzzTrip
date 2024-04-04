@@ -73,7 +73,7 @@ const AddToCollection = () => {
         fetcherKey: `marker`,
         navigate: false,
         unstable_flushSync: true,
-        replace: true,
+        replace: true,    
       }
     );
 
