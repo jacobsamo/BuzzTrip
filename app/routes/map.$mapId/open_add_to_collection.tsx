@@ -5,7 +5,7 @@ import { useMapContext } from "./providers/map_provider";
 
 const AddToCollectionButton = () => {
   const { setAddToCollectionOpen } = useMapContext();
-  const { snap, setSnap } = useGlobalContext();
+  const { setSnap } = useGlobalContext();
 
   const openView = () => {
     setAddToCollectionOpen(true);

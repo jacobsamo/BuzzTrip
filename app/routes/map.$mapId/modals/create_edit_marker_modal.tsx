@@ -20,14 +20,13 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Marker } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Form } from "@remix-run/react";
 import { Edit, Plus } from "lucide-react";
 import * as React from "react";
-import { Select } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { INTENTS } from "../intents";
 
 export interface MarkerModalProps {
@@ -105,11 +104,6 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
     <Form
       className={cn("grid items-start gap-4")}
       method="post"
-      action={
-        mode === "create"
-          ? "/api/marker/create"
-          : `"/api/marker/edit?id=${marker?.uid}`
-      }
       navigate={false}
     >
       <div className="grid gap-2">
@@ -132,11 +126,7 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
         />
       </div>
 
-      {/* <div className="grid gap-2">
-        <Label htmlFor="location">Location</Label>
-        <Select></Select>
-      </div>     */}
-      <DialogClose type="submit">Save changes</DialogClose>
+      {marker && <input type="hidden" name="uid" value={marker.uid} />}
 
       <DialogClose asChild>
         <DrawerClose asChild>
@@ -144,9 +134,11 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
             aria-label="Create Marker"
             type="submit"
             name="intent"
-            value={INTENTS.createMarker}
+            value={
+              mode == "create" ? INTENTS.createMarker : INTENTS.updateMarker
+            }
           >
-            Submit
+            {mode === "create" ? "Create" : "Save changes"}
           </Button>
         </DrawerClose>
       </DialogClose>

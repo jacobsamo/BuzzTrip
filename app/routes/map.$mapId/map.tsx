@@ -3,16 +3,19 @@ import {
   AdvancedMarker,
   Map as GoogleMap,
   Pin,
+  useMap,
 } from "@vis.gl/react-google-maps";
 import { lazy, memo } from "react";
-import { useMapContext } from "./providers/map_provider";
 import { AutocompleteCustomInput } from "./custom-search";
+import { useMapContext } from "./providers/map_provider";
+import MainDrawer from "./main_drawer";
+import Main from "./layout/main";
 
-const PlaceAutocompleteInput = lazy(() => import("./search"));
 const MarkerPin = lazy(() => import("./MarkerPin"));
 
 const Map = () => {
   const { activeLocation, markers, env, setActiveLocation } = useMapContext();
+  const map = useMap();
 
   const mapOptions = {
     center: {
@@ -35,7 +38,6 @@ const Map = () => {
         defaultZoom={mapOptions.zoom}
         mapId={env.GOOGLE_MAPS_MAPID!}
         disableDefaultUI={true}
-        onDblclick={(e) => console.log("Double click map event: ", e)}
         onClick={(e) => {
           console.log("Click map event: ", e);
         }}
@@ -64,7 +66,10 @@ const Map = () => {
               key={marker.uid}
               position={{ lat: marker.lat, lng: marker.lng }}
               title={marker.title}
-              onClick={(e) => setActiveLocation(marker)}
+              onClick={() => {
+                map!.panTo({ lat: marker.lat, lng: marker.lng });
+                setActiveLocation(marker);
+              }}
             >
               <MarkerPin
                 // backgroundColor={marker.color}
@@ -74,6 +79,10 @@ const Map = () => {
             </AdvancedMarker>
           ))}
       </GoogleMap>
+
+      <MainDrawer>
+        <Main />
+      </MainDrawer>
     </APIProvider>
   );
 };

@@ -29,9 +29,7 @@ const MapView = ({ collections, markers, env, map }: MainLayoutProps) => {
         initialMap={map}
       >
         <Map />
-        <MainDrawer>
-          <Main />
-        </MainDrawer>
+    
       </MapProvider>
     </main>
   );

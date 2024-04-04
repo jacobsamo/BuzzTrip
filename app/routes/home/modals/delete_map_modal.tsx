@@ -10,23 +10,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
+  DrawerClose
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useMediaQuery } from "@/hooks/use-media-query";
-import { cn } from "@/lib/utils";
 import { Select, SelectItem } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import { Form, useSubmit } from "@remix-run/react";
-import { Plus, Share, Share } from "lucide-react";
-import * as React from "react";
+import { Share } from "lucide-react";
 import { INTENTS } from "../intents";
 
 export interface ShareMapProps {
@@ -44,7 +35,7 @@ export default function ShareModal({ map_id }: ShareMapProps) {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Delete Map</DialogTitle>
-          <DialogDescription>THIS CAN'T BE REVERSED</DialogDescription>
+          <DialogDescription>THIS CAN&apos;T BE REVERSED</DialogDescription>
         </DialogHeader>
         <Form method="post" navigate={false}>
           <p>

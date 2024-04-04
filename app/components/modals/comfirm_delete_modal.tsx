@@ -6,8 +6,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogTrigger,
-  DialogFooter,
-} from "../ui/dialog";
+} from "@/components/ui/dialog";
 import { Trash2 } from "lucide-react";
 import { Form } from "@remix-run/react";
 import { Button } from "../ui/button";
