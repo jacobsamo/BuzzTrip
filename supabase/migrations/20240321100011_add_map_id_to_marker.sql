@@ -1,2 +1,0 @@
-ALTER TABLE public.marker
-ADD COLUMN map_id UUID REFERENCES public.map(uid) ON DELETE CASCADE;
