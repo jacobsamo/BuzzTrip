@@ -1,17 +1,15 @@
-import { useEffect, useState, useCallback } from "react";
-import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { Location } from "@/lib/types";
-import { useMapContext } from "./providers/map_provider";
-import { Input } from "@/components/ui/input";
+import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { SearchIcon, X } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { useMapContext } from "./providers/map_provider";
 // import { Command, CommandItem, CommandList, CommandEmpty } from "@/components/ui/command";
 import { Command } from "cmdk";
 
 export const AutocompleteCustomInput = () => {
   const map = useMap();
   const places = useMapsLibrary("places");
-  const { activeLocation, setActiveLocation, searchValue, setSearchValue } =
-    useMapContext();
+  const { setActiveLocation, searchValue, setSearchValue } = useMapContext();
 
   // https://developers.google.com/maps/documentation/javascript/reference/places-autocomplete-service#AutocompleteSessionToken
   const [sessionToken, setSessionToken] =
@@ -216,7 +214,7 @@ export const AutocompleteCustomInput = () => {
                 <Command.Item
                   key={pred.place_id}
                   value={pred.description}
-                  onSelect={(currentValue) => {
+                  onSelect={() => {
                     onSelect(pred);
                   }}
                   // className="select-all pointer-events-auto cursor-pointer"

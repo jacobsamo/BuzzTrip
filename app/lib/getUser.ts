@@ -5,7 +5,6 @@ export const getUser = async (request: Request, context: AppLoadContext) => {
   const supabase = getSupabaseServerClient(request, context);
   const {
     data: { user },
-    error,
   } = await supabase.auth.getUser();
   return user;
 };

@@ -115,7 +115,7 @@ export default function CollectionModal({
 }
 
 function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
-  const { collections, setCollections } = useMapContext();
+  const { setCollections } = useMapContext();
   const submit = useSubmit();
 
   // State to store selected icon

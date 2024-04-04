@@ -17,6 +17,7 @@ import { Database } from "database.types";
 import { lazy, Suspense } from "react";
 import { z } from "zod";
 import { INTENTS } from "./intents";
+import { Collection, Marker } from "@/lib/types";
 
 const MapView = lazy(() => import("./layout/map_view"));
 
@@ -78,7 +79,6 @@ export const loader = async ({
 
 export const action = async ({
   request,
-  params,
   context,
 }: LoaderFunctionArgs) => {
   try {

@@ -1,5 +1,7 @@
+import { Button } from "@/components/ui/button";
 import Icon, { IconProps } from "@/components/ui/icon";
 import { useMapContext } from "@/routes/map.$mapId/providers/map_provider";
+import { ArrowLeft } from "lucide-react";
 import { lazy } from "react";
 
 const ActiveLocation = lazy(() => import("./active_location"));
@@ -10,20 +12,32 @@ const CollectionModal = lazy(
 const MarkerCard = lazy(() => import("../marker_card"));
 
 const Main = () => {
-  const { markers, collections, activeLocation, map, addToCollectionOpen } =
-    useMapContext();
+  const {
+    markers,
+    collections,
+    activeLocation,
+    setActiveLocation,
+    map,
+    addToCollectionOpen,
+  } = useMapContext();
 
   return (
     <div className="h-full p-2">
+      {(activeLocation || addToCollectionOpen) && (
+        <Button onClick={() => setActiveLocation(null)} variant={"link"} className="text-base">
+          <ArrowLeft /> Back
+        </Button>
+      )}
+
       {activeLocation !== null && !addToCollectionOpen && <ActiveLocation />}
 
       {addToCollectionOpen && <AddToCollection />}
 
-      {!addToCollectionOpen && !activeLocation && (
+      {/* {!addToCollectionOpen && !activeLocation && (
         <div key="collection-modal" className="mb-4 flex flex-row justify-end">
           <CollectionModal map_id={map!.uid} />
         </div>
-      )}
+      )} */}
 
       {activeLocation === null && (
         <>

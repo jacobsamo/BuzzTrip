@@ -5,6 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function checkIfArray(value: any) {
   try {
     const parsedValue = JSON.parse(value);
@@ -16,7 +17,7 @@ export function checkIfArray(value: any) {
 
 export function convertFormDataToObject(formData: FormData) {
   let object: any = {};
-  const values = Object.fromEntries(formData.entries());
+  const values = Object.fromEntries(formData);
 
   formData.forEach((value, key) => {
     object[key] = values[key];
