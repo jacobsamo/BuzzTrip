@@ -1,26 +1,17 @@
 import { TablesInsert, TablesUpdate } from "@/../database.types";
 import { getUser } from "../getUser";
-import { supabaseServer } from "../supabase";
+import { createClient } from "../supabase/server";
+
 
 
 export async function createMarker(
   marker: TablesInsert<"marker">,
-
 ) {
-  const user = await getUser();
+  const supabase = createClient();
 
-  if (!user) {
-    return new Error("UNAUTHORIZED: user not found.");
-  }
-
-  const newMarker: TablesInsert<"marker"> = {
-    ...marker,
-    created_by: user.id,
-  };
-
-  const { data: createdMarker, error: createMarkerError } = await supabaseServer
+  const { data: createdMarker, error: createMarkerError } = await supabase
     .from("marker")
-    .insert(newMarker)
+    .insert(marker)
     .select();
 
   if (!createdMarker || createMarkerError) {
@@ -36,20 +27,11 @@ export async function editMarker(
   uid: string,
   marker: TablesUpdate<"marker">,
 ) {
-  const user = await getUser();
+  const supabase = createClient();
 
-  if (!user) {
-    return new Error("UNAUTHORIZED: user not found.");
-  }
-
-  const newMarker: TablesUpdate<"marker"> = {
-    ...marker,
-    created_by: user.id,
-  };
-
-  const { data: createdMarker, error: createMarkerError } = await supabaseServer
+  const { data: createdMarker, error: createMarkerError } = await supabase
     .from("marker")
-    .update(newMarker).eq("uid", uid)
+    .update(marker).eq("uid", uid)
     .select();
 
   if (!createdMarker || createMarkerError) {
@@ -65,14 +47,9 @@ export async function editMarker(
 export async function deleteMarker(
   uid: string,
 ) {
-  const user = await getUser();
+  const supabase = createClient();
 
-  if (!user) {
-    return new Error("UNAUTHORIZED: user not found.");
-  }
-
-
-  const { data: createdMarker, error: createMarkerError } = await supabaseServer
+  const { data: createdMarker, error: createMarkerError } = await supabase
     .from("marker")
     .delete().eq("uid", uid)
     .select();
