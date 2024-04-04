@@ -1,8 +1,6 @@
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Link } from '@remix-run/react';
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Link } from "@remix-run/react";
 // import { FireIcon, MenuIcon } from '@/icons';
-
-
 
 export default function Nav() {
   return (
@@ -16,9 +14,7 @@ export default function Nav() {
           className="h-16 w-16 rounded-full"
         />
       </div>
-      <div className="hidden gap-8 lg:flex">
-
-      </div>
+      <div className="hidden gap-8 lg:flex"></div>
       <div className="flex justify-end gap-2 2xl:flex-1">
         <Link to="/auth" className={buttonVariants()}>
           Sign In
@@ -26,4 +22,4 @@ export default function Nav() {
       </div>
     </div>
   );
-};
+}

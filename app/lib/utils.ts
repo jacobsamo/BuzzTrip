@@ -1,12 +1,11 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
-
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function checkIfArray(value: any) {
   try {
     const parsedValue = JSON.parse(value);
@@ -17,29 +16,28 @@ export function checkIfArray(value: any) {
 }
 
 export function convertFormDataToObject(formData: FormData) {
-let object: any = {};
-const values = Object.fromEntries(formData.entries());
+  let object: any = {};
+  const values = Object.fromEntries(formData);
 
-formData.forEach((value, key) => {
-  object[key] = values[key];
+  formData.forEach((value, key) => {
+    object[key] = values[key];
 
-  if (/^\d+$/.test(value)) {
-    values[key] = parseInt(values[key]);
-  } else if (/^-?\d+(\.\d+)?$/.test(value)) {
-    values[key] = parseFloat(values[key]);
-  } else if (values[key] === "null") {
-    values[key] = null;
-  } else if (values[key] === "true") {
-    values[key] = true;
-  } else if (values[key] === "false") {
-    values[key] = false;
-  } else if (checkIfArray(values[key])) {
-    values[key] = JSON.parse(values[key]);
-  }
+    if (/^\d+$/.test(value)) {
+      values[key] = parseInt(values[key]);
+    } else if (/^-?\d+(\.\d+)?$/.test(value)) {
+      values[key] = parseFloat(values[key]);
+    } else if (values[key] === "null") {
+      values[key] = null;
+    } else if (values[key] === "true") {
+      values[key] = true;
+    } else if (values[key] === "false") {
+      values[key] = false;
+    } else if (checkIfArray(values[key])) {
+      values[key] = JSON.parse(values[key]);
+    }
 
-  object[key] = values[key];
-});
+    object[key] = values[key];
+  });
 
-return object;
+  return object;
 }
-

@@ -277,7 +277,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      permission_level: "viewer" | "editer" | "admin" | "owner"
+      permission_level: "viewer" | "editor" | "admin" | "owner"
     }
     CompositeTypes: {
       [_ in never]: never

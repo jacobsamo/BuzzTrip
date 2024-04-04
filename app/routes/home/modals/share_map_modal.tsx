@@ -1,45 +1,54 @@
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-    Drawer,
-    DrawerClose,
-    DrawerContent,
-    DrawerDescription,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
-import { Select, SelectItem } from "@/components/ui/select";
-import { Form, useSubmit } from "@remix-run/react";
-import { Plus, Share, Share } from "lucide-react";
+import { Form, useLoaderData, useSubmit } from "@remix-run/react";
+import { Share } from "lucide-react";
 import * as React from "react";
+import { useEffect } from "react";
+import { toast } from "sonner";
 import { INTENTS } from "../intents";
+import { loader } from "../route";
 
 export interface ShareMapProps {
-    map_id: string;
+  map_id: string;
 }
 
-export default function ShareModal({map_id}: ShareMapProps) {
+export default function ShareModal({ map_id }: ShareMapProps) {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
+        <DialogTrigger>
           <Button variant="outline">
             <Share /> Share
           </Button>
@@ -78,55 +87,107 @@ export default function ShareModal({map_id}: ShareMapProps) {
   );
 }
 
-function ShareMapForm({map_id}: ShareMapProps) {
-    const submit = useSubmit();
-    // need to do fetching of data to search for users
+function ShareMapForm({ map_id }: ShareMapProps) {
+  const submit = useSubmit();
+  const [selectedUser, setSelectedUser] = React.useState<string | undefined>(
+    undefined
+  );
+  const { q, users } = useLoaderData<typeof loader>();
+  // need to do fetching of data to search for users
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const formData = new FormData(event.currentTarget);
+  useEffect(() => {
+    console.log(selectedUser);
+  }, [selectedUser]);
 
-        submit(formData, {
-            method: "post",
-            fetcherKey: `shareMap:${map_id}`,
-            navigate: false,
-            unstable_flushSync: true,
-        });
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    formData.append("map_id", map_id);
+    formData.append("intent", INTENTS.shareMap);
+
+    if (selectedUser !== undefined) formData.append("user_id", selectedUser);
+    else {
+      toast.error("Must select a user");
+      return;
     }
 
+    submit(formData, {
+      method: "post",
+      fetcherKey: `shareMap:${map_id}`,
+      navigate: false,
+      unstable_flushSync: true,
+    });
+  };
+
   return (
-    <Form
-      className={cn("grid items-start gap-4")}
-      method="post"
-      onSubmit={handleSubmit}
-    >
-      <div className="grid gap-2">
-        <Label htmlFor="title">Email</Label>
-        {/*Try to validate this field as much as possible */}
-        <Input type="email" id="email" name="email" placeholder="john@example.com" />
+    <>
+      <div className="flex flex-col gap-2">
+        <Form
+          id="search-form"
+          onChange={(event) => {
+            const isFirstSearch = q === null;
+            submit(event.currentTarget, {
+              replace: !isFirstSearch,
+            });
+          }}
+          role="search"
+        >
+          <Label htmlFor="q">Find user</Label>
+          <Input
+            aria-label="Search for user by email"
+            defaultValue={q || ""}
+            id="q"
+            name="q"
+            placeholder="Search by email"
+            type="search"
+          />
+        </Form>
+        <div className="flex-col gap-2">
+          {users !== undefined &&
+            users.map((user) => (
+              <Button
+                key={user.id}
+                onClick={() => setSelectedUser(user.id)}
+                variant={"outline"}
+              >
+                {user.email}
+              </Button>
+            ))}
+        </div>
       </div>
 
-        <Label htmlFor="permissionLevel">Access Type</Label>
-        <Select name="permissionLevel" defaultValue="editor">
-            <SelectItem value="viewer">
-                Viewer
-            </SelectItem>
-            <SelectItem value="editor">
-                Editor
-            </SelectItem>
-            <SelectItem value="admin">
-                Admin
-            </SelectItem>
+      <Form
+        className={cn("grid items-start gap-4")}
+        method="post"
+        onSubmit={handleSubmit}
+      >
+        <div className="grid gap-2"></div>
+
+        <Label htmlFor="permission">Access Type</Label>
+        <Select name="permission" defaultValue="editor">
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select a fruit" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="viewer">Viewer</SelectItem>
+            <SelectItem value="editor">Editor</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+          </SelectContent>
         </Select>
 
         <DialogClose asChild>
-            <DrawerClose asChild>
-                <Button aria-label="Share map" type="submit" name="intent" 
-                value={INTENTS.shareMap}>
-                Share
-                </Button>
-            </DrawerClose>
+          <DrawerClose asChild>
+            <Button
+              aria-label="Share map"
+              type="submit"
+              name="intent"
+              value={INTENTS.shareMap}
+            >
+              Share
+            </Button>
+          </DrawerClose>
         </DialogClose>
-    </Form>
+      </Form>
+    </>
   );
 }

@@ -1,51 +1,69 @@
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from '../ui/dialog'
-import { Trash2 } from 'lucide-react'
-import { Form } from '@remix-run/react'
-import { Button } from '../ui/button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Trash2 } from "lucide-react";
+import { Form } from "@remix-run/react";
+import { Button, buttonVariants } from "../ui/button";
 
 interface ConfirmDeleteModalProps {
-  id?: string,
-    type?: "map" | "marker" | "collection"
+  type?: "map" | "marker" | "collection";
+  handleDelete: (event: React.FormEvent<HTMLFormElement> | any) => void;
 }
 
-const ConfirmDeleteModal = ({id, type = "map"}: ConfirmDeleteModalProps) => {
+const ConfirmDeleteModal = ({
+  type = "map",
+  handleDelete,
+}: ConfirmDeleteModalProps) => {
   return (
-
-    <>
     <Dialog>
-        <DialogTrigger asChild>
-        <Trash2 /> Delete
-
-        </DialogTrigger>
-        <DialogContent>
-
+      <DialogTrigger
+        className={buttonVariants({
+          variant: "destructive",
+          className: "w-11/12",
+        })}
+      >
+        <Trash2 className="text-white" /> Delete
+      </DialogTrigger>
+      <DialogContent>
         <DialogHeader>
-            <DialogTitle>Are you sure</DialogTitle>
-            <DialogDescription>Are you sure you want to delete this {type}</DialogDescription>
-          </DialogHeader>
-          <div>
+          <DialogTitle>Are you sure</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete this {type}
+          </DialogDescription>
+        </DialogHeader>
+        <div>
+          {type === "map" && (
+            <p>This will delete all collections and markers for this map</p>
+          )}
 
-          <p>This will delete all collections and markers for this map</p>
+          {type === "collection" && (
+            <p>This will delete all markers in this collection</p>
+          )}
 
-          <Form method='post' action={`/api/${type}/delete?id=${id}`} navigate={false}>
-            
-
+          <div className="inline-flex w-full items-end justify-end gap-2">
             <DialogClose>
-              <Button variant="outline" type="button">Cancel</Button>
+              <Button variant="outline" type="button">
+                Cancel
+              </Button>
             </DialogClose>
-
-            <DialogClose>
-            <Button variant="destructive" type='submit'>Delete</Button>
-
-            </DialogClose>
-      
-          </Form>
+            <Form method="delete" onSubmit={handleDelete}>
+              <DialogClose>
+                <Button variant="destructive" type="submit">
+                  Delete
+                </Button>
+              </DialogClose>
+            </Form>
           </div>
-        </DialogContent>
-      </Dialog>
-    </>
-    
-  )
-}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
-export default ConfirmDeleteModal
+export default ConfirmDeleteModal;

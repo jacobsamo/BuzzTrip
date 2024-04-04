@@ -11,13 +11,26 @@ const PlaceAutocompleteInput = () => {
     useState<google.maps.places.Autocomplete | null>(null);
   const places = useMapsLibrary("places");
   const map = useMap();
-  const {setActiveLocation} = useMapContext();
+  const { setActiveLocation } = useMapContext();
 
   useEffect(() => {
     if (!places || !inputRef.current) return;
 
     const options: google.maps.places.AutocompleteOptions = {
-      fields: ["geometry", "name", "formatted_address", "place_id", "photos", "rating", "price_level", "types", "website", "formatted_phone_number", "opening_hours", "reviews"],
+      fields: [
+        "geometry",
+        "name",
+        "formatted_address",
+        "place_id",
+        "photos",
+        "rating",
+        "price_level",
+        "types",
+        "website",
+        "formatted_phone_number",
+        "opening_hours",
+        "reviews",
+      ],
     };
 
     setPlaceAutocomplete(new places.Autocomplete(inputRef.current, options));
@@ -36,7 +49,7 @@ const PlaceAutocompleteInput = () => {
       }
 
       const location: Location = {
-        place_id: place.place_id ?? '',
+        place_id: place.place_id ?? "",
         lat: place.geometry.location.lat(),
         lng: place.geometry.location.lng(),
         icon: "MdOutlineLocationOn",
@@ -45,16 +58,17 @@ const PlaceAutocompleteInput = () => {
           : `${place.geometry.location.lat()}, ${place.geometry.location.lng()}`,
         description: place?.html_attributions?.[0] ?? null,
         address: place.formatted_address ?? null,
-        photos: place?.photos?.map(photo => photo.getUrl()) ?? null,
-        reviews: place?.reviews?.map(review => {
+        photos: place?.photos?.map((photo) => photo.getUrl()) ?? null,
+        reviews:
+          place?.reviews?.map((review) => {
             return {
-                author_name: review.author_name,
-                author_url: review.author_url ?? null,
-                profile_photo_url: review.profile_photo_url,
-                rating: review.rating ?? null,
-                description: review.text
+              author_name: review.author_name,
+              author_url: review.author_url ?? null,
+              profile_photo_url: review.profile_photo_url,
+              rating: review.rating ?? null,
+              description: review.text,
             };
-        }) ?? null,
+          }) ?? null,
         rating: place.rating ?? null,
         avg_price: place.price_level ?? null,
         types: place.types ?? null,
@@ -62,7 +76,6 @@ const PlaceAutocompleteInput = () => {
         phone: place.formatted_phone_number ?? null,
         opening_times: place.opening_hours?.weekday_text ?? null,
       };
-
 
       if (place.geometry.viewport) {
         bounds.union(place.geometry.viewport);
@@ -92,5 +105,4 @@ const PlaceAutocompleteInput = () => {
   );
 };
 
-
-export default PlaceAutocompleteInput
+export default PlaceAutocompleteInput;

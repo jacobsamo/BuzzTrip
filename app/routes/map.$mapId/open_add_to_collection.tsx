@@ -4,9 +4,8 @@ import { useGlobalContext } from "./providers/global_provider";
 import { useMapContext } from "./providers/map_provider";
 
 const AddToCollectionButton = () => {
-  const {setAddToCollectionOpen} = useMapContext();
-  const {snap, setSnap} = useGlobalContext();
-
+  const { setAddToCollectionOpen } = useMapContext();
+  const { setSnap } = useGlobalContext();
 
   const openView = () => {
     setAddToCollectionOpen(true);
@@ -21,7 +20,7 @@ const AddToCollectionButton = () => {
       size={"icon"}
       onClick={() => openView()}
     >
-      <Plus className="w-8 h-8" />
+      <Plus className="h-8 w-8" />
     </Button>
   );
 };

@@ -1,6 +1,3 @@
-import MapCard from "@/routes/home/map_card";
-import MapModal from "@/routes/home/modals/create_edit_map_modal";
-import { SharedMap } from "@/lib/types";
 import getSupabaseServerClient from "@/server/supabaseServer";
 import {
   json,
@@ -8,9 +5,8 @@ import {
   type LoaderFunctionArgs,
   type MetaFunction,
 } from "@remix-run/cloudflare";
-import { useLoaderData } from "@remix-run/react";
-import Nav from "./nav";
 import Hero from "./hero";
+import Nav from "./nav";
 
 export const meta: MetaFunction = () => {
   return [
@@ -33,18 +29,16 @@ export const loader = async ({ request, context }: LoaderFunctionArgs) => {
     return redirect("/home");
   }
 
-
   return json({});
 };
 
 export default function Index() {
   return (
     <>
-    <Nav />
-    <main>
-      <Hero />
-    </main>
-    
+      <Nav />
+      <main>
+        <Hero />
+      </main>
     </>
-  )
+  );
 }

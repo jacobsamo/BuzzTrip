@@ -2,17 +2,19 @@ import {
   APIProvider,
   AdvancedMarker,
   Map as GoogleMap,
-  Pin
+  Pin,
+  useMap,
 } from "@vis.gl/react-google-maps";
 import { lazy, memo } from "react";
+import { AutocompleteCustomInput } from "./custom-search";
 import { useMapContext } from "./providers/map_provider";
+import MainDrawer from "./main_drawer";
+import Main from "./layout/main";
 
-const PlaceAutocompleteInput = lazy(() => import('./search'))
-const MarkerPin = lazy(() => import('./MarkerPin')) 
-
+const MarkerPin = lazy(() => import("./MarkerPin"));
 
 const Map = () => {
-  const {activeLocation, markers, env} = useMapContext();
+  const { activeLocation, markers, env, setActiveLocation } = useMapContext();
 
   const mapOptions = {
     center: {
@@ -29,44 +31,56 @@ const Map = () => {
       language="en"
       libraries={["places", "marker"]}
     >
-      <div style={{ height: "100vh", width: "100%" }}>
-        <PlaceAutocompleteInput />
-        <GoogleMap
-          defaultCenter={mapOptions.center}
-          defaultZoom={mapOptions.zoom}
-          mapId={env.GOOGLE_MAPS_MAPID!}
-          disableDefaultUI={true}
-          onDblclick={(e) => console.log("Double click map event: ", e)}
-          onClick={(e) => console.log("Click map event: ", e)}
-        >
-          {activeLocation && (
+      <AutocompleteCustomInput />
+      <GoogleMap
+        defaultCenter={mapOptions.center}
+        defaultZoom={mapOptions.zoom}
+        mapId={env.GOOGLE_MAPS_MAPID!}
+        disableDefaultUI={true}
+        onClick={(e) => {
+          console.log("Click map event: ", e);
+        }}
+        gestureHandling="greedy"
+      >
+        {activeLocation &&
+          !markers?.some(
+            (marker) =>
+              marker.lat === activeLocation.lat &&
+              marker.lng === activeLocation.lng
+          ) && (
             <AdvancedMarker
               key={activeLocation.title}
               position={{
                 lat: activeLocation.lat,
-                lng: activeLocation.lng
+                lng: activeLocation.lng,
               }}
             >
               <Pin />
             </AdvancedMarker>
           )}
 
-          {markers &&
-            markers.map((marker) => (
-              <AdvancedMarker
-                key={marker.uid}
-                position={{ lat: marker.lat, lng: marker.lng }}
-                onClick={(e) => console.log("Marker clicked: ", e)}
-              >
-                <MarkerPin
-                  // backgroundColor={marker.color}
-                  name="MdOutlineLocationOn"
-                  size={16}
-                />
-              </AdvancedMarker>
-            ))}
-        </GoogleMap>
-      </div>
+        {markers &&
+          markers.map((marker) => (
+            <AdvancedMarker
+              key={marker.uid}
+              position={{ lat: marker.lat, lng: marker.lng }}
+              title={marker.title}
+              onClick={() => {
+                // map!.panTo({ lat: marker.lat, lng: marker.lng });
+                setActiveLocation(marker);
+              }}
+            >
+              <MarkerPin
+                marker={marker}
+                size={16}
+              />
+            </AdvancedMarker>
+          ))}
+      </GoogleMap>
+
+      <MainDrawer>
+        <Main />
+      </MainDrawer>
     </APIProvider>
   );
 };
