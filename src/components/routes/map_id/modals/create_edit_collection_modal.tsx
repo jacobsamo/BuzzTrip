@@ -1,4 +1,4 @@
-import ConfirmDeleteModal from "@/components/shared/modals/";
+import ConfirmDeleteModal from "@/components/routes/shared/modals/comfirm_delete_modal";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,7 +29,8 @@ import { cn } from "@/lib/utils";
 import { Collection } from "@/types";
 import { Edit, Plus } from "lucide-react";
 import * as React from "react";
-import { useState } from "react"; // Import useState hook
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { useMapContext } from "../providers/map_provider";
 
 interface CollectionModalProps {
@@ -117,71 +118,62 @@ const Close = ({ children }: { children: React.ReactNode }) => {
 function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
   const { setCollections } = useMapContext();
 
-  // State to store selected icon
-  const [selectedIcon, setSelectedIcon] = useState<string>(
-    collection?.icon ?? "MdOutlineFolder"
-  );
+  const {
+    register,
+    handleSubmit,
+    watch,
+    control,
+    formState: { errors },
+  } = useForm<Collection>();
 
-  // Function to handle icon selection
-  const handleIconSelection = (icon: string) => {
-    setSelectedIcon(icon);
+  const onSubmit: SubmitHandler<Collection> = async (data) => {
+    try {
+      if (mode === "create") {
+        const create = fetch("/api/collection", {
+          method: "POST",
+          body: JSON.stringify(data),
+        });
+
+        toast.promise(create, {
+          loading: "Creating map...",
+          success: "Map created successfully!",
+          error: "Failed to create map",
+        });
+
+        setCollections((prev) => [data, ...(prev || [])]);
+      } else {
+        const edit = fetch(`/api/collection/${map_id}/edit`, {
+          method: "PUT",
+          body: JSON.stringify(data),
+        });
+
+        toast.promise(edit, {
+          loading: "Updating map...",
+          success: "Map updated successfully",
+          error: "Failed to update map",
+        });
+
+        setCollections((prev) => {
+          const index = prev.findIndex((c) => c.uid === collection!.uid);
+          const updatedCollection = { ...prev[index], ...data };
+          prev[index] = updatedCollection;
+          return [...prev];
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  // Function to handle form submission
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleDelete = () => {
+    const deleteCollection = fetch(`/api/collection/${collection?.uid}`, {
+      method: "DELETE",
+    });
 
-    // Create FormData object
-    const formData = new FormData(event.target);
-
-    // Append selected icon value to FormData
-    formData.append("icon", selectedIcon);
-    formData.append("color", "#000000");
-    formData.append("map_id", map_id);
-
-    if (mode === "edit") {
-      formData.append("uid", collection!.uid);
-      formData.append("intent", INTENTS.updateCollection);
-    } else {
-      formData.append("intent", INTENTS.createCollection);
-    }
-
-    // Perform your form submission
-    // Example: You can use fetch to submit the form data
-
-    const values = Object.fromEntries(formData.entries()) as Collection;
-    if (mode === "edit") {
-      // Update collections state
-      setCollections((prev) => {
-        const index = prev.findIndex((c) => c.uid === collection!.uid);
-        prev[index] = values;
-        return [...prev];
-      });
-      return;
-    } else {
-      setCollections((prev) => [values, ...(prev || [])]);
-    }
-  };
-
-  const handleDelete = (event) => {
-    event.preventDefault();
-
-    // Create FormData object
-    const formData = new FormData();
-    formData.append("intent", INTENTS.deleteCollection);
-    formData.append("uid", collection!.uid);
-
-    const values = Object.entries(formData);
-    console.log("Delete: ", values);
-
-    // Perform your form submission
-
-
-    // Delete the collection
-    setCollections((prev) => {
-      const index = prev.findIndex((c) => c.uid === collection!.uid);
-      prev.splice(index, 1);
-      return [...prev];
+    toast.promise(deleteCollection, {
+      loading: "Deleting collection...",
+      success: "Collection deleted successfully",
+      error: "Failed to delete collection",
     });
   };
 
@@ -190,38 +182,40 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
       <form
         method="post"
         className={cn("flex flex-col gap-4")}
-        onSubmit={handleSubmit} // Listen to form submission event
+        onSubmit={handleSubmit(onSubmit)} // Listen to form submission event
       >
         <Label htmlFor="title">Title</Label>
-        <Input
-          placeholder="Title"
-          name="title"
-          defaultValue={collection?.title}
-        />
+        <Input placeholder="Title" {...register("title")} />
 
-        <div className="flex flex-wrap gap-2">
-          {iconsList.map((icon, index) => (
-            <Button
-              key={index}
-              type="button"
-              variant="ghost"
-              onClick={() => handleIconSelection(icon)} // Handle icon selection
-              className={cn("group text-black", {
-                "scale-105 border border-gray-500 shadow-lg":
-                  selectedIcon == icon,
+        <Controller
+          control={control}
+          name="icon"
+          render={({ field }) => (
+            <div className="flex flex-wrap gap-2">
+              {iconsList.map((icon, index) => {
+                const selectedIcon = watch("icon");
+
+                return (
+                  <Button
+                    key={index}
+                    type="button"
+                    variant="ghost"
+                    onClick={() => field.onChange(icon)} // Handle icon selection
+                    className={cn("group text-black", {
+                      "scale-105 border border-gray-500 shadow-lg":
+                        selectedIcon == icon,
+                    })}
+                  >
+                    <Icon name={icon} size={24} />
+                  </Button>
+                );
               })}
-            >
-              <Icon name={icon} size={24} />
-            </Button>
-          ))}
-        </div>
+            </div>
+          )}
+        />
 
         <Label htmlFor="description">Description</Label>
-        <Textarea
-          placeholder="Description"
-          name="description"
-          defaultValue={collection?.description ?? ""}
-        />
+        <Textarea placeholder="Description" {...register("description")} />
 
         <Close>
           <Button aria-label="Create collection" type="submit">

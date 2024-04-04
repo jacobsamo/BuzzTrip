@@ -20,7 +20,6 @@ export type MapContextValue = {
   setActiveLocation: React.Dispatch<React.SetStateAction<Location | null>>;
   addToCollectionOpen: boolean;
   setAddToCollectionOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  env: MapEnv;
 };
 
 // Create a context to hold the state
@@ -41,13 +40,11 @@ export interface MapProviderProps {
   initialMarkers?: Marker[] | null;
   initialCollections?: Collection[] | null;
   initialActiveLocation?: Location | null;
-  env: MapEnv;
 }
 
 // Context provider component
 export const MapProvider = ({
   children,
-  env,
   initialMarkers = null,
   initialMap,
   initialCollections = null,
@@ -81,7 +78,6 @@ export const MapProvider = ({
     setActiveLocation,
     addToCollectionOpen,
     setAddToCollectionOpen,
-    env,
   };
 
   // Render the provider with context value and children

@@ -1,3 +1,4 @@
+"use client"
 import {
   APIProvider,
   AdvancedMarker,
@@ -10,11 +11,12 @@ import { AutocompleteCustomInput } from "./search";
 import { useMapContext } from "./providers/map_provider";
 import MainDrawer from "./main_drawer";
 import Main from "./layout/main";
+import env from 'env'
 
 const MarkerPin = lazy(() => import("./marker_pin"));
 
 const Map = () => {
-  const { activeLocation, markers, env, setActiveLocation } = useMapContext();
+  const { activeLocation, markers, setActiveLocation } = useMapContext();
 
   const mapOptions = {
     center: {
@@ -26,7 +28,7 @@ const Map = () => {
 
   return (
     <APIProvider
-      apiKey={env.GOOGLE_MAPS_API_KEY! as string}
+      apiKey={env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string}
       region="au"
       language="en"
       libraries={["places", "marker"]}
@@ -35,7 +37,7 @@ const Map = () => {
       <GoogleMap
         defaultCenter={mapOptions.center}
         defaultZoom={mapOptions.zoom}
-        mapId={env.GOOGLE_MAPS_MAPID!}
+        mapId={env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID}
         disableDefaultUI={true}
         onClick={(e) => {
           console.log("Click map event: ", e);

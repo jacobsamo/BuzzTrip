@@ -31,8 +31,9 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { Share } from "lucide-react";
 import * as React from "react";
-import { useEffect } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { Tables } from "../../../../../database.types";
 
 export interface ShareMapProps {
   map_id: string;
@@ -85,106 +86,67 @@ export default function ShareModal({ map_id }: ShareMapProps) {
 }
 
 function ShareMapForm({ map_id }: ShareMapProps) {
-  const submit = useSubmit();
-  const [selectedUser, setSelectedUser] = React.useState<string | undefined>(
-    undefined
-  );
-  const { q, users } = useLoaderData<typeof loader>();
-  // need to do fetching of data to search for users
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<Tables<"shared_map">>({
+    defaultValues: {
+      permission: "editor",
+      map_id: map_id,
+    },
+  });
 
-  useEffect(() => {
-    console.log(selectedUser);
-  }, [selectedUser]);
+  const onSubmit: SubmitHandler<Tables<"shared_map">> = async (data) => {
+    try {
+      const share = fetch(`/api/map/${map_id}/share`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    formData.append("map_id", map_id);
-    formData.append("intent", INTENTS.shareMap);
-
-    if (selectedUser !== undefined) formData.append("user_id", selectedUser);
-    else {
-      toast.error("Must select a user");
-      return;
+      toast.promise(share, {
+        loading: "Updating map...",
+        success: "Map updated successfully",
+        error: "Failed to update map",
+      });
+    } catch (error) {
+      console.error(error);
     }
-
-    submit(formData, {
-      method: "post",
-      fetcherKey: `shareMap:${map_id}`,
-      navigate: false,
-      unstable_flushSync: true,
-    });
   };
 
   return (
-    <>
-      <div className="flex flex-col gap-2">
-        <Form
-          id="search-form"
-          onChange={(event) => {
-            const isFirstSearch = q === null;
-            submit(event.currentTarget, {
-              replace: !isFirstSearch,
-            });
-          }}
-          role="search"
-        >
-          <Label htmlFor="q">Find user</Label>
-          <Input
-            aria-label="Search for user by email"
-            defaultValue={q || ""}
-            id="q"
-            name="q"
-            placeholder="Search by email"
-            type="search"
-          />
-        </Form>
-        <div className="flex-col gap-2">
-          {users !== undefined &&
-            users.map((user) => (
-              <Button
-                key={user.id}
-                onClick={() => setSelectedUser(user.id)}
-                variant={"outline"}
-              >
-                {user.email}
-              </Button>
-            ))}
-        </div>
-      </div>
+    <form
+      className={cn("grid items-start gap-4")}
+      method="post"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <Label htmlFor="email">Email</Label>
+      <Input
+        type="email"
+        id="email"
+        {...register("user_id", { required: "Email is required" })}
+      />
 
-      <Form
-        className={cn("grid items-start gap-4")}
-        method="post"
-        onSubmit={handleSubmit}
-      >
-        <div className="grid gap-2"></div>
+      <Label htmlFor="permission">Access Type</Label>
+      <Select {...register("permission")}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Select a fruit" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="viewer">Viewer</SelectItem>
+          <SelectItem value="editor">Editor</SelectItem>
+          <SelectItem value="admin">Admin</SelectItem>
+        </SelectContent>
+      </Select>
 
-        <Label htmlFor="permission">Access Type</Label>
-        <Select name="permission" defaultValue="editor">
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a fruit" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="viewer">Viewer</SelectItem>
-            <SelectItem value="editor">Editor</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <DialogClose asChild>
-          <DrawerClose asChild>
-            <Button
-              aria-label="Share map"
-              type="submit"
-              name="intent"
-              value={INTENTS.shareMap}
-            >
-              Share
-            </Button>
-          </DrawerClose>
-        </DialogClose>
-      </Form>
-    </>
+      <DialogClose asChild>
+        <DrawerClose asChild>
+          <Button aria-label="Share map" type="submit">
+            Share
+          </Button>
+        </DrawerClose>
+      </DialogClose>
+    </form>
   );
 }

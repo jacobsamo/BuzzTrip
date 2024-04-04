@@ -34,8 +34,9 @@ import { cn } from "@/lib/utils";
 import { Marker } from "@/types";
 import { Edit, Plus } from "lucide-react";
 import * as React from "react";
-import { lazy, useState } from "react";
-import { INTENTS } from "../intents";
+import { lazy } from "react";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { useMapContext } from "../providers/map_provider";
 
 const Icon = lazy(() => import("@/components/ui/icon"));
@@ -119,83 +120,70 @@ const Close = ({ children }: { children: React.ReactNode }) => {
 };
 
 function MarkerForm({ mode, marker }: MarkerModalProps) {
-  const { collections, setMarkers, markers } = useMapContext();
+  const { collections, setMarkers } = useMapContext();
 
-  const [selectedIcon, setSelectedIcon] = useState<string>(
-    marker?.icon ?? "MdOutlineFolder"
-  );
+  const {
+    register,
+    handleSubmit,
+    watch,
+    control,
+    formState: { errors },
+  } = useForm<Marker>();
 
-  const [selectedColor, setSelectedColor] = useState(
-    marker?.color ?? "#E65200"
-  );
+  const onSubmit: SubmitHandler<Marker> = async (data) => {
+    try {
+      if (mode === "create") {
+        const create = fetch("/api/marker", {
+          method: "POST",
+          body: JSON.stringify(data),
+        });
 
-  // Function to handle icon selection
-  const handleIconSelection = (icon: string) => {
-    setSelectedIcon(icon);
-  };
+        toast.promise(create, {
+          loading: "Creating map...",
+          success: "Map created successfully!",
+          error: "Failed to create map",
+        });
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+        setMarkers((prev) => [data, ...(prev || [])]);
+      } else {
+        const edit = fetch(`/api/marker/${marker!.uid}/edit`, {
+          method: "PUT",
+          body: JSON.stringify(data),
+        });
 
-    // Create FormData object
-    const formData = new FormData(event.target);
+        toast.promise(edit, {
+          loading: "Updating map...",
+          success: "Map updated successfully",
+          error: "Failed to update map",
+        });
 
-    // Append selected icon value to FormData
-    formData.append("color", selectedColor);
-
-    if (mode === "edit" && marker) {
-      formData.append("uid", marker.uid);
-      formData.append("map_id", marker.map_id);
-      formData.append("icon", selectedIcon);
-      formData.append("intent", INTENTS.updateMarker);
-    } else {
-      formData.append("intent", INTENTS.createCollection);
-    }
-
-    // Perform your form submission
-
-
-    const values = Object.fromEntries(formData.entries());
-    console.log("Values: ", values);
-    if (mode === "edit") {
-      // Update collections state
-      setMarkers((prev) => {
-        const index = prev.findIndex((m) => m.uid === marker!.uid);
-        const updated = { ...prev[index], ...values };
-        prev[index] = updated;
-        return [...prev];
-      });
-      return;
-    } else {
-      setMarkers((prev) => [values, ...(prev || [])]);
+        setMarkers((prev) => {
+          const index = prev.findIndex((m) => m.uid === marker!.uid);
+          const updatedCollection = { ...prev[index], ...data };
+          prev[index] = updatedCollection;
+          return [...prev];
+        });
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  const handleDelete = (event) => {
-    event.preventDefault();
+  const handleDelete = () => {
+    const deleteCollection = fetch(`/api/collection/${marker!.uid}`, {
+      method: "DELETE",
+    });
 
-    // Create FormData object
-    const formData = new FormData(event.target);
-    formData.append("intent", INTENTS.deleteMarker);
-    console.log("Delete: ", formData);
-    // Perform your form submission
-
-
-    // Delete the marker
-    setMarkers((prev) => {
-      const index = prev.findIndex((m) => m.uid === marker!.uid);
-      prev.splice(index, 1);
-      return [...prev];
+    toast.promise(deleteCollection, {
+      loading: "Deleting collection...",
+      success: "Collection deleted successfully",
+      error: "Failed to delete collection",
     });
   };
 
   return (
     <div>
-      <form
-        className={cn("grid items-start gap-4")}
-        method="post"
-        onSubmit={handleSubmit}
-      >
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-2">
           <Label htmlFor="title">Title</Label>
           <Input
@@ -208,42 +196,60 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
         </div>
 
         <Label>Color</Label>
+
         <div className="flex flex-wrap gap-2">
-          {colors.map((color, index) => {
-            return (
-              <button
-                onClick={() => setSelectedColor(color.hex)}
-                key={index}
-                className={cn("group h-8 w-8 scale-100 rounded-md", {
-                  "h-9 w-9 scale-110 border border-gray-500 shadow-lg":
-                    selectedColor == color.hex,
-                })}
-                style={{ backgroundColor: color.hex }}
-                type="button"
-              ></button>
-            );
-          })}
-          <Input type="color" name="color" defaultValue={selectedColor} />
+          <Controller
+            control={control}
+            name="icon"
+            render={({ field }) => {
+              const selectedColor = watch("color");
+              return (
+                <>
+                  {colors.map((color, index) => (
+                    <button
+                      onClick={() => field.onChange(color.hex)}
+                      key={index}
+                      className={cn("group h-8 w-8 scale-100 rounded-md", {
+                        "h-9 w-9 scale-110 border border-gray-500 shadow-lg":
+                          selectedColor == color.hex,
+                      })}
+                      style={{ backgroundColor: color.hex }}
+                      type="button"
+                    ></button>
+                  ))}
+                </>
+              );
+            }}
+          />
+          <Input type="color" {...register("color")} />
         </div>
 
-        <Label htmlFor="icon">Icon</Label>
-        <div className="flex flex-wrap gap-2">
-          {iconsList.map((icon, index) => (
-            <Button
-              key={index}
-              type="button"
-              variant="ghost"
-              onClick={() => handleIconSelection(icon)} // Handle icon selection
-              className={cn("group text-black", {
-                "scale-105 border border-gray-500 shadow-lg":
-                  selectedIcon == icon,
+        <Controller
+          control={control}
+          name="icon"
+          render={({ field }) => (
+            <div className="flex flex-wrap gap-2">
+              {iconsList.map((icon, index) => {
+                const selectedIcon = watch("icon");
+
+                return (
+                  <Button
+                    key={index}
+                    type="button"
+                    variant="ghost"
+                    onClick={() => field.onChange(icon)} // Handle icon selection
+                    className={cn("group text-black", {
+                      "scale-105 border border-gray-500 shadow-lg":
+                        selectedIcon == icon,
+                    })}
+                  >
+                    <Icon name={icon} size={24} />
+                  </Button>
+                );
               })}
-              name="icon"
-            >
-              <Icon name={icon} size={24} />
-            </Button>
-          ))}
-        </div>
+            </div>
+          )}
+        />
 
         <Label htmlFor="collection_id">Collection</Label>
         <Select name="collection_id" defaultValue={marker?.collection_id}>
@@ -278,10 +284,6 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
           <Button
             aria-label="Create Marker"
             type="submit"
-            name="intent"
-            value={
-              mode == "create" ? INTENTS.createMarker : INTENTS.updateMarker
-            }
           >
             {mode === "create" ? "Create" : "Save changes"}
           </Button>
@@ -289,18 +291,16 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
       </form>
 
       {mode === "edit" && marker && (
-        <form method="delete" onSubmit={handleDelete}>
-          <input type="hidden" name="uid" value={marker.uid} />
-          <Close>
-            <Button
-              aria-label="delete marker"
-              variant="destructive"
-              type="submit"
-            >
-              Delete
-            </Button>
-          </Close>
-        </form>
+        <Close>
+          <Button
+            aria-label="delete marker"
+            variant="destructive"
+            type="submit"
+            onClick={() => handleDelete()}
+          >
+            Delete
+          </Button>
+        </Close>
       )}
     </div>
   );

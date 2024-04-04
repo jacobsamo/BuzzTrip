@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,7 +28,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Map } from "@/types";
 import { Plus } from "lucide-react";
 import * as React from "react";
-
+import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export interface MapModalProps {
   mode?: "create" | "edit";
@@ -86,47 +88,66 @@ export default function MapModal({
 }
 
 function MapForm({ mode, map }: MapModalProps) {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<Map>();
+
+  const onSubmit: SubmitHandler<Map> = async (data) => {
+    try {
+      if (mode === "create") {
+        const create = fetch("/api/map", {
+          method: "POST",
+          body: JSON.stringify(data),
+        });
+
+        toast.promise(create, {
+          loading: "Creating map...",
+          success: "Map created successfully!",
+          error: "Failed to create map",
+        });
+      }
+
+      if (mode === "edit" && map) {
+        const edit = fetch(`/api/map/${map.uid}`, {
+          method: "PUT",
+          body: JSON.stringify(data),
+        });
+
+        toast.promise(edit, {
+          loading: "Updating map...",
+          success: "Map updated successfully",
+          error: "Failed to update map",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <Form
+    <form
       className={cn("grid items-start gap-4")}
-      method="post"
-      navigate={false}
+      onSubmit={handleSubmit(onSubmit)}
     >
       <div className="grid gap-2">
         <Label htmlFor="title">Title</Label>
-        <Input type="text" id="title" name="title" placeholder="Roadtrip" defaultValue={map?.title ?? ''} />
+        <Input type="text" placeholder="Roadtrip" {...register("title")} />
       </div>
       <div className="grid gap-2">
         <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          name="description"
-          placeholder="epic roadtrip!!"
-          defaultValue={map?.description ?? ''}
-        />
+        <Textarea placeholder="epic roadtrip!!" {...register("description")} />
       </div>
-
-      {/* <div className="grid gap-2">
-        <Label htmlFor="location">Location</Label>
-        <Select></Select>
-      </div>     */}
-
-      {mode == "edit" && map && (
-        <input type="hidden" name="map_id" value={map?.uid ?? ""} />
-      )}
 
       <DialogClose asChild>
         <DrawerClose asChild>
-          <Button
-            aria-label="create map"
-            type="submit"
-            name="intent"
-            value={mode === "create" ? INTENTS.createMap : INTENTS.editMap}
-          >
+          <Button aria-label="create map" type="submit">
             Create Map
           </Button>
         </DrawerClose>
       </DialogClose>
-    </Form>
+    </form>
   );
 }

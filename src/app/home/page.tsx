@@ -27,17 +27,20 @@ export async function generateMetadata({
 }
 
 export default async function MapPage() {
-  const user = await getUser();
-  const supabase = createClient();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!user) {
-    return redirect("/auth");
-  }
+  console.log("user: ", user)
+  // if (!user) {
+  //   return redirect("/auth");
+  // }
 
   const { data: maps } = await supabase
     .from("shared_map_view")
     .select()
-    .eq("user_id", user?.id);
+    .eq("user_id", user!.id);
 
   return (
     <main className="p-2">

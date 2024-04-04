@@ -1,14 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import React from "react";
 import Image from "next/image";
+import { createClient } from "@/lib/supabase/client";
 
 const LoginPage = () => {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   const signIn = async () => {
-    const signIn = await supabase.auth.signInWithOAuth({
+    await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo:

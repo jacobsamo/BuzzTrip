@@ -1,3 +1,4 @@
+"use client"
 import { Button } from "@/components/ui/button";
 import { DrawerHeader } from "@/components/ui/drawer";
 import Icon, { IconProps } from "@/components/ui/icon";
