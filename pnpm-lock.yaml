@@ -133,6 +133,9 @@ devDependencies:
   postcss:
     specifier: ^8
     version: 8.4.38
+  prettier:
+    specifier: ^3.2.5
+    version: 3.2.5
   tailwindcss:
     specifier: ^3.3.0
     version: 3.4.3
@@ -4988,7 +4991,6 @@ packages:
     resolution: {integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==}
     engines: {node: '>=14'}
     hasBin: true
-    dev: false
 
   /pretty-ms@7.0.1:
     resolution: {integrity: sha512-973driJZvxiGOQ5ONsFhOF/DtzPMOMtgC11kCpUrPGMTgqp2q/1gwzCquocrN33is0VZ5GFHXZYMM9l6h67v2Q==}
