@@ -79,7 +79,7 @@ export const AutocompleteCustomInput = () => {
 
       setFetchingData(true);
 
-      const detailRequestOptions = {
+      const detailRequestOptions: google.maps.places.PlaceDetailsRequest = {
         placeId: prediction.place_id,
         fields: [
           "geometry",

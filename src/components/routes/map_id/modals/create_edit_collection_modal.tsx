@@ -124,7 +124,14 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
     watch,
     control,
     formState: { errors },
-  } = useForm<Collection>();
+  } = useForm<Collection>({
+    defaultValues: {
+      title: collection?.title || "",
+      description: collection?.description || "",
+      icon: collection?.icon || "map-pin",
+      color: collection?.color || "#fff",
+    },
+  });
 
   const onSubmit: SubmitHandler<Collection> = async (data) => {
     try {
@@ -133,7 +140,7 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
           ...data,
           color: "#fff",
           map_id: map_id,
-        }
+        };
 
         const create = fetch("/api/collection", {
           method: "POST",
@@ -145,17 +152,16 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
           success: (res) => {
             if (res.ok) {
               res.json().then((val) => {
-                console.log("returned val: ", val)
+                console.log("returned val: ", val);
                 setCollections((prev) => [val.data, ...(prev || [])]);
-              })
+              });
             }
-    
+
             return "Collection created successfully!";
           },
           error: "Failed to created collection",
         });
       }
-      
 
       if (mode === "edit" && collection) {
         const edit = fetch(`/api/collection/${collection.uid}/edit`, {
@@ -169,20 +175,20 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
             if (res.ok) {
               res.json().then((val) => {
                 setCollections((prev) => {
-                  const index = prev.findIndex((c) => c.uid === collection!.uid);
+                  const index = prev.findIndex(
+                    (c) => c.uid === collection!.uid
+                  );
                   const updatedCollection = { ...prev[index], ...val.data };
                   prev[index] = updatedCollection;
                   return [...prev];
                 });
-              })
+              });
             }
-    
+
             return "Collection edited successfully!";
           },
           error: "Failed to edit collection",
         });
-
-      
       }
     } catch (error) {
       console.error(error);
@@ -190,9 +196,12 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
   };
 
   const handleDelete = () => {
-    const deleteCollection = fetch(`/api/collection/${collection?.uid}/delete`, {
-      method: "DELETE",
-    });
+    const deleteCollection = fetch(
+      `/api/collection/${collection?.uid}/delete`,
+      {
+        method: "DELETE",
+      }
+    );
 
     toast.promise(deleteCollection, {
       loading: "Deleting collection...",

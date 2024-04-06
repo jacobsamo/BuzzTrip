@@ -21,7 +21,7 @@ export async function PUT(req: NextRequest, { params }: { params: { uid: string 
   }
 
   const json = await req.json();
-  const marker = markerEditSchema.parse(json);
+  const marker = markerEditSchema.partial().parse(json);
 
   const editedMarker = await editMarker(params.uid, marker)
 

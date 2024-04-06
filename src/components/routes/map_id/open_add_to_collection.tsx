@@ -19,6 +19,7 @@ const AddToCollectionButton = () => {
       variant="ghost"
       size={"icon"}
       onClick={() => openView()}
+      type="button"
     >
       <Plus className="h-8 w-8" />
     </Button>
