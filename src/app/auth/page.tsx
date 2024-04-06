@@ -21,11 +21,7 @@ const LoginPage = () => {
       },
     });
 
-    if (error) {
-      console.log(error);
-    } else {
-      return redirect(data.url);
-    }
+    if (error) console.log(error);
   };
 
   return (

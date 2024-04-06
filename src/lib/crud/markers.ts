@@ -20,7 +20,7 @@ export async function createMarker(
     });
   }
 
-  return { marker: createdMarker[0] };
+  return createdMarker[0]
 }
 
 export async function editMarker(
@@ -29,18 +29,18 @@ export async function editMarker(
 ) {
   const supabase = createClient();
 
-  const { data: createdMarker, error: createMarkerError } = await supabase
+  const { data: editedMarker, error: editedMarkerError } = await supabase
     .from("marker")
     .update(marker).eq("uid", uid)
     .select();
 
-  if (!createdMarker || createMarkerError) {
+  if (!editedMarker || editedMarkerError) {
     return new Error(`Error editing marker ${uid}`, {
-      cause: createMarkerError,
+      cause: editedMarkerError,
     });
   }
 
-  return { marker: createdMarker[0] };
+  return editedMarker[0]
 }
 
 
@@ -49,16 +49,16 @@ export async function deleteMarker(
 ) {
   const supabase = createClient();
 
-  const { data: createdMarker, error: createMarkerError } = await supabase
+  const { data: deletedMarker, error: deletedMarkerError } = await supabase
     .from("marker")
     .delete().eq("uid", uid)
     .select();
 
-  if (!createdMarker || createMarkerError) {
+  if (!deletedMarker || deletedMarkerError) {
     return new Error(`Error deleting marker ${uid}`, {
-      cause: createMarkerError,
+      cause: deletedMarkerError,
     });
   }
 
-  return { marker: createdMarker[0] };
+  return deletedMarker[0]
 }

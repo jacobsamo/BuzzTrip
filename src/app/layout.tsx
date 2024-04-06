@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-
-
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "BuzzTrip",
@@ -16,7 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <Toaster position="top-center" richColors={true} />
+      </body>
     </html>
   );
 }

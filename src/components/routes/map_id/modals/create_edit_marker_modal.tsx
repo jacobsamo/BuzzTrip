@@ -140,11 +140,20 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
 
         toast.promise(create, {
           loading: "Creating map...",
-          success: "Map created successfully!",
+          success: (res) => {
+            if (res.ok) {
+              res.json().then((val) => {
+              
+                console.log(val.data)
+                setMarkers((prev) => [val!.data, ...(prev || [])]);
+              })
+            }
+
+            return "Map created successfully!";
+          },
           error: "Failed to create map",
         });
 
-        setMarkers((prev) => [data, ...(prev || [])]);
       } else {
         const edit = fetch(`/api/marker/${marker!.uid}/edit`, {
           method: "PUT",

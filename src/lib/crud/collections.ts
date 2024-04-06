@@ -17,7 +17,7 @@ export async function createCollection(
     });
   }
 
-  return { collection: createdCollection[0] };
+  return createdCollection[0];
 }
 
 
@@ -38,7 +38,7 @@ export async function editCollection(
     });
   }
 
-  return { collection: editedCollection[0] };
+  return editedCollection[0];
 }
 
 
@@ -58,17 +58,19 @@ export async function deleteCollection(
     });
   }
 
-  const { data: deleteCollection, error: deletedCollectionError } = await supabase
+  
+
+  const { data: deletedCollection, error: deletedCollectionError } = await supabase
     .from("collection")
     .delete().eq("uid", uid)
     .select();
 
-  if (!deleteCollection || deletedCollectionError) {
+  if (!deletedCollection || deletedCollectionError) {
     return new Error(`Error deleting collection ${uid}`, {
       cause: deletedCollectionError,
     });
   }
 
-  return { collection: deleteCollection[0] };
+  return deletedCollection[0]
 }
 

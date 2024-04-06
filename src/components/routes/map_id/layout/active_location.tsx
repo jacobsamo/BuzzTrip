@@ -41,6 +41,8 @@ const ActiveLocation = () => {
               <Image
                 key={photo}
                 src={photo}
+                width={160}
+                height={160}
                 alt="location photo"
                 className="h-40 w-40 rounded-md object-cover object-center"
               />

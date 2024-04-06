@@ -129,36 +129,60 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
   const onSubmit: SubmitHandler<Collection> = async (data) => {
     try {
       if (mode === "create") {
+        const newCollection = {
+          ...data,
+          color: "#fff",
+          map_id: map_id,
+        }
+
         const create = fetch("/api/collection", {
           method: "POST",
-          body: JSON.stringify(data),
+          body: JSON.stringify(newCollection),
         });
 
         toast.promise(create, {
-          loading: "Creating map...",
-          success: "Map created successfully!",
-          error: "Failed to create map",
+          loading: "Create collection...",
+          success: (res) => {
+            if (res.ok) {
+              res.json().then((val) => {
+                console.log("returned val: ", val)
+                setCollections((prev) => [val.data, ...(prev || [])]);
+              })
+            }
+    
+            return "Collection created successfully!";
+          },
+          error: "Failed to created collection",
         });
+      }
+      
 
-        setCollections((prev) => [data, ...(prev || [])]);
-      } else {
-        const edit = fetch(`/api/collection/${map_id}/edit`, {
+      if (mode === "edit" && collection) {
+        const edit = fetch(`/api/collection/${collection.uid}/edit`, {
           method: "PUT",
           body: JSON.stringify(data),
         });
 
         toast.promise(edit, {
-          loading: "Updating map...",
-          success: "Map updated successfully",
-          error: "Failed to update map",
+          loading: "Editing collection...",
+          success: (res) => {
+            if (res.ok) {
+              res.json().then((val) => {
+                setCollections((prev) => {
+                  const index = prev.findIndex((c) => c.uid === collection!.uid);
+                  const updatedCollection = { ...prev[index], ...val.data };
+                  prev[index] = updatedCollection;
+                  return [...prev];
+                });
+              })
+            }
+    
+            return "Collection edited successfully!";
+          },
+          error: "Failed to edit collection",
         });
 
-        setCollections((prev) => {
-          const index = prev.findIndex((c) => c.uid === collection!.uid);
-          const updatedCollection = { ...prev[index], ...data };
-          prev[index] = updatedCollection;
-          return [...prev];
-        });
+      
       }
     } catch (error) {
       console.error(error);
@@ -166,7 +190,7 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
   };
 
   const handleDelete = () => {
-    const deleteCollection = fetch(`/api/collection/${collection?.uid}`, {
+    const deleteCollection = fetch(`/api/collection/${collection?.uid}/delete`, {
       method: "DELETE",
     });
 

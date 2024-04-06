@@ -46,17 +46,13 @@ const AddToCollection = () => {
   };
 
   // Function to handle form submission
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const marker = {
       ...activeLocation,
       collection_id: selected,
       map_id: map!.uid,
       color: "#ef233c",
-      reviews: JSON.stringify(activeLocation.reviews),
-      photos: JSON.stringify(activeLocation.photos),
-      types: JSON.stringify(activeLocation.types),
-      opening_times: JSON.stringify(activeLocation.opening_times),
     };
 
     if (marker.collection_id === "" || marker.collection_id == null) {
@@ -64,12 +60,30 @@ const AddToCollection = () => {
       return;
     }
 
-    setAddToCollectionOpen(false);
-    setActiveLocation(null);
-    setSnap(0.5);
-    setMarkers([marker, ...markers]);
-    setSearchValue("");
-    toast.success("Location added to collection");
+    const create = fetch("/api/marker", {
+      method: "POST",
+      body: JSON.stringify(marker),
+    });
+
+    toast.promise(create, {
+      loading: "Creating marker...",
+      success: (res) => {
+        if (res.ok) {
+          res.json().then((val) => {
+            setMarkers((prev) => [val!.data, ...(prev || [])]);
+            setAddToCollectionOpen(false);
+            setActiveLocation(null);
+            setSnap(0.5);
+            setSearchValue("");
+          })
+        }
+
+        return "Marker created successfully!";
+      },
+      error: "Failed to create marker",
+    });
+
+
   };
 
   return (

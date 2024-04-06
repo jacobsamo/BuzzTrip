@@ -1,4 +1,3 @@
-import { deleteCollection } from '@/lib/crud/collections'
 import { deleteMarker } from '@/lib/crud/markers'
 import { getUser } from '@/lib/getUser'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
@@ -19,13 +18,13 @@ export async function DELETE(req: NextRequest, { params }: { params: { uid: stri
     return NextResponse.json("Missing uid", { status: 400 });
   }
 
-  const deletedCollection = await deleteCollection(params.uid)
+  const deletedMarker = await deleteMarker(params.uid)
 
 
-  return NextResponse.json({ message: "Deleted collection and it's data successfully", data: deletedCollection })
+  return NextResponse.json({ message: 'Updated marker successfully', data: deletedMarker })
   } catch (error) {
-    console.error(`Error on /api/collection/${params.uid}/delete`, error);
+    console.error(`Error on /api/marker/${params.uid}/delete`, error);
 
-    return NextResponse.json({error: `Error on /api/collection/${params.uid}/delete: ${error}`}, { status: 500 });
+    return NextResponse.json({error: `Error on /api/marker/${params.uid}/delete: ${error}`}, { status: 500 });
   }
 }
