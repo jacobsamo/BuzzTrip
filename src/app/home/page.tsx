@@ -1,10 +1,10 @@
-import { getUser } from "@/lib/getUser";
-import { constructMetadata } from "@/lib/metadata";
-import { createClient } from "@/lib/supabase/server";
 import MapCard from "@/components/routes/home/map_card";
 import MapModal from "@/components/routes/home/modals/create_edit_map_modal";
-import { redirect } from "next/navigation";
+import { constructMetadata } from "@/lib/metadata";
+import { createClient } from "@/lib/supabase/server";
 import { SharedMap } from "@/types";
+
+export const runtime = 'edge'
 
 export async function generateMetadata({
   params,

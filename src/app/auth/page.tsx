@@ -2,10 +2,9 @@
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
-import { redirect, usePathname } from "next/navigation";
 
 const LoginPage = () => {
-  console.log(`${window.location}/api/auth/callback`);
+  // console.log(`${window.location}/api/auth/callback`);
 
   const signIn = async () => {
     const supabase = createClient();
