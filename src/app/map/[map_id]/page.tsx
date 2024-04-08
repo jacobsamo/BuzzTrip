@@ -3,7 +3,6 @@ import { GlobalProvider } from "@/components/routes/map_id/providers/global_prov
 import { constructMetadata } from "@/lib/metadata";
 import { createClient } from "@/lib/supabase/server";
 import { Collection, Marker } from "@/types";
-import React, { Suspense } from "react";
 
 export async function generateMetadata({
   params,
@@ -52,13 +51,10 @@ export default async function MapPage({
 
   return (
     <GlobalProvider>
-      <Suspense fallback={<div>Loading...</div>}>
-        <MapView
-          collections={collections}
-          markers={markers}
-          map={map!}
-        />
-      </Suspense>
+      {/* <Suspense fallback={<MapViewSkeleton />}>
+      </Suspense> */}
+
+      <MapView collections={collections} markers={markers} map={map!} />
     </GlobalProvider>
   );
 }

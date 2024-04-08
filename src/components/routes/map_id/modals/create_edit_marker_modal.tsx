@@ -128,7 +128,15 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
     watch,
     control,
     formState: { errors },
-  } = useForm<Marker>();
+  } = useForm<Marker>({
+    defaultValues: {
+      title: marker?.title ?? "",
+      description: marker?.description ?? undefined,
+      icon: marker?.icon ?? "MdOutlineFolder",
+      color: marker?.color ?? "#00000",
+      collection_id: marker?.collection_id ?? undefined,
+    },
+  });
 
   const onSubmit: SubmitHandler<Marker> = async (data) => {
     try {
@@ -139,21 +147,19 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
         });
 
         toast.promise(create, {
-          loading: "Creating map...",
+          loading: "Creating marker...",
           success: (res) => {
             if (res.ok) {
               res.json().then((val) => {
-              
-                console.log(val.data)
+                console.log(val.data);
                 setMarkers((prev) => [val!.data, ...(prev || [])]);
-              })
+              });
             }
 
-            return "Map created successfully!";
+            return "Marker created successfully!";
           },
-          error: "Failed to create map",
+          error: "Failed to create marker",
         });
-
       } else {
         const edit = fetch(`/api/marker/${marker!.uid}/edit`, {
           method: "PUT",
@@ -161,16 +167,22 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
         });
 
         toast.promise(edit, {
-          loading: "Updating map...",
-          success: "Map updated successfully",
-          error: "Failed to update map",
-        });
+          loading: "Editing marker...",
+          success: (res) => {
+            if (res.ok) {
+              res.json().then((val) => {
+                setMarkers((prev) => {
+                  const index = prev.findIndex((m) => m.uid === marker!.uid);
+                  const updatedCollection = { ...prev[index], ...val!.data };
+                  prev[index] = updatedCollection;
+                  return [...prev];
+                });
+              });
+            }
 
-        setMarkers((prev) => {
-          const index = prev.findIndex((m) => m.uid === marker!.uid);
-          const updatedCollection = { ...prev[index], ...data };
-          prev[index] = updatedCollection;
-          return [...prev];
+            return "Marker edited successfully!";
+          },
+          error: "Failed to edit marker",
         });
       }
     } catch (error) {
@@ -179,14 +191,14 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
   };
 
   const handleDelete = () => {
-    const deleteCollection = fetch(`/api/collection/${marker!.uid}`, {
+    const deleteCollection = fetch(`/api/marker/${marker!.uid}`, {
       method: "DELETE",
     });
 
     toast.promise(deleteCollection, {
-      loading: "Deleting collection...",
-      success: "Collection deleted successfully",
-      error: "Failed to delete collection",
+      loading: "Deleting marker...",
+      success: "Markker deleted successfully",
+      error: "Failed to delete marker",
     });
   };
 
@@ -209,7 +221,7 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
         <div className="flex flex-wrap gap-2">
           <Controller
             control={control}
-            name="icon"
+            name="color"
             render={({ field }) => {
               const selectedColor = watch("color");
               return (
@@ -226,11 +238,12 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
                       type="button"
                     ></button>
                   ))}
+                  <Input type="color" value={field.value ?? '#000'} onChange={field.onChange} />
+
                 </>
               );
             }}
           />
-          <Input type="color" {...register("color")} />
         </div>
 
         <Controller
@@ -290,10 +303,7 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
         {marker && <input type="hidden" name="uid" value={marker.uid} />}
 
         <Close>
-          <Button
-            aria-label="Create Marker"
-            type="submit"
-          >
+          <Button aria-label="Create Marker" type="submit">
             {mode === "create" ? "Create" : "Save changes"}
           </Button>
         </Close>

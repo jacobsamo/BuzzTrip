@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Button } from "@/components/ui/button";
 import { DrawerHeader } from "@/components/ui/drawer";
 import Icon, { IconProps } from "@/components/ui/icon";
@@ -75,15 +75,13 @@ const AddToCollection = () => {
             setActiveLocation(null);
             setSnap(0.5);
             setSearchValue("");
-          })
+          });
         }
 
         return "Marker created successfully!";
       },
       error: "Failed to create marker",
     });
-
-
   };
 
   return (
@@ -159,7 +157,10 @@ const AddToCollection = () => {
           Done
         </Button>
         <Button
-          onClick={() => setAddToCollectionOpen(false)}
+          onClick={() => {
+            setAddToCollectionOpen(false);
+            setActiveLocation(null);
+          }}
           className="mt-auto"
           variant="ghost"
           type="button"

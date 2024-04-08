@@ -17,6 +17,7 @@ const Main = () => {
     collections,
     activeLocation,
     setActiveLocation,
+  setAddToCollectionOpen,
     map,
     addToCollectionOpen,
   } = useMapContext();
@@ -24,7 +25,12 @@ const Main = () => {
   return (
     <div className="h-full p-2">
       {(activeLocation || addToCollectionOpen) && (
-        <Button onClick={() => setActiveLocation(null)} variant={"link"} className="text-base">
+        <Button onClick={() => {
+            setActiveLocation(null)
+          if (addToCollectionOpen) {
+            setAddToCollectionOpen(false)
+          }
+        }} variant={"link"} className="text-base">
           <ArrowLeft /> Back
         </Button>
       )}
