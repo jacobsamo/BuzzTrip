@@ -91,9 +91,7 @@ export default function ShareModal({ map_id }: ShareMapProps) {
 function ShareMapForm({ map_id }: ShareMapProps) {
   const [searchValue, setSearchValue] = useState("");
   const [users, setUsers] = useState<SearchUserReturn[] | undefined>(undefined);
-  const [selectedUser, setSelectedUser] = useState<
-    SearchUserReturn | undefined
-  >(undefined);
+  const [selectedUser, setSelectedUser] = useState<string | undefined>(undefined);
 
   const {
     register,
@@ -118,7 +116,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
   const onSubmit: SubmitHandler<Tables<"shared_map">> = async (data) => {
     const share = fetch(`/api/map/${map_id}/share`, {
       method: "POST",
-      body: JSON.stringify({ data, user_id: selectedUser?.id }),
+      body: JSON.stringify({ data, user_id: selectedUser }),
     });
 
     toast.promise(share, {
@@ -155,7 +153,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
               <Button
                 key={user.id}
                 onClick={() => setSelectedUser(user.id)}
-                variant={"outline"}
+                variant={"outline"} 
               >
                 {user.email}
               </Button>

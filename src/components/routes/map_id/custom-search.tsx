@@ -1,4 +1,4 @@
-import { Location } from "@/lib/types";
+import { Location } from "@/types";
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { SearchIcon, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
