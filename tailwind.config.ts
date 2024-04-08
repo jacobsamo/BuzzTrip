@@ -2,7 +2,13 @@ import type { Config } from "tailwindcss";
 
 const config = {
   darkMode: ["class"],
-  content: ["./app/**/*.{ts,tsx}"],
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
+  prefix: "",
   theme: {
     container: {
       center: true,
@@ -12,53 +18,45 @@ const config = {
       },
     },
     extend: {
-      myrtle_green: {
-        DEFAULT: "#2c7873",
-        100: "#091817",
-        200: "#12302e",
-        300: "#1a4744",
-        400: "#235f5b",
-        500: "#2c7873",
-        600: "#3faaa3",
-        700: "#67c7c0",
-        800: "#9adad5",
-        900: "#ccecea",
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
       },
-      deep_sky_blue: {
-        DEFAULT: "#30c5ff",
-        100: "#002b3c",
-        200: "#005678",
-        300: "#0081b5",
-        400: "#00adf1",
-        500: "#30c5ff",
-        600: "#58d0ff",
-        700: "#82dbff",
-        800: "#abe7ff",
-        900: "#d5f3ff",
-      },
-      ivory: {
-        DEFAULT: "#f5f3e5",
-        100: "#443f1b",
-        200: "#897d35",
-        300: "#c0b35d",
-        400: "#dad3a1",
-        500: "#f5f3e5",
-        600: "#f7f5ea",
-        700: "#f9f8f0",
-        800: "#fbfaf5",
-        900: "#fdfdfa",
-      },
-      rich_black: {
-        DEFAULT: "#04131b",
-        100: "#010405",
-        200: "#02070b",
-        300: "#020b10",
-        400: "#030f15",
-        500: "#04131b",
-        600: "#104d6e",
-        700: "#1d88c1",
-        800: "#58b4e6",
-        900: "#acdaf3",
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
         "accordion-down": {
