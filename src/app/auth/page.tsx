@@ -16,7 +16,7 @@ const LoginPage = () => {
         redirectTo:
           process.env.NODE_ENV === "development"
             ? "http://192.168.0.109:5173/auth/callback" // if you want to test on your local network
-            : "https://buzztrip.co/api/auth/callback",
+            : "https://buzztrip.co/auth/callback",
       },
     });
 

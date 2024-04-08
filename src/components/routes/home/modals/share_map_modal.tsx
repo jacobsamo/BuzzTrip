@@ -91,7 +91,9 @@ export default function ShareModal({ map_id }: ShareMapProps) {
 function ShareMapForm({ map_id }: ShareMapProps) {
   const [searchValue, setSearchValue] = useState("");
   const [users, setUsers] = useState<SearchUserReturn[] | undefined>(undefined);
-  const [selectedUser, setSelectedUser] = useState<string | undefined>(undefined);
+  const [selectedUser, setSelectedUser] = useState<string | undefined>(
+    undefined
+  );
 
   const {
     register,
@@ -153,7 +155,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
               <Button
                 key={user.id}
                 onClick={() => setSelectedUser(user.id)}
-                variant={"outline"} 
+                variant={"outline"}
               >
                 {user.email}
               </Button>
