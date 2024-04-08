@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { redirect, useRouter } from "next/navigation";
 
+export const runtime = "edge";
+
 const SignOutPage = () => {
   const router = useRouter();
   const supabase = createClientComponentClient();
