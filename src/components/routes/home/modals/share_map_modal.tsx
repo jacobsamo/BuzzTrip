@@ -151,7 +151,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
         />
 
         <div className="flex-col gap-2">
-          {users !== undefined &&
+          {users && users !== undefined &&
             users.map((user) => {
               const selected = selectedUser === user.id;
 

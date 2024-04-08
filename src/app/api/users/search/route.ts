@@ -42,8 +42,14 @@ export async function GET(
           email: user.email,
           picture: user.user_metadata.picture,
           name: user.user_metadata.name,
-        };
-      }) as SearchUserReturn[];
+        } as SearchUserReturn;
+      });
+
+      console.log("found users: ", {
+        foundUsers,
+        users,
+        searchValue
+      })
 
     return NextResponse.json(foundUsers);
   } catch (error) {
