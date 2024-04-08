@@ -37,6 +37,7 @@ import { toast } from "sonner";
 import { Tables } from "../../../../../database.types";
 import { useEffect, useState } from "react";
 import { SearchUserReturn } from "@/app/api/users/search/route";
+import { useQuery } from "@tanstack/react-query";
 
 export interface ShareMapProps {
   map_id: string;
@@ -90,7 +91,15 @@ export default function ShareModal({ map_id }: ShareMapProps) {
 
 function ShareMapForm({ map_id }: ShareMapProps) {
   const [searchValue, setSearchValue] = useState("");
-  const [users, setUsers] = useState<SearchUserReturn[] | undefined>(undefined);
+  const {data: users} = useQuery({
+    queryKey: ["search", searchValue],
+    queryFn: async () => {
+      if (searchValue === "") return undefined;
+      const res = await fetch(`/api/users/search?q=${searchValue}`);
+      const val = await res.json();
+      return val as SearchUserReturn[] | undefined
+    },
+  });
   const [selectedUser, setSelectedUser] = useState<string | undefined>(
     undefined
   );
@@ -106,14 +115,6 @@ function ShareMapForm({ map_id }: ShareMapProps) {
       map_id: map_id,
     },
   });
-
-  useEffect(() => {
-    fetch(`/api/users/search?q=${searchValue}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setUsers(data as SearchUserReturn[] | undefined);
-      });
-  }, [searchValue]);
 
   const onSubmit: SubmitHandler<Tables<"shared_map">> = async (data) => {
     const share = fetch(`/api/map/${map_id}/share`, {
@@ -151,15 +152,23 @@ function ShareMapForm({ map_id }: ShareMapProps) {
 
         <div className="flex-col gap-2">
           {users !== undefined &&
-            users.map((user) => (
-              <Button
-                key={user.id}
-                onClick={() => setSelectedUser(user.id)}
-                variant={"outline"}
-              >
-                {user.email}
-              </Button>
-            ))}
+            users.map((user) => {
+              const selected = selectedUser === user.id;
+
+              return (
+                <Button
+                  key={user.id}
+                  onClick={() => setSelectedUser(user.id)}
+                  variant={"outline"}
+                  className={cn(
+                    "w-full text-left",
+                    selected ? "bg-gray-500" : ""
+                  )}
+                >
+                  {user.email}
+                </Button>
+              )
+            })}
         </div>
       </div>
 

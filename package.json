@@ -54,6 +54,7 @@
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.11.0",
     "@cloudflare/workers-types": "^4.20240405.0",
+    "@tanstack/eslint-plugin-query": "^5.28.11",
     "@types/google.maps": "^3.55.7",
     "@types/node": "^20.12.5",
     "@types/react": "^18.2.74",

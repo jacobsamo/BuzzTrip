@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
 import "./globals.css";
+import Providers from "@/components/shared/providers";
 
 export const metadata: Metadata = {
   title: "BuzzTrip",
@@ -15,8 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
-        <Toaster position="top-center" richColors={true} />
+        <Providers>
+          {children}
+          <Toaster position="top-center" richColors={true} />
+        </Providers>
       </body>
     </html>
   );

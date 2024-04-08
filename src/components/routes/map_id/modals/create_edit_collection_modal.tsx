@@ -1,4 +1,4 @@
-import ConfirmDeleteModal from "@/components/routes/shared/modals/comfirm_delete_modal";
+import ConfirmDeleteModal from "@/components/shared/modals/comfirm_delete_modal";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
