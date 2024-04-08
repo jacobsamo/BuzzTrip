@@ -23,8 +23,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { uid: stri
 
   return NextResponse.json({ message: 'Updated marker successfully', data: editedMarker })
   } catch (error) {
-    console.error(`Error on /api/marker/${params.uid}/delete`, error);
+    console.error(`Error on /api/map/${params.uid}/delete`, error);
 
-    return NextResponse.json({error: `Error on /api/marker/${params.uid}/delete: ${error}`}, { status: 500 });
+    return NextResponse.json({error: `Error on /api/map/${params.uid}/delete: ${error}`}, { status: 500 });
   }
 }

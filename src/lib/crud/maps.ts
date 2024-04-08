@@ -78,5 +78,5 @@ export async function shareMap(
   }
 
 
-  return { sharedMap: createdSharedMap[0] };
+  return createdSharedMap[0]
 }

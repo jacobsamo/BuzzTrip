@@ -35,6 +35,8 @@ import * as React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Tables } from "../../../../../database.types";
+import { useEffect, useState } from "react";
+import { SearchUserReturn } from "@/app/api/users/search/route";
 
 export interface ShareMapProps {
   map_id: string;
@@ -87,6 +89,11 @@ export default function ShareModal({ map_id }: ShareMapProps) {
 }
 
 function ShareMapForm({ map_id }: ShareMapProps) {
+  const [searchValue, setSearchValue] = useState('');
+  const [users, setUsers] = useState<SearchUserReturn[] | undefined>(undefined);
+  const [selectedUser, setSelectedUser] = useState<SearchUserReturn | undefined>(undefined);
+  
+  
   const {
     register,
     handleSubmit,
@@ -99,21 +106,29 @@ function ShareMapForm({ map_id }: ShareMapProps) {
     },
   });
 
+  useEffect(() => {
+    fetch(`/api/users/search?q=${searchValue}`).then((res) => res.json()).then((data) => {
+      setUsers(data as SearchUserReturn[] | undefined);
+    }
+  );
+    
+  }, [searchValue]);
+  
+
   const onSubmit: SubmitHandler<Tables<"shared_map">> = async (data) => {
-    try {
       const share = fetch(`/api/map/${map_id}/share`, {
-        method: "PUT",
-        body: JSON.stringify(data),
+        method: "POST",
+        body: JSON.stringify({data, user_id: selectedUser?.id}),
       });
 
       toast.promise(share, {
-        loading: "Updating map...",
-        success: "Map updated successfully",
-        error: "Failed to update map",
+        loading: "sharing map...",
+        success: "Shared map successfully",
+        error: (err) => {
+          console.error(err);
+          return  "Failed to share map"
+        },
       });
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   return (
@@ -122,12 +137,32 @@ function ShareMapForm({ map_id }: ShareMapProps) {
       method="post"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <Label htmlFor="email">Email</Label>
-      <Input
-        type="email"
-        id="email"
-        {...register("user_id", { required: "Email is required" })}
-      />
+        <div className="flex flex-col gap-2">
+      
+          <Label htmlFor="q">Find user</Label>
+          <Input
+            aria-label="Search for user by email"
+            id="search"
+            name="search"
+            placeholder="Search by email"
+            type="search"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
+
+        <div className="flex-col gap-2">
+          {users !== undefined &&
+            users.map((user) => (
+              <Button
+                key={user.id}
+                onClick={() => setSelectedUser(user.id)}
+                variant={"outline"}
+              >
+                {user.email}
+              </Button>
+            ))}
+        </div>
+      </div>
 
       <Label htmlFor="permission">Access Type</Label>
       <Select {...register("permission")}>

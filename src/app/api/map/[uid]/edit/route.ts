@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest, { params }: { params: { uid: string 
 
   return NextResponse.json({ message: 'Coming soon...'}, { status: 501 })
   } catch (error) {
-    console.error(`Error on /api/marker/${params.uid}/edit`, error);
+    console.error(`Error on /api/map/${params.uid}/edit`, error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(JSON.stringify(error.issues), { status: 422 });
