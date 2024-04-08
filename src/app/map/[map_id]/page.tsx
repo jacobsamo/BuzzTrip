@@ -4,7 +4,7 @@ import { constructMetadata } from "@/lib/metadata";
 import { createClient } from "@/lib/supabase/server";
 import { Collection, Marker } from "@/types";
 
-export const runtime = 'edge'
+export const runtime = "edge";
 
 export async function generateMetadata({
   params,

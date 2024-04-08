@@ -3,11 +3,8 @@ import { Map } from "@/types";
 import { getUser } from "../getUser";
 import { createClient } from "../supabase/server";
 
-export async function createMap(
-  map: TablesInsert<"map">,
-) {
+export async function createMap(map: TablesInsert<"map">) {
   const supabase = createClient();
-
 
   const { data: createdMap, error: createMapError } = await supabase
     .from("map")
@@ -40,9 +37,7 @@ export async function createMap(
   return { map: createdMap[0], shared_map: createSharedMap[0] };
 }
 
-export async function deleteMap(
-  map_id: string,
-) {
+export async function deleteMap(map_id: string) {
   const supabase = createClient();
 
   const { data: map } = await supabase
@@ -60,10 +55,7 @@ export async function deleteMap(
   return new Error("you don't have the right permissions");
 }
 
-
-export async function shareMap(
-  sharedMap: TablesInsert<"shared_map">,
-) {
+export async function shareMap(sharedMap: TablesInsert<"shared_map">) {
   const supabase = createClient();
 
   const { data: createdSharedMap, error: createSharedMapError } = await supabase
@@ -77,6 +69,5 @@ export async function shareMap(
     });
   }
 
-
-  return createdSharedMap[0]
+  return createdSharedMap[0];
 }

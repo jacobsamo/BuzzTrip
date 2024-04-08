@@ -4,7 +4,7 @@ import { constructMetadata } from "@/lib/metadata";
 import { createClient } from "@/lib/supabase/server";
 import { SharedMap } from "@/types";
 
-export const runtime = 'edge'
+export const runtime = "edge";
 
 export async function generateMetadata({
   params,
@@ -32,7 +32,7 @@ export default async function MapPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  console.log("user: ", user)
+  console.log("user: ", user);
   // if (!user) {
   //   return redirect("/auth");
   // }

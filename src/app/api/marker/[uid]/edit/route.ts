@@ -1,32 +1,37 @@
-import { editMarker } from '@/lib/crud/markers'
-import { getUser } from '@/lib/getUser'
-import { markerEditSchema } from '@/types/schemas'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
+import { editMarker } from "@/lib/crud/markers";
+import { getUser } from "@/lib/getUser";
+import { markerEditSchema } from "@/types/schemas";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 
-export const runtime = 'edge'
+export const runtime = "edge";
 
-export async function PUT(req: NextRequest, { params }: { params: { uid: string } }) {
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { uid: string } }
+) {
   try {
-    const user = await getUser()
+    const user = await getUser();
 
-  if (!user) {
-    return NextResponse.json("Unauthorized", { status: 401 });
-  }
+    if (!user) {
+      return NextResponse.json("Unauthorized", { status: 401 });
+    }
 
-  if (!params.uid) {
-    return NextResponse.json("Missing uid", { status: 400 });
-  }
+    if (!params.uid) {
+      return NextResponse.json("Missing uid", { status: 400 });
+    }
 
-  const json = await req.json();
-  const marker = markerEditSchema.partial().parse(json);
+    const json = await req.json();
+    const marker = markerEditSchema.partial().parse(json);
 
-  const editedMarker = await editMarker(params.uid, marker)
+    const editedMarker = await editMarker(params.uid, marker);
 
-
-  return NextResponse.json({ message: 'Updated marker successfully', data: editedMarker })
+    return NextResponse.json({
+      message: "Updated marker successfully",
+      data: editedMarker,
+    });
   } catch (error) {
     console.error(`Error on /api/marker/${params.uid}/edit`, error);
 

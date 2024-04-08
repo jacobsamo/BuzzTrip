@@ -3,7 +3,6 @@ import type { Collection, Marker, Map as TMap } from "@/types";
 import { MapProvider } from "../providers/map_provider";
 import Map from "../map";
 
-
 interface MainLayoutProps {
   markers: Marker[] | null;
   collections: Collection[] | null;
@@ -12,7 +11,7 @@ interface MainLayoutProps {
 
 const MapView = ({ collections, markers, map }: MainLayoutProps) => {
   return (
-    <main className="w-full h-full">
+    <main className="h-full w-full">
       <MapProvider
         initialCollections={collections}
         initialMarkers={markers}

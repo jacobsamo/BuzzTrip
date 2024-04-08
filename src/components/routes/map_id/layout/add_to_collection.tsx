@@ -70,7 +70,10 @@ const AddToCollection = () => {
       success: (res) => {
         if (res.ok) {
           res.json().then((val) => {
-            setMarkers((prev) => [(val as {data: any})!.data, ...(prev || [])]);
+            setMarkers((prev) => [
+              (val as { data: any })!.data,
+              ...(prev || []),
+            ]);
             setAddToCollectionOpen(false);
             setActiveLocation(null);
             setSnap(0.5);

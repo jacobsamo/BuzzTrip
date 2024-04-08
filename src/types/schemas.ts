@@ -32,7 +32,7 @@ export const markerEditSchema = z.object({
   color: z.string().nullable(),
   description: z.string().nullable(),
   collection_id: z.string(),
-})
+});
 
 export const markerSchema = locationSchema.extend({
   ...markerEditSchema.shape,
@@ -48,8 +48,7 @@ export const collectionSchema = z.object({
   title: z.string(),
 });
 
-
-const permissionLevel = z.enum(["viewer", "editor",  "admin", "owner" ]);
+const permissionLevel = z.enum(["viewer", "editor", "admin", "owner"]);
 
 export const sharedMapSchema = z.object({
   map_id: z.string(),

@@ -89,11 +89,12 @@ export default function ShareModal({ map_id }: ShareMapProps) {
 }
 
 function ShareMapForm({ map_id }: ShareMapProps) {
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState("");
   const [users, setUsers] = useState<SearchUserReturn[] | undefined>(undefined);
-  const [selectedUser, setSelectedUser] = useState<SearchUserReturn | undefined>(undefined);
-  
-  
+  const [selectedUser, setSelectedUser] = useState<
+    SearchUserReturn | undefined
+  >(undefined);
+
   const {
     register,
     handleSubmit,
@@ -107,28 +108,27 @@ function ShareMapForm({ map_id }: ShareMapProps) {
   });
 
   useEffect(() => {
-    fetch(`/api/users/search?q=${searchValue}`).then((res) => res.json()).then((data) => {
-      setUsers(data as SearchUserReturn[] | undefined);
-    }
-  );
-    
+    fetch(`/api/users/search?q=${searchValue}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(data as SearchUserReturn[] | undefined);
+      });
   }, [searchValue]);
-  
 
   const onSubmit: SubmitHandler<Tables<"shared_map">> = async (data) => {
-      const share = fetch(`/api/map/${map_id}/share`, {
-        method: "POST",
-        body: JSON.stringify({data, user_id: selectedUser?.id}),
-      });
+    const share = fetch(`/api/map/${map_id}/share`, {
+      method: "POST",
+      body: JSON.stringify({ data, user_id: selectedUser?.id }),
+    });
 
-      toast.promise(share, {
-        loading: "sharing map...",
-        success: "Shared map successfully",
-        error: (err) => {
-          console.error(err);
-          return  "Failed to share map"
-        },
-      });
+    toast.promise(share, {
+      loading: "sharing map...",
+      success: "Shared map successfully",
+      error: (err) => {
+        console.error(err);
+        return "Failed to share map";
+      },
+    });
   };
 
   return (
@@ -137,18 +137,17 @@ function ShareMapForm({ map_id }: ShareMapProps) {
       method="post"
       onSubmit={handleSubmit(onSubmit)}
     >
-        <div className="flex flex-col gap-2">
-      
-          <Label htmlFor="q">Find user</Label>
-          <Input
-            aria-label="Search for user by email"
-            id="search"
-            name="search"
-            placeholder="Search by email"
-            type="search"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="q">Find user</Label>
+        <Input
+          aria-label="Search for user by email"
+          id="search"
+          name="search"
+          placeholder="Search by email"
+          type="search"
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+        />
 
         <div className="flex-col gap-2">
           {users !== undefined &&

@@ -1,36 +1,41 @@
-import { createMap, shareMap } from '@/lib/crud/maps'
-import { createMarker } from '@/lib/crud/markers'
-import { getUser } from '@/lib/getUser'
-import { createClient } from '@/lib/supabase/server'
-import { markerSchema, sharedMapSchema } from '@/types/schemas'
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-import { TablesInsert } from '@/../database.types'
-import { revalidatePath } from 'next/cache'
+import { createMap, shareMap } from "@/lib/crud/maps";
+import { createMarker } from "@/lib/crud/markers";
+import { getUser } from "@/lib/getUser";
+import { createClient } from "@/lib/supabase/server";
+import { markerSchema, sharedMapSchema } from "@/types/schemas";
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { TablesInsert } from "@/../database.types";
+import { revalidatePath } from "next/cache";
 
-export const runtime = 'edge'
+export const runtime = "edge";
 
-export async function POST(req: NextRequest, { params }: { params: { uid: string }}) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { uid: string } }
+) {
   try {
-    const user = await getUser()
+    const user = await getUser();
 
-  if (!user) {
-    return NextResponse.json("Unauthorized", { status: 401 });
-  }
+    if (!user) {
+      return NextResponse.json("Unauthorized", { status: 401 });
+    }
 
     if (!params.uid) {
-    return NextResponse.json("Missing uid", { status: 400 });
-  }
+      return NextResponse.json("Missing uid", { status: 400 });
+    }
 
-  const json = await req.json();
-  const shared_map = sharedMapSchema.parse(json);
+    const json = await req.json();
+    const shared_map = sharedMapSchema.parse(json);
 
+    const createdMap = await shareMap(shared_map);
 
-  const createdMap = await shareMap(shared_map)
+    revalidatePath("/home");
 
-  revalidatePath("/home")
-
-  return NextResponse.json({ message: 'shared map successfully', data: createdMap })
+    return NextResponse.json({
+      message: "shared map successfully",
+      data: createdMap,
+    });
   } catch (error) {
     console.error(`Error on /api/map/${params.uid}/share`, error);
 

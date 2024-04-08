@@ -3,9 +3,7 @@ import { BookmarkCheck } from "lucide-react";
 import Image from "next/image";
 import { lazy } from "react";
 
-const AddToCollectionButton = lazy(
-  () => import("../open_add_to_collection")
-);
+const AddToCollectionButton = lazy(() => import("../open_add_to_collection"));
 const Icon = lazy(() => import("@/components/ui/icon"));
 
 const ActiveLocation = () => {
@@ -36,7 +34,8 @@ const ActiveLocation = () => {
           {activeLocation.lat}, {activeLocation.lng}
         </p>
         <div className="flex h-44 w-fit flex-row gap-2 overflow-x-auto overflow-y-hidden">
-          {activeLocation.photos && activeLocation.photos.map((photo) => (
+          {activeLocation.photos &&
+            activeLocation.photos.map((photo) => (
               // eslint-disable-next-line jsx-a11y/img-redundant-alt
               <Image
                 key={photo}
@@ -44,9 +43,9 @@ const ActiveLocation = () => {
                 width={160}
                 height={160}
                 alt="location photo"
-                className="h-40 w-40 rounded-md object-cover object-center aspect-square"
+                className="aspect-square h-40 w-40 rounded-md object-cover object-center"
               />
-          ))}
+            ))}
         </div>
       </div>
     </>

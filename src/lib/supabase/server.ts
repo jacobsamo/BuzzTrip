@@ -23,16 +23,15 @@ const clientOptions = () => {
       // The remove method is used to delete a cookie by its name
       remove(name: string, options: CookieOptions) {
         try {
-          cookieStore.set({ name, value: '', ...options });
+          cookieStore.set({ name, value: "", ...options });
         } catch (error) {
           // If the remove method is called from a Server Component, an error may occur
           // This can be ignored if there is middleware refreshing user sessions
         }
-      }
-    }
-  }
-}
-
+      },
+    },
+  };
+};
 
 export const createClient = () => {
   const options = clientOptions();
@@ -43,7 +42,6 @@ export const createClient = () => {
     options
   );
 };
-
 
 export const createAdminClient = () => {
   const options = clientOptions();

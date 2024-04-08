@@ -151,7 +151,10 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
           success: (res) => {
             if (res.ok) {
               res.json().then((val) => {
-                setMarkers((prev) => [(val as {data: any})!.data, ...(prev || [])]);
+                setMarkers((prev) => [
+                  (val as { data: any })!.data,
+                  ...(prev || []),
+                ]);
               });
             }
 
@@ -173,11 +176,14 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
                 setMarkers((prev) => {
                   if (prev) {
                     const index = prev.findIndex((m) => m.uid === marker!.uid);
-                    const updatedCollection = { ...prev[index], ...(val as {data: any})!.data };
+                    const updatedCollection = {
+                      ...prev[index],
+                      ...(val as { data: any })!.data,
+                    };
                     prev[index] = updatedCollection;
                     return [...prev];
                   }
-                  return []
+                  return [];
                 });
               });
             }
@@ -240,8 +246,11 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
                       type="button"
                     ></button>
                   ))}
-                  <Input type="color" value={field.value ?? '#000'} onChange={field.onChange} />
-
+                  <Input
+                    type="color"
+                    value={field.value ?? "#000"}
+                    onChange={field.onChange}
+                  />
                 </>
               );
             }}

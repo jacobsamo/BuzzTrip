@@ -2,10 +2,7 @@ import { TablesInsert, TablesUpdate } from "@/../database.types";
 import { getUser } from "../getUser";
 import { createClient } from "../supabase/server";
 
-
-export async function createCollection(
-  collection: TablesInsert<"collection">,
-) {
+export async function createCollection(collection: TablesInsert<"collection">) {
   const supabase = await createClient();
 
   const { data: createdCollection, error: createCollectionError } =
@@ -20,16 +17,16 @@ export async function createCollection(
   return createdCollection[0];
 }
 
-
 export async function editCollection(
   uid: string,
-  collection: TablesUpdate<"collection">,
+  collection: TablesUpdate<"collection">
 ) {
   const supabase = await createClient();
 
   const { data: editedCollection, error: editCollectionError } = await supabase
     .from("collection")
-    .update(collection).eq("uid", uid)
+    .update(collection)
+    .eq("uid", uid)
     .select();
 
   if (!editedCollection || editCollectionError) {
@@ -41,16 +38,14 @@ export async function editCollection(
   return editedCollection[0];
 }
 
-
-export async function deleteCollection(
-  uid: string,
-) {
+export async function deleteCollection(uid: string) {
   const supabase = await createClient();
 
   const { data: deleteMarkers, error: deleteMarkersError } = await supabase
-  .from("marker")
-  .delete().eq("collection_id", uid)
-  .select();
+    .from("marker")
+    .delete()
+    .eq("collection_id", uid)
+    .select();
 
   if (!deleteMarkers || deleteMarkersError) {
     return new Error(`Error deleting collection ${uid}`, {
@@ -58,12 +53,8 @@ export async function deleteCollection(
     });
   }
 
-  
-
-  const { data: deletedCollection, error: deletedCollectionError } = await supabase
-    .from("collection")
-    .delete().eq("uid", uid)
-    .select();
+  const { data: deletedCollection, error: deletedCollectionError } =
+    await supabase.from("collection").delete().eq("uid", uid).select();
 
   if (!deletedCollection || deletedCollectionError) {
     return new Error(`Error deleting collection ${uid}`, {
@@ -71,6 +62,5 @@ export async function deleteCollection(
     });
   }
 
-  return deletedCollection[0]
+  return deletedCollection[0];
 }
-
