@@ -1,4 +1,4 @@
-import { Marker } from "@/types";
+import { Location, Marker } from "@/types";
 import { useMap } from "@vis.gl/react-google-maps";
 import MarkerPin from "./marker_pin";
 import MarkerModal from "./modals/create_edit_marker_modal";
@@ -13,7 +13,7 @@ const MarkerCard = ({ marker }: { marker: Marker }) => {
       <button
         onClick={() => {
           if (map) map!.panTo({ lat: marker.lat, lng: marker.lng });
-          setActiveLocation(marker);
+          setActiveLocation(marker as Location);
         }}
         className="inline-flex items-center gap-2"
       >

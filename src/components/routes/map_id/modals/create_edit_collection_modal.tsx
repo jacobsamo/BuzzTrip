@@ -133,7 +133,7 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
     },
   });
 
-  const onSubmit: SubmitHandler<Collection> = async (data) => {
+  const onSubmit: SubmitHandler<Collection> = async (data: Collection) => {
     try {
       if (mode === "create") {
         const newCollection = {
@@ -153,7 +153,7 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
             if (res.ok) {
               res.json().then((val) => {
                 console.log("returned val: ", val);
-                setCollections((prev) => [val.data, ...(prev || [])]);
+                setCollections((prev) => [(val as {data: any}).data, ...(prev || [])]);
               });
             }
 
@@ -175,12 +175,15 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
             if (res.ok) {
               res.json().then((val) => {
                 setCollections((prev) => {
-                  const index = prev.findIndex(
-                    (c) => c.uid === collection!.uid
-                  );
-                  const updatedCollection = { ...prev[index], ...val.data };
-                  prev[index] = updatedCollection;
-                  return [...prev];
+                  if (prev) {
+                    const index = prev.findIndex(
+                      (c) => c.uid === collection!.uid
+                    );
+                    const updatedCollection = { ...prev[index], ...(val as {data: any}).data };
+                    prev[index] = updatedCollection;
+                    return [...prev];
+                  }
+                  return [];
                 });
               });
             }

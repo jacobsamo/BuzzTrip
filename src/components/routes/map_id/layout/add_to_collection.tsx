@@ -46,7 +46,7 @@ const AddToCollection = () => {
   };
 
   // Function to handle form submission
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
     const marker = {
       ...activeLocation,
@@ -70,7 +70,7 @@ const AddToCollection = () => {
       success: (res) => {
         if (res.ok) {
           res.json().then((val) => {
-            setMarkers((prev) => [val!.data, ...(prev || [])]);
+            setMarkers((prev) => [(val as {data: any})!.data, ...(prev || [])]);
             setAddToCollectionOpen(false);
             setActiveLocation(null);
             setSnap(0.5);

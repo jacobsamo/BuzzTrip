@@ -12,6 +12,7 @@ import { useMapContext } from "./providers/map_provider";
 import MainDrawer from "./main_drawer";
 import Main from "./layout/main";
 import env from "env";
+import { Location } from "@/types";
 
 const MarkerPin = lazy(() => import("./marker_pin"));
 
@@ -70,7 +71,7 @@ const Map = () => {
                 title={marker.title}
                 onClick={() => {
                   // map!.panTo({ lat: marker.lat, lng: marker.lng });
-                  setActiveLocation(marker);
+                  setActiveLocation(marker as Location);
                 }}
               >
                 <MarkerPin marker={marker} size={16} />
