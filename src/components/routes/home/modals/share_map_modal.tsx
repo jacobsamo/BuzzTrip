@@ -38,6 +38,7 @@ import { Tables } from "../../../../../database.types";
 import { useEffect, useState } from "react";
 import { SearchUserReturn } from "@/app/api/users/search/route";
 import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
 
 export interface ShareMapProps {
   map_id: string;
@@ -119,7 +120,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
   const onSubmit: SubmitHandler<Tables<"shared_map">> = async (data) => {
     const share = fetch(`/api/map/${map_id}/share`, {
       method: "POST",
-      body: JSON.stringify({ data, user_id: selectedUser }),
+      body: JSON.stringify({ ...data, user_id: selectedUser }),
     });
 
     toast.promise(share, {
@@ -161,10 +162,14 @@ function ShareMapForm({ map_id }: ShareMapProps) {
                   onClick={() => setSelectedUser(user.id)}
                   variant={"outline"}
                   className={cn(
-                    "w-full text-left",
+                    "inline-flex gap-2 items-center w-full justify-start text-left",
                     selected ? "bg-gray-500" : ""
                   )}
+                  type="button"
                 >
+                  {user.picture &&
+                  <Image width={32} height={32} alt={user.email ?? user.id} src={user.picture} className="w-8 h-8 rounded-full" />
+                }
                   {user.email}
                 </Button>
               )
