@@ -1,21 +1,13 @@
 import { createMarker } from "@/lib/crud/markers";
-import { getUser } from "@/lib/getUser";
-import { createClient } from "@/lib/supabase/server";
-import { hasAccess } from "@/lib/utils/checks";
+import { withAuth } from "@/lib/utils/checks";
 import { markerSchema } from "@/types/schemas";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export const runtime = "edge";
 
-export async function POST(req: NextRequest, { params }: { params: { map_id: string }}) {
+export const POST = withAuth(async ({ req, params, user }) => {
   try {
-    const user = await getUser();
-
-    if (!user) {
-      return NextResponse.json("Unauthorized", { status: 401 });
-    }
-
     const json = await req.json();
     const marker = markerSchema
       .extend({
@@ -30,7 +22,7 @@ export async function POST(req: NextRequest, { params }: { params: { map_id: str
       data: createdMarker,
     });
   } catch (error) {
-    console.error("Error on /api/marker", error);
+    console.error("Error on /api/[map_id]/marker", error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(JSON.stringify(error.issues), { status: 422 });
@@ -38,4 +30,4 @@ export async function POST(req: NextRequest, { params }: { params: { map_id: str
 
     return NextResponse.json(null, { status: 500 });
   }
-}
+});

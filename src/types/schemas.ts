@@ -48,7 +48,7 @@ export const collectionSchema = z.object({
   title: z.string(),
 });
 
-const permissionLevel = z.enum(["viewer", "editor", "admin", "owner"]);
+export const permissionLevel = z.enum(["viewer", "editor", "admin", "owner"]);
 
 export const sharedMapSchema = z.object({
   map_id: z.string(),

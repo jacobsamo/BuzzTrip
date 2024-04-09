@@ -1,26 +1,14 @@
-import { createMap, shareMap } from "@/lib/crud/maps";
-import { createMarker } from "@/lib/crud/markers";
-import { getUser } from "@/lib/getUser";
-import { createClient } from "@/lib/supabase/server";
-import { markerSchema, sharedMapSchema } from "@/types/schemas";
-import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
-import { TablesInsert } from "@/../database.types";
+import { shareMap } from "@/lib/crud/maps";
+import { withAuth } from "@/lib/utils";
+import { sharedMapSchema } from "@/types/schemas";
 import { revalidatePath } from "next/cache";
+import { NextResponse } from "next/server";
+import { z } from "zod";
 
 export const runtime = "edge";
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { map_id: string } }
-) {
+export const POST = withAuth(async ({req, params}) => {
   try {
-    const user = await getUser();
-
-    if (!user) {
-      return NextResponse.json("Unauthorized", { status: 401 });
-    }
-
     if (!params.map_id) {
       return NextResponse.json("Missing uid", { status: 400 });
     }
@@ -45,4 +33,4 @@ export async function POST(
 
     return NextResponse.json(null, { status: 500 });
   }
-}
+});

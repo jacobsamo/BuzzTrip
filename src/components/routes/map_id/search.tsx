@@ -154,9 +154,8 @@ export const AutocompleteCustomInput = () => {
           bounds.extend(placeDetails.geometry.location);
         }
 
-        if (map) {
-          map.panToBounds(bounds);
-        }
+        if (map) map.fitBounds(bounds);
+
 
         setFetchingData(false);
       };

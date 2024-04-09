@@ -1,25 +1,12 @@
-import { editMarker } from "@/lib/crud/markers";
-import { getUser } from "@/lib/getUser";
 import { createClient } from "@/lib/supabase/server";
-import { markerEditSchema } from "@/types/schemas";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from "@/lib/utils";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export const runtime = "edge";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { uid: string, map_id: string } }
-) {
+export const GET = withAuth(async ({ req, params }) => {
   try {
-    const user = await getUser();
-
-    if (!user) {
-      return NextResponse.json("Unauthorized", { status: 401 });
-    }
-
     if (!params.uid) {
       return NextResponse.json("Missing uid", { status: 400 });
     }
@@ -33,7 +20,7 @@ export async function GET(
 
     return NextResponse.json({ message: "Got marker", data: marker });
   } catch (error) {
-    console.error(`Error on /api/marker/${params.uid}`, error);
+    console.error(`Error on /api/[map_id]/marker/${params.uid}`, error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(JSON.stringify(error.issues), { status: 422 });
@@ -41,4 +28,4 @@ export async function GET(
 
     return NextResponse.json(null, { status: 500 });
   }
-}
+});

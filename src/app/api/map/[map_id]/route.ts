@@ -1,18 +1,10 @@
-import { editMarker } from "@/lib/crud/markers";
-import { getUser } from "@/lib/getUser";
-import { createClient } from "@/lib/supabase/server";
-import { markerEditSchema } from "@/types/schemas";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from "@/lib/utils";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export const runtime = "edge";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { map_id: string } }
-) {
+export const GET = withAuth(async ({req, params}) => {
   try {
     //   const user = await getUser()
 
@@ -38,4 +30,4 @@ export async function GET(
 
     return NextResponse.json(null, { status: 500 });
   }
-}
+});

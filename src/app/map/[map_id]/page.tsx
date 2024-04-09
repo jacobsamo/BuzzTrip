@@ -1,8 +1,10 @@
 import MapView from "@/components/routes/map_id/layout/map_view";
 import { GlobalProvider } from "@/components/routes/map_id/providers/global_provider";
+import { getUser } from "@/lib/getUser";
 import { constructMetadata } from "@/lib/metadata";
 import { createClient } from "@/lib/supabase/server";
 import { Collection, Marker } from "@/types";
+import { notFound, redirect } from "next/navigation";
 
 export const runtime = "edge";
 
@@ -32,6 +34,7 @@ export default async function MapPage({
   params: { map_id: string };
 }) {
   const supabase = createClient();
+  const user = await getUser();
 
   const { data: collections } = await supabase
     .from("collection")
@@ -50,6 +53,23 @@ export default async function MapPage({
     .select()
     .eq("uid", params.map_id)
     .single();
+
+  const { data: sharedMap } = await supabase
+    .from("shared_map")
+    .select()
+    .eq("map_id", params.map_id);
+
+  if (!user) {
+    return redirect("/auth");
+  }
+
+  if (
+    sharedMap &&
+    sharedMap.length > 0 &&
+    !sharedMap.find((sm) => sm.user_id == user.id)
+  ) {
+    return notFound();
+  }
 
   return (
     <GlobalProvider>

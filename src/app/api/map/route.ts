@@ -6,17 +6,12 @@ import { markerSchema } from "@/types/schemas";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { TablesInsert } from "../../../../database.types";
+import { withAuth } from "@/lib/utils";
 
 export const runtime = "edge";
 
-export async function POST(req: NextRequest) {
+export const POST = withAuth(async ({ req, params, user }) => {
   try {
-    const user = await getUser();
-
-    if (!user) {
-      return NextResponse.json("Unauthorized", { status: 401 });
-    }
-
     const json = await req.json();
     const map = z
       .object({
@@ -46,4 +41,4 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(null, { status: 500 });
   }
-}
+});

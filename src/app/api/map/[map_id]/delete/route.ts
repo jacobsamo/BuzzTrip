@@ -1,22 +1,11 @@
 import { deleteMarker } from "@/lib/crud/markers";
-import { getUser } from "@/lib/getUser";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from "@/lib/utils";
+import { NextResponse } from "next/server";
 
 export const runtime = "edge";
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { map_id: string } }
-) {
+export const DELETE = withAuth(async ({ req, params }) => {
   try {
-    const user = await getUser();
-
-    if (!user) {
-      return NextResponse.json("Unauthorized", { status: 401 });
-    }
-
     if (!params.map_id) {
       return NextResponse.json("Missing uid", { status: 400 });
     }
@@ -35,4 +24,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-}
+});
