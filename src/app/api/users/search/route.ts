@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { Logger } from "next-axiom";
-import { withAuth } from "@/lib/utils";
+import { withAuth } from "@/lib/utils/checks";
 
 export const runtime = "edge";
 

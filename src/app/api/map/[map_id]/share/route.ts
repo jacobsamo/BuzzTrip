@@ -1,5 +1,5 @@
 import { shareMap } from "@/lib/crud/maps";
-import { withAuth } from "@/lib/utils";
+import { withAuth } from "@/lib/utils/checks";
 import { sharedMapSchema } from "@/types/schemas";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
@@ -7,7 +7,7 @@ import { z } from "zod";
 
 export const runtime = "edge";
 
-export const POST = withAuth(async ({req, params}) => {
+export const POST = withAuth(async ({ req, params }) => {
   try {
     if (!params.map_id) {
       return NextResponse.json("Missing uid", { status: 400 });

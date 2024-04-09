@@ -21,10 +21,9 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
-// import getSupabaseServerClient from "@/server/supabaseServer";
-import { Textarea } from "@/components/ui/textarea";
 import { Map } from "@/types";
 import { Plus } from "lucide-react";
 import * as React from "react";
@@ -93,7 +92,12 @@ function MapForm({ mode, map }: MapModalProps) {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<Map>();
+  } = useForm<Map>({
+    defaultValues: {
+      title: map?.title || "",
+      description: map?.description || "",
+    }
+  });
 
   const onSubmit: SubmitHandler<Map> = async (data) => {
     try {

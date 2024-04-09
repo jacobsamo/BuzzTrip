@@ -6,7 +6,7 @@ import { markerSchema } from "@/types/schemas";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { TablesInsert } from "../../../../database.types";
-import { withAuth } from "@/lib/utils";
+import { withAuth } from "@/lib/utils/checks";
 
 export const runtime = "edge";
 

@@ -1,5 +1,5 @@
 import { editCollection } from "@/lib/crud/collections";
-import { withAuth } from "@/lib/utils";
+import { withAuth } from "@/lib/utils/checks";
 import { collectionSchema } from "@/types/schemas";
 import { NextResponse } from "next/server";
 import { z } from "zod";

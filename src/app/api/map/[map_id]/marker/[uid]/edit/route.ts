@@ -1,5 +1,5 @@
 import { editMarker } from "@/lib/crud/markers";
-import { withAuth } from "@/lib/utils";
+import { withAuth } from "@/lib/utils/checks";
 import { markerEditSchema } from "@/types/schemas";
 import { NextResponse } from "next/server";
 import { z } from "zod";

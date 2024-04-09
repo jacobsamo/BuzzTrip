@@ -60,7 +60,7 @@ const AddToCollection = () => {
       return;
     }
 
-    const create = fetch(`/api/${map!.uid}/marker`, {
+    const create = fetch(`/api/map/${map!.uid}/marker`, {
       method: "POST",
       body: JSON.stringify(marker),
     });

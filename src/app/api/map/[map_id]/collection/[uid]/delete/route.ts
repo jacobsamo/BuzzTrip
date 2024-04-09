@@ -1,5 +1,5 @@
 import { deleteCollection } from "@/lib/crud/collections";
-import { withAuth } from "@/lib/utils";
+import { withAuth } from "@/lib/utils/checks";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";

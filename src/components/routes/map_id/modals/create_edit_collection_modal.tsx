@@ -142,7 +142,7 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
           map_id: map_id,
         };
 
-        const create = fetch(`/api/${map_id}/collection`, {
+        const create = fetch(`/api/map/${map_id}/collection`, {
           method: "POST",
           body: JSON.stringify(newCollection),
         });
@@ -167,7 +167,7 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
       }
 
       if (mode === "edit" && collection) {
-        const edit = fetch(`/api/${map_id}/collection/${collection.uid}/edit`, {
+        const edit = fetch(`/api/map/${map_id}/collection/${collection.uid}/edit`, {
           method: "PUT",
           body: JSON.stringify(data),
         });
@@ -206,7 +206,7 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
 
   const handleDelete = () => {
     const deleteCollection = fetch(
-      `/api/${map_id}/collection/${collection?.uid}/delete`,
+      `/api/map/${map_id}/collection/${collection?.uid}/delete`,
       {
         method: "DELETE",
       }

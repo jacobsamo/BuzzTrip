@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { withAuth } from "@/lib/utils";
+import { withAuth } from "@/lib/utils/checks";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
