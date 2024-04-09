@@ -8,7 +8,7 @@ import { z } from "zod";
 
 export const runtime = "edge";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest, { params }: { params: { map_id: string }}) {
   try {
     const user = await getUser();
 

@@ -3,28 +3,9 @@ import MapModal from "@/components/routes/home/modals/create_edit_map_modal";
 import { constructMetadata } from "@/lib/metadata";
 import { createClient } from "@/lib/supabase/server";
 import { SharedMap } from "@/types";
+import { redirect } from "next/navigation";
 
 export const runtime = "edge";
-
-export async function generateMetadata({
-  params,
-}: {
-  params: { map_id: string };
-}) {
-  const supabase = await createClient();
-  const { data: map } = await supabase
-    .from("map")
-    .select()
-    .eq("uid", params.map_id)
-    .single();
-
-  return constructMetadata({
-    title: map?.title,
-    description: map?.description || undefined,
-    // image: map?.image ?? "",
-    url: `https://buzztrip.co/map/${map?.uid}`,
-  });
-}
 
 export default async function MapPage() {
   const supabase = await createClient();
@@ -32,10 +13,9 @@ export default async function MapPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  console.log("user: ", user);
-  // if (!user) {
-  //   return redirect("/auth");
-  // }
+  if (!user) {
+    return redirect("/auth");
+  }
 
   const { data: maps } = await supabase
     .from("shared_map_view")

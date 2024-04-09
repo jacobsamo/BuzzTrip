@@ -8,7 +8,7 @@ export const runtime = "edge";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { uid: string } }
+  { params }: { params: { uid: string, map_id: string } }
 ) {
   try {
     const user = await getUser();

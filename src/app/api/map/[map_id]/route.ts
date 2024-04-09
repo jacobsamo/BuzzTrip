@@ -11,29 +11,26 @@ export const runtime = "edge";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { uid: string } }
+  { params }: { params: { map_id: string } }
 ) {
   try {
-    const user = await getUser();
+    //   const user = await getUser()
 
-    if (!user) {
-      return NextResponse.json("Unauthorized", { status: 401 });
-    }
+    // if (!user) {
+    //   return NextResponse.json("Unauthorized", { status: 401 });
+    // }
 
-    if (!params.uid) {
-      return NextResponse.json("Missing uid", { status: 400 });
-    }
+    // if (!params.uid) {
+    //   return NextResponse.json("Missing uid", { status: 400 });
+    // }
 
-    const supabase = await createClient();
-    const { data: marker } = await supabase
-      .from("marker")
-      .select()
-      .eq("uid", params.uid)
-      .single();
+    // const supabase = await createClient();
+    // const {data: map} = await supabase.from('shared_map_view').select().eq('uid', params.uid).single()
 
-    return NextResponse.json({ message: "Got marker", data: marker });
+    // return NextResponse.json({ message: 'Got map', data: map})
+    return NextResponse.json({ message: "Coming soon..." }, { status: 501 });
   } catch (error) {
-    console.error(`Error on /api/marker/${params.uid}`, error);
+    console.error(`Error on /api/map/${params.map_id}`, error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(JSON.stringify(error.issues), { status: 422 });

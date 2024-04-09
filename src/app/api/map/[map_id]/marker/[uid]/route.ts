@@ -11,7 +11,7 @@ export const runtime = "edge";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { uid: string } }
+  { params }: { params: { uid: string, map_id: string } }
 ) {
   try {
     const user = await getUser();
@@ -25,15 +25,15 @@ export async function GET(
     }
 
     const supabase = await createClient();
-    const { data: collection } = await supabase
-      .from("collection")
+    const { data: marker } = await supabase
+      .from("marker")
       .select()
       .eq("uid", params.uid)
       .single();
 
-    return NextResponse.json({ message: "Got collection", data: collection });
+    return NextResponse.json({ message: "Got marker", data: marker });
   } catch (error) {
-    console.error(`Error on /api/collection/${params.uid}`, error);
+    console.error(`Error on /api/marker/${params.uid}`, error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(JSON.stringify(error.issues), { status: 422 });

@@ -120,7 +120,7 @@ const Close = ({ children }: { children: React.ReactNode }) => {
 };
 
 function MarkerForm({ mode, marker }: MarkerModalProps) {
-  const { collections, setMarkers } = useMapContext();
+  const { collections, setMarkers, map } = useMapContext();
 
   const {
     register,
@@ -141,7 +141,7 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
   const onSubmit: SubmitHandler<Marker> = async (data) => {
     try {
       if (mode === "create") {
-        const create = fetch("/api/marker", {
+        const create = fetch(`/api/${map!.uid}/marker`, {
           method: "POST",
           body: JSON.stringify(data),
         });
@@ -163,7 +163,7 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
           error: "Failed to create marker",
         });
       } else {
-        const edit = fetch(`/api/marker/${marker!.uid}/edit`, {
+        const edit = fetch(`/api/${map!.uid}/marker/${marker!.uid}/edit`, {
           method: "PUT",
           body: JSON.stringify(data),
         });
@@ -199,7 +199,7 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
   };
 
   const handleDelete = () => {
-    const deleteCollection = fetch(`/api/marker/${marker!.uid}`, {
+    const deleteCollection = fetch(`/api/${map!.uid}/marker/${marker!.uid}`, {
       method: "DELETE",
     });
 

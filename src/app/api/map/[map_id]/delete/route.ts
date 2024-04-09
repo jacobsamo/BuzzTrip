@@ -8,7 +8,7 @@ export const runtime = "edge";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { uid: string } }
+  { params }: { params: { map_id: string } }
 ) {
   try {
     const user = await getUser();
@@ -17,21 +17,21 @@ export async function DELETE(
       return NextResponse.json("Unauthorized", { status: 401 });
     }
 
-    if (!params.uid) {
+    if (!params.map_id) {
       return NextResponse.json("Missing uid", { status: 400 });
     }
 
-    const editedMarker = await deleteMarker(params.uid);
+    const editedMarker = await deleteMarker(params.map_id);
 
     return NextResponse.json({
       message: "Updated marker successfully",
       data: editedMarker,
     });
   } catch (error) {
-    console.error(`Error on /api/map/${params.uid}/delete`, error);
+    console.error(`Error on /api/map/${params.map_id}/delete`, error);
 
     return NextResponse.json(
-      { error: `Error on /api/map/${params.uid}/delete: ${error}` },
+      { error: `Error on /api/map/${params.map_id}/delete: ${error}` },
       { status: 500 }
     );
   }

@@ -1,5 +1,6 @@
 import { editMarker } from "@/lib/crud/markers";
 import { getUser } from "@/lib/getUser";
+import { createClient } from "@/lib/supabase/server";
 import { markerEditSchema } from "@/types/schemas";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
@@ -8,9 +9,9 @@ import { z } from "zod";
 
 export const runtime = "edge";
 
-export async function PUT(
+export async function GET(
   req: NextRequest,
-  { params }: { params: { uid: string } }
+  { params }: { params: { uid: string, map_id: string } }
 ) {
   try {
     const user = await getUser();
@@ -23,17 +24,16 @@ export async function PUT(
       return NextResponse.json("Missing uid", { status: 400 });
     }
 
-    const json = await req.json();
-    const marker = markerEditSchema.partial().parse(json);
+    const supabase = await createClient();
+    const { data: collection } = await supabase
+      .from("collection")
+      .select()
+      .eq("uid", params.uid)
+      .single();
 
-    const editedMarker = await editMarker(params.uid, marker);
-
-    return NextResponse.json({
-      message: "Updated marker successfully",
-      data: editedMarker,
-    });
+    return NextResponse.json({ message: "Got collection", data: collection });
   } catch (error) {
-    console.error(`Error on /api/marker/${params.uid}/edit`, error);
+    console.error(`Error on /api/collection/${params.uid}`, error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(JSON.stringify(error.issues), { status: 422 });
