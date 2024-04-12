@@ -5,8 +5,6 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-export const runtime = "edge";
-
 export const POST = withAuth(async ({ req, params }) => {
   try {
     if (!params.map_id) {

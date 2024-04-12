@@ -5,8 +5,6 @@ import { z } from "zod";
 import { Logger } from "next-axiom";
 import { withAuth } from "@/lib/utils/checks";
 
-export const runtime = "edge";
-
 export type SearchUserReturn = {
   id: string;
   email: string | undefined;

@@ -8,10 +8,6 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "pages:build": "pnpm next-on-pages",
-    "preview": "pnpm pages:build && wrangler pages dev .vercel/output/static",
-    "deploy": "pnpm pages:build && wrangler pages deploy .vercel/output/static",
-    "build-cf-types": "wrangler types --env-interface CloudflareEnv env.d.ts",
     "db:types": "supabase gen types typescript --project-id xsxgqxgqjqfyrddqhuhr > database.types.ts",
     "db:push": "supabase db push",
     "db:pull": "supabase db pull",
@@ -53,8 +49,6 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1.11.0",
-    "@cloudflare/workers-types": "^4.20240405.0",
     "@tanstack/eslint-plugin-query": "^5.28.11",
     "@types/google.maps": "^3.55.7",
     "@types/node": "^20.12.5",

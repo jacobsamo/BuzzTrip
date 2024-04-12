@@ -2,8 +2,6 @@ import { withAuth } from "@/lib/utils/checks";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-export const runtime = "edge";
-
 export const PUT = withAuth(async ({ req, params }) => {
   try {
     //   const user = await getUser()

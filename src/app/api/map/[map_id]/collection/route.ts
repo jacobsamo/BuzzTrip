@@ -4,8 +4,6 @@ import { collectionSchema } from "@/types/schemas";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-export const runtime = "edge";
-
 export const POST = withAuth(async ({ req, params }) => {
   try {
     const json = await req.json();

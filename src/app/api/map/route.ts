@@ -8,8 +8,6 @@ import { z } from "zod";
 import { TablesInsert } from "../../../../database.types";
 import { withAuth } from "@/lib/utils/checks";
 
-export const runtime = "edge";
-
 export const POST = withAuth(async ({ req, params, user }) => {
   try {
     const json = await req.json();

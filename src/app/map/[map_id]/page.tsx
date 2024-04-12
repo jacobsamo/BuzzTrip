@@ -6,8 +6,6 @@ import { createClient } from "@/lib/supabase/server";
 import { Collection, Marker } from "@/types";
 import { notFound, redirect } from "next/navigation";
 
-export const runtime = "edge";
-
 export async function generateMetadata({
   params,
 }: {

@@ -5,8 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 import { SharedMap } from "@/types";
 import { redirect } from "next/navigation";
 
-export const runtime = "edge";
-
 export default async function MapPage() {
   const supabase = await createClient();
   const {
