@@ -9,7 +9,6 @@ import {
 import { lazy, memo } from "react";
 import { AutocompleteCustomInput } from "./search";
 import { useMapContext } from "./providers/map_provider";
-import MainDrawer from "./main_drawer";
 import Main from "./layout/main";
 import env from "env";
 import { Location } from "@/types";
@@ -79,9 +78,7 @@ const Map = () => {
             ))}
         </GoogleMap>
 
-        <MainDrawer>
-          <Main />
-        </MainDrawer>
+        <Main />
       </div>
     </APIProvider>
   );

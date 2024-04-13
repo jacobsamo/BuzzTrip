@@ -96,7 +96,7 @@ function MapForm({ mode, map }: MapModalProps) {
     defaultValues: {
       title: map?.title || "",
       description: map?.description || "",
-    }
+    },
   });
 
   const onSubmit: SubmitHandler<Map> = async (data) => {
@@ -143,6 +143,11 @@ function MapForm({ mode, map }: MapModalProps) {
       <div className="grid gap-2">
         <Label htmlFor="description">Description</Label>
         <Textarea placeholder="epic roadtrip!!" {...register("description")} />
+      </div>
+
+      <div>
+        <Label htmlFor="location">Location</Label>
+        <Input type="search" value={'test'} onChange={() => {}} />
       </div>
 
       <DialogClose asChild>

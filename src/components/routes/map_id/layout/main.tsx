@@ -1,3 +1,6 @@
+import { Drawer } from "vaul";
+import { useGlobalContext } from "../providers/global_provider";
+import { useRef, type ComponentProps, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import Icon, { IconProps } from "@/components/ui/icon";
 import { useMapContext } from "../providers/map_provider";
@@ -11,7 +14,8 @@ const CollectionModal = lazy(
 );
 const MarkerCard = lazy(() => import("../marker_card"));
 
-const Main = () => {
+export default function Main() {
+  const { snap, setSnap } = useGlobalContext();
   const {
     markers,
     collections,
@@ -23,79 +27,93 @@ const Main = () => {
   } = useMapContext();
 
   return (
-    <div className="h-full p-2">
-      {(activeLocation || addToCollectionOpen) && (
-        <Button
-          onClick={() => {
-            setActiveLocation(null);
-            if (addToCollectionOpen) {
-              setAddToCollectionOpen(false);
-            }
-          }}
-          variant={"link"}
-          className="text-base"
-        >
-          <ArrowLeft /> Back
-        </Button>
-      )}
+    <Drawer.Root
+      open
+      dismissible={false}
+      snapPoints={[0.1, 0.2, 0.5, 0.75, 0.9]}
+      activeSnapPoint={snap}
+      setActiveSnapPoint={setSnap}
+      modal={false}
+      fixed={true}
+    >
+      <Drawer.Content className="fixed inset-0 bottom-0 z-50 mx-auto flex w-full flex-col overflow-y-auto rounded-t-[10px] border bg-background p-2 pb-6 md:w-3/4">
+        <div className="top-0 mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
 
-      {activeLocation !== null && !addToCollectionOpen && <ActiveLocation />}
+        {(activeLocation || addToCollectionOpen) && (
+          <Button
+            onClick={() => {
+              setActiveLocation(null);
+              if (addToCollectionOpen) {
+                setAddToCollectionOpen(false);
+              }
+            }}
+            variant={"link"}
+            className="text-base"
+          >
+            <ArrowLeft /> Back
+          </Button>
+        )}
 
-      {addToCollectionOpen && <AddToCollection />}
+        {activeLocation !== null && !addToCollectionOpen && <ActiveLocation />}
 
-      {!addToCollectionOpen && !activeLocation && (
-        <div key="collection-modal" className="mb-4 flex flex-row justify-end">
-          <CollectionModal map_id={map!.uid} />
-        </div>
-      )}
+        {addToCollectionOpen && <AddToCollection />}
 
-      {activeLocation === null && (
-        <>
-          {collections ? (
-            <>
-              {collections.map((collection) => (
-                <div key={collection.uid}>
-                  <div className="flex h-fit flex-row items-center gap-2">
-                    <Icon
-                      name={collection.icon as IconProps["name"]}
-                      size={24}
-                      color="#000"
-                    />
-                    <h1>{collection.title}</h1>
-                    <CollectionModal
-                      mode="edit"
-                      collection={collection}
-                      map_id={map!.uid}
-                    />
+        {!addToCollectionOpen && !activeLocation && (
+          <div
+            key="collection-modal"
+            className="mb-4 flex flex-row justify-between"
+          >
+            <h2 className="text-lg font-bold">{map!.title}</h2>
+            <CollectionModal map_id={map!.uid} />
+          </div>
+        )}
+
+        {activeLocation === null && (
+          <div>
+            {collections ? (
+              <>
+                {collections.map((collection) => (
+                  <div key={collection.uid}>
+                    <div className="flex h-fit flex-row items-center gap-2">
+                      <Icon
+                        name={collection.icon as IconProps["name"]}
+                        size={24}
+                        color="#000"
+                      />
+                      <h1>{collection.title}</h1>
+                      <CollectionModal
+                        mode="edit"
+                        collection={collection}
+                        map_id={map!.uid}
+                      />
+                    </div>
+                    <ul key={`markers-${collection.uid}`} className="ml-4">
+                      {markers &&
+                        markers.map((marker) => (
+                          <>
+                            {marker.collection_id === collection.uid && (
+                              <li key={marker.uid}>
+                                <MarkerCard marker={marker} />
+                              </li>
+                            )}
+                          </>
+                        ))}
+                    </ul>
                   </div>
-                  <ul key={`markers-${collection.uid}`} className="ml-4">
-                    {markers &&
-                      markers.map((marker) => (
-                        <>
-                          {marker.collection_id === collection.uid && (
-                            <li key={marker.uid}>
-                              <MarkerCard marker={marker} />
-                            </li>
-                          )}
-                        </>
-                      ))}
-                  </ul>
-                </div>
-              ))}
-            </>
-          ) : (
-            <>
-              <h1>No Collections</h1>
-              <p className="text-base text-gray-900">
-                You don&apos;t have any collections yet. Create one to add
-                locations to.
-              </p>
-            </>
-          )}
-        </>
-      )}
-    </div>
+                ))}
+              </>
+            ) : (
+              <>
+                <h1>No Collections</h1>
+                <p className="text-base text-gray-900">
+                  You don&apos;t have any collections yet. Create one to add
+                  locations to.
+                </p>
+              </>
+            )}
+          </div>
+        )}
+      </Drawer.Content>
+    </Drawer.Root>
   );
-};
-
-export default Main;
+}
