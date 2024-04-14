@@ -53,13 +53,13 @@ export default function CollectionModal({
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline">
+          <Button variant="ghost">
             {triggerType == "text" && mode == "create" ? (
               <>
-                <Plus /> Create Collection
+                <Plus className="w-6 h-6" /> Create Collection
               </>
             ) : (
-              <Edit />
+              <Edit className="w-6 h-6" />
             )}
           </Button>
         </DialogTrigger>

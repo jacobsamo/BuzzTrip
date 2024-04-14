@@ -1,11 +1,12 @@
-import { Drawer } from "vaul";
-import { useGlobalContext } from "../providers/global_provider";
-import { useRef, type ComponentProps, type ReactNode } from "react";
+"use client";
 import { Button } from "@/components/ui/button";
-import Icon, { IconProps } from "@/components/ui/icon";
-import { useMapContext } from "../providers/map_provider";
+import * as Accordion from '@radix-ui/react-accordion';
 import { ArrowLeft } from "lucide-react";
 import { lazy } from "react";
+import { Drawer } from "vaul";
+import CollectionCard from "../collection_card";
+import { useGlobalContext } from "../providers/global_provider";
+import { useMapContext } from "../providers/map_provider";
 
 const ActiveLocation = lazy(() => import("./active_location"));
 const AddToCollection = lazy(() => import("./add_to_collection"));
@@ -72,35 +73,25 @@ export default function Main() {
           <div>
             {collections ? (
               <>
-                {collections.map((collection) => (
-                  <div key={collection.uid}>
-                    <div className="flex h-fit flex-row items-center gap-2">
-                      <Icon
-                        name={collection.icon as IconProps["name"]}
-                        size={24}
-                        color="#000"
-                      />
-                      <h1>{collection.title}</h1>
-                      <CollectionModal
-                        mode="edit"
-                        collection={collection}
-                        map_id={map!.uid}
-                      />
-                    </div>
-                    <ul key={`markers-${collection.uid}`} className="ml-4">
-                      {markers &&
-                        markers.map((marker) => (
-                          <>
-                            {marker.collection_id === collection.uid && (
-                              <li key={marker.uid}>
-                                <MarkerCard marker={marker} />
-                              </li>
-                            )}
-                          </>
-                        ))}
-                    </ul>
-                  </div>
-                ))}
+                <Accordion.Root
+                  type="multiple"
+                  defaultValue={collections.map((col) => col.uid)}
+                >
+                  {collections.map((collection) => (
+                    <CollectionCard
+                      key={collection.uid}
+                      collection={collection}
+                      markers={
+                        markers
+                          ? markers.filter(
+                              (marker) =>
+                                marker.collection_id === collection.uid
+                            )
+                          : null
+                      }
+                    />
+                  ))}
+                </Accordion.Root>
               </>
             ) : (
               <>

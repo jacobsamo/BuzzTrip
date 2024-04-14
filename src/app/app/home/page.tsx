@@ -5,6 +5,12 @@ import { createClient } from "@/lib/supabase/server";
 import { SharedMap } from "@/types";
 import env from "env";
 import { redirect } from "next/navigation";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 export default async function MapPage() {
   const supabase = await createClient();

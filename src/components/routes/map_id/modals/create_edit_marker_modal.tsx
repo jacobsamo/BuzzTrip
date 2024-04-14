@@ -57,13 +57,13 @@ export default function MarkerModal({
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline">
+          <Button variant="ghost">
             {mode == "create" ? (
               <>
-                <Plus /> Marker
+                <Plus className="h-6 w-6" /> Marker
               </>
             ) : (
-              <Edit />
+              <Edit className="h-6 w-6" />
             )}
           </Button>
         </DialogTrigger>
@@ -83,13 +83,13 @@ export default function MarkerModal({
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="outline">
+        <Button variant="ghost">
           {mode == "create" ? (
             <>
-              <Plus /> Marker
+              <Plus className="h-6 w-6" /> Marker
             </>
           ) : (
-            <Edit />
+            <Edit className="h-6 w-6" />
           )}
         </Button>
       </DrawerTrigger>
