@@ -146,16 +146,12 @@ export const AutocompleteCustomInput = () => {
         setPredictionResults([]);
         setSessionToken(new places.AutocompleteSessionToken());
 
-        const bounds = new google.maps.LatLngBounds();
-
         if (placeDetails.geometry.viewport) {
-          bounds.union(placeDetails.geometry.viewport);
+          map!.fitBounds(placeDetails.geometry.viewport);
         } else {
-          bounds.extend(placeDetails.geometry.location);
+          map!.setCenter(placeDetails.geometry.location);
+          map!.setZoom(8);
         }
-
-        if (map) map.fitBounds(bounds);
-
 
         setFetchingData(false);
       };

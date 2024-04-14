@@ -16,7 +16,7 @@ export const POST = withAuth(async ({ req, params }) => {
 
     const createdMap = await shareMap(shared_map);
 
-    revalidatePath("/home");
+    revalidatePath("/app/home");
 
     return NextResponse.json({
       message: "shared map successfully",

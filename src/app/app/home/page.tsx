@@ -3,6 +3,7 @@ import MapModal from "@/components/routes/home/modals/create_edit_map_modal";
 import { constructMetadata } from "@/lib/metadata";
 import { createClient } from "@/lib/supabase/server";
 import { SharedMap } from "@/types";
+import env from "env";
 import { redirect } from "next/navigation";
 
 export default async function MapPage() {
@@ -41,6 +42,12 @@ export default async function MapPage() {
           <MapModal />
         </>
       )}
+
+      <script
+        src={`https://maps.googleapis.com/maps/api/js?key=${env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
+        async
+        defer
+      ></script>
     </main>
   );
 }

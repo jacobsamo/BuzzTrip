@@ -25,8 +25,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { Map } from "@/types";
+import { useMapsLibrary } from "@vis.gl/react-google-maps";
+import env from "env";
 import { Plus } from "lucide-react";
+import Script from "next/script";
 import * as React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -87,15 +91,25 @@ export default function MapModal({
 }
 
 function MapForm({ mode, map }: MapModalProps) {
+  // const places = useMapsLibrary("places");
+  // const [searchValue, setSearchValue] = useState("");
+  // const locationInputRef = useRef<HTMLInputElement>(null);
+
+  // const [placeAutocomplete, setPlaceAutocomplete] =
+  //   useState<google.maps.places.Autocomplete | null>(null);
+
+  // const [fetchingData, setFetchingData] = useState<boolean>(false);
+
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<Map>({
     defaultValues: {
-      title: map?.title || "",
-      description: map?.description || "",
+      title: map?.title || undefined,
+      description: map?.description || undefined,
     },
   });
 
@@ -131,6 +145,32 @@ function MapForm({ mode, map }: MapModalProps) {
     }
   };
 
+  // useEffect(() => {
+  //   if (!places || !locationInputRef.current) return;
+
+  //   const options: google.maps.places.AutocompleteOptions = {
+  //     fields: ["formatted_address", "geometry/viewport", "name", "type"],
+  //     types: ["country", "continent", "(regions)"],
+  //   };
+
+  //   setPlaceAutocomplete(
+  //     new places.Autocomplete(locationInputRef.current, options)
+  //   );
+  // }, [places]);
+
+  // useEffect(() => {
+  //   if (!placeAutocomplete) return;
+
+  //   placeAutocomplete.addListener("place_changed", () => {
+  //     const place = placeAutocomplete.getPlace();
+  //     if (!place.geometry || !place.geometry.location) {
+  //       console.log("Returned place contains no geometry");
+  //       return;
+  //     }
+  //     console.log("Places: ", place);
+  //   });
+  // }, [placeAutocomplete]);
+
   return (
     <form
       className={cn("grid items-start gap-4")}
@@ -145,10 +185,16 @@ function MapForm({ mode, map }: MapModalProps) {
         <Textarea placeholder="epic roadtrip!!" {...register("description")} />
       </div>
 
-      <div>
+      {/* <div>
         <Label htmlFor="location">Location</Label>
-        <Input type="search" value={'test'} onChange={() => {}} />
-      </div>
+        <Input
+          className="mt-2 rounded-full outline-none"
+          placeholder="Search location"
+          type="search"
+          id="search"
+          ref={locationInputRef}
+        />
+      </div> */}
 
       <DialogClose asChild>
         <DrawerClose asChild>

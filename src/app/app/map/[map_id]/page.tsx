@@ -22,7 +22,7 @@ export async function generateMetadata({
     title: map?.title,
     description: map?.description || undefined,
     // image: map?.image ?? "",
-    url: `https://buzztrip.co/map/${map?.uid}`,
+    url: `https://buzztrip.co/app/map/${map?.uid}`,
   });
 }
 

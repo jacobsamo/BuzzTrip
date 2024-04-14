@@ -7,7 +7,7 @@ import Hero from "@/components/routes/landing/hero";
 export default async function Home() {
   const user = await getUser();
 
-  if (user) return redirect("/home");
+  if (user) return redirect("/app/home");
 
   return (
     <>
