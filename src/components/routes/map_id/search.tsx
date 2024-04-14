@@ -146,16 +146,11 @@ export const AutocompleteCustomInput = () => {
         setPredictionResults([]);
         setSessionToken(new places.AutocompleteSessionToken());
 
-        const bounds = new google.maps.LatLngBounds();
-
         if (placeDetails.geometry.viewport) {
-          bounds.union(placeDetails.geometry.viewport);
+          map!.fitBounds(placeDetails.geometry.viewport);
         } else {
-          bounds.extend(placeDetails.geometry.location);
-        }
-
-        if (map) {
-          map.panToBounds(bounds);
+          map!.setCenter(placeDetails.geometry.location);
+          map!.setZoom(8);
         }
 
         setFetchingData(false);
@@ -163,7 +158,7 @@ export const AutocompleteCustomInput = () => {
 
       placesService?.getDetails(detailRequestOptions, detailsRequestCallback);
     },
-    [places, placesService, sessionToken, setActiveLocation, setSearchValue]
+    [map, places, placesService, sessionToken, setActiveLocation, setSearchValue]
   );
 
   return (

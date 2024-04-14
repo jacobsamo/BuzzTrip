@@ -15,7 +15,7 @@ const LoginPage = () => {
       options: {
         redirectTo:
           process.env.NODE_ENV === "development"
-            ? "http://192.168.0.109:5173/auth/callback" // if you want to test on your local network
+            ? "http://localhost:5173/auth/callback" // if you want to test on your local network
             : "https://buzztrip.co/auth/callback",
       },
     });
@@ -27,7 +27,7 @@ const LoginPage = () => {
     <>
       <div className="flex flex-col items-center p-4">
         <Image
-          src="/icons/svg/icon-128.svg"
+          src="/logos/logo_x128.png"
           alt="Logo"
           width={128}
           height={128}
@@ -64,7 +64,8 @@ const LoginPage = () => {
             </svg>
           }
           aria-label="sign in with google"
-          className="text-step--3 flex w-56 max-w-sm cursor-pointer items-center gap-2 rounded-lg bg-white px-2 py-6 text-center text-black"
+          // className="text-step--3 flex w-56 max-w-sm cursor-pointer items-center gap-2 rounded-lg bg-white px-2 py-6 text-center text-black"
+          className="bg-white text-black hover:text-white"
           onClick={() => signIn()}
         >
           Continue with Google

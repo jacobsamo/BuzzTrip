@@ -33,7 +33,7 @@ export interface GlobalProviderProps {
 // Context provider component
 export const GlobalProvider = ({ children }: GlobalProviderProps) => {
   // State variables
-  const [snap, setSnap] = useState<number | string | null>(0.2);
+  const [snap, setSnap] = useState<number | string | null>(0.1);
 
   const contextValue: GlobalProviderContextValue = {
     snap,

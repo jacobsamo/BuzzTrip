@@ -2,9 +2,8 @@ import { getUser } from "@/lib/getUser";
 import { createAdminClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { Logger } from 'next-axiom';
-
-export const runtime = "edge";
+import { Logger } from "next-axiom";
+import { withAuth } from "@/lib/utils/checks";
 
 export type SearchUserReturn = {
   id: string;
@@ -13,19 +12,11 @@ export type SearchUserReturn = {
   name: string | undefined;
 };
 
-export async function GET(
-  req: NextRequest,
-  { searchParams }: { searchParams: { [key: string]: string | undefined } }
-) {
+export const GET = withAuth(async ({ req, params }) => {
   try {
-    const user = await getUser();
     const url = new URL(req.url);
     const search = url.searchParams;
     const searchValue = search.get("q")?.toLowerCase();
-
-    if (!user) {
-      return NextResponse.json("Unauthorized", { status: 401 });
-    }
 
     if (!searchValue) {
       return NextResponse.json("Missing search value", { status: 400 });
@@ -48,25 +39,28 @@ export async function GET(
         } as SearchUserReturn;
       });
 
-      const log = new Logger()
-      log.info("found users: ", {
-        foundUsers,
-        users,
-        searchValue
-      })
+    const log = new Logger();
+    log.info("found users: ", {
+      foundUsers,
+      users,
+      searchValue,
+    });
 
     return NextResponse.json(foundUsers);
   } catch (error) {
-    const log = new Logger()
+    const log = new Logger();
     log.error(`Error on /api/users/search: ${error}`, {
-      error
-    })
+      error,
+    });
     console.error(`Error on /api/users/search`, error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(JSON.stringify(error.issues), { status: 422 });
     }
 
-    return NextResponse.json(null, { status: 500, statusText: `Error on /api/users/search: ${error}` });
+    return NextResponse.json(null, {
+      status: 500,
+      statusText: `Error on /api/users/search: ${error}`,
+    });
   }
-}
+});

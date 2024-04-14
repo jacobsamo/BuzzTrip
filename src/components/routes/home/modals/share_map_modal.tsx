@@ -92,13 +92,13 @@ export default function ShareModal({ map_id }: ShareMapProps) {
 
 function ShareMapForm({ map_id }: ShareMapProps) {
   const [searchValue, setSearchValue] = useState("");
-  const {data: users} = useQuery({
+  const { data: users } = useQuery({
     queryKey: ["search", searchValue],
     queryFn: async () => {
       if (searchValue === "") return undefined;
       const res = await fetch(`/api/users/search?q=${searchValue}`);
       const val = await res.json();
-      return val as SearchUserReturn[] | undefined
+      return val as SearchUserReturn[] | undefined;
     },
   });
   const [selectedUser, setSelectedUser] = useState<string | undefined>(
@@ -152,7 +152,8 @@ function ShareMapForm({ map_id }: ShareMapProps) {
         />
 
         <div className="flex-col gap-2">
-          {users && users !== undefined &&
+          {users &&
+            users !== undefined &&
             users.map((user) => {
               const selected = selectedUser === user.id;
 
@@ -162,25 +163,31 @@ function ShareMapForm({ map_id }: ShareMapProps) {
                   onClick={() => setSelectedUser(user.id)}
                   variant={"outline"}
                   className={cn(
-                    "inline-flex gap-2 items-center w-full justify-start text-left",
+                    "inline-flex w-full items-center justify-start gap-2 text-left",
                     selected ? "bg-gray-500" : ""
                   )}
                   type="button"
                 >
-                  {user.picture &&
-                  <Image width={32} height={32} alt={user.email ?? user.id} src={user.picture} className="w-8 h-8 rounded-full" />
-                }
+                  {user.picture && (
+                    <Image
+                      width={32}
+                      height={32}
+                      alt={user.email ?? user.id}
+                      src={user.picture}
+                      className="h-8 w-8 rounded-full"
+                    />
+                  )}
                   {user.email}
                 </Button>
-              )
+              );
             })}
         </div>
       </div>
 
-      <Label htmlFor="permission">Access Type</Label>
-      <Select {...register("permission")}>
+      <Label htmlFor="permission">Access Level</Label>
+      <Select {...register("permission")} defaultValue="editor">
         <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Select a fruit" />
+          <SelectValue placeholder="Access Level" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="viewer">Viewer</SelectItem>

@@ -57,13 +57,13 @@ export default function MarkerModal({
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline">
+          <Button variant="ghost">
             {mode == "create" ? (
               <>
-                <Plus /> Marker
+                <Plus className="h-6 w-6" /> Marker
               </>
             ) : (
-              <Edit />
+              <Edit className="h-6 w-6" />
             )}
           </Button>
         </DialogTrigger>
@@ -83,13 +83,13 @@ export default function MarkerModal({
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button variant="outline">
+        <Button variant="ghost">
           {mode == "create" ? (
             <>
-              <Plus /> Marker
+              <Plus className="h-6 w-6" /> Marker
             </>
           ) : (
-            <Edit />
+            <Edit className="h-6 w-6" />
           )}
         </Button>
       </DrawerTrigger>
@@ -120,7 +120,7 @@ const Close = ({ children }: { children: React.ReactNode }) => {
 };
 
 function MarkerForm({ mode, marker }: MarkerModalProps) {
-  const { collections, setMarkers } = useMapContext();
+  const { collections, setMarkers, map } = useMapContext();
 
   const {
     register,
@@ -141,7 +141,7 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
   const onSubmit: SubmitHandler<Marker> = async (data) => {
     try {
       if (mode === "create") {
-        const create = fetch("/api/marker", {
+        const create = fetch(`/api/map/${map!.uid}/marker`, {
           method: "POST",
           body: JSON.stringify(data),
         });
@@ -163,7 +163,7 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
           error: "Failed to create marker",
         });
       } else {
-        const edit = fetch(`/api/marker/${marker!.uid}/edit`, {
+        const edit = fetch(`/api/map/${map!.uid}/marker/${marker!.uid}/edit`, {
           method: "PUT",
           body: JSON.stringify(data),
         });
@@ -199,9 +199,12 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
   };
 
   const handleDelete = () => {
-    const deleteCollection = fetch(`/api/marker/${marker!.uid}`, {
-      method: "DELETE",
-    });
+    const deleteCollection = fetch(
+      `/api/map/${map!.uid}/marker/${marker!.uid}`,
+      {
+        method: "DELETE",
+      }
+    );
 
     toast.promise(deleteCollection, {
       loading: "Deleting marker...",

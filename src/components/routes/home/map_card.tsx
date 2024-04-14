@@ -19,7 +19,7 @@ interface MapCardProps {
 const MapCard = ({ map }: MapCardProps) => {
   return (
     <div className="relative flex h-32 w-full flex-row justify-between rounded-lg border shadow">
-      <Link href={`/map/${map.uid}`} className="inline-flex">
+      <Link href={`/app/map/${map.uid}`} className="inline-flex">
         <Image
           src={map.image ?? ""}
           alt={map.title}
