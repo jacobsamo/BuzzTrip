@@ -158,7 +158,7 @@ export const AutocompleteCustomInput = () => {
 
       placesService?.getDetails(detailRequestOptions, detailsRequestCallback);
     },
-    [places, placesService, sessionToken, setActiveLocation, setSearchValue]
+    [map, places, placesService, sessionToken, setActiveLocation, setSearchValue]
   );
 
   return (

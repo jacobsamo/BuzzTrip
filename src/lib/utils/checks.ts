@@ -60,7 +60,7 @@ export const withAuth = (
     const supabase = createClient();
 
     if (!user) {
-      return new Error("Unauthorized", {});
+      return new Response("Unauthorized", { status: 401 });
     }
 
     return await handler({
