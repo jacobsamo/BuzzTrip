@@ -223,7 +223,7 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
             id="title"
             name="title"
             placeholder="Roadtrip"
-            defaultValue={marker?.title}
+            defaultValue={marker?.title ?? ""}
           />
         </div>
 

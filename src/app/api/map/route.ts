@@ -1,12 +1,8 @@
 import { createMap } from "@/lib/crud/maps";
-import { createMarker } from "@/lib/crud/markers";
-import { getUser } from "@/lib/getUser";
-import { createClient } from "@/lib/supabase/server";
-import { markerSchema } from "@/types/schemas";
-import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from "@/lib/utils/checks";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { TablesInsert } from "../../../../database.types";
-import { withAuth } from "@/lib/utils/checks";
 
 export const POST = withAuth(async ({ req, params, user }) => {
   try {

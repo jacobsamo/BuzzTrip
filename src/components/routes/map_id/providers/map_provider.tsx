@@ -1,4 +1,4 @@
-import { Collection, Location, Map, Marker } from "@/types";
+import { Collection, LocationEdit, Map, Marker } from "@/types";
 import { createContext, useContext, useState } from "react";
 
 export type MapEnv = {
@@ -16,8 +16,8 @@ export type MapContextValue = {
   setSearchValue: React.Dispatch<React.SetStateAction<string>>;
   collections: Collection[] | null;
   setCollections: React.Dispatch<React.SetStateAction<Collection[] | null>>;
-  activeLocation: Location | null;
-  setActiveLocation: React.Dispatch<React.SetStateAction<Location | null>>;
+  activeLocation: LocationEdit | null;
+  setActiveLocation: React.Dispatch<React.SetStateAction<LocationEdit | null>>;
   addToCollectionOpen: boolean;
   setAddToCollectionOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -39,7 +39,7 @@ export interface MapProviderProps {
   initialMap: Map;
   initialMarkers?: Marker[] | null;
   initialCollections?: Collection[] | null;
-  initialActiveLocation?: Location | null;
+  initialActiveLocation?: LocationEdit | null;
 }
 
 // Context provider component
@@ -56,7 +56,7 @@ export const MapProvider = ({
   const [collections, setCollections] = useState<Collection[] | null>(
     initialCollections
   );
-  const [activeLocation, setActiveLocation] = useState<Location | null>(
+  const [activeLocation, setActiveLocation] = useState<LocationEdit | null>(
     initialActiveLocation
   );
   const [addToCollectionOpen, setAddToCollectionOpen] =

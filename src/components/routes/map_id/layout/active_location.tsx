@@ -21,7 +21,7 @@ const ActiveLocation = () => {
           </span>
           <span>
             {markers?.find(
-              (marker) => marker.place_id === activeLocation.place_id
+              (marker) => marker.gm_place_id === activeLocation.gm_place_id
             ) ? (
               <BookmarkCheck className="h-8 w-8" />
             ) : (

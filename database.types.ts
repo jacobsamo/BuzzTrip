@@ -51,6 +51,113 @@ export type Database = {
           },
         ];
       };
+      feedback: {
+        Row: {
+          created_at: string;
+          description: string;
+          page: string | null;
+          title: string;
+          type: Database["public"]["Enums"]["feedback_type"];
+          uid: string;
+          user_email: string;
+          user_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          description: string;
+          page?: string | null;
+          title: string;
+          type?: Database["public"]["Enums"]["feedback_type"];
+          uid?: string;
+          user_email: string;
+          user_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          description?: string;
+          page?: string | null;
+          title?: string;
+          type?: Database["public"]["Enums"]["feedback_type"];
+          uid?: string;
+          user_email?: string;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "feedback_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      locations: {
+        Row: {
+          address: string | null;
+          avg_price: number | null;
+          bounds: Json | null;
+          created_at: string;
+          description: string | null;
+          gm_place_id: string | null;
+          icon: string | null;
+          lat: number;
+          lng: number;
+          opening_times: string[] | null;
+          phone: string | null;
+          photos: Json | null;
+          rating: number | null;
+          reviews: Json | null;
+          title: string;
+          types: string[] | null;
+          uid: string;
+          updated_at: string;
+          website: string | null;
+        };
+        Insert: {
+          address?: string | null;
+          avg_price?: number | null;
+          bounds?: Json | null;
+          created_at?: string;
+          description?: string | null;
+          gm_place_id?: string | null;
+          icon?: string | null;
+          lat: number;
+          lng: number;
+          opening_times?: string[] | null;
+          phone?: string | null;
+          photos?: Json | null;
+          rating?: number | null;
+          reviews?: Json | null;
+          title: string;
+          types?: string[] | null;
+          uid?: string;
+          updated_at?: string;
+          website?: string | null;
+        };
+        Update: {
+          address?: string | null;
+          avg_price?: number | null;
+          bounds?: Json | null;
+          created_at?: string;
+          description?: string | null;
+          gm_place_id?: string | null;
+          icon?: string | null;
+          lat?: number;
+          lng?: number;
+          opening_times?: string[] | null;
+          phone?: string | null;
+          photos?: Json | null;
+          rating?: number | null;
+          reviews?: Json | null;
+          title?: string;
+          types?: string[] | null;
+          uid?: string;
+          updated_at?: string;
+          website?: string | null;
+        };
+        Relationships: [];
+      };
       map: {
         Row: {
           created_at: string;
@@ -88,73 +195,46 @@ export type Database = {
       };
       marker: {
         Row: {
-          address: string | null;
-          avg_price: number | null;
           collection_id: string;
           color: string | null;
           created_at: string;
           created_by: string;
-          description: string | null;
           icon: string | null;
-          lat: number;
-          lng: number;
+          lat: number | null;
+          lng: number | null;
+          location_id: string | null;
           map_id: string;
-          opening_times: string[] | null;
-          phone: string | null;
-          photos: Json | null;
-          place_id: string | null;
-          rating: number | null;
-          reviews: Json | null;
-          title: string;
-          types: string[] | null;
+          note: string | null;
+          title: string | null;
           uid: string;
-          website: string | null;
         };
         Insert: {
-          address?: string | null;
-          avg_price?: number | null;
           collection_id: string;
           color?: string | null;
           created_at?: string;
           created_by: string;
-          description?: string | null;
           icon?: string | null;
-          lat: number;
-          lng: number;
+          lat?: number | null;
+          lng?: number | null;
+          location_id?: string | null;
           map_id: string;
-          opening_times?: string[] | null;
-          phone?: string | null;
-          photos?: Json | null;
-          place_id?: string | null;
-          rating?: number | null;
-          reviews?: Json | null;
-          title: string;
-          types?: string[] | null;
+          note?: string | null;
+          title?: string | null;
           uid?: string;
-          website?: string | null;
         };
         Update: {
-          address?: string | null;
-          avg_price?: number | null;
           collection_id?: string;
           color?: string | null;
           created_at?: string;
           created_by?: string;
-          description?: string | null;
           icon?: string | null;
-          lat?: number;
-          lng?: number;
+          lat?: number | null;
+          lng?: number | null;
+          location_id?: string | null;
           map_id?: string;
-          opening_times?: string[] | null;
-          phone?: string | null;
-          photos?: Json | null;
-          place_id?: string | null;
-          rating?: number | null;
-          reviews?: Json | null;
-          title?: string;
-          types?: string[] | null;
+          note?: string | null;
+          title?: string | null;
           uid?: string;
-          website?: string | null;
         };
         Relationships: [
           {
@@ -170,6 +250,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "users";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "marker_location_id_fkey";
+            columns: ["location_id"];
+            isOneToOne: false;
+            referencedRelation: "locations";
+            referencedColumns: ["uid"];
           },
           {
             foreignKeyName: "marker_map_id_fkey";
@@ -191,16 +278,19 @@ export type Database = {
         Row: {
           map_id: string;
           permission: Database["public"]["Enums"]["permission_level"];
+          uid: string;
           user_id: string;
         };
         Insert: {
           map_id: string;
           permission: Database["public"]["Enums"]["permission_level"];
+          uid?: string;
           user_id: string;
         };
         Update: {
           map_id?: string;
           permission?: Database["public"]["Enums"]["permission_level"];
+          uid?: string;
           user_id?: string;
         };
         Relationships: [
@@ -229,6 +319,71 @@ export type Database = {
       };
     };
     Views: {
+      markers_view: {
+        Row: {
+          address: string | null;
+          avg_price: number | null;
+          bounds: Json | null;
+          collection_id: string | null;
+          color: string | null;
+          created_at: string | null;
+          created_by: string | null;
+          description: string | null;
+          gm_place_id: string | null;
+          icon: string | null;
+          lat: number | null;
+          lng: number | null;
+          location_id: string | null;
+          map_id: string | null;
+          note: string | null;
+          opening_times: string[] | null;
+          phone: string | null;
+          photos: Json | null;
+          rating: number | null;
+          reviews: Json | null;
+          title: string | null;
+          types: string[] | null;
+          uid: string | null;
+          website: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "marker_collection_id_fkey";
+            columns: ["collection_id"];
+            isOneToOne: false;
+            referencedRelation: "collection";
+            referencedColumns: ["uid"];
+          },
+          {
+            foreignKeyName: "marker_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "marker_location_id_fkey";
+            columns: ["location_id"];
+            isOneToOne: false;
+            referencedRelation: "locations";
+            referencedColumns: ["uid"];
+          },
+          {
+            foreignKeyName: "marker_map_id_fkey";
+            columns: ["map_id"];
+            isOneToOne: false;
+            referencedRelation: "map";
+            referencedColumns: ["uid"];
+          },
+          {
+            foreignKeyName: "marker_map_id_fkey";
+            columns: ["map_id"];
+            isOneToOne: false;
+            referencedRelation: "shared_map_view";
+            referencedColumns: ["uid"];
+          },
+        ];
+      };
       shared_map_view: {
         Row: {
           created_at: string | null;
@@ -277,6 +432,7 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
+      feedback_type: "feature" | "bug" | "other";
       permission_level: "viewer" | "editor" | "admin" | "owner";
     };
     CompositeTypes: {

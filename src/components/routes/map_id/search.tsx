@@ -1,4 +1,4 @@
-import { Location } from "@/types";
+import { LocationEdit } from "@/types";
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { SearchIcon, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -110,10 +110,22 @@ export const AutocompleteCustomInput = () => {
           return;
         }
 
-        const location: Location = {
-          place_id: placeDetails.place_id ?? "",
+        let bounds = new google.maps.LatLngBounds();
+
+        if (placeDetails.geometry.viewport) {
+          bounds.union(placeDetails.geometry.viewport);
+          map!.fitBounds(placeDetails.geometry.viewport);
+        } else {
+          bounds.extend(placeDetails.geometry.location);
+          map!.setCenter(placeDetails.geometry.location);
+          map!.setZoom(8);
+        }
+
+        const location: LocationEdit = {
+          gm_place_id: placeDetails.place_id ?? null,
           lat: placeDetails.geometry.location.lat(),
           lng: placeDetails.geometry.location.lng(),
+          bounds: bounds.toJSON(),
           icon: "MdOutlineLocationOn",
           title: placeDetails.name
             ? placeDetails.name
@@ -146,19 +158,19 @@ export const AutocompleteCustomInput = () => {
         setPredictionResults([]);
         setSessionToken(new places.AutocompleteSessionToken());
 
-        if (placeDetails.geometry.viewport) {
-          map!.fitBounds(placeDetails.geometry.viewport);
-        } else {
-          map!.setCenter(placeDetails.geometry.location);
-          map!.setZoom(8);
-        }
-
         setFetchingData(false);
       };
 
       placesService?.getDetails(detailRequestOptions, detailsRequestCallback);
     },
-    [map, places, placesService, sessionToken, setActiveLocation, setSearchValue]
+    [
+      map,
+      places,
+      placesService,
+      sessionToken,
+      setActiveLocation,
+      setSearchValue,
+    ]
   );
 
   return (

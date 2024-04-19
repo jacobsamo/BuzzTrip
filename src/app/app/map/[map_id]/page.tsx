@@ -41,7 +41,7 @@ export default async function MapPage({
     .returns<Collection[]>();
 
   const { data: markers } = await supabase
-    .from("marker")
+    .from("markers_view")
     .select("*")
     .eq("map_id", params.map_id)
     .returns<Marker[]>();

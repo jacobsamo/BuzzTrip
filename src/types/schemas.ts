@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-export const reviewSchema = z.object({
+export const reviewsSchema = z.object({
   author_name: z.string(),
   author_url: z.string().nullable(),
   profile_photo_url: z.string(),
@@ -8,36 +8,99 @@ export const reviewSchema = z.object({
   description: z.string(),
 });
 
-export const locationSchema = z.object({
-  place_id: z.string().nullable(),
-  title: z.string(),
-  description: z.string().nullable(),
-  address: z.string().nullable(),
+export const bounds = z.object({
+  east: z.number(),
+  north: z.number(),
+  south: z.number(),
+  west: z.number(),
+});
+
+export const latlng = z.object({
   lat: z.number(),
   lng: z.number(),
-  icon: z.string().nullable(),
-  photos: z.string().array().nullable(),
-  reviews: reviewSchema.array().nullable(),
-  rating: z.number().nullable(),
+});
+
+export const boundsSchema = z.union([bounds, latlng]).nullish();
+
+export const locationsSchema = z.object({
+  address: z.string().nullable(),
   avg_price: z.number().nullable(),
-  types: z.string().array().nullable(),
-  website: z.string().nullable(),
-  phone: z.string().nullable(),
-  opening_times: z.string().array().nullable(),
-});
-
-export const markerEditSchema = z.object({
-  uid: z.string(),
-  title: z.string(),
-  color: z.string().nullable(),
+  bounds: boundsSchema,
+  created_at: z.string(),
   description: z.string().nullable(),
-  collection_id: z.string(),
+  gm_place_id: z.string().nullable(),
+  icon: z.string().nullable(),
+  lat: z.number(),
+  lng: z.number(),
+  opening_times: z.string().array().nullable(),
+  phone: z.string().nullable(),
+  photos: z.string().array().nullable(),
+  rating: z.number().nullable(),
+  reviews: reviewsSchema.array().nullable(),
+  title: z.string(),
+  types: z.string().array().nullable(),
+  uid: z.string(),
+  updated_at: z.string(),
+  website: z.string().nullable(),
 });
 
-export const markerSchema = locationSchema.extend({
-  ...markerEditSchema.shape,
-  map_id: z.string(),
+export const locationsEditSchema = locationsSchema.extend({
+  address: z.string().nullish(),
+  avg_price: z.number().nullish(),
+  bounds: boundsSchema,
+  created_at: z.string().optional(),
+  description: z.string().nullish(),
+  gm_place_id: z.string().nullish(),
+  icon: z.string().nullish(),
+  lat: z.number(),
+  lng: z.number(),
+  opening_times: z.string().array().nullish(),
+  phone: z.string().nullish(),
+  photos: z.string().array().nullish(),
+  rating: z.number().nullish(),
+  reviews: reviewsSchema.array().nullish(),
+  title: z.string(),
+  types: z.string().array().nullish(),
+  uid: z.string().optional(),
+  updated_at: z.string().optional(),
+  website: z.string().nullish(),
+});
+
+export const markersSchema = locationsSchema.extend({
+  collection_id: z.string(),
+  color: z.string().nullish(),
+  created_at: z.string().optional(),
   created_by: z.string(),
+  icon: z.string().nullish(),
+  location_id: z.string().nullish(),
+  map_id: z.string(),
+  note: z.string().nullish(),
+  title: z.string().nullish(),
+  uid: z.string().optional(),
+});
+
+export const markersEditSchema = z.object({
+  collection_id: z.string(),
+  color: z.string().nullish(),
+  created_at: z.string().optional(),
+  created_by: z.string(),
+  icon: z.string().nullish(),
+  lat: z.number().nullish(),
+  lng: z.number().nullish(),
+  location_id: z.string().nullish(),
+  map_id: z.string(),
+  note: z.string().nullish(),
+  title: z.string().nullish(),
+  uid: z.string().optional(),
+});
+
+export const mapSchema = z.object({
+  created_at: z.string(),
+  created_by: z.string(),
+  description: z.string().nullable(),
+  image: z.string().nullable(),
+  title: z.string(),
+  uid: z.string(),
 });
 
 export const collectionSchema = z.object({

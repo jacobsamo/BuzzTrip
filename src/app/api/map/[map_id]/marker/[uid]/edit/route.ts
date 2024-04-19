@@ -1,6 +1,6 @@
 import { editMarker } from "@/lib/crud/markers";
 import { withAuth } from "@/lib/utils/checks";
-import { markerEditSchema } from "@/types/schemas";
+import { markersEditSchema } from "@/types/schemas";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -11,7 +11,7 @@ export const PUT = withAuth(async ({ req, params }) => {
     }
 
     const json = await req.json();
-    const marker = markerEditSchema.partial().parse(json);
+    const marker = markersEditSchema.partial().parse(json);
 
     const editedMarker = await editMarker(params.uid, marker);
 
