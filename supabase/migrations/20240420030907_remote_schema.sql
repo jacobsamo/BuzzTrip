@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS "public"."feedback" (
     "page" "text",
     "user_email" "text" NOT NULL,
     "user_id" "uuid",
-    "created_at" timestamp with time zone DEFAULT "timezone"('utc'::"text", "now"()) NOT NULL
+    "created_at" timestamp with time zone DEFAULT ("now"() AT TIME ZONE 'utc'::"text") NOT NULL
 );
 
 ALTER TABLE "public"."feedback" OWNER TO "postgres";

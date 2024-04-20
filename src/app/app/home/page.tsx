@@ -10,7 +10,8 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
+} from "@/components/ui/accordion";
+import FeedbackModal from "@/components/shared/modals/feedback_modal";
 
 export default async function MapPage() {
   const supabase = await createClient();
@@ -31,7 +32,10 @@ export default async function MapPage() {
     <main className="p-2">
       <span className="mx-auto flex w-full flex-row items-center justify-between">
         <h2 className="text-2xl font-bold">Your Maps</h2>
-        <MapModal />
+        <div>
+          <FeedbackModal />
+          <MapModal />
+        </div>
       </span>
 
       {maps && (
@@ -48,12 +52,6 @@ export default async function MapPage() {
           <MapModal />
         </>
       )}
-
-      <script
-        src={`https://maps.googleapis.com/maps/api/js?key=${env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
-        async
-        defer
-      ></script>
     </main>
   );
 }

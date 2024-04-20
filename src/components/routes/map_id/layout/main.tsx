@@ -1,12 +1,13 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import * as Accordion from '@radix-ui/react-accordion';
+import * as Accordion from "@radix-ui/react-accordion";
 import { ArrowLeft } from "lucide-react";
 import { lazy } from "react";
 import { Drawer } from "vaul";
 import CollectionCard from "../collection_card";
 import { useGlobalContext } from "../providers/global_provider";
 import { useMapContext } from "../providers/map_provider";
+import FeedbackModal from "@/components/shared/modals/feedback_modal";
 
 const ActiveLocation = lazy(() => import("./active_location"));
 const AddToCollection = lazy(() => import("./add_to_collection"));
@@ -39,35 +40,36 @@ export default function Main() {
     >
       <Drawer.Content className="fixed inset-0 bottom-0 z-50 mx-auto flex w-full flex-col overflow-y-auto rounded-t-[10px] border bg-background p-2 pb-6 md:w-3/4">
         <div className="top-0 mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
+        <div className="mb-4 flex flex-row justify-between">
+          {(activeLocation || addToCollectionOpen) && (
+            <Button
+              onClick={() => {
+                setActiveLocation(null);
+                if (addToCollectionOpen) {
+                  setAddToCollectionOpen(false);
+                }
+              }}
+              variant={"link"}
+              className="text-base"
+            >
+              <ArrowLeft /> Back
+            </Button>
+          )}
 
-        {(activeLocation || addToCollectionOpen) && (
-          <Button
-            onClick={() => {
-              setActiveLocation(null);
-              if (addToCollectionOpen) {
-                setAddToCollectionOpen(false);
-              }
-            }}
-            variant={"link"}
-            className="text-base"
-          >
-            <ArrowLeft /> Back
-          </Button>
-        )}
+          {!addToCollectionOpen && !activeLocation && (
+            <>
+              <h2 className="text-lg font-bold">{map!.title}</h2>
+              <div>
+                <FeedbackModal />
+                <CollectionModal map_id={map!.uid} />
+              </div>
+            </>
+          )}
+        </div>
 
         {activeLocation !== null && !addToCollectionOpen && <ActiveLocation />}
 
         {addToCollectionOpen && <AddToCollection />}
-
-        {!addToCollectionOpen && !activeLocation && (
-          <div
-            key="collection-modal"
-            className="mb-4 flex flex-row justify-between"
-          >
-            <h2 className="text-lg font-bold">{map!.title}</h2>
-            <CollectionModal map_id={map!.uid} />
-          </div>
-        )}
 
         {activeLocation === null && (
           <div>

@@ -1,3 +1,4 @@
+import FeedbackModal from "@/components/shared/modals/feedback_modal";
 import { Button, buttonVariants } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
@@ -17,6 +18,7 @@ export default function Nav() {
       </div>
       <div className="hidden gap-8 lg:flex"></div>
       <div className="flex justify-end gap-2 2xl:flex-1">
+        <FeedbackModal />
         <Link href="/auth" className={buttonVariants()}>
           Sign In
         </Link>
