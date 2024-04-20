@@ -267,7 +267,10 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
       </form>
 
       {mode === "edit" && collection && (
-        <ConfirmDeleteModal type="collection" handleDelete={handleDelete} />
+        <div className="mt-2">
+
+          <ConfirmDeleteModal type="collection" handleDelete={handleDelete} />
+        </div>
       )}
     </div>
   );

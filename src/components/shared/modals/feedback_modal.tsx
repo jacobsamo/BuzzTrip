@@ -87,20 +87,30 @@ export default function FeedbackModal() {
                 value={field.value}
                 onValueChange={field.onChange}
               >
-                <ToggleGroupItem value="bug">
+                <ToggleGroupItem value="bug" className="inline-flex gap-2">
                   <Bug /> Bug
                 </ToggleGroupItem>
-                <ToggleGroupItem value="feature">
+                <ToggleGroupItem value="feature" className="inline-flex gap-2">
                   <Lightbulb /> Feature
                 </ToggleGroupItem>
-                <ToggleGroupItem value="other">
+                <ToggleGroupItem value="other" className="inline-flex gap-2">
                   <CircleHelp /> Other
                 </ToggleGroupItem>
               </ToggleGroup>
             )}
           />
-          <Input {...register("title", { required: true })} required />
-          <Textarea {...register("description", { required: true })} required />
+          <Label htmlFor="title">Title</Label>
+          <Input
+            {...register("title", { required: true })}
+            required
+            placeholder="Title"
+          />
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            {...register("description", { required: true })}
+            required
+            placeholder="Description"
+          />
 
           <Button onClick={handleSubmit(onSubmit)}>Submit</Button>
         </form>

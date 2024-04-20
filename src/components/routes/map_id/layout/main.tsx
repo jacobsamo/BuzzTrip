@@ -26,6 +26,7 @@ export default function Main() {
     setAddToCollectionOpen,
     map,
     addToCollectionOpen,
+    setSearchValue,
   } = useMapContext();
 
   return (
@@ -40,11 +41,12 @@ export default function Main() {
     >
       <Drawer.Content className="fixed inset-0 bottom-0 z-50 mx-auto flex w-full flex-col overflow-y-auto rounded-t-[10px] border bg-background p-2 pb-6 md:w-3/4">
         <div className="top-0 mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
-        <div className="mb-4 flex flex-row justify-between">
+        <div className="mb-4 flex flex-row items-center justify-between">
           {(activeLocation || addToCollectionOpen) && (
             <Button
               onClick={() => {
                 setActiveLocation(null);
+                setSearchValue("");
                 if (addToCollectionOpen) {
                   setAddToCollectionOpen(false);
                 }
@@ -59,7 +61,7 @@ export default function Main() {
           {!addToCollectionOpen && !activeLocation && (
             <>
               <h2 className="text-lg font-bold">{map!.title}</h2>
-              <div>
+              <div className="inline-flex items-center gap-2">
                 <FeedbackModal />
                 <CollectionModal map_id={map!.uid} />
               </div>

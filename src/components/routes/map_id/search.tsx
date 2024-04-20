@@ -132,7 +132,8 @@ export const AutocompleteCustomInput = () => {
             : `${placeDetails.geometry.location.lat()}, ${placeDetails.geometry.location.lng()}`,
           description: placeDetails?.html_attributions?.[0] ?? null,
           address: placeDetails.formatted_address ?? null,
-          photos: placeDetails?.photos?.map((photo) => photo.getUrl()) ?? null,
+          photos:
+            placeDetails?.photos?.map((photo) => photo.getUrl({})) ?? null,
           reviews:
             placeDetails?.reviews?.map((review) => {
               return {
