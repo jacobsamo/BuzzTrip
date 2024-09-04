@@ -1,4 +1,5 @@
 {
+  "extends": "@buzztrip/tsconfig/nextjs.json",
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -18,11 +19,9 @@
       }
     ],
     "paths": {
-      " @/*": ["./src/*"]
+      "@/*": ["./src/*"]
     },
-    "types": [
-        "@cloudflare/workers-types/2023-07-01"
-    ]
+    "types": ["@cloudflare/workers-types/2023-07-01"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
