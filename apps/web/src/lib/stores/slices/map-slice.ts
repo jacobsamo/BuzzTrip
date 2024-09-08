@@ -8,6 +8,7 @@ import type {
   Marker,
   Route,
   RouteStop,
+  CombinedMarker,
 } from "@/types";
 
 export type MapState = {
@@ -15,7 +16,7 @@ export type MapState = {
   collections: Collection[] | null;
   mapUsers: MapUser[] | null;
   map: Map | null;
-  markers: Marker[] | null;
+  markers: CombinedMarker[] | null;
   route: Route[] | null;
   routeStops: RouteStop[] | null;
 };
@@ -25,7 +26,7 @@ export type MapActions = {
   setCollections: (collections: Collection[] | null) => void;
   setMapUsers: (mapUsers: MapUser[] | null) => void;
   setMap: (maps: Map | null) => void;
-  setMarkers: (markers: Marker[] | null) => void;
+  setMarkers: (markers: CombinedMarker[] | null) => void;
   setRoute: (route: Route[] | null) => void;
   setRouteStops: (routeStops: RouteStop[] | null) => void;
 };
@@ -119,7 +120,7 @@ export const createMapSlice: StateCreator<Store, [], [], MapSlice> = (set) => ({
 
     return set({ map: map });
   },
-  setMarkers: (markers: Marker[] | null) => {
+  setMarkers: (markers: CombinedMarker[] | null) => {
     if (!markers) return;
 
     return set(({ markers: prevMarkers }) => {

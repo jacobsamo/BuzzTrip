@@ -9,7 +9,7 @@ import {
   route_stops,
   users,
   locations,
-  markersView
+  markersView,
 } from "@/server/db/schema";
 import * as z from "zod";
 
@@ -27,6 +27,7 @@ export const routeEditSchema = createInsertSchema(route);
 export const route_stopsEditSchema = createInsertSchema(route_stops);
 
 export const locationsEditSchema = createInsertSchema(locations);
+export const locationsSchema = createSelectSchema(locations); 
 
 // Custom schemas
 export const reviewsSchema = z.object({
@@ -51,25 +52,7 @@ export const latlng = z.object({
 
 export const boundsSchema = z.union([bounds, latlng]).nullish();
 
-export const locationsSchema = z.object({
-  address: z.string().nullable(),
-  avg_price: z.number().nullable(),
-  bounds: boundsSchema,
-  created_at: z.string(),
-  description: z.string().nullable(),
-  gm_place_id: z.string().nullable(),
-  icon: z.string().nullable(),
-  lat: z.number(),
-  lng: z.number(),
-  opening_times: z.string().array().nullable(),
-  phone: z.string().nullable(),
-  photos: z.string().array().nullable(),
-  rating: z.number().nullable(),
-  reviews: reviewsSchema.array().nullable(),
-  title: z.string(),
-  types: z.string().array().nullable(),
-  uid: z.string(),
-  updated_at: z.string(),
-  website: z.string().nullable(),
-});
 
+export const combinedMarkersSchema = locationsSchema.extend({
+  ...createSelectSchema(markers).shape,
+});

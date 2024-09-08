@@ -1,6 +1,6 @@
 "use client";
 import { type Store, createStore } from "@/lib/stores";
-import { StoreState } from "@/lib/stores/default-state";
+import { defaultState, StoreState } from "@/lib/stores/default-state";
 import { type ReactNode, createContext, useContext, useRef } from "react";
 import { useStore as useZustandStore } from "zustand";
 
@@ -17,7 +17,7 @@ export interface MapStoreProviderProps {
 
 export const MapStoreProvider = ({
   children,
-  initState,
+  initState = defaultState,
 }: MapStoreProviderProps) => {
   const storeRef = useRef<MapStoreApi>();
 

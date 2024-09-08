@@ -10,7 +10,7 @@ import {
   locations,
   markersView
 } from "@/server/db/schema";
-import { boundsSchema, reviewsSchema } from "./scheams";
+import { boundsSchema, combinedMarkersSchema, reviewsSchema } from "./scheams";
 import * as z from "zod";
 
 export type User = typeof users.$inferSelect;
@@ -44,3 +44,5 @@ export type NewRouteStop = typeof route_stops.$inferInsert;
 // Generated Types from zod schemas
 export type Bounds = z.infer<typeof boundsSchema>;
 export type Review = z.infer<typeof reviewsSchema>;
+
+export type CombinedMarker = z.infer<typeof combinedMarkersSchema>;
