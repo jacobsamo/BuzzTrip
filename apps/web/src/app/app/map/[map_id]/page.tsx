@@ -20,7 +20,7 @@ export async function generateMetadata({
   //   url: `https://buzztrip.co/app/map/${map?.uid}`,
   // });
   return {
-    title: map?.name,
+    title: map?.title,
   };
 }
 
@@ -62,7 +62,7 @@ export default async function MapPage({
 
   return (
     <div>
-      <h1>{map?.name}</h1>
+      <h1>{map?.title}</h1>
     </div>
   );
 }

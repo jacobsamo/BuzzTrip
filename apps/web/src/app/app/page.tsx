@@ -21,7 +21,7 @@ export default async function MapPage() {
       <h1>My Maps</h1>
       <ul>
         {usersMaps.map((map) => (
-          <li key={map.map_id}>{map.name}</li>
+          <li key={map.map_id}>{map.title}</li>
         ))}
       </ul>
     </main>
