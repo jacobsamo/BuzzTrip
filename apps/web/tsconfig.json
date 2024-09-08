@@ -13,6 +13,9 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "baseUrl": ".",
+    "declaration": false,
+    "declarationMap": false,
     "plugins": [
       {
         "name": "next"

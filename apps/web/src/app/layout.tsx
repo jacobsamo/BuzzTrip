@@ -9,6 +9,7 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { getRequestContext } from "@cloudflare/next-on-pages";
+import Providers from "@/components/providers";
 
 export const runtime = "edge";
 
@@ -29,7 +30,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={inter.className}>{children}</body>
+        <body className={inter.className}>
+          <Providers>{children}</Providers>
+        </body>
       </html>
     </ClerkProvider>
   );

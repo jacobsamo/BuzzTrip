@@ -24,3 +24,15 @@ bun install
 cd apps/web && 
 bunx wrangler d1 execute BuzzTrip-db --file=./drizzle/migrations/0000_seed.sql --local
 ```
+
+
+To setup clerk webhooks you will need to do the following:
+1. Install `localtunnel` globally
+```bash
+npm install -g localtunnel
+```
+2. Run the following command to start a tunnel to your local dev server
+```bash
+lt --port 5173 --subdomain buzztrip
+```
+3. Copy the url from the tunnel and paste it in the webhook url field in your clerk dashboard

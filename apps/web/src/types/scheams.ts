@@ -15,7 +15,9 @@ import * as z from "zod";
 
 // Table generated schemas with drizzle-zod
 export const usersEditSchema = createInsertSchema(users);
-export const mapsEditSchema = createInsertSchema(maps);
+export const mapsEditSchema = createInsertSchema(maps).extend({
+  map_id: z.string().optional(),
+});
 export const markersEditSchema = createInsertSchema(markers);
 export const collectionsEditSchema = createInsertSchema(collections);
 export const collection_markersEditSchema =

@@ -7,16 +7,23 @@ import {
   sqliteTable,
   sqliteView,
 } from "drizzle-orm/sqlite-core";
+import { v4 as uuid } from "uuid";
 
 export const users = sqliteTable("users", {
   user_id: text("user_id").primaryKey().notNull(),
-  first_name: text("first_name").notNull(),
-  last_name: text("last_name").notNull(),
+  first_name: text("first_name"),
+  last_name: text("last_name"),
+  username: text("username").unique(),
   email: text("email").notNull().unique(),
+  created_at: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
+  updated_at: text("updated_at").default(sql`(CURRENT_TIMESTAMP)`),
 });
 
 export const maps = sqliteTable("maps", {
-  map_id: text("map_id").primaryKey().notNull(),
+  map_id: text("map_id")
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => uuid()),
   title: text("title").notNull(),
   description: text("description"),
   image: text("image"),
@@ -26,7 +33,10 @@ export const maps = sqliteTable("maps", {
 });
 
 export const markers = sqliteTable("markers", {
-  marker_id: text("marker_id").primaryKey().notNull(),
+  marker_id: text("marker_id")
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => uuid()),
   collection_id: text("collection_id").references(
     () => collections.collection_id
   ),
@@ -45,7 +55,10 @@ export const markers = sqliteTable("markers", {
 });
 
 export const locations = sqliteTable("locations", {
-  location_id: text("location_id").primaryKey().notNull(),
+  location_id: text("location_id")
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => uuid()),
   title: text("title").notNull(),
   description: text("description"),
   lat: real("lat").notNull(),
@@ -69,7 +82,10 @@ export const locations = sqliteTable("locations", {
 });
 
 export const collections = sqliteTable("collections", {
-  collection_id: text("collection_id").primaryKey().notNull(),
+  collection_id: text("collection_id")
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => uuid()),
   map_id: text("map_id").references(() => maps.map_id),
   title: text("title").notNull(),
   description: text("description"),
@@ -90,7 +106,9 @@ export const collection_markers = sqliteTable("collection_markers", {
 });
 
 export const map_users = sqliteTable("map_users", {
-  map_id: text("map_id").references(() => maps.map_id),
+  map_id: text("map_id")
+    .references(() => maps.map_id)
+    .$defaultFn(() => uuid()),
   user_id: text("user_id").references(() => users.user_id),
   permission: text("permission", {
     enum: ["owner", "editor", "viewer", "commentor"],
@@ -100,14 +118,20 @@ export const map_users = sqliteTable("map_users", {
 });
 
 export const route = sqliteTable("route", {
-  route_id: text("route_id").primaryKey().notNull(),
+  route_id: text("route_id")
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => uuid()),
   name: text("name").notNull(),
   description: text("description"),
   user_id: text("user_id").references(() => users.user_id),
 });
 
 export const route_stops = sqliteTable("route_stops", {
-  route_stop_id: text("route_stop_id").primaryKey().notNull(),
+  route_stop_id: text("route_stop_id")
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => uuid()),
   route_id: text("route_id").references(() => route.route_id),
   marker_id: text("marker_id").references(() => markers.marker_id),
   stop_order: integer("stop_order").notNull(),

@@ -1,3 +1,4 @@
+import { MapStoreProvider } from "@/components/providers/map-state-provider";
 import { db } from "@/server/db";
 import { collections, map_users, maps, markers } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
@@ -35,22 +36,14 @@ export default async function MapPage({
     return notFound();
   }
 
-  const foundCollections = await db
-    .select()
-    .from(collections)
-    .where(eq(collections.map_id, params.map_id!));
-  const foundMarkers = await db
-    .select()
-    .from(markers)
-    .where(eq(markers.map_id, params.map_id!));
-  const sharedMap = await db
-    .select()
-    .from(map_users)
-    .where(eq(map_users.map_id, params.map_id!));
-
-  const map = await db.query.maps.findFirst({
-    where: eq(maps.map_id, params.map_id),
-  });
+  const [foundCollections, foundMarkers, sharedMap, map] = await Promise.all([
+    db.select().from(collections).where(eq(collections.map_id, params.map_id!)),
+    db.select().from(markers).where(eq(markers.map_id, params.map_id!)),
+    db.select().from(map_users).where(eq(map_users.map_id, params.map_id!)),
+    db.query.maps.findFirst({
+      where: eq(maps.map_id, params.map_id),
+    }),
+  ]);
 
   if (
     sharedMap &&
@@ -61,8 +54,22 @@ export default async function MapPage({
   }
 
   return (
-    <div>
-      <h1>{map?.title}</h1>
-    </div>
+    <MapStoreProvider
+      initState={{
+        collections: foundCollections,
+        markers: foundMarkers,
+        map: map ?? null,
+        mapUsers: sharedMap,
+        route: null,
+        routeStops: null,
+        activeLocation: null,
+        collectionsOpen: false,
+        collectionMarkers: null,
+      }}
+    >
+      <div>
+        <h1>{map?.title}</h1>
+      </div>
+    </MapStoreProvider>
   );
 }
