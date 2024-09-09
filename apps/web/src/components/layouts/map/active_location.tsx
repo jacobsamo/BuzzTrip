@@ -3,6 +3,7 @@ import { useMapStore } from "@/components/providers/map-state-provider";
 import { BookmarkCheck } from "lucide-react";
 import Image from "next/image";
 import { lazy } from "react";
+import AddToCollectionButton from "./open_add_to_collection";
 
 // const AddToCollectionButton = lazy(() => import("../open_add_to_collection"));
 const Icon = lazy(() => import("@/components/icon"));
@@ -21,13 +22,13 @@ const ActiveLocation = () => {
             <h1 className="text-2xl text-gray-900">{activeLocation.title}</h1>
           </span>
           <span>
-            {/* {markers?.find(
+            {markers?.find(
               (marker) => marker.gm_place_id === activeLocation.gm_place_id
             ) ? (
               <BookmarkCheck className="h-8 w-8" />
             ) : (
               <AddToCollectionButton />
-            )} */}
+            )}
           </span>
         </div>
         <p className="text-base text-gray-900">{activeLocation.address}</p>

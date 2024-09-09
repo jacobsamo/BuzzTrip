@@ -107,7 +107,7 @@ const AddToCollection = () => {
 
       <span className="flex w-full flex-row justify-between">
         <h2 className="font-bold">Collections</h2>
-        <CollectionModal map_id={map!.map_id} />
+        <CollectionModal/>
       </span>
 
       <form
@@ -123,8 +123,6 @@ const AddToCollection = () => {
               <Button
                 onClick={() => handleCollectionSelected(collection.collection_id!)}
                 key={index}
-                // name="collection_id"
-                // value={collection.uid}
                 className={cn(
                   "group h-fit w-full flex-row items-start justify-start gap-2",
                   {
@@ -154,8 +152,6 @@ const AddToCollection = () => {
           aria-label="Add to list"
           className="mt-2"
           type="submit"
-          // name="intent"
-          // value={INTENTS.createMarker}
         >
           Done
         </Button>

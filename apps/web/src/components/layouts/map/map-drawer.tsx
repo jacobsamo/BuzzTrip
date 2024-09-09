@@ -9,6 +9,8 @@ import { useMapStore } from "@/components/providers/map-state-provider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import * as Accordion from "@radix-ui/react-accordion";
 import ActiveLocation from "./active_location";
+import CollectionModal from "@/components/modals/map/create_edit_collection_modal";
+import AddToCollection from "./add_to_collection";
 
 export default function MapDrawer() {
   const {
@@ -94,8 +96,8 @@ export default function MapDrawer() {
             <>
               {/* <h2 className="text-lg font-bold">{map!.title}</h2> */}
               <div className="inline-flex items-center gap-2">
-                {/* <FeedbackModal />
-                <CollectionModal map_id={map!.uid} /> */}
+                {/* <FeedbackModal /> */}
+                <CollectionModal  />
               </div>
             </>
           )}
@@ -103,7 +105,7 @@ export default function MapDrawer() {
 
         {activeLocation !== null && !addToCollectionOpen && <ActiveLocation />}
 
-        {/* {addToCollectionOpen && <AddToCollection />} */}
+        {addToCollectionOpen && <AddToCollection />}
 
         {/* {activeLocation === null && (
           <div>

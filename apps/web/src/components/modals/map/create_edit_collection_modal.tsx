@@ -31,19 +31,18 @@ import * as React from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useMapStore } from "@/components/providers/map-state-provider";
+import { createCollection } from "@/actions/map/collection/create-collection";
 
 interface CollectionModalProps {
   triggerType?: "icon" | "text";
   mode?: "create" | "edit";
   collection?: Collection | null;
-  map_id: string;
 }
 
 export default function CollectionModal({
   mode = "create",
   collection = null,
   triggerType = "text",
-  map_id,
 }: CollectionModalProps) {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -69,7 +68,7 @@ export default function CollectionModal({
             </DialogTitle>
             <DialogDescription>Start your travel plans here</DialogDescription>
           </DialogHeader>
-          <CollectionForm mode={mode} collection={collection} map_id={map_id} />
+          <CollectionForm mode={mode} collection={collection} />
         </DialogContent>
       </Dialog>
     );
@@ -95,7 +94,7 @@ export default function CollectionModal({
           </DrawerTitle>
           <DrawerDescription>Start your travel plans here</DrawerDescription>
         </DrawerHeader>
-        <CollectionForm mode={mode} collection={collection} map_id={map_id} />
+        <CollectionForm mode={mode} collection={collection} />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -114,8 +113,9 @@ const Close = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
-  const { setCollections } = useMapStore((store) => store);
+function CollectionForm({ mode, collection }: CollectionModalProps) {
+  const { setCollections, map } = useMapStore((store) => store);
+  const allItems = useMapStore((store) => store);
 
   const {
     register,
@@ -135,34 +135,26 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
   const onSubmit: SubmitHandler<Collection> = async (data: Collection) => {
     try {
       if (mode === "create") {
+        console.log("map_id: ", allItems);
         const newCollection = {
           ...data,
           color: "#fff",
-          map_id: map_id,
+          map_id: map!.map_id,
         };
+        const create = createCollection(newCollection);
 
-        // const create = fetch(`/api/map/${map_id}/collection`, {
-        //   method: "POST",
-        //   body: JSON.stringify(newCollection),
-        // });
+        toast.promise(create, {
+          loading: "Create collection...",
+          success: (data) => {
+            if (data && !(data.data instanceof Error)) {
+              const collections = data.data ?? null;
+              setCollections(collections);
+            }
 
-        // toast.promise(create, {
-        //   loading: "Create collection...",
-        //   success: (res) => {
-        //     if (res.ok) {
-        //       res.json().then((val) => {
-        //         console.log("returned val: ", val);
-        //         setCollections((prev) => [
-        //           (val as { data: any }).data,
-        //           ...(prev || []),
-        //         ]);
-        //       });
-        //     }
-
-        //     return "Collection created successfully!";
-        //   },
-        //   error: "Failed to created collection",
-        // });
+            return "Collection created successfully!";
+          },
+          error: "Failed to created collection",
+        });
       }
 
       if (mode === "edit" && collection) {
