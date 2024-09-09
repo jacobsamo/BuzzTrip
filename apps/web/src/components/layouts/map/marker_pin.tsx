@@ -1,4 +1,4 @@
-import { type IconProps } from "@/components/icon";
+import { IconName, type IconProps } from "@/components/icon";
 import { Marker } from "@/types";
 import { lazy } from "react";
 
@@ -22,7 +22,7 @@ const MarkerPin = ({
       style={{ backgroundColor: marker?.color ?? backgroundColor }}
     >
       <Icon
-        name={(marker?.icon as IconProps["name"]) ?? name}
+        name={(marker?.icon as IconName) ?? name}
         color="#fff"
         size={size}
       />

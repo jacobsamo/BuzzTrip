@@ -1,3 +1,5 @@
+import { otherIconsList } from "@/components/icon";
+import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,8 +30,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useMediaQuery } from "@/hooks/use-media-query";
-import { colors, iconsList } from "@/lib/data";
+import { useMediaQuery } from "@uidotdev/usehooks";
+import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { Marker } from "@/types";
 import { Edit, Plus } from "lucide-react";
@@ -37,9 +39,8 @@ import * as React from "react";
 import { lazy } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useMapContext } from "../providers/map_provider";
 
-const Icon = lazy(() => import("@/components/ui/icon"));
+const Icon = lazy(() => import("@/components/icon"));
 
 export interface MarkerModalProps {
   mode?: "create" | "edit";
@@ -120,7 +121,7 @@ const Close = ({ children }: { children: React.ReactNode }) => {
 };
 
 function MarkerForm({ mode, marker }: MarkerModalProps) {
-  const { collections, setMarkers, map } = useMapContext();
+  const { collections, setMarkers, map } = useMapStore((store) => store);
 
   const {
     register,
@@ -131,8 +132,8 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
   } = useForm<Marker>({
     defaultValues: {
       title: marker?.title ?? "",
-      description: marker?.description ?? undefined,
-      icon: marker?.icon ?? "MdOutlineFolder",
+      note: marker?.note ?? undefined,
+      icon: marker?.icon ?? "MapPin",
       color: marker?.color ?? "#00000",
       collection_id: marker?.collection_id ?? undefined,
     },
@@ -141,57 +142,57 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
   const onSubmit: SubmitHandler<Marker> = async (data) => {
     try {
       if (mode === "create") {
-        const create = fetch(`/api/map/${map!.uid}/marker`, {
-          method: "POST",
-          body: JSON.stringify(data),
-        });
+        // const create = fetch(`/api/map/${map!.uid}/marker`, {
+        //   method: "POST",
+        //   body: JSON.stringify(data),
+        // });
 
-        toast.promise(create, {
-          loading: "Creating marker...",
-          success: (res) => {
-            if (res.ok) {
-              res.json().then((val) => {
-                setMarkers((prev) => [
-                  (val as { data: any })!.data,
-                  ...(prev || []),
-                ]);
-              });
-            }
+        // toast.promise(create, {
+        //   loading: "Creating marker...",
+        //   success: (res) => {
+        //     if (res.ok) {
+        //       res.json().then((val) => {
+        //         setMarkers((prev) => [
+        //           (val as { data: any })!.data,
+        //           ...(prev || []),
+        //         ]);
+        //       });
+        //     }
 
-            return "Marker created successfully!";
-          },
-          error: "Failed to create marker",
-        });
+        //     return "Marker created successfully!";
+        //   },
+        //   error: "Failed to create marker",
+        // });
       } else {
-        const edit = fetch(`/api/map/${map!.uid}/marker/${marker!.uid}/edit`, {
-          method: "PUT",
-          body: JSON.stringify(data),
-        });
+        // const edit = fetch(`/api/map/${map!.uid}/marker/${marker!.uid}/edit`, {
+        //   method: "PUT",
+        //   body: JSON.stringify(data),
+        // });
 
-        toast.promise(edit, {
-          loading: "Editing marker...",
-          success: (res) => {
-            if (res.ok) {
-              res.json().then((val) => {
-                setMarkers((prev) => {
-                  if (prev) {
-                    const index = prev.findIndex((m) => m.uid === marker!.uid);
-                    const updatedCollection = {
-                      ...prev[index],
-                      ...(val as { data: any })!.data,
-                    };
-                    prev[index] = updatedCollection;
-                    return [...prev];
-                  }
-                  return [];
-                });
-              });
-            }
+        // toast.promise(edit, {
+        //   loading: "Editing marker...",
+        //   success: (res) => {
+        //     if (res.ok) {
+        //       res.json().then((val) => {
+        //         setMarkers((prev) => {
+        //           if (prev) {
+        //             const index = prev.findIndex((m) => m.uid === marker!.uid);
+        //             const updatedCollection = {
+        //               ...prev[index],
+        //               ...(val as { data: any })!.data,
+        //             };
+        //             prev[index] = updatedCollection;
+        //             return [...prev];
+        //           }
+        //           return [];
+        //         });
+        //       });
+        //     }
 
-            return "Marker edited successfully!";
-          },
-          error: "Failed to edit marker",
-        });
+        //     return "Marker edited successfully!";
+        //   },
+        //   error: "Failed to edit marker",
+        // });
       }
     } catch (error) {
       console.error(error);
@@ -199,18 +200,18 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
   };
 
   const handleDelete = () => {
-    const deleteCollection = fetch(
-      `/api/map/${map!.uid}/marker/${marker!.uid}`,
-      {
-        method: "DELETE",
-      }
-    );
+    // const deleteCollection = fetch(
+    //   `/api/map/${map!.uid}/marker/${marker!.uid}`,
+    //   {
+    //     method: "DELETE",
+    //   }
+    // );
 
-    toast.promise(deleteCollection, {
-      loading: "Deleting marker...",
-      success: "Markker deleted successfully",
-      error: "Failed to delete marker",
-    });
+    // toast.promise(deleteCollection, {
+    //   loading: "Deleting marker...",
+    //   success: "Markker deleted successfully",
+    //   error: "Failed to delete marker",
+    // });
   };
 
   return (
@@ -265,7 +266,7 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
           name="icon"
           render={({ field }) => (
             <div className="flex flex-wrap gap-2">
-              {iconsList.map((icon, index) => {
+              {otherIconsList.map((icon, index) => {
                 const selectedIcon = watch("icon");
 
                 return (
@@ -288,7 +289,7 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
         />
 
         <Label htmlFor="collection_id">Collection</Label>
-        <Select name="collection_id" defaultValue={marker?.collection_id}>
+        <Select name="collection_id" defaultValue={marker?.collection_id!}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select a collections" />
           </SelectTrigger>
@@ -296,7 +297,7 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
             {collections &&
               collections.map((collection, index) => {
                 return (
-                  <SelectItem key={index} value={collection.uid}>
+                  <SelectItem key={index} value={collection.collection_id!}>
                     {collection.title}
                   </SelectItem>
                 );
@@ -310,11 +311,11 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
             id="description"
             name="description"
             placeholder=""
-            defaultValue={marker?.description ?? ""}
+            defaultValue={marker?.note ?? ""}
           />
         </div>
 
-        {marker && <input type="hidden" name="uid" value={marker.uid} />}
+        {marker && <input type="hidden" name="uid" value={marker.map_id!} />}
 
         <Close>
           <Button aria-label="Create Marker" type="submit">

@@ -4,7 +4,9 @@ import { setupDevPlatform } from "@cloudflare/next-on-pages/next-dev";
 // (when running the application with `next dev`), for more information see:
 // https://github.com/cloudflare/next-on-pages/blob/main/internal-packages/next-dev/README.md
 if (process.env.NODE_ENV === "development") {
-  await setupDevPlatform();
+  await setupDevPlatform({
+    persist: true,
+  });
 }
 
 /** @type {import('next').NextConfig} */
@@ -25,6 +27,10 @@ const nextConfig = {
       },
     ],
   },
+  experimental: {
+    optimizePackageImports: ["lucide-react", "@phosphor-icons/react"],
+  },
+  skipTrailingSlashRedirect: true,
 };
 
 export default nextConfig;

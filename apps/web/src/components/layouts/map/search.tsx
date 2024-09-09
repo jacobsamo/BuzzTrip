@@ -128,7 +128,7 @@ export const AutocompleteCustomInput = () => {
           lat: placeDetails.geometry.location.lat(),
           lng: placeDetails.geometry.location.lng(),
           bounds: bounds.toJSON(),
-          icon: "MdOutlineLocationOn",
+          icon: "MapPin",
           title: placeDetails.name
             ? placeDetails.name
             : `${placeDetails.geometry.location.lat()}, ${placeDetails.geometry.location.lng()}`,

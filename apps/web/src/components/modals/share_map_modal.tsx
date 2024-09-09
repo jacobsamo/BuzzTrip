@@ -28,17 +28,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import { useMediaQuery } from "@uidotdev/usehooks";
 import { cn } from "@/lib/utils";
 import { Share } from "lucide-react";
 import * as React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Tables } from "../../../../../database.types";
 import { useEffect, useState } from "react";
-import { SearchUserReturn } from "@/app/api/users/search/route";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
+import { NewMapUser } from "@/types";
 
 export interface ShareMapProps {
   map_id: string;
@@ -95,10 +94,10 @@ function ShareMapForm({ map_id }: ShareMapProps) {
   const { data: users } = useQuery({
     queryKey: ["search", searchValue],
     queryFn: async () => {
-      if (searchValue === "") return undefined;
-      const res = await fetch(`/api/users/search?q=${searchValue}`);
-      const val = await res.json();
-      return val as SearchUserReturn[] | undefined;
+      // if (searchValue === "") return undefined;
+      // const res = await fetch(`/api/users/search?q=${searchValue}`);
+      // const val = await res.json();
+      // return val as SearchUserReturn[] | undefined;
     },
   });
   const [selectedUser, setSelectedUser] = useState<string | undefined>(
@@ -110,14 +109,14 @@ function ShareMapForm({ map_id }: ShareMapProps) {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<Tables<"shared_map">>({
+  } = useForm<NewMapUser>({
     defaultValues: {
       permission: "editor",
       map_id: map_id,
     },
   });
 
-  const onSubmit: SubmitHandler<Tables<"shared_map">> = async (data) => {
+  const onSubmit: SubmitHandler<NewMapUser> = async (data) => {
     const share = fetch(`/api/map/${map_id}/share`, {
       method: "POST",
       body: JSON.stringify({ ...data, user_id: selectedUser }),
@@ -152,7 +151,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
         />
 
         <div className="flex-col gap-2">
-          {users &&
+          {/* {users &&
             users !== undefined &&
             users.map((user) => {
               const selected = selectedUser === user.id;
@@ -180,7 +179,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
                   {user.email}
                 </Button>
               );
-            })}
+            })} */}
         </div>
       </div>
 

@@ -13,6 +13,7 @@ import { useMapStore } from "@/components/providers/map-state-provider";
 import MapDrawer from "./map-drawer";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import MapSideBar from "./map-sidebar";
+import { IconName } from "@/components/icon";
 
 const MarkerPin = lazy(() => import("./marker_pin"));
 
@@ -74,7 +75,10 @@ const Map = () => {
                   setActiveLocation(marker as Location);
                 }}
               >
-                <MarkerPin marker={marker} size={16} />
+                <MarkerPin
+                  marker={{ ...marker, icon: marker.icon as IconName }}
+                  size={16}
+                />
               </AdvancedMarker>
             ))}
         </GoogleMap>

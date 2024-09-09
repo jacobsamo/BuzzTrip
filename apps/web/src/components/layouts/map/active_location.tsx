@@ -17,7 +17,7 @@ const ActiveLocation = () => {
       <div className="flex flex-col pl-3">
         <div className="relative flex w-full flex-row justify-between">
           <span className="flex flex-row gap-2">
-            <Icon name="MdOutlineLocationOn" size={24} color="#000" />
+            <Icon name="MapPin" size={24} color="#000" />
             <h1 className="text-2xl text-gray-900">{activeLocation.title}</h1>
           </span>
           <span>

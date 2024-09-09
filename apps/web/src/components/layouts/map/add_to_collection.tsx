@@ -1,16 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { DrawerHeader } from "@/components/ui/drawer";
-import Icon, { IconProps } from "@/components/ui/icon";
+import Icon, { IconProps } from "@/components/icon";
 import { cn } from "@/lib/utils";
-import { useMapContext } from "../providers/map_provider";
 import { lazy, useState } from "react";
 import { toast } from "sonner";
-import { useGlobalContext } from "../providers/global_provider";
 import Image from "next/image";
+import { useMapStore } from "@/components/providers/map-state-provider";
 
 const CollectionModal = lazy(
-  () => import("../modals/create_edit_collection_modal")
+  () => import("@/components/modals/map/create_edit_collection_modal")
 );
 
 const AddToCollection = () => {
@@ -23,16 +22,17 @@ const AddToCollection = () => {
     setActiveLocation,
     map,
     setAddToCollectionOpen,
-  } = useMapContext();
-  const { setSnap } = useGlobalContext();
+    setSnap
+  } = useMapStore(store => store);
+
   const [selected, setSelected] = useState<string>("");
 
   const collectionsMarkerCount = collections
     ? collections.map((collection) => {
         return {
-          uid: collection.uid,
+          collection_id: collection.collection_id!,
           markerCount: markers
-            ? markers.filter((marker) => marker.collection_id == collection.uid)
+            ? markers.filter((marker) => marker.collection_id == collection.collection_id)
                 .length
             : 0,
         };
@@ -51,7 +51,7 @@ const AddToCollection = () => {
     const marker = {
       ...activeLocation,
       collection_id: selected,
-      map_id: map!.uid,
+      map_id: map!.map_id,
       color: "#ef233c",
     };
 
@@ -60,31 +60,31 @@ const AddToCollection = () => {
       return;
     }
 
-    const create = fetch(`/api/map/${map!.uid}/marker`, {
-      method: "POST",
-      body: JSON.stringify(marker),
-    });
+    // const create = fetch(`/api/map/${map!.map_id}/marker`, {
+    //   method: "POST",
+    //   body: JSON.stringify(marker),
+    // });
 
-    toast.promise(create, {
-      loading: "Creating marker...",
-      success: (res) => {
-        if (res.ok) {
-          res.json().then((val) => {
-            setMarkers((prev) => [
-              (val as { data: any })!.data,
-              ...(prev || []),
-            ]);
-            setAddToCollectionOpen(false);
-            setActiveLocation(null);
-            setSnap(0.5);
-            setSearchValue("");
-          });
-        }
+    // toast.promise(create, {
+    //   loading: "Creating marker...",
+    //   success: (res) => {
+    //     if (res.ok) {
+    //       res.json().then((val) => {
+    //         setMarkers((prev) => [
+    //           (val as { data: any })!.data,
+    //           ...(prev || []),
+    //         ]);
+    //         setAddToCollectionOpen(false);
+    //         setActiveLocation(null);
+    //         setSnap(0.5);
+    //         setSearchValue("");
+    //       });
+    //     }
 
-        return "Marker created successfully!";
-      },
-      error: "Failed to create marker",
-    });
+    //     return "Marker created successfully!";
+    //   },
+    //   error: "Failed to create marker",
+    // });
   };
 
   return (
@@ -107,7 +107,7 @@ const AddToCollection = () => {
 
       <span className="flex w-full flex-row justify-between">
         <h2 className="font-bold">Collections</h2>
-        <CollectionModal map_id={map!.uid} />
+        <CollectionModal map_id={map!.map_id} />
       </span>
 
       <form
@@ -117,11 +117,11 @@ const AddToCollection = () => {
       >
         {collections &&
           collections.map((collection, index) => {
-            const selectedCollection = collection.uid === selected;
+            const selectedCollection = collection.collection_id === selected;
 
             return (
               <Button
-                onClick={() => handleCollectionSelected(collection.uid)}
+                onClick={() => handleCollectionSelected(collection.collection_id!)}
                 key={index}
                 // name="collection_id"
                 // value={collection.uid}
@@ -142,7 +142,7 @@ const AddToCollection = () => {
                     Markers:
                     {typeof collectionsMarkerCount == "object" &&
                       collectionsMarkerCount.find(
-                        (col) => collection.uid == col.uid
+                        (col) => collection.collection_id == col.collection_id
                       )?.markerCount}
                   </p>
                 </div>

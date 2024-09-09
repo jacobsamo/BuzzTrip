@@ -19,18 +19,18 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import Icon from "@/components/icon";
+import Icon, { otherIconsList } from "@/components/icon";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useMediaQuery } from "@uidotdev/usehooks";
-import { iconsList } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { Collection } from "@/types";
 import { Edit, Plus } from "lucide-react";
 import * as React from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useMapStore } from "@/components/providers/map-state-provider";
 
 interface CollectionModalProps {
   triggerType?: "icon" | "text";
@@ -115,7 +115,7 @@ const Close = ({ children }: { children: React.ReactNode }) => {
 };
 
 function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
-  const { setCollections } = useMapContext();
+  const { setCollections } = useMapStore((store) => store);
 
   const {
     register,
@@ -127,7 +127,7 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
     defaultValues: {
       title: collection?.title || "",
       description: collection?.description || "",
-      icon: collection?.icon || "map-pin",
+      icon: collection?.icon || "MapPin",
       color: collection?.color || "#fff",
     },
   });
@@ -230,7 +230,7 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
           name="icon"
           render={({ field }) => (
             <div className="flex flex-wrap gap-2">
-              {iconsList.map((icon, index) => {
+              {otherIconsList.map((icon, index) => {
                 const selectedIcon = watch("icon");
 
                 return (
@@ -264,7 +264,7 @@ function CollectionForm({ mode, collection, map_id }: CollectionModalProps) {
 
       {mode === "edit" && collection && (
         <div className="mt-2">
-          <ConfirmDeleteModal type="collection" handleDelete={handleDelete} />
+          {/* <ConfirmDeleteModal type="collection" handleDelete={handleDelete} /> */}
         </div>
       )}
     </div>
