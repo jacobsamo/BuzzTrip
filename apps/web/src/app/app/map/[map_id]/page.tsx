@@ -89,10 +89,16 @@ export default async function MapPage({
     return notFound();
   }
 
+  console.log("Data: ", {
+    foundCollections,
+    foundMarkers,
+    sharedMap,
+    map: map[0],
+  });
+
   return (
     <MapStoreProvider
-      initState={{
-        ...defaultState,
+      initialState={{
         collections: foundCollections,
         markers: foundMarkers.map((marker) => ({
           ...marker,
