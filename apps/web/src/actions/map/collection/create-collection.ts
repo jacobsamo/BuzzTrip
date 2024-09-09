@@ -6,13 +6,18 @@ import { collections } from "@/server/db/schema";
 import { NewCollection } from "@/types";
 import { collectionsEditSchema } from "@/types/scheams";
 
+const schema = collectionsEditSchema.omit({
+  created_by: true,
+});
+
 export const createCollection = authAction
-  .schema(collectionsEditSchema)
+  .schema(schema)
   .metadata({ name: "create-collection" })
   .action(async ({ parsedInput: params, ctx }) => {
     const newCollection: NewCollection = {
       ...params,
       icon: params.icon as IconName,
+      created_by: ctx.user.id,
     };
 
     const collection = await db
@@ -21,10 +26,10 @@ export const createCollection = authAction
       .returning();
 
     if (!collection) {
-      return new Error("Error creating new map.", {
+      throw new Error("Error creating new map.", {
         cause: collection,
       });
     }
 
-    return collection
+    return collection;
   });

@@ -2,15 +2,19 @@
 import { Button } from "@/components/ui/button";
 // import * as Accordion from "@radix-ui/react-accordion";
 import { ArrowLeft } from "lucide-react";
-import { lazy } from "react";
 import { Drawer } from "vaul";
 // import CollectionCard from "../collection_card";
+import CollectionModal from "@/components/modals/map/create_edit_collection_modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import * as Accordion from "@radix-ui/react-accordion";
 import ActiveLocation from "./active_location";
-import CollectionModal from "@/components/modals/map/create_edit_collection_modal";
 import AddToCollection from "./add_to_collection";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default function MapDrawer() {
   const {
@@ -47,31 +51,32 @@ export default function MapDrawer() {
         >
           {!activeLocation && collections && (
             <ScrollArea className="flex h-full flex-col">
-              {collections?.map((collection) => (
-                <Accordion.Item
-                  key={collection.collection_id}
-                  value={collection.collection_id}
-                >
-                  <Accordion.Header>
-                    <Accordion.Trigger>{collection.title}</Accordion.Trigger>
-                  </Accordion.Header>
-                  <Accordion.Content>
-                    <div className="flex flex-col gap-2">
-                      {markers &&
-                        markers
-                          .filter(
-                            (marker) =>
-                              marker.collection_id === collection.collection_id
-                          )
-                          .map((marker) => (
-                            <div key={marker.marker_id} className="text-sm">
-                              {marker.title}
-                            </div>
-                          ))}
-                    </div>
-                  </Accordion.Content>
-                </Accordion.Item>
-              ))}
+              <Accordion type="multiple">
+                {collections?.map((collection) => (
+                  <AccordionItem
+                    key={collection.collection_id}
+                    value={collection.collection_id}
+                  >
+                    <AccordionTrigger>{collection.title}</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="flex flex-col gap-2">
+                        {markers &&
+                          markers
+                            .filter(
+                              (marker) =>
+                                marker.collection_id ===
+                                collection.collection_id
+                            )
+                            .map((marker) => (
+                              <div key={marker.marker_id} className="text-sm">
+                                {marker.title}
+                              </div>
+                            ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </ScrollArea>
           )}
 
@@ -97,7 +102,7 @@ export default function MapDrawer() {
               {/* <h2 className="text-lg font-bold">{map!.title}</h2> */}
               <div className="inline-flex items-center gap-2">
                 {/* <FeedbackModal /> */}
-                <CollectionModal  />
+                <CollectionModal />
               </div>
             </>
           )}

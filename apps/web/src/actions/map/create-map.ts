@@ -25,7 +25,7 @@ export const createMap = authAction
     const createdMap = await db.insert(maps).values(newMap).returning();
 
     if (!createdMap || !createdMap[0]) {
-      return new Error("Error creating new map.", {
+      throw new Error("Error creating new map.", {
         cause: createdMap,
       });
     }
@@ -39,7 +39,7 @@ export const createMap = authAction
     const sharedMap = await db.insert(map_users).values(shared_map).returning();
 
     if (!sharedMap) {
-      return new Error("Error creating new shared map.", {
+      throw new Error("Error creating new shared map.", {
         cause: sharedMap,
       });
     }

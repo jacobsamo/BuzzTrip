@@ -27,11 +27,10 @@ import { cn } from "@/lib/utils";
 import { Map } from "@/types";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Plus } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
 import * as React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useMapStore } from "../providers/map-state-provider";
-import { useAction } from "next-safe-action/hooks";
 
 export interface MapModalProps {
   mode?: "create" | "edit";
@@ -90,7 +89,6 @@ export default function MapModal({
 }
 
 function MapForm({ mode, map }: MapModalProps) {
-  const {execute, result} = useAction(createMap)
   // const places = useMapsLibrary("places");
   // const [searchValue, setSearchValue] = useState("");
   // const locationInputRef = useRef<HTMLInputElement>(null);
@@ -124,15 +122,13 @@ function MapForm({ mode, map }: MapModalProps) {
   const onSubmit: SubmitHandler<Map> = async (data) => {
     try {
       if (mode === "create") {
-        const create = await createMap(data);
+        const create = createMap(data);
 
-        console.log("Create result: ", create);
-
-        // toast.promise(create, {
-        //   loading: "Creating map...",
-        //   success: "Map created successfully!",
-        //   error: "Failed to create map",
-        // });
+        toast.promise(create, {
+          loading: "Creating map...",
+          success: "Map created successfully!",
+          error: "Failed to create map",
+        });
       }
 
       // if (mode === "edit" && map) {

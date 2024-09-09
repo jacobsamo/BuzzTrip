@@ -1,4 +1,4 @@
-import { otherIconsList } from "@/components/icon";
+import { popularIconsList } from "@/components/icon";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,15 +30,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useMediaQuery } from "@uidotdev/usehooks";
 import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { Marker } from "@/types";
+import { useMediaQuery } from "@uidotdev/usehooks";
 import { Edit, Plus } from "lucide-react";
 import * as React from "react";
 import { lazy } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "sonner";
+import IconPickerModal from "../icon-picker-modal";
 
 const Icon = lazy(() => import("@/components/icon"));
 
@@ -146,7 +146,6 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
         //   method: "POST",
         //   body: JSON.stringify(data),
         // });
-
         // toast.promise(create, {
         //   loading: "Creating marker...",
         //   success: (res) => {
@@ -158,7 +157,6 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
         //         ]);
         //       });
         //     }
-
         //     return "Marker created successfully!";
         //   },
         //   error: "Failed to create marker",
@@ -168,7 +166,6 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
         //   method: "PUT",
         //   body: JSON.stringify(data),
         // });
-
         // toast.promise(edit, {
         //   loading: "Editing marker...",
         //   success: (res) => {
@@ -188,7 +185,6 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
         //         });
         //       });
         //     }
-
         //     return "Marker edited successfully!";
         //   },
         //   error: "Failed to edit marker",
@@ -206,7 +202,6 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
     //     method: "DELETE",
     //   }
     // );
-
     // toast.promise(deleteCollection, {
     //   loading: "Deleting marker...",
     //   success: "Markker deleted successfully",
@@ -266,7 +261,7 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
           name="icon"
           render={({ field }) => (
             <div className="flex flex-wrap gap-2">
-              {otherIconsList.map((icon, index) => {
+              {popularIconsList.map((icon, index) => {
                 const selectedIcon = watch("icon");
 
                 return (
@@ -284,6 +279,10 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
                   </Button>
                 );
               })}
+              <IconPickerModal
+                selectedIcon={watch("icon")}
+                setSelectedIcon={field.onChange}
+              />
             </div>
           )}
         />

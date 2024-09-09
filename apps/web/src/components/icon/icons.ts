@@ -57,6 +57,7 @@ import {
   MapPinLine,
   Compass,
   Folder,
+  Bed,
 } from "@phosphor-icons/react/dist/ssr";
 
 export const transport = {
@@ -77,6 +78,7 @@ export const accommodation = {
   //   Villa: {},
   Cabin: Tipi,
   Camping: Tent,
+  Bed: Bed,
 };
 
 export const activities = {
@@ -128,11 +130,23 @@ export const places = {
 };
 
 export const other = {
+  Folder: Folder,
   MapPin: MapPin,
+  Compass: Compass,
   Map: MapTrifold,
   MapPinLine: MapPinLine,
-  Compass: Compass,
-  Folder: Folder,
+};
+
+/**
+ * A list of the most popular icons, derived from the icons object.
+ */
+export const popular = {
+  Bed: Bed,
+  Car: Car,
+  Camping: Tent,
+  Hiking: PersonSimpleHike,
+  Biking: PersonSimpleBike,
+  House: HouseLine,
 };
 
 export const Icons = {

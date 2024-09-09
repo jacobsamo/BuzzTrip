@@ -3,9 +3,10 @@ import {
   accommodation,
   activities,
   food,
-  places,
-  transport,
   other,
+  places,
+  popular,
+  transport,
 } from "./icons";
 
 export type IconName = keyof typeof Icons;
@@ -30,6 +31,7 @@ const Icon = ({
 export default Icon;
 
 export const iconsList = Object.keys(Icons) as IconName[];
+export const popularIconsList = Object.keys(popular) as IconName[];
 export const activitiesIconsList = Object.keys(activities) as IconName[];
 export const accommodationIconsList = Object.keys(accommodation) as IconName[];
 export const foodIconsList = Object.keys(food) as IconName[];

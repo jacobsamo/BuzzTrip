@@ -1,4 +1,7 @@
 // import ConfirmDeleteModal from "@/components/shared/modals/comfirm_delete_modal";
+import { createCollection } from "@/actions/map/collection/create-collection";
+import Icon, { otherIconsList } from "@/components/icon";
+import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,19 +22,16 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import Icon, { otherIconsList } from "@/components/icon";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useMediaQuery } from "@uidotdev/usehooks";
 import { cn } from "@/lib/utils";
 import { Collection } from "@/types";
+import { useMediaQuery } from "@uidotdev/usehooks";
 import { Edit, Plus } from "lucide-react";
 import * as React from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useMapStore } from "@/components/providers/map-state-provider";
-import { createCollection } from "@/actions/map/collection/create-collection";
 
 interface CollectionModalProps {
   triggerType?: "icon" | "text";
@@ -144,16 +144,14 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
         const create = createCollection(newCollection);
 
         toast.promise(create, {
-          loading: "Create collection...",
+          loading: "Creating collection...",
           success: (data) => {
-            if (data && !(data.data instanceof Error)) {
-              const collections = data.data ?? null;
-              setCollections(collections);
+            if (data?.data) {
+              setCollections(data.data);
             }
-
             return "Collection created successfully!";
           },
-          error: "Failed to created collection",
+          error: "Failed to create collection",
         });
       }
 
