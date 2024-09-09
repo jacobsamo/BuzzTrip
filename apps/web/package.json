@@ -2,6 +2,10 @@
   "name": "@buzztrip/web",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "bun@1.1.26",
   "scripts": {
     "dev": "next dev --port 5173",
     "build": "next build",
