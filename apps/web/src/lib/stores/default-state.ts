@@ -35,6 +35,9 @@ export type StoreActions = {
   setMarkers: (markers: CombinedMarker[] | null) => void;
   setRoute: (route: Route[] | null) => void;
   setRouteStops: (routeStops: RouteStop[] | null) => void;
+  getMarkersForCollection: (collectionId: string) => CombinedMarker[] | null;
+  getCollectionsForMarker: (markerId: string) => Collection[] | null;
+
   // Modals
   setActiveLocation: (location: NewLocation | null) => void;
   setCollectionsOpen: (open: boolean) => void;

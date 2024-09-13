@@ -2,6 +2,7 @@
 import { authAction } from "@/actions/safe-action";
 import { IconName } from "@/components/icon";
 import { db } from "@/server/db";
+import { getMarkersView } from "@/server/db/quieries";
 import { collection_markers, markers } from "@/server/db/schema";
 import { NewCollectionMarker, NewMarker } from "@/types";
 import { markersEditSchema } from "@/types/scheams";
@@ -26,7 +27,7 @@ export const createMarker = authAction
       created_by: ctx.user.id,
     };
 
-    const marker = await db.insert(markers).values(newMarker).returning();
+    await db.insert(markers).values(newMarker);
 
     if (params.collectionIds) {
       const collectionPromises = params.collectionIds.map(
@@ -54,13 +55,16 @@ export const createMarker = authAction
       await Promise.all(collectionPromises);
     }
 
-    const collectionLinks = await db
-      .select()
-      .from(collection_markers)
-      .where(eq(collection_markers.marker_id, id));
+    const [newMarkers, collectionLinks] = await Promise.all([
+      getMarkersView(params.marker.map_id!),
+      db
+        .select()
+        .from(collection_markers)
+        .where(eq(collection_markers.marker_id, id)),
+    ]);
 
     return {
-      marker,
+      markers: newMarkers,
       collectionLinks,
     };
   });

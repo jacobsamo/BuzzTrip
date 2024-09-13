@@ -32,13 +32,24 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
-import { Marker } from "@/types";
+import { Marker, NewMarker } from "@/types";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Edit, Plus } from "lucide-react";
 import * as React from "react";
 import { lazy } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import IconPickerModal from "../icon-picker-modal";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { createMarker } from "@/actions/map/marker/create-marker";
+import { toast } from "sonner";
 
 const Icon = lazy(() => import("@/components/icon"));
 
@@ -123,13 +134,7 @@ const Close = ({ children }: { children: React.ReactNode }) => {
 function MarkerForm({ mode, marker }: MarkerModalProps) {
   const { collections, setMarkers, map } = useMapStore((store) => store);
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    control,
-    formState: { errors },
-  } = useForm<Marker>({
+  const form = useForm<Marker>({
     defaultValues: {
       title: marker?.title ?? "",
       note: marker?.note ?? undefined,
@@ -139,28 +144,29 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
     },
   });
 
+  const {
+    register,
+    handleSubmit,
+    watch,
+    control,
+    formState: { errors },
+  } = form;
+
   const onSubmit: SubmitHandler<Marker> = async (data) => {
     try {
       if (mode === "create") {
-        // const create = fetch(`/api/map/${map!.uid}/marker`, {
-        //   method: "POST",
-        //   body: JSON.stringify(data),
-        // });
-        // toast.promise(create, {
-        //   loading: "Creating marker...",
-        //   success: (res) => {
-        //     if (res.ok) {
-        //       res.json().then((val) => {
-        //         setMarkers((prev) => [
-        //           (val as { data: any })!.data,
-        //           ...(prev || []),
-        //         ]);
-        //       });
-        //     }
-        //     return "Marker created successfully!";
-        //   },
-        //   error: "Failed to create marker",
-        // });
+        const create = createMarker({ marker: data });
+
+        toast.promise(create, {
+          loading: "Creating marker...",
+          success: (data) => {
+            if (data && data.data) {
+              setMarkers(data.data.markers);
+            }
+            return "Marker created successfully!";
+          },
+          error: "Failed to create marker",
+        });
       } else {
         // const edit = fetch(`/api/map/${map!.uid}/marker/${marker!.uid}/edit`, {
         //   method: "PUT",
@@ -211,130 +217,169 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
 
   return (
     <div>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid gap-2">
-          <Label htmlFor="title">Title</Label>
-          <Input
-            type="text"
-            id="title"
+      <Form {...form}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <FormField
+            control={control}
             name="title"
-            placeholder="Roadtrip"
-            defaultValue={marker?.title ?? ""}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Title</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Roadtrip" />
+                </FormControl>
+                <FormDescription />
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
 
-        <Label>Color</Label>
-
-        <div className="flex flex-wrap gap-2">
-          <Controller
+          <FormField
             control={control}
             name="color"
             render={({ field }) => {
               const selectedColor = watch("color");
+
               return (
-                <>
-                  {colors.map((color, index) => (
-                    <button
-                      onClick={() => field.onChange(color.hex)}
-                      key={index}
-                      className={cn("group h-8 w-8 scale-100 rounded-md", {
-                        "h-9 w-9 scale-110 border border-gray-500 shadow-lg":
-                          selectedColor == color.hex,
-                      })}
-                      style={{ backgroundColor: color.hex }}
-                      type="button"
-                    ></button>
-                  ))}
-                  <Input
-                    type="color"
-                    value={field.value ?? "#000"}
-                    onChange={field.onChange}
-                  />
-                </>
+                <FormItem>
+                  <FormLabel>Color</FormLabel>
+                  <FormControl>
+                    <div className="flex flex-wrap gap-2">
+                      {colors.map((color, index) => (
+                        <button
+                          onClick={() => field.onChange(color.hex)}
+                          key={index}
+                          className={cn("group h-8 w-8 scale-100 rounded-md", {
+                            "h-9 w-9 scale-110 border border-gray-500 shadow-lg":
+                              selectedColor == color.hex,
+                          })}
+                          style={{ backgroundColor: color.hex }}
+                          type="button"
+                        ></button>
+                      ))}
+                      <Input
+                        type="color"
+                        value={field.value ?? "#000"}
+                        onChange={field.onChange}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormDescription />
+                  <FormMessage />
+                </FormItem>
               );
             }}
           />
-        </div>
 
-        <Controller
-          control={control}
-          name="icon"
-          render={({ field }) => (
-            <div className="flex flex-wrap gap-2">
-              {popularIconsList.map((icon, index) => {
-                const selectedIcon = watch("icon");
+          <FormField
+            control={control}
+            name="icon"
+            render={({ field }) => {
+              const selectedIcon = watch("icon");
 
-                return (
-                  <Button
-                    key={index}
-                    type="button"
-                    variant="ghost"
-                    onClick={() => field.onChange(icon)} // Handle icon selection
-                    className={cn("group text-black", {
-                      "scale-105 border border-gray-500 shadow-lg":
-                        selectedIcon == icon,
-                    })}
-                  >
-                    <Icon name={icon} size={24} />
-                  </Button>
-                );
-              })}
-              <IconPickerModal
-                selectedIcon={watch("icon")}
-                setSelectedIcon={field.onChange}
-              />
-            </div>
-          )}
-        />
-
-        <Label htmlFor="collection_id">Collection</Label>
-        <Select name="collection_id" defaultValue={marker?.collection_id!}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a collections" />
-          </SelectTrigger>
-          <SelectContent>
-            {collections &&
-              collections.map((collection, index) => {
-                return (
-                  <SelectItem key={index} value={collection.collection_id!}>
-                    {collection.title}
-                  </SelectItem>
-                );
-              })}
-          </SelectContent>
-        </Select>
-
-        <div className="grid gap-2">
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            name="description"
-            placeholder=""
-            defaultValue={marker?.note ?? ""}
+              return (
+                <FormItem>
+                  <FormLabel>Color</FormLabel>
+                  <FormControl>
+                    <div className="flex flex-wrap gap-2">
+                      {popularIconsList.map((icon, index) => (
+                        <Button
+                          key={index}
+                          type="button"
+                          variant="ghost"
+                          onClick={() => field.onChange(icon)} // Handle icon selection
+                          className={cn("group text-black", {
+                            "scale-105 border border-gray-500 shadow-lg":
+                              selectedIcon == icon,
+                          })}
+                        >
+                          <Icon name={icon} size={24} />
+                        </Button>
+                      ))}
+                      <IconPickerModal
+                        selectedIcon={watch("icon")}
+                        setSelectedIcon={field.onChange}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormDescription />
+                  <FormMessage />
+                </FormItem>
+              );
+            }}
           />
-        </div>
 
-        {marker && <input type="hidden" name="uid" value={marker.map_id!} />}
+          <FormField
+            control={control}
+            name="collection_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Collection</FormLabel>
+                <FormControl>
+                  <Select
+                    name="collection_id"
+                    defaultValue={field.value ?? undefined}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select a collections" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {collections &&
+                        collections.map((collection, index) => {
+                          return (
+                            <SelectItem
+                              key={index}
+                              value={collection.collection_id!}
+                            >
+                              {collection.title}
+                            </SelectItem>
+                          );
+                        })}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormDescription />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Close>
-          <Button aria-label="Create Marker" type="submit">
-            {mode === "create" ? "Create" : "Save changes"}
-          </Button>
-        </Close>
-      </form>
+          <FormField
+            control={control}
+            name="note"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea {...field} value={field.value ?? undefined} />
+                </FormControl>
+                <FormDescription />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      {mode === "edit" && marker && (
-        <Close>
-          <Button
-            aria-label="delete marker"
-            variant="destructive"
-            type="submit"
-            onClick={() => handleDelete()}
-          >
-            Delete
-          </Button>
-        </Close>
-      )}
+          <Close>
+            <Button aria-label="Create Marker" type="submit">
+              {mode === "create" ? "Create" : "Save changes"}
+            </Button>
+          </Close>
+        </form>
+
+        {mode === "edit" && marker && (
+          <Close>
+            <Button
+              aria-label="delete marker"
+              variant="destructive"
+              type="submit"
+              onClick={() => handleDelete()}
+            >
+              Delete
+            </Button>
+          </Close>
+        )}
+      </Form>
     </div>
   );
 }

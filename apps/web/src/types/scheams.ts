@@ -12,6 +12,7 @@ import {
   markersView,
 } from "@/server/db/schema";
 import * as z from "zod";
+import { Icons } from "@/components/icon/icons";
 
 // Table generated schemas with drizzle-zod
 export const usersEditSchema = createInsertSchema(users);

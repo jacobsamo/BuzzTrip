@@ -9,12 +9,7 @@ import { useMapStore } from "@/components/providers/map-state-provider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ActiveLocation from "./active_location";
 import AddToCollection from "./add_to_collection";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import CollectionsView from "./collections-view";
 
 export default function MapDrawer() {
   const {
@@ -26,6 +21,7 @@ export default function MapDrawer() {
     setSearchValue,
     addToCollectionOpen,
     setAddToCollectionOpen,
+    getMarkersForCollection,
     snap,
     setSnap,
   } = useMapStore((store) => store);
@@ -51,32 +47,13 @@ export default function MapDrawer() {
         >
           {!activeLocation && collections && (
             <ScrollArea className="flex h-full flex-col">
-              <Accordion type="multiple">
-                {collections?.map((collection) => (
-                  <AccordionItem
-                    key={collection.collection_id}
-                    value={collection.collection_id}
-                  >
-                    <AccordionTrigger>{collection.title}</AccordionTrigger>
-                    <AccordionContent>
-                      <div className="flex flex-col gap-2">
-                        {markers &&
-                          markers
-                            .filter(
-                              (marker) =>
-                                marker.collection_id ===
-                                collection.collection_id
-                            )
-                            .map((marker) => (
-                              <div key={marker.marker_id} className="text-sm">
-                                {marker.title}
-                              </div>
-                            ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+              {collections?.map((collection) => (
+                <CollectionsView
+                  key={collection.collection_id}
+                  collection={collection}
+                  markers={getMarkersForCollection(collection.collection_id)}
+                />
+              ))}
             </ScrollArea>
           )}
 

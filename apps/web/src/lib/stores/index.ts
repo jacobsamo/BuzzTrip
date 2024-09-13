@@ -158,6 +158,38 @@ export const createStore = (initState: Partial<StoreState>) =>
         return { routeStops: updatedRouteStops };
       });
     },
+    getCollectionsForMarker: (markerId: string) => {
+      const links = get().collectionMarkers;
+      const collections = get().collections;
+      if (!links || !collections) return null;
+
+      const collectionIds = links
+      .filter((link) => link.marker_id === markerId)
+        .map((link) => link.collection_id);
+
+      // Get the collections that match the collection IDs
+      const markerCollections = collections.filter((collection) =>
+        collectionIds.includes(collection.collection_id)
+      );
+
+      return markerCollections;
+    },
+    getMarkersForCollection: (collectionId: string) => {
+      const links = get().collectionMarkers;
+      const markers = get().markers;
+      if (!links || !markers) return null;
+
+      const markerIds = links
+        .filter((link) => link.collection_id === collectionId)
+        .map((link) => link.marker_id);
+
+      // Get the markers that match the marker IDs
+      const collectionMarkers = markers.filter((marker) =>
+        markerIds.includes(marker.marker_id)
+      );
+
+      return collectionMarkers;
+    },
 
     // Modals
     setActiveLocation: (location: NewLocation | null) =>
