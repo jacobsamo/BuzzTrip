@@ -158,13 +158,14 @@ export const createStore = (initState: Partial<StoreState>) =>
         return { routeStops: updatedRouteStops };
       });
     },
-    getCollectionsForMarker: (markerId: string) => {
+    getCollectionsForMarker: (markerId: string | null) => {
+      if (!markerId) return null;
       const links = get().collectionMarkers;
       const collections = get().collections;
       if (!links || !collections) return null;
 
       const collectionIds = links
-      .filter((link) => link.marker_id === markerId)
+        .filter((link) => link.marker_id === markerId)
         .map((link) => link.collection_id);
 
       // Get the collections that match the collection IDs
@@ -174,7 +175,9 @@ export const createStore = (initState: Partial<StoreState>) =>
 
       return markerCollections;
     },
-    getMarkersForCollection: (collectionId: string) => {
+    getMarkersForCollection: (collectionId: string | null) => {
+      if (!collectionId) return null;
+
       const links = get().collectionMarkers;
       const markers = get().markers;
       if (!links || !markers) return null;
@@ -185,20 +188,40 @@ export const createStore = (initState: Partial<StoreState>) =>
 
       // Get the markers that match the marker IDs
       const collectionMarkers = markers.filter((marker) =>
-        markerIds.includes(marker.marker_id)
+        markerIds.includes(marker.marker_id!)
       );
 
       return collectionMarkers;
     },
+    removeCollectionMarkers: (collectionMarkers: string | string[]) => {
+      return set(({ collectionMarkers: prevLinks }) => {
+        let newLinks = prevLinks ? [...prevLinks] : [];
+
+        if (Array.isArray(collectionMarkers)) {
+          newLinks = newLinks.filter(
+            (link) => !collectionMarkers.includes(link.link_id)
+          );
+        } else {
+          newLinks = newLinks.filter(
+            (link) => link.collection_id !== collectionMarkers
+          );
+        }
+
+        return { collectionMarkers: newLinks };
+      });
+    },
 
     // Modals
-    setActiveLocation: (location: NewLocation | null) =>
+    setActiveLocation: (location: CombinedMarker | null) =>
       set(() => ({ activeLocation: location, snap: 0.5 })),
     setCollectionsOpen: (open: boolean) =>
       set(() => ({ collectionsOpen: open })),
     setSearchValue: (value: string | null) =>
       set(() => ({ searchValue: value })),
     setSnap: (snap: number | string | null) => set(() => ({ snap: snap })),
-    setAddToCollectionOpen: (open: boolean) =>
-      set(() => ({ addToCollectionOpen: open, snap: 0.75 })),
+    setMarkerOpen: (
+      open: boolean,
+      marker: CombinedMarker | null,
+      mode: "create" | "edit" | null
+    ) => set(() => ({ markerOpen: { open, marker, mode } })),
   }));

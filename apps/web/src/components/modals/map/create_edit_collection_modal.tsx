@@ -135,13 +135,11 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
   const onSubmit: SubmitHandler<Collection> = async (data: Collection) => {
     try {
       if (mode === "create") {
-        console.log("map_id: ", allItems);
-        const newCollection = {
+        const create = createCollection({
           ...data,
           color: "#fff",
           map_id: map!.map_id,
-        };
-        const create = createCollection(newCollection);
+        });
 
         toast.promise(create, {
           loading: "Creating collection...",
@@ -155,37 +153,36 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
         });
       }
 
-      if (mode === "edit" && collection) {
-        // const edit = fetch(`/api/map/${map_id}/collection/${collection.uid}/edit`, {
-        //   method: "PUT",
-        //   body: JSON.stringify(data),
-        // });
-        // toast.promise(edit, {
-        //   loading: "Editing collection...",
-        //   success: (res) => {
-        //     if (res.ok) {
-        //       res.json().then((val) => {
-        //         setCollections((prev) => {
-        //           if (prev) {
-        //             const index = prev.findIndex(
-        //               (c) => c.uid === collection!.uid
-        //             );
-        //             const updatedCollection = {
-        //               ...prev[index],
-        //               ...(val as { data: any }).data,
-        //             };
-        //             prev[index] = updatedCollection;
-        //             return [...prev];
-        //           }
-        //           return [];
-        //         });
-        //       });
-        //     }
-        //     return "Collection edited successfully!";
-        //   },
-        //   error: "Failed to edit collection",
-        // });
-      }
+      // if (mode === "edit" && collection) {}
+      // const edit = fetch(`/api/map/${map_id}/collection/${collection.uid}/edit`, {
+      //   method: "PUT",
+      //   body: JSON.stringify(data),
+      // });
+      // toast.promise(edit, {
+      //   loading: "Editing collection...",
+      //   success: (res) => {
+      //     if (res.ok) {
+      //       res.json().then((val) => {
+      //         setCollections((prev) => {
+      //           if (prev) {
+      //             const index = prev.findIndex(
+      //               (c) => c.uid === collection!.uid
+      //             );
+      //             const updatedCollection = {
+      //               ...prev[index],
+      //               ...(val as { data: any }).data,
+      //             };
+      //             prev[index] = updatedCollection;
+      //             return [...prev];
+      //           }
+      //           return [];
+      //         });
+      //       });
+      //     }
+      //     return "Collection edited successfully!";
+      //   },
+      //   error: "Failed to edit collection",
+      // });
     } catch (error) {
       console.error(error);
     }

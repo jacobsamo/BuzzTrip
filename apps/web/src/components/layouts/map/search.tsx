@@ -1,15 +1,15 @@
-import { NewLocation } from "@/types";
+import { useMapStore } from "@/components/providers/map-state-provider";
+import { CombinedMarker } from "@/types";
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { SearchIcon, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { useMapStore } from "@/components/providers/map-state-provider";
 // import { Command, CommandItem, CommandList, CommandEmpty } from "@/components/ui/command";
 import { Command } from "cmdk";
 
 export const AutocompleteCustomInput = () => {
   const map = useMap();
   const places = useMapsLibrary("places");
-  const { setActiveLocation, searchValue, setSearchValue } = useMapStore(
+  const { setActiveLocation, searchValue, setSearchValue  } = useMapStore(
     (state) => state
   );
 
@@ -57,7 +57,7 @@ export const AutocompleteCustomInput = () => {
 
       const request = { input: searchValue, sessionToken };
       const response = await autocompleteService.getPlacePredictions(request);
-      console.log("pred", response.predictions);
+      
       setPredictionResults(response.predictions);
       setFetchingData(false);
     },
@@ -123,7 +123,11 @@ export const AutocompleteCustomInput = () => {
           map!.setZoom(8);
         }
 
-        const location: NewLocation = {
+        const location: CombinedMarker = {
+          marker_id: undefined,
+          note: null,
+          collection_id: null,
+          color: null,
           gm_place_id: placeDetails.place_id ?? null,
           lat: placeDetails.geometry.location.lat(),
           lng: placeDetails.geometry.location.lng(),

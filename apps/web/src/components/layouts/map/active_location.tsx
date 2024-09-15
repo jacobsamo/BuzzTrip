@@ -1,15 +1,13 @@
-
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { BookmarkCheck } from "lucide-react";
 import Image from "next/image";
 import { lazy } from "react";
-import AddToCollectionButton from "./open_add_to_collection";
+import OpenMarkerButton from "./open-marker";
 
-// const AddToCollectionButton = lazy(() => import("../open_add_to_collection"));
 const Icon = lazy(() => import("@/components/icon"));
 
 const ActiveLocation = () => {
-  const { markers, activeLocation } = useMapStore(store => store);
+  const { markers, activeLocation } = useMapStore((store) => store);
 
   if (activeLocation === null) return null;
 
@@ -27,7 +25,7 @@ const ActiveLocation = () => {
             ) ? (
               <BookmarkCheck className="h-8 w-8" />
             ) : (
-              <AddToCollectionButton />
+              <OpenMarkerButton marker={activeLocation} mode="create" />
             )}
           </span>
         </div>

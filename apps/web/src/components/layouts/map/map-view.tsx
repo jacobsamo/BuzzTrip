@@ -67,7 +67,7 @@ const Map = () => {
           {markers &&
             markers.map((marker) => (
               <AdvancedMarker
-                key={marker.map_id}
+                key={marker.marker_id}
                 position={{ lat: marker.lat, lng: marker.lng }}
                 title={marker.title}
                 onClick={() => {
@@ -76,7 +76,7 @@ const Map = () => {
                 }}
               >
                 <MarkerPin
-                  marker={{ ...marker, icon: marker.icon as IconName }}
+                  marker={marker}
                   size={16}
                 />
               </AdvancedMarker>

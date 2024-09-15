@@ -1,11 +1,12 @@
-import { popularIconsList } from "@/components/icon";
+import { createMarker } from "@/actions/map/marker/create-marker";
+import { updateMarker } from "@/actions/map/marker/edit-marker";
+import { IconName, popularIconsList } from "@/components/icon";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -14,31 +15,11 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { colors } from "@/lib/data";
-import { cn } from "@/lib/utils";
-import { Marker, NewMarker } from "@/types";
-import { useMediaQuery } from "@uidotdev/usehooks";
-import { Edit, Plus } from "lucide-react";
-import * as React from "react";
-import { lazy } from "react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import IconPickerModal from "../icon-picker-modal";
 import {
   Form,
   FormControl,
@@ -48,71 +29,78 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { createMarker } from "@/actions/map/marker/create-marker";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { colors } from "@/lib/data";
+import { cn } from "@/lib/utils";
+import { CombinedMarker } from "@/types";
+import { combinedMarkersSchema } from "@/types/scheams";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMediaQuery } from "@uidotdev/usehooks";
+import { Circle, CircleCheck, Edit, Plus } from "lucide-react";
+import Image from "next/image";
+import * as React from "react";
+import { lazy, useEffect } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
+import IconPickerModal from "../icon-picker-modal";
 
 const Icon = lazy(() => import("@/components/icon"));
 
-export interface MarkerModalProps {
-  mode?: "create" | "edit";
-  marker?: Marker | null;
-}
-
-export default function MarkerModal({
-  mode = "create",
-  marker = null,
-}: MarkerModalProps) {
-  const [open, setOpen] = React.useState(false);
+export default function MarkerModal() {
+  const { setMarkerOpen, markerOpen } = useMapStore((store) => store);
   const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  const handleClose = () => {
+    setMarkerOpen(false, null, null);
+    console.log("Marker open-fire close: ", markerOpen);
+  };
+
+  const Header = () => {
+    return (
+      <div className="flex flex-row items-center gap-1">
+        {markerOpen.marker?.photos !== undefined && (
+          <Image
+            src={markerOpen.marker?.photos?.[0] ?? ""}
+            alt={markerOpen.marker?.title ?? "location"}
+            width={64}
+            height={64}
+            className="h-16 w-16 rounded-md object-cover object-center"
+          />
+        )}
+
+        <h1 className="w-fit text-wrap text-start text-xl font-bold">
+          {markerOpen.marker?.title}
+        </h1>
+      </div>
+    );
+  };
 
   if (isDesktop) {
     return (
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button variant="ghost">
-            {mode == "create" ? (
-              <>
-                <Plus className="h-6 w-6" /> Marker
-              </>
-            ) : (
-              <Edit className="h-6 w-6" />
-            )}
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+      <Dialog open={markerOpen.open} onOpenChange={handleClose}>
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {mode == "create" ? "Create" : "Edit"} Marker
+              <Header />
             </DialogTitle>
-            <DialogDescription>Start your travel plans here</DialogDescription>
           </DialogHeader>
-          <MarkerForm mode={mode} marker={marker} />
+          <MarkerForm />
         </DialogContent>
       </Dialog>
     );
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button variant="ghost">
-          {mode == "create" ? (
-            <>
-              <Plus className="h-6 w-6" /> Marker
-            </>
-          ) : (
-            <Edit className="h-6 w-6" />
-          )}
-        </Button>
-      </DrawerTrigger>
+    <Drawer open={markerOpen.open} onOpenChange={handleClose}>
       <DrawerContent>
         <DrawerHeader className="text-left">
           <DrawerTitle>
-            {mode == "create" ? "Create" : "Edit"} Marker
+            <Header />
           </DrawerTitle>
-          <DrawerDescription>Start your travel plans here</DrawerDescription>
         </DrawerHeader>
-        <MarkerForm mode={mode} marker={marker} />
+        <MarkerForm />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -123,24 +111,48 @@ export default function MarkerModal({
   );
 }
 
-const Close = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <DialogClose asChild>
-      <DrawerClose asChild>{children}</DrawerClose>
-    </DialogClose>
+// const Close = ({ children }: { children: React.ReactNode }) => {
+//   return (
+//     <DialogClose asChild>
+//       <DrawerClose asChild>{children}</DrawerClose>
+//     </DialogClose>
+//   );
+// };
+
+const schema = z.object({
+  ...combinedMarkersSchema.shape,
+  collection_ids: z.array(z.string()).nullish(),
+});
+
+function MarkerForm() {
+  const {
+    collections,
+    setMarkers,
+    map,
+    markers,
+    getCollectionsForMarker,
+    setCollectionMarkers,
+    removeCollectionMarkers,
+    collectionMarkers,
+    setMarkerOpen,
+    markerOpen,
+  } = useMapStore((store) => store);
+
+  const { mode, marker } = markerOpen;
+  const [inCollections, setInCollections] = React.useState<string[] | null>(
+    null
   );
-};
+  const [isSaved, setIsSaved] = React.useState<CombinedMarker | null>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
 
-function MarkerForm({ mode, marker }: MarkerModalProps) {
-  const { collections, setMarkers, map } = useMapStore((store) => store);
-
-  const form = useForm<Marker>({
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     defaultValues: {
-      title: marker?.title ?? "",
-      note: marker?.note ?? undefined,
+      ...marker,
       icon: marker?.icon ?? "MapPin",
-      color: marker?.color ?? "#00000",
-      collection_id: marker?.collection_id ?? undefined,
+      color: marker?.color ?? "#0B7138",
+      map_id: map?.map_id ?? null,
+      bounds: marker?.bounds ?? undefined,
     },
   });
 
@@ -149,56 +161,119 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
     handleSubmit,
     watch,
     control,
+    setValue,
+    reset,
     formState: { errors },
   } = form;
 
-  const onSubmit: SubmitHandler<Marker> = async (data) => {
+  useEffect(() => {
+    const saved = marker
+      ? (markers?.find((marker) => marker.marker_id == marker.marker_id) ??
+        null)
+      : null;
+    setIsSaved(saved);
+
+    const inCols =
+      getCollectionsForMarker(saved?.marker_id ?? null)?.map(
+        (collection) => collection.collection_id
+      ) ?? null;
+    setInCollections(inCols);
+    setValue("collection_ids", inCols);
+
+    console.log("Data change: ", {
+      markerOpen,
+      markers,
+      collections,
+      inCols,
+      inCollections,
+    });
+  }, [markers, collections, getCollectionsForMarker, setValue, markerOpen]);
+
+  useEffect(() => {
+    console.log("Errors: ", errors);
+  }, [errors]);
+
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async (data) => {
+    console.log("Data: ", {
+      data,
+      markerOpen,
+    });
     try {
-      if (mode === "create") {
-        const create = createMarker({ marker: data });
+      setIsLoading(true);
+      const cols = data.collection_ids ?? null;
+
+      if (mode == "edit") {
+        const markerId = marker!.marker_id!;
+        const selectedCollections = cols ?? [];
+
+        // Collections to add are those in the selected list but not in the current list
+        const collectionsToAdd = selectedCollections.filter(
+          (collectionId) => !inCollections!.includes(collectionId)
+        );
+
+        // Collections to remove are those in the current list but not in the selected list
+        const collectionsToRemove = inCollections!.filter(
+          (collectionId) => !selectedCollections.includes(collectionId)
+        );
+        const updatedMarker = {
+          marker_id: markerId!,
+          marker: data,
+          collectionIds_to_add: collectionsToAdd,
+          collectionIds_to_remove: collectionsToRemove,
+        };
+        console.log("Edit marker", updatedMarker);
+
+        const res = await updateMarker(updatedMarker);
+
+        if (res && res.data) {
+          if (res.data.collectionLinksDeleted) {
+            removeCollectionMarkers(res.data.collectionLinksDeleted);
+          }
+          if (res.data.collectionLinksCreated) {
+            setCollectionMarkers(res.data.collectionLinksCreated);
+          }
+          if (res.data.marker) {
+            setMarkers([
+              {
+                ...res.data.marker,
+                location_id: res.data.marker.location_id ?? undefined,
+              },
+            ]);
+          }
+          toast.success("Updated Bookmark");
+        }
+      }
+
+      if (mode == "create") {
+        const newMarker = {
+          marker: {
+            ...data,
+          },
+          collectionIds: cols,
+        };
+        const create = createMarker(newMarker);
+
+        console.log("Create: ", newMarker);
 
         toast.promise(create, {
           loading: "Creating marker...",
           success: (data) => {
             if (data && data.data) {
               setMarkers(data.data.markers);
+              setCollectionMarkers(data.data.collectionLinks);
             }
             return "Marker created successfully!";
           },
           error: "Failed to create marker",
         });
-      } else {
-        // const edit = fetch(`/api/map/${map!.uid}/marker/${marker!.uid}/edit`, {
-        //   method: "PUT",
-        //   body: JSON.stringify(data),
-        // });
-        // toast.promise(edit, {
-        //   loading: "Editing marker...",
-        //   success: (res) => {
-        //     if (res.ok) {
-        //       res.json().then((val) => {
-        //         setMarkers((prev) => {
-        //           if (prev) {
-        //             const index = prev.findIndex((m) => m.uid === marker!.uid);
-        //             const updatedCollection = {
-        //               ...prev[index],
-        //               ...(val as { data: any })!.data,
-        //             };
-        //             prev[index] = updatedCollection;
-        //             return [...prev];
-        //           }
-        //           return [];
-        //         });
-        //       });
-        //     }
-        //     return "Marker edited successfully!";
-        //   },
-        //   error: "Failed to edit marker",
-        // });
       }
+
+      reset();
+      setMarkerOpen(false, null, null);
     } catch (error) {
       console.error(error);
     }
+    setIsLoading(false);
   };
 
   const handleDelete = () => {
@@ -215,8 +290,18 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
     // });
   };
 
+  const handleChange = (id: string) => {
+    const selected = watch("collection_ids") ?? [];
+    setValue(
+      "collection_ids",
+      selected.includes(id)
+        ? selected.filter((cId) => cId !== id)
+        : [...selected, id]
+    );
+  };
+
   return (
-    <div>
+    <div className="p-2">
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormField
@@ -270,6 +355,20 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
               );
             }}
           />
+          <FormField
+            control={control}
+            name="note"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Notes</FormLabel>
+                <FormControl>
+                  <Textarea {...field} value={field.value ?? undefined} />
+                </FormControl>
+                <FormDescription />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={control}
@@ -309,75 +408,58 @@ function MarkerForm({ mode, marker }: MarkerModalProps) {
             }}
           />
 
-          <FormField
-            control={control}
-            name="collection_id"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Collection</FormLabel>
-                <FormControl>
-                  <Select
-                    name="collection_id"
-                    defaultValue={field.value ?? undefined}
-                    onValueChange={field.onChange}
+          <div>
+            {collections &&
+              collections.map((collection, index) => {
+                const isChecked = watch("collection_ids")?.includes(
+                  collection.collection_id
+                );
+
+                return (
+                  <Button
+                    onClick={() => handleChange(collection.collection_id!)}
+                    key={index}
+                    className={cn(
+                      "group h-fit w-full flex-row items-start justify-start gap-2",
+                      {
+                        "scale-105 border border-gray-500 shadow-lg": isChecked,
+                      }
+                    )}
+                    type="button"
+                    variant="ghost"
                   >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Select a collections" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {collections &&
-                        collections.map((collection, index) => {
-                          return (
-                            <SelectItem
-                              key={index}
-                              value={collection.collection_id!}
-                            >
-                              {collection.title}
-                            </SelectItem>
-                          );
-                        })}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormDescription />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                    {isChecked ? <CircleCheck /> : <Circle />}
+                    <Icon name={collection.icon as IconName} size={32} />
+                    <div className="flex-col">
+                      <h2>{collection.title}</h2>
+                      {/* <p>
+                                Markers:
+                                {typeof collectionsMarkerCount == "object" &&
+                                  collectionsMarkerCount.find(
+                                    (col) =>
+                                      collection.collection_id ==
+                                      col.collection_id
+                                  )?.markerCount}
+                              </p> */}
+                    </div>
+                  </Button>
+                );
+              })}
+          </div>
 
-          <FormField
-            control={control}
-            name="note"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea {...field} value={field.value ?? undefined} />
-                </FormControl>
-                <FormDescription />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <Close>
-            <Button aria-label="Create Marker" type="submit">
-              {mode === "create" ? "Create" : "Save changes"}
-            </Button>
-          </Close>
+          <Button aria-label="Create Marker" type="submit">
+            {mode === "create" ? "Create" : "Save changes"}
+          </Button>
         </form>
-
         {mode === "edit" && marker && (
-          <Close>
-            <Button
-              aria-label="delete marker"
-              variant="destructive"
-              type="submit"
-              onClick={() => handleDelete()}
-            >
-              Delete
-            </Button>
-          </Close>
+          <Button
+            aria-label="delete marker"
+            variant="destructive"
+            type="submit"
+            onClick={() => handleDelete()}
+          >
+            Delete
+          </Button>
         )}
       </Form>
     </div>

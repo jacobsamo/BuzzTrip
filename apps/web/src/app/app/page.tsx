@@ -18,8 +18,6 @@ export default async function MapPage() {
     .from(maps)
     .where(eq(maps.owner_id, userId!));
 
-  console.log("Values ", usersMaps);
-
   return (
     <main className="container mx-auto p-4">
       <div className="inline-flex justify-between items-center w-full">

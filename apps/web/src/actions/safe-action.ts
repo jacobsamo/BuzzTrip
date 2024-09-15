@@ -6,14 +6,21 @@ import { z } from "zod";
 import { currentUser } from "@clerk/nextjs/server";
 
 export const actionWithMeta = createSafeActionClient({
-  handleServerError(error) {
-    console.error(error);
-    return DEFAULT_SERVER_ERROR_MESSAGE;
-  },
   defineMetadataSchema() {
     return z.object({
       name: z.string(),
     });
+  },
+  handleServerError(error, utils) {
+    const { clientInput, bindArgsClientInputs, metadata, ctx } = utils;
+    console.error("Action Error: ", {
+      error,
+      clientInput: JSON.stringify(clientInput),
+      // bindArgsClientInputs,
+      // metadata,
+      // ctx,
+    });
+    return DEFAULT_SERVER_ERROR_MESSAGE;
   },
 });
 

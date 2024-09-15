@@ -1,12 +1,12 @@
 import { IconName, type IconProps } from "@/components/icon";
-import { Marker } from "@/types";
+import { CombinedMarker, Marker } from "@/types";
 import { lazy } from "react";
 
 const Icon = lazy(() => import("@/components/icon"));
 
 interface MarkerPinProps extends Omit<IconProps, "name"> {
   backgroundColor?: string;
-  marker?: Marker | null;
+  marker?: CombinedMarker | null;
   name?: string;
 }
 

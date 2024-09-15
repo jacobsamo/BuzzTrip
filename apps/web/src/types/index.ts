@@ -1,17 +1,16 @@
 import {
   collection_markers,
   collections,
+  locations,
   map_users,
   maps,
   markers,
   route,
   route_stops,
-  users,
-  locations,
-  markersView
+  users
 } from "@/server/db/schema";
-import { boundsSchema, combinedMarkersSchema, reviewsSchema } from "./scheams";
 import * as z from "zod";
+import { boundsSchema, reviewsSchema } from "./scheams";
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -40,9 +39,11 @@ export type NewRoute = typeof route.$inferInsert;
 export type RouteStop = typeof route_stops.$inferSelect;
 export type NewRouteStop = typeof route_stops.$inferInsert;
 
-
 // Generated Types from zod schemas
 export type Bounds = z.infer<typeof boundsSchema>;
 export type Review = z.infer<typeof reviewsSchema>;
 
-export type CombinedMarker = z.infer<typeof combinedMarkersSchema>;
+
+
+export type CombinedMarker = Partial<Pick<NewMarker, "created_by" | "location_id">> & Omit<NewMarker, "created_by" | "location_id"> & NewLocation
+

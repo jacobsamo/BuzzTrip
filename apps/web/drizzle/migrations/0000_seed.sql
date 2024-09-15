@@ -1,10 +1,13 @@
 CREATE TABLE `collection_markers` (
+	`link_id` text PRIMARY KEY NOT NULL,
 	`collection_id` text,
 	`marker_id` text,
 	`map_id` text,
+	`user_id` text,
 	FOREIGN KEY (`collection_id`) REFERENCES `collections`(`collection_id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`marker_id`) REFERENCES `markers`(`marker_id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `collections` (
@@ -14,7 +17,7 @@ CREATE TABLE `collections` (
 	`description` text,
 	`created_by` text NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP),
-	`icon` text,
+	`icon` text NOT NULL,
 	`color` text,
 	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`created_by`) REFERENCES `users`(`user_id`) ON UPDATE no action ON DELETE no action
@@ -29,7 +32,7 @@ CREATE TABLE `locations` (
 	`bounds` text NOT NULL,
 	`address` text,
 	`gm_place_id` text,
-	`icon` text,
+	`icon` text NOT NULL,
 	`photos` text,
 	`reviews` text,
 	`rating` real,
@@ -68,7 +71,7 @@ CREATE TABLE `markers` (
 	`lng` real NOT NULL,
 	`created_by` text NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP),
-	`icon` text,
+	`icon` text NOT NULL,
 	`color` text,
 	`location_id` text,
 	`map_id` text,
@@ -97,9 +100,13 @@ CREATE TABLE `route_stops` (
 --> statement-breakpoint
 CREATE TABLE `users` (
 	`user_id` text PRIMARY KEY NOT NULL,
-	`first_name` text NOT NULL,
-	`last_name` text NOT NULL,
-	`email` text NOT NULL
+	`first_name` text,
+	`last_name` text,
+	`username` text,
+	`email` text NOT NULL,
+	`created_at` text DEFAULT (CURRENT_TIMESTAMP),
+	`updated_at` text DEFAULT (CURRENT_TIMESTAMP)
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `users_username_unique` ON `users` (`username`);--> statement-breakpoint
 CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);
