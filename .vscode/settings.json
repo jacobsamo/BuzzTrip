@@ -1,10 +1,19 @@
 {
-  "deno.enablePaths": [
-    "supabase/functions"
+  "dotenv.enableAutocloaking": false,
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    "next/router.d.ts",
+    "next/dist/client/router.d.ts"
   ],
-  "deno.lint": true,
-  "deno.unstable": true,
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "terminal.integrated.localEchoStyle": "dim",
+  "search.exclude": {
+    "**/node_modules": true
+  },
+  "editor.formatOnSave": true,
+  "workbench.editor.customLabels.patterns": {
+    "**/app/**/page.tsx": "${dirname} - page.tsx",
+    "**/app/**/layout.tsx": "${dirname} - layout.tsx",
+    "**/app/**/route.ts": "${dirname} - route.ts",
   }
 }
