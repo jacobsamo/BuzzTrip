@@ -11,20 +11,14 @@
     "build": "next build",
     "start": "next start --port 5173",
     "lint": "next lint",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts",
-    "pages:build": "bunx @cloudflare/next-on-pages",
-    "preview": "bun pages:build && wrangler pages dev",
-    "deploy": "bun pages:build && wrangler pages deploy",
     "db:studio:dev": "drizzle-kit studio",
     "db:studio:prd": "cross-env NODE_ENV=production drizzle-kit studio",
-    "db:migrate": "drizzle-kit generate",
-    "migrate:prd": "bunx wrangler d1 migrations apply BuzzTrip-db --remote",
-    "migrate:dev": "bunx wrangler d1 migrations apply BuzzTrip-db --local"
+    "db:migrate": "drizzle-kit generate"
   },
   "dependencies": {
     "@clerk/nextjs": "^5.5.4",
     "@hookform/resolvers": "^3.9.0",
-    "@libsql/client": "^0.12.0",
+    "@libsql/client": "^0.13.0",
     "@phosphor-icons/react": "^2.1.7",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-collapsible": "^1.1.0",
@@ -72,8 +66,6 @@
   },
   "devDependencies": {
     "@buzztrip/tsconfig": "workspace:*",
-    "@cloudflare/next-on-pages": "^1.13.2",
-    "@cloudflare/workers-types": "^4.20240909.0",
     "@tanstack/eslint-plugin-query": "^5.56.1",
     "@types/google.maps": "^3.58.0",
     "@types/node": "^22.5.5",
@@ -88,8 +80,6 @@
     "eslint-plugin-next-on-pages": "^1.13.2",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.11",
-    "typescript": "^5.6.2",
-    "vercel": "^37.4.2",
-    "wrangler": "^3.78.3"
+    "typescript": "^5.6.2"
   }
 }

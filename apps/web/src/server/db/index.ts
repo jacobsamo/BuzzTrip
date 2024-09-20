@@ -1,19 +1,14 @@
-import { drizzle } from "drizzle-orm/d1";
 import * as schema from "@/server/db/schema";
-import { getRequestContext } from "@cloudflare/next-on-pages";
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
+import { env } from "env";
 
-export const runtime = "edge";
+const client = createClient({
+  url: env.TURSO_CONNECTION_URL,
+  authToken: env.TURSO_AUTH_TOKEN,
+});
 
-function initDbConnection() {
-  if (process.env.NODE_ENV === "development") {
-    const { env } = getRequestContext();
-
-    return drizzle(env.BUZZTRIP_DATABASE, { schema, logger: true });
-  }
-
-  return drizzle(process.env.BUZZTRIP_DATABASE as unknown as D1Database, {
-    schema,
-  });
-}
-
-export const db = initDbConnection();
+export const db = drizzle(client, {
+  schema: schema,
+  logger: process.env.NODE_ENV === "development",
+});
