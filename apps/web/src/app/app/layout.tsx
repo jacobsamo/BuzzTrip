@@ -1,5 +1,6 @@
 "use client";
 import { APIProvider } from "@vis.gl/react-google-maps";
+import { env } from "env.mjs";
 
 export default function RootLayout({
   children,
@@ -9,7 +10,7 @@ export default function RootLayout({
   return (
     <>
       <APIProvider
-        apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string}
+        apiKey={env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
         libraries={["places", "marker"]}
       >
         {children}

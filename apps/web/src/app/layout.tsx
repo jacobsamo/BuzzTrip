@@ -1,15 +1,10 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import Providers from "@/components/providers";
 import "@/lib/styles/globals.css";
 import {
-  ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
+  ClerkProvider
 } from "@clerk/nextjs";
-import { getRequestContext } from "@cloudflare/next-on-pages";
-import Providers from "@/components/providers";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 
 export const runtime = "edge";
 
@@ -25,7 +20,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { env } = getRequestContext();
 
   return (
     <ClerkProvider>

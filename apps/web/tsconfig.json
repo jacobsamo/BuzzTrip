@@ -22,7 +22,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "env": ["./env.mjs"]
     },
     "types": ["@cloudflare/workers-types/2023-07-01", "google.maps"]
   },

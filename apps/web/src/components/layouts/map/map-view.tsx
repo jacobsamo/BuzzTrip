@@ -1,19 +1,18 @@
 "use client";
+import { useMapStore } from "@/components/providers/map-state-provider";
+import { Location } from "@/types";
+import { useMediaQuery } from "@uidotdev/usehooks";
 import {
-  APIProvider,
   AdvancedMarker,
   Map as GoogleMap,
   Pin,
-  useMap,
+  useMap
 } from "@vis.gl/react-google-maps";
+import { env } from "env";
 import { lazy, memo } from "react";
-import { AutocompleteCustomInput } from "./search";
-import { Location } from "@/types";
-import { useMapStore } from "@/components/providers/map-state-provider";
 import MapDrawer from "./map-drawer";
-import { useMediaQuery } from "@uidotdev/usehooks";
 import MapSideBar from "./map-sidebar";
-import { IconName } from "@/components/icon";
+import { AutocompleteCustomInput } from "./search";
 
 const MarkerPin = lazy(() => import("./marker_pin"));
 
@@ -40,7 +39,7 @@ const Map = () => {
         <GoogleMap
           defaultCenter={mapOptions.center}
           defaultZoom={mapOptions.zoom}
-          mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID}
+          mapId={env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID}
           disableDefaultUI={true}
           onClick={(e) => {
             console.log("Click map event: ", e);

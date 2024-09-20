@@ -3,6 +3,7 @@
 import { defineConfig } from "drizzle-kit";
 import fs from "fs";
 import path from "path";
+import { env } from "env";
 
 function getLocalD1DB() {
   try {
@@ -30,9 +31,9 @@ export default defineConfig({
     ? {
         driver: "d1-http",
         dbCredentials: {
-          accountId: process.env.CLOUDFLARE_D1_ACCOUNT_ID,
-          databaseId: process.env.BUZZTRIP_DATABASE,
-          token: process.env.CLOUDFLARE_D1_API_TOKEN,
+          accountId: env.CLOUDFLARE_D1_ACCOUNT_ID,
+          databaseId: env.BUZZTRIP_DATABASE_ID,
+          token: env.CLOUDFLARE_D1_API_TOKEN,
         },
       }
     : {
