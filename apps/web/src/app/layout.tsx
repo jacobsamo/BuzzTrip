@@ -1,9 +1,7 @@
 import Providers from "@/components/providers";
 import "@/lib/styles/globals.css";
-import {
-  ClerkProvider
-} from "@clerk/nextjs";
-import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -13,12 +11,19 @@ export const metadata: Metadata = {
   description: "Plan the trip you've always dreamed of",
 };
 
+export const viewport: Viewport = {
+  maximumScale: 1,
+  minimumScale: 1,
+  initialScale: 1,
+  userScalable: false,
+  width: "device-width",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <ClerkProvider>
       <html lang="en">

@@ -6,8 +6,10 @@ export default defineConfig({
   out: "./drizzle/migrations",
   dialect: "sqlite",
   driver: "turso",
-  dbCredentials: {
+  dbCredentials: process.env.NODE_ENV === "production" ? {
     url: env.TURSO_CONNECTION_URL,
     authToken: env.TURSO_AUTH_TOKEN,
+  } : {
+    url: "file:./.db/buzztrip-local.db",
   },
 });
