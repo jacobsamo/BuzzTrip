@@ -1,8 +1,8 @@
 import "server-only";
-import { db } from "@/server/db";
-import { markers, locations } from "@/server/db/schema";
+import { db } from "../src";
+import { markers, locations } from "./schema";
 import { eq } from "drizzle-orm";
-import { CombinedMarker } from "@/types";
+import { CombinedMarker } from "./types";
 
 export const getMarkersView = async (map_id: string) => {
   return db

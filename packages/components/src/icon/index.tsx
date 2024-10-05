@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Icons,
   accommodation,
@@ -29,6 +30,8 @@ const Icon = ({
 };
 
 export default Icon;
+
+export * from './icons'
 
 export const iconsList = Object.keys(Icons) as IconName[];
 export const popularIconsList = Object.keys(popular) as IconName[];

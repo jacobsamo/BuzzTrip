@@ -37,7 +37,7 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import { NewMapUser } from "@/types";
+import { NewMapUser } from "@buzztrip/db/types";
 
 export interface ShareMapProps {
   map_id: string;

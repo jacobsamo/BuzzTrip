@@ -1,9 +1,9 @@
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
 import { Webhook } from "svix";
-import { db } from "@/server/db";
-import { users } from "@/server/db/schema";
-import { NewUser } from "@/types";
+import { db } from "@buzztrip/db";
+import { users } from "@buzztrip/db/schema";
+import { NewUser } from "@buzztrip/db/types";
 import { eq } from "drizzle-orm";
 
 const webhookSecret = process.env.CLERK_WEBHOOK_SECRET || ``;

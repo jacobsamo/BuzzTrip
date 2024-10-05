@@ -1,6 +1,6 @@
 import { createMarker } from "@/actions/map/marker/create-marker";
 import { updateMarker } from "@/actions/map/marker/edit-marker";
-import { IconName, popularIconsList } from "@/components/icon";
+import { IconName, popularIconsList } from "@buzztrip/components/icon";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,8 +33,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
-import { CombinedMarker } from "@/types";
-import { combinedMarkersSchema } from "@/types/scheams";
+import { CombinedMarker } from "@buzztrip/db/types";
+import { combinedMarkersSchema } from "@buzztrip/db/types/scheams";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Circle, CircleCheck, Edit, Plus } from "lucide-react";
@@ -46,7 +46,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import IconPickerModal from "../icon-picker-modal";
 
-const Icon = lazy(() => import("@/components/icon"));
+const Icon = lazy(() => import("@buzztrip/components/icon"));
 
 export default function MarkerModal() {
   const { setMarkerOpen, markerOpen } = useMapStore((store) => store);

@@ -1,8 +1,8 @@
 "use server";
-import { db } from "@/server/db";
-import { map_users, maps } from "@/server/db/schema";
-import { NewMap, NewMapUser } from "@/types";
-import { mapsEditSchema } from "@/types/scheams";
+import { db } from "@buzztrip/db";
+import { map_users, maps } from "@buzztrip/db/schema";
+import { NewMap, NewMapUser } from "@buzztrip/db/types";
+import { mapsEditSchema } from "@buzztrip/db/types/scheams";
 import { authAction } from "../safe-action";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
@@ -43,7 +43,6 @@ export const createMap = authAction
         cause: sharedMap,
       });
     }
-
 
     return {
       message: "Map created successfully",

@@ -1,0 +1,23 @@
+{
+  "name": "@buzztrip/db",
+  "version": "0.0.0",
+  "private": true,
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "typescript": "^5.3.3",
+    "drizzle-kit": "^0.24.2",
+    "@buzztrip/components": "workspace:*",
+    "@buzztrip/tsconfig": "workspace:*"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.14.0",
+    "drizzle-orm": "^0.33.0",
+    "drizzle-zod": "^0.5.1"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema/index.ts",
+    "./queries": "./src/queries.ts",
+    "./types": "./src/types/index.ts"
+  }
+}

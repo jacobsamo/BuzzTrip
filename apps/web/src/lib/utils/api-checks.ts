@@ -1,4 +1,4 @@
-// import { Permissions } from "@/types";
+// import { Permissions } from "@buzztrip/db/types";
 import { currentUser, User } from "@clerk/nextjs/server";
 
 // export async function hasAccess({

@@ -1,11 +1,15 @@
 "use server";
 import { authAction } from "@/actions/safe-action";
-import { IconName } from "@/components/icon";
-import { db } from "@/server/db";
-import { getMarkersView } from "@/server/db/quieries";
-import { collection_markers, locations, markers } from "@/server/db/schema";
-import { NewCollectionMarker, NewLocation, NewMarker } from "@/types";
-import { combinedMarkersSchema } from "@/types/scheams";
+import { IconName } from "@buzztrip/components/icon";
+import { db } from "@buzztrip/db";
+import { getMarkersView } from "@buzztrip/db/queries";
+import { collection_markers, locations, markers } from "@buzztrip/db/schema";
+import {
+  NewCollectionMarker,
+  NewLocation,
+  NewMarker,
+} from "@buzztrip/db/types";
+import { combinedMarkersSchema } from "@buzztrip/db/types/scheams";
 import { and, eq } from "drizzle-orm";
 import { v4 as uuid } from "uuid";
 import * as z from "zod";

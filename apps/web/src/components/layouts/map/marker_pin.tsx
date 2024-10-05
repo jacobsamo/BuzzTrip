@@ -1,8 +1,8 @@
-import { IconName, type IconProps } from "@/components/icon";
-import { CombinedMarker, Marker } from "@/types";
+import { IconName, type IconProps } from "@buzztrip/components/icon";
+import { CombinedMarker, Marker } from "@buzztrip/db/types";
 import { lazy } from "react";
 
-const Icon = lazy(() => import("@/components/icon"));
+const Icon = lazy(() => import("@buzztrip/components/icon"));
 
 interface MarkerPinProps extends Omit<IconProps, "name"> {
   backgroundColor?: string;

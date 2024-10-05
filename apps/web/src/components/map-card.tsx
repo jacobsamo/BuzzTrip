@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Map } from "@/types";
+import { Map } from "@buzztrip/db/types";
 import { Edit, MapPin, MoreVertical, Share2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -30,7 +30,7 @@ const MapCard = ({ map }: MapCardProps) => {
   };
 
   return (
-    <Card key={map.map_id} className="bg-white shadow-md w-full">
+    <Card key={map.map_id} className="w-full bg-white shadow-md">
       <Link href={`/app/map/${map.map_id}`}>
         <CardContent className="p-0">
           <div className="relative h-48">

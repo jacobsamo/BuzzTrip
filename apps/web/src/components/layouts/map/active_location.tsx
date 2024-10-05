@@ -4,7 +4,7 @@ import Image from "next/image";
 import { lazy } from "react";
 import OpenMarkerButton from "./open-marker";
 
-const Icon = lazy(() => import("@/components/icon"));
+const Icon = lazy(() => import("@buzztrip/components/icon"));
 
 const ActiveLocation = () => {
   const { markers, activeLocation } = useMapStore((store) => store);

@@ -1,5 +1,5 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { CombinedMarker } from "@/types";
+import { CombinedMarker } from "@buzztrip/db/types";
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { SearchIcon, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -9,7 +9,7 @@ import { Command } from "cmdk";
 export const AutocompleteCustomInput = () => {
   const map = useMap();
   const places = useMapsLibrary("places");
-  const { setActiveLocation, searchValue, setSearchValue  } = useMapStore(
+  const { setActiveLocation, searchValue, setSearchValue } = useMapStore(
     (state) => state
   );
 
@@ -57,7 +57,7 @@ export const AutocompleteCustomInput = () => {
 
       const request = { input: searchValue, sessionToken };
       const response = await autocompleteService.getPlacePredictions(request);
-      
+
       setPredictionResults(response.predictions);
       setFetchingData(false);
     },

@@ -1,7 +1,7 @@
 import MapCard from "@/components/map-card";
 import MapModal from "@/components/modals/create_edit_map_modal";
-import { db } from "@/server/db";
-import { maps, map_users } from "@/server/db/schema";
+import { db } from "@buzztrip/db";
+import { maps, map_users } from "@buzztrip/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";

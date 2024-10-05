@@ -1,0 +1,16 @@
+{
+  "name": "@buzztrip/components",
+  "version": "0.0.0",
+  "private": true,
+  "devDependencies": {
+    "@buzztrip/tsconfig": "workspace:*"
+
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.7"
+  },
+  "exports": {
+    ".": "./src/index.tsx",
+    "./icon": "./src/icon/index.tsx"
+  }
+}

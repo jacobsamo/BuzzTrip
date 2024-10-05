@@ -1,12 +1,12 @@
 "use client";
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { Location } from "@/types";
+import { Location } from "@buzztrip/db/types";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import {
   AdvancedMarker,
   Map as GoogleMap,
   Pin,
-  useMap
+  useMap,
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
 import { lazy, memo } from "react";
@@ -74,10 +74,7 @@ const Map = () => {
                   setActiveLocation(marker as Location);
                 }}
               >
-                <MarkerPin
-                  marker={marker}
-                  size={16}
-                />
+                <MarkerPin marker={marker} size={16} />
               </AdvancedMarker>
             ))}
         </GoogleMap>
