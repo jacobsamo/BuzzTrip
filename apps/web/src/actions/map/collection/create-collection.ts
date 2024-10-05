@@ -1,10 +1,10 @@
 "use server";
 import { authAction } from "@/actions/safe-action";
-import { IconName } from "@/components/icon";
-import { db } from "@/server/db";
-import { collections } from "@/server/db/schema";
-import { NewCollection } from "@/types";
-import { collectionsEditSchema } from "@/types/scheams";
+import { IconName } from "@buzztrip/components/icon";
+import { db } from "@buzztrip/db";
+import { collections } from "@buzztrip/db/schema";
+import { NewCollection } from "@buzztrip/db/types";
+import { collectionsEditSchema } from "@buzztrip/db/types/scheams";
 
 const schema = collectionsEditSchema.omit({
   created_by: true,

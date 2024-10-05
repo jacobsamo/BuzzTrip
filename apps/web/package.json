@@ -37,6 +37,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^4.1.0",
+    "@buzztrip/db": "workspace:*",
     "drizzle-orm": "^0.33.0",
     "drizzle-zod": "^0.5.1",
     "framer-motion": "^11.5.4",

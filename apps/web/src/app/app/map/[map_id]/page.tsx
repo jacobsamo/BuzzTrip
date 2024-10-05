@@ -1,13 +1,13 @@
 import Map from "@/components/layouts/map/map-view";
 import { MapStoreProvider } from "@/components/providers/map-state-provider";
-import { db } from "@/server/db";
-import { getMarkersView } from "@/server/db/quieries";
+import { db } from "@buzztrip/db";
+import { getMarkersView } from "@buzztrip/db/queries";
 import {
   collection_markers,
   collections,
   map_users,
-  maps
-} from "@/server/db/schema";
+  maps,
+} from "@buzztrip/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
@@ -74,7 +74,7 @@ export default async function MapPage({
   ) {
     return notFound();
   }
-  
+
   return (
     <MapStoreProvider
       initialState={{

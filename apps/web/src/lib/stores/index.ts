@@ -11,7 +11,7 @@ import type {
   RouteStop,
   CombinedMarker,
   NewLocation,
-} from "@/types";
+} from "@buzztrip/db/types";
 
 export type Store = StoreState & StoreActions;
 

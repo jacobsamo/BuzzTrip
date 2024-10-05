@@ -1,5 +1,5 @@
 "use client";
-import Icon from "@/components/icon";
+import Icon from "@buzztrip/components/icon";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Collection, CombinedMarker } from "@/types";
+import { Collection, CombinedMarker } from "@buzztrip/db/types";
 import {
   ChevronDown,
   ChevronRight,
@@ -64,10 +64,7 @@ const CollectionsView = ({ collection, markers }: CollectionsViewProps) => {
             <DropdownMenuItem>
               <Edit className="mr-2 h-4 w-4" /> Edit
             </DropdownMenuItem>
-            <DropdownMenuItem
-  
-              className="text-destructive"
-            >
+            <DropdownMenuItem className="text-destructive">
               <Trash className="mr-2 h-4 w-4" /> Delete
             </DropdownMenuItem>
           </DropdownMenuContent>

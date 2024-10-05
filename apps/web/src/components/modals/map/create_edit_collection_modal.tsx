@@ -1,6 +1,6 @@
 // import ConfirmDeleteModal from "@/components/shared/modals/comfirm_delete_modal";
 import { createCollection } from "@/actions/map/collection/create-collection";
-import Icon, { otherIconsList } from "@/components/icon";
+import Icon, { otherIconsList } from "@buzztrip/components/icon";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { Collection } from "@/types";
+import { Collection } from "@buzztrip/db/types";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Edit, Plus } from "lucide-react";
 import * as React from "react";

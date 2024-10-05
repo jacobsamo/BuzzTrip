@@ -1,5 +1,5 @@
-import { IconName } from "@/components/icon";
-import { Bounds, Review } from "@/types";
+import { IconName } from "@buzztrip/components/icon";
+import { Bounds, Review } from "../types";
 import { eq, sql } from "drizzle-orm";
 import {
   integer,

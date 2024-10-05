@@ -6,7 +6,7 @@ import type {
   MapUser,
   Route,
   RouteStop,
-} from "@/types";
+} from "@buzztrip/db/types";
 
 export type StoreState = {
   collectionMarkers: CollectionMarker[] | null;
