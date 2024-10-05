@@ -15,7 +15,7 @@ import Icon, {
     placesIconsList,
     popularIconsList,
     transportIconsList,
-} from "../icon";
+} from "@buzztrip/components/icon";
 import { Button } from "../ui/button";
 
 interface IconPickerModalProps {

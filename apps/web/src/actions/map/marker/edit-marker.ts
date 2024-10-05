@@ -9,7 +9,7 @@ import {
   NewLocation,
   NewMarker,
 } from "@buzztrip/db/types";
-import { combinedMarkersSchema } from "@buzztrip/db/types/scheams";
+import { combinedMarkersSchema } from "@buzztrip/db/zod-schemas";
 import { and, eq } from "drizzle-orm";
 import { v4 as uuid } from "uuid";
 import * as z from "zod";

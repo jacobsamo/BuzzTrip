@@ -2,7 +2,7 @@
 import { db } from "@buzztrip/db";
 import { map_users, maps } from "@buzztrip/db/schema";
 import { NewMap, NewMapUser } from "@buzztrip/db/types";
-import { mapsEditSchema } from "@buzztrip/db/types/scheams";
+import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
 import { authAction } from "../safe-action";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";

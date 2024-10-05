@@ -4,7 +4,7 @@ import { IconName } from "@buzztrip/components/icon";
 import { db } from "@buzztrip/db";
 import { collections } from "@buzztrip/db/schema";
 import { NewCollection } from "@buzztrip/db/types";
-import { collectionsEditSchema } from "@buzztrip/db/types/scheams";
+import { collectionsEditSchema } from "@buzztrip/db/zod-schemas";
 
 const schema = collectionsEditSchema.omit({
   created_by: true,

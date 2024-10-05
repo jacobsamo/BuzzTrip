@@ -6,12 +6,10 @@
     "dev": "next dev --port 5173",
     "build": "next build",
     "start": "next start --port 5173",
-    "lint": "next lint",
-    "db:studio:dev": "drizzle-kit studio",
-    "db:studio:prd": "cross-env NODE_ENV=production drizzle-kit studio",
-    "db:migrate": "drizzle-kit generate"
+    "lint": "next lint"
   },
   "dependencies": {
+    "@buzztrip/tailwind-config": "workspace:*",
     "@clerk/nextjs": "^5.5.4",
     "@hookform/resolvers": "^3.9.0",
     "@libsql/client": "^0.13.0",

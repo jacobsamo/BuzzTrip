@@ -1,11 +1,11 @@
 # my-maps-app
  
 ## TODO:
-- [X] Setup `drizzle`
+- [ ] Setup `drizzle`
 - [ ] Get `Supabase working`
 - [ ] Signin page using Supabase
-- [X] add `react-query` into the app
-- [X] add `uuid` into the app
+- [ ] add `react-query` into the app
+- [ ] add `uuid` into the app
 - [ ] Bottom Sheet to include relevant information
 - [ ] Ability to edit markers & collections
 - [ ] customization of colours & icons
