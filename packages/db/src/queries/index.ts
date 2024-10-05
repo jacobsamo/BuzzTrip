@@ -1,10 +1,10 @@
-import "server-only";
-import { db } from "../";
-import { markers, locations } from "../schema";
+import { markers, locations, maps, map_users } from "../schema";
 import { eq } from "drizzle-orm";
-import { CombinedMarker } from "../types";
+import { CombinedMarker, UserMap } from "../types";
+import { getTableColumns } from "drizzle-orm";
+import { Database } from "..";
 
-export const getMarkersView = async (map_id: string) => {
+export const getMarkersView = async (db: Database, map_id: string) => {
   return db
     .select({
       marker_id: markers.marker_id,
@@ -36,4 +36,16 @@ export const getMarkersView = async (map_id: string) => {
     .from(markers)
     .leftJoin(locations, eq(locations.location_id, markers.location_id))
     .where(eq(markers.map_id, map_id)) as Promise<CombinedMarker[]>;
+};
+
+export const getUserMaps = async (db: Database, userId: string) => {
+  return db
+    .select({
+      ...getTableColumns(maps),
+      ...getTableColumns(map_users),
+      map_id: maps.map_id,
+    })
+    .from(map_users)
+    .leftJoin(maps, eq(map_users.map_id, maps.map_id))
+    .where(eq(maps.owner_id, userId!)) as Promise<UserMap[]>;
 };

@@ -12,12 +12,17 @@ import { drizzle } from "drizzle-orm/libsql";
 //         url: "file:./buzztrip-local.db",
 //       });
 
-const client =  createClient({
-  url: process.env.TURSO_CONNECTION_URL!,
-  authToken: process.env.TURSO_AUTH_TOKEN!,
-})
 
-export const db = drizzle(client, {
-  schema: schema,
-  logger: process.env.NODE_ENV === "development",
-});
+export const createDb = (url: string, authToken: string) => {
+  return drizzle(createClient({
+    url: url,
+    authToken: authToken,
+  }), {
+    schema: schema,
+    logger: process.env.NODE_ENV === "development",
+  });
+}
+
+export type Database = ReturnType<typeof createDb>;
+
+

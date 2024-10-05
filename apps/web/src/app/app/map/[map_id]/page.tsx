@@ -1,6 +1,6 @@
 import Map from "@/components/layouts/map/map-view";
 import { MapStoreProvider } from "@/components/providers/map-state-provider";
-import { db } from "@buzztrip/db";
+import { db } from "@/server/db";
 import { getMarkersView } from "@buzztrip/db/queries";
 import {
   collection_markers,
@@ -53,7 +53,7 @@ export default async function MapPage({
         .select()
         .from(collection_markers)
         .where(eq(collection_markers.map_id, params.map_id)),
-      getMarkersView(params.map_id),
+      getMarkersView(db, params.map_id),
       db.select().from(map_users).where(eq(map_users.map_id, params.map_id)),
       db.select().from(maps).where(eq(maps.map_id, params.map_id)),
     ]);

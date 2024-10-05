@@ -1,6 +1,7 @@
 import MapCard from "@/components/map-card";
 import MapModal from "@/components/modals/create_edit_map_modal";
-import { db } from "@buzztrip/db";
+import { db } from "@/server/db";
+import { getUserMaps } from "@buzztrip/db/queries";
 import { maps, map_users } from "@buzztrip/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
@@ -13,19 +14,7 @@ export default async function MapPage() {
     return notFound();
   }
 
-  const usersMaps = await db
-    .select({
-      map_id: maps.map_id,
-      title: maps.title,
-      description: maps.description,
-      image: maps.image,
-      owner_id: maps.owner_id,
-      user_id: map_users.user_id,
-      permission: map_users.user_id,
-    })
-    .from(map_users)
-    .leftJoin(maps, eq(map_users.map_id, maps.map_id))
-    .where(eq(maps.owner_id, userId!));
+  const usersMaps = await getUserMaps(db, userId);
 
   return (
     <main className="container mx-auto p-4">

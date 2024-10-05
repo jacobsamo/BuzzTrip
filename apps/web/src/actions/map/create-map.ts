@@ -1,5 +1,5 @@
 "use server";
-import { db } from "@buzztrip/db";
+import { db } from "@/server/db";
 import { map_users, maps } from "@buzztrip/db/schema";
 import { NewMap, NewMapUser } from "@buzztrip/db/types";
 import { mapsEditSchema } from "@buzztrip/db/zod-schemas";

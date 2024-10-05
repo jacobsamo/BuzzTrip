@@ -1,7 +1,7 @@
 "use server";
 import { authAction } from "@/actions/safe-action";
 import { IconName } from "@buzztrip/components/icon";
-import { db } from "@buzztrip/db";
+import { db } from "@/server/db";
 import { getMarkersView } from "@buzztrip/db/queries";
 import { collection_markers, locations, markers } from "@buzztrip/db/schema";
 import {
