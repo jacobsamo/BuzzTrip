@@ -34,7 +34,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { CombinedMarker } from "@buzztrip/db/types";
-import { combinedMarkersSchema } from "@buzztrip/db/types/scheams";
+import { combinedMarkersSchema } from "@buzztrip/db/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Circle, CircleCheck, Edit, Plus } from "lucide-react";

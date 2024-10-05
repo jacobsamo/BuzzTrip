@@ -1,5 +1,5 @@
 {
-  "extends": "@buzztrip/tsconfig/base.json",
+  "extends": "@buzztrip/tsconfig/nextjs.json",
   "compilerOptions": {
     "jsx": "react"
   }

@@ -14,6 +14,8 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@buzztrip/tailwind-config": "workspace:*",
+    "@buzztrip/db": "workspace:*",
     "@clerk/clerk-expo": "^2.2.14",
     "@expo/metro-runtime": "~3.2.3",
     "@expo/vector-icons": "^14.0.3",

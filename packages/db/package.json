@@ -2,6 +2,13 @@
   "name": "@buzztrip/db",
   "version": "0.0.0",
   "private": true,
+  "scripts": {
+    "db:studio:dev": "drizzle-kit studio",
+    "db:studio:prd": "cross-env NODE_ENV=production drizzle-kit studio",
+    "db:migrate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:setup": "touch buzztrip-local.db && bun db:migrate"
+  },
   "devDependencies": {
     "@types/node": "^22.7.4",
     "typescript": "^5.3.3",
@@ -17,7 +24,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./schema": "./src/schema/index.ts",
-    "./queries": "./src/queries.ts",
+    "./zod-schemas": "./src/zod-schemas/index.ts",
+    "./queries": "./src/queries/index.ts",
     "./types": "./src/types/index.ts"
   }
 }
