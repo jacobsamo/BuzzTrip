@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Mixie - Web",
+            "name": "BuzzTrip - Web",
             "type": "node",
             "request": "launch",
             "runtimeArgs": [
