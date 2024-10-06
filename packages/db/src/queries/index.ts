@@ -4,8 +4,8 @@ import { CombinedMarker, UserMap } from "../types";
 import { getTableColumns } from "drizzle-orm";
 import { Database } from "..";
 
-export const getMarkersView = async (db: Database, map_id: string) => {
-  return db
+export const getMarkersView = async (db: Database, map_id: string, markerId?: string) => {
+  let getMarkers =  db
     .select({
       marker_id: markers.marker_id,
       collection_id: markers.collection_id,
@@ -35,7 +35,13 @@ export const getMarkersView = async (db: Database, map_id: string) => {
     })
     .from(markers)
     .leftJoin(locations, eq(locations.location_id, markers.location_id))
-    .where(eq(markers.map_id, map_id)) as Promise<CombinedMarker[]>;
+    .where(eq(markers.map_id, map_id)).$dynamic();
+
+  if (markerId) {
+    getMarkers = getMarkers.where(eq(markers.marker_id, markerId));
+  }
+
+  return getMarkers as Promise<CombinedMarker[]>;
 };
 
 export const getUserMaps = async (db: Database, userId: string) => {

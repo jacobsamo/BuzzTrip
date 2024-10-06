@@ -1,5 +1,5 @@
+import { userMapsSchema } from "@buzztrip/db/zod-schemas";
 import { z } from "@hono/zod-openapi";
-import { mapsSchema, userMapsSchema } from "@buzztrip/db/zod-schemas";
 
 export const MapsParamsSchema = z.object({
   userId: z

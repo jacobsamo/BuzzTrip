@@ -84,7 +84,7 @@ export const createMarker = authAction
 
     // Fetch new markers and collection links
     const [newMarkers, collectionLinks] = await Promise.all([
-      getMarkersView(params.marker.map_id!),
+      getMarkersView(db, params.marker.map_id!),
       db
         .select()
         .from(collection_markers)

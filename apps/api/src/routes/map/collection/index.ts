@@ -1,0 +1,185 @@
+import { Bindings } from "@/common/bindings";
+import { ErrorSchema } from "@/common/schema";
+import { createDb } from "@buzztrip/db";
+import { collections } from "@buzztrip/db/schema";
+import { getAuth } from "@hono/clerk-auth";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { eq } from "drizzle-orm";
+import { MapParamsSchema } from "../schema";
+import {
+  CollectionParamsSchema,
+  CollectionReturnSchema,
+  CreateCollectionSchema,
+  EditCollectionSchema,
+} from "./schema";
+
+const app = new OpenAPIHono<{ Bindings: Bindings }>();
+
+const createCollection = createRoute({
+  method: "post",
+  path: "/{mapId}/collection/create",
+  summary: "Create a new collection",
+  request: {
+    params: MapParamsSchema,
+    body: {
+      content: { "application/json": { schema: CreateCollectionSchema } },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CollectionReturnSchema,
+        },
+      },
+      description: "Create a new collection",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Returns an error",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Returns an error if user is not authenticated",
+    },
+  },
+});
+
+app.openapi(createCollection, async (c) => {
+  const { mapId } = c.req.valid("param");
+  const newCollection = c.req.valid("json");
+  const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+  const auth = getAuth(c);
+
+  if (!auth || !auth.userId) {
+    return c.json(
+      {
+        code: "unauthorized",
+        message: "Unauthorized",
+        requestId: c.get("requestId"),
+      },
+      401
+    );
+  }
+
+  const [collection] = await db
+    .insert(collections)
+    .values({
+      ...newCollection,
+      map_id: mapId,
+      created_by: auth.userId,
+    })
+    .returning();
+
+  if (!collection) {
+    return c.json(
+      {
+        code: "failed_to_create_object",
+        message: "Failed to create collection",
+        requestId: c.get("requestId"),
+      },
+      400
+    );
+  }
+
+  return c.json(
+    {
+      data: {
+        collection,
+      },
+    },
+    200
+  );
+});
+
+const editCollection = createRoute({
+  method: "put",
+  path: "/{mapId}/collection/{collectionId}",
+  summary: "Edit a collection",
+  request: {
+    params: CollectionParamsSchema,
+    body: {
+      content: { "application/json": { schema: EditCollectionSchema } },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: CollectionReturnSchema,
+        },
+      },
+      description: "Edit a collection",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Returns an error",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Returns an error if user is not authenticated",
+    },
+  },
+});
+
+app.openapi(editCollection, async (c) => {
+  const { mapId, collectionId } = c.req.valid("param");
+  const editCollection = c.req.valid("json");
+  const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+  const auth = getAuth(c);
+
+  if (!auth || !auth.userId) {
+    return c.json(
+      {
+        code: "unauthorized",
+        message: "Unauthorized",
+        requestId: c.get("requestId"),
+      },
+      401
+    );
+  }
+
+  const [updatedCollection] = await db
+    .update(collections)
+    .set(editCollection)
+    .where(eq(collections.collection_id, collectionId))
+    .returning();
+
+  if (!updatedCollection) {
+    return c.json(
+      {
+        code: "failed_to_update_object",
+        message: "Failed to update collection",
+        requestId: c.get("requestId"),
+      },
+      400
+    );
+  }
+
+  return c.json(
+    {
+      data: {
+        collection: updatedCollection,
+      },
+    },
+    200
+  );
+});
+
+export default app;

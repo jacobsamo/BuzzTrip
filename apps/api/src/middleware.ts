@@ -1,7 +1,6 @@
 import type { Context, Next } from "hono";
 import { env } from "hono/adapter";
 import { bearerAuth } from "hono/bearer-auth";
-import { cache } from "hono/cache";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 
@@ -34,7 +33,5 @@ const securityMiddleware = secureHeaders();
 const loggingMiddleware = logger(console.log);
 
 export {
-  authMiddleware,
-  securityMiddleware,
-  loggingMiddleware,
+  authMiddleware, loggingMiddleware, securityMiddleware
 };
