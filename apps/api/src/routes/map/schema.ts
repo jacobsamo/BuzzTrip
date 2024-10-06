@@ -1,13 +1,11 @@
-import { z } from "@hono/zod-openapi";
 import {
-  collectionsSchema,
   collection_markersSchema,
-  mapsSchema,
-  markersSchema,
-  userMapsSchema,
+  collectionsSchema,
   combinedMarkersSchema,
   map_usersSchema,
+  mapsSchema
 } from "@buzztrip/db/zod-schemas";
+import { z } from "@hono/zod-openapi";
 
 export const MapParamsSchema = z.object({
   mapId: z
@@ -15,7 +13,7 @@ export const MapParamsSchema = z.object({
     .min(36)
     .openapi({
       param: {
-        name: "userId",
+        name: "mapId",
         in: "path",
         required: true,
       },
@@ -38,3 +36,46 @@ export const MapDataSchema = z.object({
     map: mapsSchema,
   }),
 });
+
+// Creating a map
+export const CreateMapSchema = z
+  .object({
+    title: z.string().openapi({ example: "My Map" }),
+    description: z
+      .string()
+      .nullish()
+      .openapi({ example: "An awesome trip across Australia" }),
+    owner_id: z
+      .string()
+      .openapi({ example: "user_2lmIzCk7BhX5a5MwvgITlFjkoLH" }),
+  })
+  .openapi("CreateMapSchema");
+
+export const CreateMapReturnSchema = z.object({
+  data: z.object({
+    map: mapsSchema.optional(),
+    mapUser: map_usersSchema.optional(),
+  }),
+});
+
+// Editing of a map
+export const EditMapSchema = z
+  .object({
+    map_id: z.string().openapi({
+      param: { name: "mapId", in: "path", required: true },
+      example: "1f36c536-c8cf-4174-8ed4-3150c08212b5",
+    }),
+    title: z.string().optional().openapi({ example: "My Map" }),
+    description: z
+      .string()
+      .nullish()
+      .openapi({ example: "An awesome trip across Australia" }),
+    owner_id: z
+      .string()
+      .openapi({ example: "user_2lmIzCk7BhX5a5MwvgITlFjkoLH" }),
+    image: z
+      .string()
+      .optional()
+      .openapi({ example: "https://example.com/image.png" }),
+  })
+  .openapi("EditMapSchema");

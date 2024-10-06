@@ -1,9 +1,9 @@
 import { Bindings } from "@/common/bindings";
 import { ErrorSchema } from "@/common/schema";
+import { createDb } from "@buzztrip/db";
 import { getUserMaps } from "@buzztrip/db/queries";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { MapsParamsSchema, MapsSchema } from "./schema";
-import { createDb } from "@buzztrip/db";
 
 const app = new OpenAPIHono<{ Bindings: Bindings }>();
 
