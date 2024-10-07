@@ -5,7 +5,7 @@ import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 
 
-const PUBLIC_PATHS = ["/"];
+const PUBLIC_PATHS = ["/", "/health"];
 
 const authMiddleware = (c: Context, next: Next) => {
   if (PUBLIC_PATHS.includes(c.req.path)) {
