@@ -9,6 +9,8 @@ import {
 } from "./middleware";
 import mapRoutes from "./routes/map";
 import userRoutes from "./routes/user";
+import markerRoutes from "./routes/map/marker";
+import collectionRoutes from "./routes/map/collection";
 
 const app = new OpenAPIHono<{ Bindings: Bindings }>({
   defaultHook: (result, c) => {
@@ -25,11 +27,18 @@ app.use(securityMiddleware);
 app.use(loggingMiddleware);
 app.use("*", clerkMiddleware());
 
-app.route("/users", userRoutes).route("/maps", mapRoutes);
+app.get("/health", (c) => {
+  return c.json({ status: "ok" });
+});
 
 app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
   type: "http",
   scheme: "bearer",
 });
 
+const routes = [userRoutes, mapRoutes, markerRoutes, collectionRoutes] as const;
+
+routes.forEach((route) => app.route("/", route));
+
+export type AppType = typeof routes[number];
 export default app;
