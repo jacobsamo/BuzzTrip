@@ -1,4 +1,4 @@
-import {AppType} from "@buzztrip/api/src"
+import type { AppType } from "@buzztrip/api/src";
 import { hc } from "hono/client";
 
 export const apiClient = hc<AppType>(process.env.EXPO_PUBLIC_API_URL!, {

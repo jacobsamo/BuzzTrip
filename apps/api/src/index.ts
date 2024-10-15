@@ -36,9 +36,9 @@ app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
   scheme: "bearer",
 });
 
-const routes = [userRoutes, mapRoutes, markerRoutes, collectionRoutes] as const;
+const routes = [userRoutes, mapRoutes, markerRoutes, collectionRoutes];
 
 routes.forEach((route) => app.route("/", route));
 
-export type AppType = typeof routes[number];
+export type AppType = (typeof routes)[number];
 export default app;
