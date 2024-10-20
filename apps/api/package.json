@@ -1,5 +1,7 @@
 {
   "name": "@buzztrip/api",
+  "version": "0.0.0",
+  "main": "src/index.ts",
   "scripts": {
     "dev": "NODE_ENV=development wrangler dev src/index.ts --port 3002",
     "deploy": "wrangler deploy --minify src/index.ts",

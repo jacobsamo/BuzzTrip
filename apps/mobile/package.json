@@ -14,9 +14,11 @@
     "preset": "jest-expo"
   },
   "dependencies": {
-    "@buzztrip/tailwind-config": "workspace:*",
+    "@buzztrip/api": "workspace:*",
     "@buzztrip/db": "workspace:*",
+    "@buzztrip/tailwind-config": "workspace:*",
     "@clerk/clerk-expo": "^2.2.14",
+    "@dev-plugins/react-query": "^0.0.7",
     "@expo/metro-runtime": "~3.2.3",
     "@expo/vector-icons": "^14.0.3",
     "@gorhom/bottom-sheet": "^4.6.4",
@@ -52,7 +54,6 @@
     "sidcn": "^1.1.0"
   },
   "devDependencies": {
-    "@buzztrip/api": "workspace:*",
     "@babel/core": "^7.25.2",
     "@types/react": "~18.3.8",
     "jest": "^29.7.0",

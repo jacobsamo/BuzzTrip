@@ -6,8 +6,7 @@
       "@/*": [
         "./src/*"
       ]
-    },
-    "composite": true
+    }
   },
   "include": [
     "**/*.ts",
@@ -17,5 +16,10 @@
     "tailwind.config.js",
     "nativewind-env.d.ts",
     "../api"
+  ],
+  "references": [
+    {
+      "path": "../api/tsconfig.json"
+    }
   ]
 }
