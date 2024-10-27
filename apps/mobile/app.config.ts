@@ -17,20 +17,20 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   assetBundlePatterns: ["**/*"],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: "com.jacobsamorowski.buzztrip",
+    bundleIdentifier: "com.jacobsamo.buzztrip",
     config: {
-      googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
+      googleMapsApiKey: process.env.GOOGLE_MAPS_IOS_API_KEY!,
     },
   },
   android: {
-    package: "com.jacobsamorowski.buzztrip",
+    package: "com.jacobsamo.buzztrip",
     adaptiveIcon: {
       foregroundImage: "./src/assets/icons/logo_x48.png",
       backgroundColor: "#FFFFFF",
     },
     config: {
       googleMaps: {
-        apiKey: process.env.GOOGLE_MAPS_API_KEY,
+        apiKey: process.env.GOOGLE_MAPS_ANDROID_API_KEY,
       },
     },
   },
@@ -42,11 +42,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   experiments: {
     typedRoutes: true,
   },
-  plugins: [
-    "expo-font",
-    "expo-router",
-    "expo-secure-store",
-  ],
+  plugins: ["expo-font", "expo-router", "expo-secure-store"],
   extra: {
     clerkPublishableKey: process.env.CLERK_PUBLISHABLE_KEY,
   },

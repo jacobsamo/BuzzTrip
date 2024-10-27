@@ -3,17 +3,17 @@ import { Link } from "expo-router";
 import React from "react";
 import { Image } from "react-native-elements";
 
-interface MapCardProps {
+export interface MapCardProps {
   image: string;
   title: string;
   mapId: string;
 }
 
-const MapCard = ({ image, title, mapId }: MapCardProps) => {
+export const MapCard = ({ image, title, mapId }: MapCardProps) => {
   return (
-    <Link style={styles.container} href={`/app/map/${mapId}`}>
-      <Image src={image} alt="Map image" style={styles.image} />
-      <Text style={styles.title}>{title}</Text>
+    <Link className="flex flex-1 items-center w-auto flex-col max-w-40 max-h-[300px]" href={`/map/${mapId}`}>
+      <Image src={image} alt="Map image" className="w-full h-full rounded-xl" />
+      <Text className="text-center text-black">{title}</Text>
     </Link>
   );
 };
