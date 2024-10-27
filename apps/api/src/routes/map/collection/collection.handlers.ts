@@ -44,14 +44,7 @@ export const createCollectionHandler: AppRouteHandler<
     );
   }
 
-  return c.json(
-    {
-      data: {
-        collection,
-      },
-    },
-    200
-  );
+  return c.json(collection, 200);
 };
 
 export const editCollectionHandler: AppRouteHandler<
@@ -92,9 +85,7 @@ export const editCollectionHandler: AppRouteHandler<
 
   return c.json(
     {
-      data: {
-        collection: updatedCollection,
-      },
+      collection: updatedCollection,
     },
     200
   );

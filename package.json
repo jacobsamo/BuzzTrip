@@ -4,19 +4,37 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md,mdx}\""
+    "sherif": "bunx sherif@latest -p ./apps/mobile",
+    "lint": "turbo lint && bun sherif",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md,mdx}\"",
+    "turbo:clean:all": "turbo run clean:all",
+    "clean:all": "rm -rf node_modules/ && bun turbo",
+    "update": "bun update --latest && cd ./packages/db && bun update --latest && cd ../eslint-config && bun update --latest && cd ../tsconfig && bun update --latest&& cd ../tailwind-config && bun update --latest&& cd ../../apps/api && bun update --latest&& cd ../mobile && bun update --latest&& cd ../web && bun update --latest&& cd ../.."
   },
   "devDependencies": {
-    "turbo": "^2.1.2",
+    "@buzztrip/tsconfig": "workspace:*",
+    "drizzle-orm": "^0.35.3",
     "prettier": "^3.3.3",
-    "prettier-plugin-tailwindcss": "^0.6.6",
-    "typescript": "^5.6.2",
-    "@buzztrip/tsconfig": "workspace:*"
+    "prettier-plugin-tailwindcss": "^0.6.8",
+    "turbo": "^2.2.3",
+    "typescript": "^5.6.3"
   },
   "packageManager": "bun@1.1.26",
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "trustedDependencies": [
+    "@clerk/shared",
+    "browser-tabs-lock",
+    "core-js",
+    "esbuild",
+    "keccak",
+    "react-native-elements",
+    "sharp",
+    "workerd"
+  ],
+  "resolutions": {
+    "drizzle-orm": "^0.35.3"
+  }
 }

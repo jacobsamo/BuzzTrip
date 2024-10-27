@@ -1,3 +1,8 @@
 {
   "extends": "@buzztrip/tsconfig/base.json",
+  "compilerOptions": {
+    "paths": {
+      "drizzle-orm": ["./node_modules/drizzle-orm"]
+    }
+  }
 }

@@ -17,6 +17,7 @@
     "**/app/**/route.ts": "${dirname} - route.ts",
   },
   "cSpell.words": [
-    "buzztrip"
+    "buzztrip",
+    "hono"
   ]
 }

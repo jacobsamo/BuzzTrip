@@ -4,7 +4,6 @@
   "private": true,
   "devDependencies": {
     "@buzztrip/tsconfig": "workspace:*"
-
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7"

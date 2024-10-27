@@ -15,8 +15,4 @@ export const MapsParamsSchema = z.object({
     }),
 });
 
-export const MapsSchema = z
-  .object({
-    data: userMapsSchema.array(),
-  })
-  .openapi("MapsSchema");
+export const MapsSchema = userMapsSchema.array().openapi("MapsSchema");

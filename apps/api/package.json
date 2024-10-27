@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "NODE_ENV=development wrangler dev src/index.ts --port 3002",
+    "clean:all": "rm -rf node_modules/",
+    "dev": "NODE_ENV=development wrangler dev src/index.ts",
     "deploy": "wrangler deploy --minify src/index.ts",
     "check:types": "tsc --noEmit"
   },
@@ -14,8 +15,7 @@
     "@hono/swagger-ui": "^0.4.1",
     "@hono/zod-openapi": "^0.16.3",
     "@hono/zod-validator": "^0.3.0",
-    "drizzle-orm": "^0.33.0",
-    "hono": "^4.6.3",
+    "hono": "^4.6.7",
     "uuid": "^10.0.0"
   },
   "devDependencies": {

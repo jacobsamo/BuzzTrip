@@ -2,10 +2,10 @@ import { AppRouteHandler } from "@/common/types";
 import { createDb } from "@buzztrip/db";
 import { getMarkersView } from "@buzztrip/db/queries";
 import {
-    collection_markers,
-    collections,
-    map_users,
-    maps,
+  collection_markers,
+  collections,
+  map_users,
+  maps,
 } from "@buzztrip/db/schema";
 import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
@@ -16,7 +16,7 @@ export const getMapHandler: AppRouteHandler<typeof getMap> = async (c) => {
   const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
   const map = await db.query.maps.findFirst({
-    where: eq(maps.map_id, mapId),
+    where: (maps, { eq }) => eq(maps.map_id, mapId),
   });
 
   if (!map) {
@@ -30,12 +30,7 @@ export const getMapHandler: AppRouteHandler<typeof getMap> = async (c) => {
     );
   }
 
-  return c.json(
-    {
-      data: map,
-    },
-    200
-  );
+  return c.json(map, 200);
 };
 
 export const getMapDataHandler: AppRouteHandler<
@@ -58,18 +53,16 @@ export const getMapDataHandler: AppRouteHandler<
 
   return c.json(
     {
-      data: {
-        markers: foundMarkers.map((marker) => ({
-          ...marker,
-          lat: marker.lat as number,
-          lng: marker.lng as number,
-          bounds: marker.bounds ?? null,
-        })),
-        collections: foundCollections,
-        collection_markers: collectionMarkers,
-        mapUsers: sharedMap,
-        map: map[0]!,
-      },
+      markers: foundMarkers.map((marker) => ({
+        ...marker,
+        lat: marker.lat as number,
+        lng: marker.lng as number,
+        bounds: marker.bounds ?? null,
+      })),
+      collections: foundCollections,
+      collection_markers: collectionMarkers,
+      mapUsers: sharedMap,
+      map: map[0]!,
     },
     200
   );
@@ -113,12 +106,7 @@ export const createMapHandler: AppRouteHandler<typeof createMap> = async (
       throw new Error("Error creating map");
     }
 
-    return c.json(
-      {
-        data: createMap,
-      },
-      200
-    );
+    return c.json(createMap, 200);
   } catch (error) {
     return c.json(
       {
@@ -152,10 +140,5 @@ export const editMapHandler: AppRouteHandler<typeof editMap> = async (c) => {
     );
   }
 
-  return c.json(
-    {
-      data: updatedMap,
-    },
-    200
-  );
+  return c.json(updatedMap, 200);
 };

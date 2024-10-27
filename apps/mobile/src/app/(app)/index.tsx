@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
-import { Text, View } from "react-native";
+import { Text, View, Button } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api.client";
 
@@ -12,21 +12,32 @@ export default function App() {
     return <Text>Loading...</Text>;
   }
 
-  const { data } = useQuery({
+  const { data, refetch } = useQuery({
     queryKey: ["maps", userId],
     queryFn: async () => {
-      const res = await apiClient[":userId"].maps.$get({
-        param: { userId },
-      });
-      const data = await res.json();
+      try {
+        const res = await apiClient[":userId"].maps.$get({
+          param: { userId },
+        });
 
+        console.log("data: ", res);
+
+        if (res.ok) {
+          return res.json();
+        }
+        return null;
+      } catch (error) {
+        console.log("Error fetching data", error);
+        return null;
+      }
     },
   });
 
   return (
     <View>
       <Text className="text-black">Main page</Text>
-      {data!}
+      {data?.map((map) => <Text key={map.map_id}>{map.map_id}</Text>)}
+      <Button title="Refresh" onPress={() => refetch()} />
     </View>
   );
 }
