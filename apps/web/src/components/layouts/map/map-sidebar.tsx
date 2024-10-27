@@ -2,6 +2,7 @@
 // import * as Accordion from "@radix-ui/react-accordion";
 // import CollectionCard from "../collection_card";
 import MainView from "./main-view";
+import { Sidebar } from "@/components/ui/sidebar";
 
 const MapSideBar = () => {
   return (

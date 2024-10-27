@@ -16,11 +16,11 @@ export const CollectionParamsSchema = MapParamsSchema.extend({
     }),
 });
 
-export const CollectionReturnSchema = z.object({
-  data: z.object({
+export const CollectionReturnSchema = z
+  .object({
     collection: collectionsEditSchema,
-  }),
-});
+  })
+  .openapi("CollectionReturnSchema");
 
 export const CreateCollectionSchema = collectionsEditSchema
   .omit({

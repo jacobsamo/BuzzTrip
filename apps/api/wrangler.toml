@@ -5,6 +5,10 @@ main = "src/index.ts"
 minify = true
 workers_dev = false
 
+[dev]
+port = 8181
+ip = "0.0.0.0" #used to access the api from the mobile app
+
 [env.production]
 name = "api"
 route = { pattern = "api.buzztrip.co/*", zone_name = "buzztrip.co" }

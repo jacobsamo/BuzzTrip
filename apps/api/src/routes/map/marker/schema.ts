@@ -1,11 +1,9 @@
 import {
-    collection_markersSchema,
-    combinedMarkersSchema,
+  collection_markersSchema,
+  combinedMarkersSchema,
 } from "@buzztrip/db/zod-schemas";
 import { z } from "@hono/zod-openapi";
 import { MapParamsSchema } from "../schema";
-
-
 
 export const MarkerParamsSchema = MapParamsSchema.extend({
   markerId: z
@@ -28,12 +26,12 @@ export const CreateMarkerSchema = z
   })
   .openapi("CreateMarkerSchema");
 
-export const CreateMarkersReturnSchema = z.object({
-  data: z.object({
+export const CreateMarkersReturnSchema = z
+  .object({
     markers: combinedMarkersSchema.array(),
     collectionLinks: collection_markersSchema.array().nullable(),
-  }),
-});
+  })
+  .openapi("CreateMarkersReturnSchema");
 
 // Edit a marker
 export const EditMarkerSchema = z
@@ -45,8 +43,8 @@ export const EditMarkerSchema = z
   })
   .openapi("EditMarkerSchema");
 
-export const EditMarkerReturnSchema = z.object({
-  data: z.object({
+export const EditMarkerReturnSchema = z
+  .object({
     collectionLinksDeleted: z
       .string()
       .array()
@@ -54,5 +52,5 @@ export const EditMarkerReturnSchema = z.object({
       .openapi({ description: "An array of collection ids that were deleted" }),
     collectionLinksCreated: collection_markersSchema.array().nullable(),
     marker: combinedMarkersSchema,
-  }),
-});
+  })
+  .openapi("EditMarkerReturnSchema");

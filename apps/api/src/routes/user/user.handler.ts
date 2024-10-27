@@ -11,10 +11,5 @@ export const getUserMapsHandler: AppRouteHandler<
 
   const usersMaps = await getUserMaps(db, userId);
 
-  return c.json(
-    {
-      data: usersMaps,
-    },
-    200
-  );
+  return c.json(usersMaps, 200);
 };

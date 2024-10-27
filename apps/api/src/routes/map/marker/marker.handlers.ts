@@ -46,7 +46,7 @@ export const createMarkerHandler: AppRouteHandler<typeof createMarker> = async (
       const newLocation: NewLocation = {
         ...newMarker.marker,
         location_id: locationId,
-        icon: newMarker.marker.icon,
+        icon: newMarker.marker.icon as IconName,
       };
       await tx.insert(locations).values(newLocation);
     }
@@ -93,10 +93,8 @@ export const createMarkerHandler: AppRouteHandler<typeof createMarker> = async (
 
   return c.json(
     {
-      data: {
-        markers: newMarkers,
-        collectionLinks,
-      },
+      markers: newMarkers,
+      collectionLinks,
     },
     200
   );
@@ -172,11 +170,9 @@ export const editMarkerHandler: AppRouteHandler<typeof editMarker> = async (
 
   return c.json(
     {
-      data: {
-        collectionLinksDeleted: collectionLinksDeleted,
-        collectionLinksCreated: collectionLinksCreated,
-        marker: editMarker.marker,
-      },
+      collectionLinksDeleted: collectionLinksDeleted,
+      collectionLinksCreated: collectionLinksCreated,
+      marker: editMarker.marker,
     },
     200
   );

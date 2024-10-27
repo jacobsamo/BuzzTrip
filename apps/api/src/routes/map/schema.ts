@@ -3,7 +3,7 @@ import {
   collectionsSchema,
   combinedMarkersSchema,
   map_usersSchema,
-  mapsSchema
+  mapsSchema,
 } from "@buzztrip/db/zod-schemas";
 import { z } from "@hono/zod-openapi";
 
@@ -21,21 +21,17 @@ export const MapParamsSchema = z.object({
     }),
 });
 
-export const MapSchema = z
-  .object({
-    data: mapsSchema,
-  })
-  .openapi("MapsSchema");
+export const MapSchema = mapsSchema.openapi("MapsSchema");
 
-export const MapDataSchema = z.object({
-  data: z.object({
+export const MapDataSchema = z
+  .object({
     markers: combinedMarkersSchema.array(),
     collections: collectionsSchema.array(),
     collection_markers: collection_markersSchema.array(),
     mapUsers: map_usersSchema.array(),
     map: mapsSchema,
-  }),
-});
+  })
+  .openapi("MapDataSchema");
 
 // Creating a map
 export const CreateMapSchema = z
@@ -51,12 +47,12 @@ export const CreateMapSchema = z
   })
   .openapi("CreateMapSchema");
 
-export const CreateMapReturnSchema = z.object({
-  data: z.object({
+export const CreateMapReturnSchema = z
+  .object({
     map: mapsSchema.optional(),
     mapUser: map_usersSchema.optional(),
-  }),
-});
+  })
+  .openapi("CreateMapReturnSchema");
 
 // Editing of a map
 export const EditMapSchema = z
