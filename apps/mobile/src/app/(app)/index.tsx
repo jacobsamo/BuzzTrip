@@ -3,6 +3,7 @@ import { useAuth } from "@clerk/clerk-expo";
 import { Text, View, Button } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api.client";
+import { MapCard } from "@/components/MapCards";
 
 // login page that after login will route to /[id] containing the userId
 export default function App() {
@@ -16,16 +17,10 @@ export default function App() {
     queryKey: ["maps", userId],
     queryFn: async () => {
       try {
-        const res = await apiClient[":userId"].maps.$get({
+        const res = await apiClient.user[":userId"].maps.$get({
           param: { userId },
         });
-
-        console.log("data: ", res);
-
-        if (res.ok) {
-          return res.json();
-        }
-        return null;
+        return res.ok ? res.json() : null;
       } catch (error) {
         console.log("Error fetching data", error);
         return null;
@@ -36,7 +31,14 @@ export default function App() {
   return (
     <View>
       <Text className="text-black">Main page</Text>
-      {data?.map((map) => <Text key={map.map_id}>{map.map_id}</Text>)}
+      {data?.map((map) => (
+        <MapCard
+          key={map.map_id}
+          image={map.image!}
+          title={map.title}
+          mapId={map.map_id!}
+        />
+      ))}
       <Button title="Refresh" onPress={() => refetch()} />
     </View>
   );

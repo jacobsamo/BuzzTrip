@@ -4,7 +4,7 @@ import { MapsParamsSchema, MapsSchema } from "./schema";
 
 export const getUserMapsRoute = createRoute({
   method: "get",
-  path: "/{userId}/maps",
+  path: "/user/{userId}/maps",
   summary: "Get all maps that a user has created or been shared",
   request: {
     params: MapsParamsSchema,

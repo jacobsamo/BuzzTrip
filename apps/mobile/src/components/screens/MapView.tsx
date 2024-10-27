@@ -1,11 +1,28 @@
 import React, { useMemo, useRef } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { Dimensions, StyleSheet, View } from "react-native";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import GooglePlacesSearch from "@/components/Search/GooglePlacesSearch";
 import Sheet from "../Sheet";
+import {
+  Collection,
+  CollectionMarker,
+  CombinedMarker,
+  Map,
+  MapUser,
+} from "@buzztrip/db/src/types";
 
-export default function MapViewPage() {
+export interface MapViewProps {
+  initState: {
+    collections: Collection[] | null;
+    collectionMarkers: CollectionMarker[] | null;
+    markers: CombinedMarker[] | null;
+    mapUsers: MapUser[] | null;
+    map: Map;
+  };
+}
+
+export default function MapViewPage({ initState }: MapViewProps) {
+  const { collectionMarkers, collections, map, markers, mapUsers } = initState;
   const mapRef = useRef<any>();
   const [pin, setPin] = React.useState({
     latitude: 0,
@@ -55,23 +72,27 @@ export default function MapViewPage() {
           console.log(e.nativeEvent.coordinate);
           setPin(e.nativeEvent.coordinate);
         }}
-        googleMapId={process.env.GOOGLE_MAPS_MAPID}
+        googleMapId={process.env.EXPO_PUBLIC_GOOGLE_MAPS_MAPID}
         initialCamera={mapInitialCamera}
         camera={camera}
         mapType="terrain"
       >
-        <Marker
-          coordinate={{
-            latitude: camera.center.latitude,
-            longitude: camera.center.longitude,
-          }}
-        />
+        {markers &&
+          markers.map((marker) => (
+            <Marker
+              key={marker.marker_id as string}
+              coordinate={{
+                latitude: marker.lat as number,
+                longitude: marker.lng as number,
+              }}
+            />
+          ))}
 
         <Marker coordinate={pin} />
       </MapView>
-      <Sheet>
+      {/* <Sheet>
         <GooglePlacesSearch region={camera} setRegion={setCamera} />
-      </Sheet>
+      </Sheet> */}
     </View>
   );
 }
