@@ -1,13 +1,13 @@
 import React, { useEffect } from "react";
-import { useAuth } from "@clerk/clerk-expo";
 import { Text, View, Button } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api.client";
 import { MapCard } from "@/components/MapCards";
+import { useClerk, useAuth } from "@clerk/clerk-expo";
 
 // login page that after login will route to /[id] containing the userId
 export default function App() {
-  const { userId } = useAuth();
+  const { userId, signOut } = useAuth();
 
   if (!userId) {
     return <Text>Loading...</Text>;
@@ -40,6 +40,7 @@ export default function App() {
         />
       ))}
       <Button title="Refresh" onPress={() => refetch()} />
+      <Button title="Sign out" onPress={() => signOut()} />
     </View>
   );
 }
