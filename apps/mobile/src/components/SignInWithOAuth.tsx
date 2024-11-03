@@ -3,6 +3,8 @@ import * as WebBrowser from "expo-web-browser";
 import { TouchableOpacity, Text, View } from "react-native";
 import { useOAuth } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
+import Google from "./GoogleLogo";
+import { Button } from "@/components/ui/button";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -31,12 +33,10 @@ const SignInWithOAuth = () => {
   }, []);
 
   return (
-    <TouchableOpacity className="flex flex-row gap-2" onPress={onPress}>
-      <Text className="text-lg">🌐</Text>
-      <Text className="text-base font-medium ">
-        Continue with Google
-      </Text>
-    </TouchableOpacity>
+    <Button className="flex flex-row gap-2" onPress={onPress}>
+      <Google size={24} />
+      <Text className="text-base font-medium">Continue with Google</Text>
+    </Button>
   );
 };
 
