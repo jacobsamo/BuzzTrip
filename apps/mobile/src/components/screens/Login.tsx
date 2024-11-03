@@ -1,11 +1,12 @@
-import { SignedIn, SignedOut } from "@clerk/clerk-expo";
+import { SignedOut } from "@clerk/clerk-expo";
+import { Image } from "expo-image";
 import React from "react";
 import { Text, View } from "react-native";
 import SignInWithOAuth from "../SignInWithOAuth";
 
 export default function LoginScreen() {
   return (
-    <View className="w-dvw h-dvh items-center justify-center">
+    <View className="h-dvh w-dvw items-center justify-center">
       <SignedOut>
         <View className="mx-4 w-full max-w-sm items-center rounded-2xl bg-card p-6 text-gray-800 shadow-lg">
           <View className="mb-6 items-center">
@@ -19,6 +20,11 @@ export default function LoginScreen() {
           </View>
           <SignInWithOAuth />
         </View>
+        <Image
+          className="h-full w-full flex-1"
+          source="./assets/images/login-screen.png"
+          contentFit="cover"
+        />
       </SignedOut>
     </View>
   );
