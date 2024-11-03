@@ -9,11 +9,19 @@ import {
   popular,
   transport,
 } from "./icons";
-
-export type IconName = keyof typeof Icons;
+import type {
+  AccommodationIcon,
+  ActivitiesIcon,
+  TransportIcon,
+  FoodIcon,
+  PlacesIcon,
+  OtherIcon,
+  IconType,
+  PopularIcon,
+} from "@buzztrip/db/types";
 
 export interface IconProps {
-  name: IconName;
+  name: IconType;
   color?: React.CSSProperties["color"] | string;
   size?: number;
 }
@@ -33,11 +41,11 @@ export default Icon;
 
 export * from './icons'
 
-export const iconsList = Object.keys(Icons) as IconName[];
-export const popularIconsList = Object.keys(popular) as IconName[];
-export const activitiesIconsList = Object.keys(activities) as IconName[];
-export const accommodationIconsList = Object.keys(accommodation) as IconName[];
-export const foodIconsList = Object.keys(food) as IconName[];
-export const placesIconsList = Object.keys(places) as IconName[];
-export const transportIconsList = Object.keys(transport) as IconName[];
-export const otherIconsList = Object.keys(other) as IconName[];
+export const iconsList = Object.keys(Icons) as IconType[];
+export const popularIconsList = Object.keys(popular) as PopularIcon[];
+export const activitiesIconsList = Object.keys(activities) as ActivitiesIcon[];
+export const accommodationIconsList = Object.keys(accommodation) as AccommodationIcon[];
+export const foodIconsList = Object.keys(food) as FoodIcon[];
+export const placesIconsList = Object.keys(places) as PlacesIcon[];
+export const transportIconsList = Object.keys(transport) as TransportIcon[];
+export const otherIconsList = Object.keys(other) as OtherIcon[];

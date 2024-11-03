@@ -1,6 +1,5 @@
-// this file contains all the icons that are used in the application
+// this file contains all the icons that are used for maps
 import { Icon } from "@phosphor-icons/react";
-
 import {
   // Transport
   Train,
@@ -60,7 +59,19 @@ import {
   Bed,
 } from "@phosphor-icons/react/dist/ssr";
 
-export const transport = {
+import type {
+  AccommodationIcon,
+  ActivitiesIcon,
+  TransportIcon,
+  FoodIcon,
+  PlacesIcon,
+  OtherIcon,
+  IconType,
+  PopularIcon,
+} from "@buzztrip/db/types";
+
+
+export const transport: Record<TransportIcon, Icon> = {
   Train: Train,
   Car: Car,
   Taxi: Taxi,
@@ -71,7 +82,7 @@ export const transport = {
   Bus: Bus,
 };
 
-export const accommodation = {
+export const accommodation: Record<AccommodationIcon, Icon> = {
   Hotel: BuildingApartment,
   Motel: Garage,
   House: HouseLine,
@@ -81,7 +92,7 @@ export const accommodation = {
   Bed: Bed,
 };
 
-export const activities = {
+export const activities: Record<ActivitiesIcon, Icon> = {
   Hiking: PersonSimpleHike,
   Walking: PersonSimpleWalk,
   Biking: PersonSimpleBike,
@@ -104,7 +115,7 @@ export const activities = {
   Fishing: FishSimple,
 };
 
-export const food = {
+export const food: Record<FoodIcon, Icon> = {
   Pizza: Pizza,
   Burger: Hamburger,
   Sandwich: Bread,
@@ -115,7 +126,7 @@ export const food = {
   // Taco: {},
 };
 
-export const places = {
+export const places: Record<PlacesIcon, Icon> = {
   Beach: Island,
   Mountain: Mountains,
   Park: Park,
@@ -129,7 +140,7 @@ export const places = {
   Church: Church,
 };
 
-export const other = {
+export const other: Record<OtherIcon, Icon> = {
   Folder: Folder,
   MapPin: MapPin,
   Compass: Compass,
@@ -140,7 +151,7 @@ export const other = {
 /**
  * A list of the most popular icons, derived from the icons object.
  */
-export const popular = {
+export const popular: Record<PopularIcon, Icon> = {
   Bed: Bed,
   Car: Car,
   Camping: Tent,
@@ -149,7 +160,7 @@ export const popular = {
   House: HouseLine,
 };
 
-export const Icons = {
+export const Icons: Record<IconType, Icon> = {
   ...transport,
   ...accommodation,
   ...activities,
@@ -157,62 +168,3 @@ export const Icons = {
   ...food,
   ...other,
 };
-
-export const readOnlyIconsArray = [
-  "Bed",
-  "Car",
-  "Camping",
-  "Hiking",
-  "Biking",
-  "House",
-  "Beach",
-  "Mountain",
-  "Park",
-  "Fuel",
-  "Hospital",
-  "Pharmacy",
-  "Supermarket",
-  "Restaurant",
-  "Bar",
-  "Cafe",
-  "Church",
-  "Folder",
-  "MapPin",
-  "Compass",
-  "Map",
-  "MapPinLine",
-  "Pizza",
-  "Burger",
-  "Sandwich",
-  "IceCream",
-  "Hiking",
-  "Walking",
-  "Biking",
-  "Swimming",
-  "Sightseeing",
-  "Theater",
-  "Concert",
-  "Festival",
-  "Shopping",
-  "Golf",
-  "Tennis",
-  "Soccer",
-  "Football",
-  "Basketball",
-  "Volleyball",
-  "Fishing",
-  "Hotel",
-  "Motel",
-  "House",
-  "Cabin",
-  "Camping",
-  "Bed",
-  "Train",
-  "Car",
-  "Taxi",
-  "Plane",
-  "Ferry",
-  "Motorbike",
-  "Bicyle",
-  "Bus",
-] as const;

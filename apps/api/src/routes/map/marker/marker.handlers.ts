@@ -7,6 +7,7 @@ import { getAuth } from "@hono/clerk-auth";
 import { and, eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { createMarker, editMarker } from "./marker.routes";
+import type { IconType } from "@buzztrip/db/types";
 
 export const createMarkerHandler: AppRouteHandler<typeof createMarker> = async (
   c
@@ -46,7 +47,7 @@ export const createMarkerHandler: AppRouteHandler<typeof createMarker> = async (
       const newLocation: NewLocation = {
         ...newMarker.marker,
         location_id: locationId,
-        icon: newMarker.marker.icon as IconName,
+        icon: newMarker.marker.icon as IconType,
       };
       await tx.insert(locations).values(newLocation);
     }
