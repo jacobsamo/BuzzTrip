@@ -1,6 +1,7 @@
 import { createMarker } from "@/actions/map/marker/create-marker";
 import { updateMarker } from "@/actions/map/marker/edit-marker";
-import { IconName, popularIconsList } from "@buzztrip/components/icon";
+import {  popularIconsList } from "@buzztrip/components/icon";
+import type { IconType } from "@buzztrip/db/types";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -429,7 +430,7 @@ function MarkerForm() {
                     variant="ghost"
                   >
                     {isChecked ? <CircleCheck /> : <Circle />}
-                    <Icon name={collection.icon as IconName} size={32} />
+                    <Icon name={collection.icon as IconType} size={32} />
                     <div className="flex-col">
                       <h2>{collection.title}</h2>
                       {/* <p>

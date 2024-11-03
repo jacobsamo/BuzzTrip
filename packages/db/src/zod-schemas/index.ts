@@ -11,7 +11,7 @@ import {
   locations,
 } from "../schema";
 import * as z from "zod";
-import { readOnlyIconsArray } from "@buzztrip/components/icon";
+import { iconsList } from "../types";
 
 // Custom schemas
 export const reviewsSchema = z.object({
@@ -33,7 +33,7 @@ export const latlng = z.object({
   lat: z.number(),
   lng: z.number(),
 });
-const iconSchema = z.enum(readOnlyIconsArray);
+const iconSchema = z.enum(iconsList);
 
 export const boundsSchema = z.union([bounds, latlng]);
 

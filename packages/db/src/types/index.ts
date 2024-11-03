@@ -17,6 +17,8 @@ import {
   userMapsSchema,
 } from "../zod-schemas";
 
+export * from "./icons";
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 

@@ -1,6 +1,6 @@
 "use server";
 import { authAction } from "@/actions/safe-action";
-import { IconName } from "@buzztrip/components/icon";
+import type { IconType } from "@buzztrip/db/types";
 import { db } from "@/server/db";
 import { getMarkersView } from "@buzztrip/db/queries";
 import { collection_markers, locations, markers } from "@buzztrip/db/schema";
@@ -44,7 +44,7 @@ export const createMarker = authAction
         const newLocation: NewLocation = {
           ...params.marker,
           location_id: locationId,
-          icon: params.marker.icon as IconName,
+          icon: params.marker.icon as IconType,
         };
         await tx.insert(locations).values(newLocation);
       }
@@ -52,7 +52,7 @@ export const createMarker = authAction
       await tx.insert(markers).values({
         ...params.marker,
         marker_id: id,
-        icon: params.marker.icon as IconName,
+        icon: params.marker.icon as IconType,
         created_by: ctx.user.id,
         location_id: locationId,
       });

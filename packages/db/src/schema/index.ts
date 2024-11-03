@@ -1,4 +1,4 @@
-import { IconName } from "@buzztrip/components/icon";
+import type { IconType } from "../types";
 import { Bounds, Review } from "../types";
 import { eq, sql } from "drizzle-orm";
 import {
@@ -50,7 +50,7 @@ export const markers = sqliteTable("markers", {
     .notNull()
     .references(() => users.user_id),
   created_at: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
-  icon: text("icon").$type<IconName>().notNull(),
+  icon: text("icon").$type<IconType>().notNull(),
   color: text("color"),
   location_id: text("location_id").references(() => locations.location_id),
   map_id: text("map_id").references(() => maps.map_id),
@@ -68,7 +68,7 @@ export const locations = sqliteTable("locations", {
   bounds: text("bounds", { mode: "json" }).notNull().$type<Bounds | null>(),
   address: text("address"),
   gm_place_id: text("gm_place_id"),
-  icon: text("icon").$type<IconName>().notNull(),
+  icon: text("icon").$type<IconType>().notNull(),
   photos: text("photos", { mode: "json" }).$type<string[] | null>(),
   reviews: text("reviews", { mode: "json" }).$type<Review[] | null>(),
   rating: real("rating"),
@@ -95,7 +95,7 @@ export const collections = sqliteTable("collections", {
     .notNull()
     .references(() => users.user_id),
   created_at: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
-  icon: text("icon").$type<IconName>().notNull(),
+  icon: text("icon").$type<IconType>().notNull(),
   color: text("color"),
 });
 

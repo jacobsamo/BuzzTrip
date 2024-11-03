@@ -1,4 +1,5 @@
-import { IconName, type IconProps } from "@buzztrip/components/icon";
+import type { IconProps } from "@buzztrip/components/icon";
+import type { IconType } from "@buzztrip/db/types";
 import { CombinedMarker, Marker } from "@buzztrip/db/types";
 import { lazy } from "react";
 
@@ -22,7 +23,7 @@ const MarkerPin = ({
       style={{ backgroundColor: marker?.color ?? backgroundColor }}
     >
       <Icon
-        name={(marker?.icon as IconName) ?? name}
+        name={(marker?.icon as IconType) ?? name}
         color="#fff"
         size={size}
       />

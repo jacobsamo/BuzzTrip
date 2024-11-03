@@ -1,7 +1,7 @@
 {
-  "extends": "@buzztrip/tsconfig/react-library.json",
+  "extends": "@buzztrip/tsconfig/base.json",
   "compilerOptions": {
-    "jsx": "react",
+    "jsx": "react"
   },
   "include": ["."],
   "exclude": ["dist", "build", "node_modules"]

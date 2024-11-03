@@ -11,16 +11,16 @@ import Icon, {
     accommodationIconsList,
     activitiesIconsList,
     foodIconsList,
-    IconName,
     placesIconsList,
     popularIconsList,
     transportIconsList,
 } from "@buzztrip/components/icon";
+import type { IconType } from "@buzztrip/db/types";
 import { Button } from "../ui/button";
 
 interface IconPickerModalProps {
-  selectedIcon: IconName;
-  setSelectedIcon: (icon: IconName) => void;
+  selectedIcon: IconType;
+  setSelectedIcon: (icon: IconType) => void;
 }
 
 const IconPickerModal = ({

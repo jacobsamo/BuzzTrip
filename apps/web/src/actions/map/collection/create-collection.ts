@@ -1,6 +1,6 @@
 "use server";
 import { authAction } from "@/actions/safe-action";
-import { IconName } from "@buzztrip/components/icon";
+import type { IconType } from "@buzztrip/db/types";
 import { db } from "@/server/db";
 import { collections } from "@buzztrip/db/schema";
 import { NewCollection } from "@buzztrip/db/types";
@@ -16,7 +16,7 @@ export const createCollection = authAction
   .action(async ({ parsedInput: params, ctx }) => {
     const newCollection: NewCollection = {
       ...params,
-      icon: params.icon as IconName,
+      icon: params.icon as IconType,
       created_by: ctx.user.id,
     };
 
