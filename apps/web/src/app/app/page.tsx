@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 export default async function MapPage() {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     return notFound();

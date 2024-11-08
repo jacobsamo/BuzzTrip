@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Layers, MapPin, Palette, Search, Tag, Users } from "lucide-react";
@@ -19,7 +19,7 @@ export default function LandingPage() {
           />
           <span className="ml-2 text-2xl font-bold">BuzzTrip</span>
         </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
+        <nav className="ml-auto flex items-center gap-4 sm:gap-6">
           <Link
             className="text-sm font-medium underline-offset-4 hover:underline"
             href="#features"
@@ -30,8 +30,10 @@ export default function LandingPage() {
             <SignedOut>
               <SignInButton />
             </SignedOut>
-            <SignedIn>
-              <UserButton />
+            <SignedIn >
+              <Link href={"/app"} className={buttonVariants({ variant: "link" })}>
+                Go To app
+              </Link>
             </SignedIn>
           </div>
           {/* <Link
@@ -157,7 +159,7 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
-{/* 
+        {/* 
         <section id="testimonials" className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
             <h2 className="mb-12 text-center text-3xl font-bold tracking-tighter sm:text-5xl">

@@ -7,8 +7,7 @@
     "sherif": "bunx sherif@latest -p ./apps/mobile",
     "lint": "turbo lint && bun sherif",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md,mdx}\"",
-    "turbo:clean:all": "turbo run clean:all",
-    "clean:all": "rm -rf node_modules/ && bun turbo",
+    "clean:all": "turbo run clean:all",
     "update": "bun update --latest && cd ./packages/db && bun update --latest && cd ../eslint-config && bun update --latest && cd ../tsconfig && bun update --latest&& cd ../tailwind-config && bun update --latest&& cd ../../apps/api && bun update --latest&& cd ../mobile && bun update --latest&& cd ../web && bun update --latest&& cd ../.."
   },
   "devDependencies": {

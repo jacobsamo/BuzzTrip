@@ -111,7 +111,7 @@ export const createStore = (initState: Partial<StoreState>) =>
 
         const updatedMarkers = Array.from(prevMarkersMap.values());
 
-        return { markers: updatedMarkers };
+        return { markers: updatedMarkers, searchValue: null, activeLocation: null };
       });
     },
     setRoute: (route: Route[] | null) => {

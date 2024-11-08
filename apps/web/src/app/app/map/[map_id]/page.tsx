@@ -1,7 +1,7 @@
 import Map from "@/components/layouts/map/map-view";
 import { MapStoreProvider } from "@/components/providers/map-state-provider";
 import { db } from "@/server/db";
-import { getMarkersView } from "@buzztrip/db/queries";
+import { getAllMapData, getMarkersView } from "@buzztrip/db/queries";
 import {
   collection_markers,
   collections,
@@ -37,26 +37,14 @@ export default async function MapPage({
 }: {
   params: { map_id: string };
 }) {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId || !params.map_id) {
     return notFound();
   }
 
   const [foundCollections, collectionMarkers, foundMarkers, sharedMap, map] =
-    await Promise.all([
-      db
-        .select()
-        .from(collections)
-        .where(eq(collections.map_id, params.map_id)),
-      db
-        .select()
-        .from(collection_markers)
-        .where(eq(collection_markers.map_id, params.map_id)),
-      getMarkersView(db, params.map_id),
-      db.select().from(map_users).where(eq(map_users.map_id, params.map_id)),
-      db.select().from(maps).where(eq(maps.map_id, params.map_id)),
-    ]);
+    await getAllMapData(db, params.map_id);
 
   // const mapData = await db.query.maps.findFirst({
   //   with: {

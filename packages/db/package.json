@@ -25,6 +25,7 @@
     "./schema": "./src/schema/index.ts",
     "./zod-schemas": "./src/zod-schemas/index.ts",
     "./queries": "./src/queries/index.ts",
+    "./cached-queries": "./src/queries/cached-queries.ts",
     "./types": "./src/types/index.ts"
   }
 }
