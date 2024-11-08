@@ -6,6 +6,77 @@ import { useCallback, useEffect, useState } from "react";
 // import { Command, CommandItem, CommandList, CommandEmpty } from "@/components/ui/command";
 import { Command } from "cmdk";
 
+interface DetailsRequestCallbackReturn {
+  placeDetails: google.maps.places.PlaceResult;
+  location: CombinedMarker;
+  bounds: google.maps.LatLngBounds;
+}
+
+export const detailsRequestCallback = (
+  map: google.maps.Map,
+  placeDetails: google.maps.places.PlaceResult | null
+): DetailsRequestCallbackReturn | null => {
+  if (
+    placeDetails == null ||
+    !placeDetails.geometry ||
+    !placeDetails.geometry.location
+  ) {
+    console.warn("Returned place contains no geometry");
+    return null;
+  }
+
+  let bounds = new google.maps.LatLngBounds();
+
+  if (placeDetails.geometry.viewport) {
+    bounds.union(placeDetails.geometry.viewport);
+    map!.fitBounds(placeDetails.geometry.viewport);
+  } else {
+    bounds.extend(placeDetails.geometry.location);
+    map!.setCenter(placeDetails.geometry.location);
+    map!.setZoom(8);
+  }
+
+  const location: CombinedMarker = {
+    marker_id: undefined,
+    note: null,
+    collection_id: null,
+    color: null,
+    gm_place_id: placeDetails.place_id ?? null,
+    lat: placeDetails.geometry.location.lat(),
+    lng: placeDetails.geometry.location.lng(),
+    bounds: bounds.toJSON(),
+    icon: "MapPin",
+    title: placeDetails.name
+      ? placeDetails.name
+      : `${placeDetails.geometry.location.lat()}, ${placeDetails.geometry.location.lng()}`,
+    description: placeDetails?.html_attributions?.[0] ?? null,
+    address: placeDetails.formatted_address ?? null,
+    photos: placeDetails?.photos?.map((photo) => photo.getUrl({})) ?? null,
+    reviews:
+      placeDetails?.reviews?.map((review) => {
+        return {
+          author_name: review.author_name,
+          author_url: review.author_url ?? null,
+          profile_photo_url: review.profile_photo_url,
+          rating: review.rating ?? null,
+          description: review.text,
+        };
+      }) ?? null,
+    rating: placeDetails.rating ?? null,
+    avg_price: placeDetails.price_level ?? null,
+    types: placeDetails.types ?? null,
+    website: placeDetails.website ?? null,
+    phone: placeDetails.formatted_phone_number ?? null,
+    opening_times: placeDetails.opening_hours?.weekday_text ?? null,
+  };
+
+  return {
+    placeDetails,
+    location,
+    bounds,
+  };
+};
+
 export const AutocompleteCustomInput = () => {
   const map = useMap();
   const places = useMapsLibrary("places");
@@ -100,75 +171,18 @@ export const AutocompleteCustomInput = () => {
         sessionToken,
       };
 
-      const detailsRequestCallback = (
-        placeDetails: google.maps.places.PlaceResult | null
-      ) => {
-        if (
-          placeDetails == null ||
-          !placeDetails.geometry ||
-          !placeDetails.geometry.location
-        ) {
-          console.warn("Returned place contains no geometry");
-          return;
+      placesService?.getDetails(detailRequestOptions, (data) => {
+        const res = detailsRequestCallback(map!, data);
+        if (res) {
+          setActiveLocation(res.location);
+          setSearchValue(
+            res.placeDetails?.name ?? res.placeDetails?.formatted_address ?? ""
+          );
+          setPredictionResults([]);
+          setSessionToken(new places.AutocompleteSessionToken());
         }
-
-        let bounds = new google.maps.LatLngBounds();
-
-        if (placeDetails.geometry.viewport) {
-          bounds.union(placeDetails.geometry.viewport);
-          map!.fitBounds(placeDetails.geometry.viewport);
-        } else {
-          bounds.extend(placeDetails.geometry.location);
-          map!.setCenter(placeDetails.geometry.location);
-          map!.setZoom(8);
-        }
-
-        const location: CombinedMarker = {
-          marker_id: undefined,
-          note: null,
-          collection_id: null,
-          color: null,
-          gm_place_id: placeDetails.place_id ?? null,
-          lat: placeDetails.geometry.location.lat(),
-          lng: placeDetails.geometry.location.lng(),
-          bounds: bounds.toJSON(),
-          icon: "MapPin",
-          title: placeDetails.name
-            ? placeDetails.name
-            : `${placeDetails.geometry.location.lat()}, ${placeDetails.geometry.location.lng()}`,
-          description: placeDetails?.html_attributions?.[0] ?? null,
-          address: placeDetails.formatted_address ?? null,
-          photos:
-            placeDetails?.photos?.map((photo) => photo.getUrl({})) ?? null,
-          reviews:
-            placeDetails?.reviews?.map((review) => {
-              return {
-                author_name: review.author_name,
-                author_url: review.author_url ?? null,
-                profile_photo_url: review.profile_photo_url,
-                rating: review.rating ?? null,
-                description: review.text,
-              };
-            }) ?? null,
-          rating: placeDetails.rating ?? null,
-          avg_price: placeDetails.price_level ?? null,
-          types: placeDetails.types ?? null,
-          website: placeDetails.website ?? null,
-          phone: placeDetails.formatted_phone_number ?? null,
-          opening_times: placeDetails.opening_hours?.weekday_text ?? null,
-        };
-
-        setActiveLocation(location);
-        setSearchValue(
-          placeDetails?.name ?? placeDetails?.formatted_address ?? ""
-        );
-        setPredictionResults([]);
-        setSessionToken(new places.AutocompleteSessionToken());
-
         setFetchingData(false);
-      };
-
-      placesService?.getDetails(detailRequestOptions, detailsRequestCallback);
+      });
     },
     [
       map,
@@ -213,6 +227,7 @@ export const AutocompleteCustomInput = () => {
                 onClick={() => {
                   setSearchValue("");
                   setPredictionResults([]);
+                  setActiveLocation(null);
                 }}
               >
                 <X className="h-5 w-5" />

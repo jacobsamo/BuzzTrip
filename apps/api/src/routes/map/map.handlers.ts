@@ -1,11 +1,9 @@
 import { AppRouteHandler } from "@/common/types";
 import { createDb } from "@buzztrip/db";
-import { getMarkersView } from "@buzztrip/db/queries";
+import { getAllMapData } from "@buzztrip/db/queries";
 import {
-  collection_markers,
-  collections,
   map_users,
-  maps,
+  maps
 } from "@buzztrip/db/schema";
 import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
@@ -40,16 +38,7 @@ export const getMapDataHandler: AppRouteHandler<
   const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
   const [foundCollections, collectionMarkers, foundMarkers, sharedMap, map] =
-    await Promise.all([
-      db.select().from(collections).where(eq(collections.map_id, mapId)),
-      db
-        .select()
-        .from(collection_markers)
-        .where(eq(collection_markers.map_id, mapId)),
-      getMarkersView(db, mapId),
-      db.select().from(map_users).where(eq(map_users.map_id, mapId)),
-      db.select().from(maps).where(eq(maps.map_id, mapId)),
-    ]);
+    await getAllMapData(db, mapId);
 
   return c.json(
     {
