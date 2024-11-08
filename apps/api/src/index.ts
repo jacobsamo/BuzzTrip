@@ -1,7 +1,7 @@
 import { clerkMiddleware } from "@hono/clerk-auth";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { requestId } from "hono/request-id";
-import { Bindings } from "hono/types";
+import { Bindings } from "./common/bindings";
 import {
   authMiddleware,
   loggingMiddleware,
@@ -25,7 +25,12 @@ app.use("*", requestId());
 app.use(authMiddleware);
 app.use(securityMiddleware);
 app.use(loggingMiddleware);
-app.use("*", clerkMiddleware());
+app.use("*", async (c, next) => {
+  return clerkMiddleware({
+    publishableKey: c.env.CLERK_PUBLISHABLE_KEY,
+    secretKey: c.env.CLERK_SECRET_KEY,
+  })(c, next);
+});
 
 app.get("/health", (c) => {
   return c.json({ status: "ok" });

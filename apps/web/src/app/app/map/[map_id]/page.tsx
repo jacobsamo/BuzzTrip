@@ -21,12 +21,6 @@ export async function generateMetadata({
     where: eq(maps.map_id, params.map_id),
   });
 
-  // return constructMetadata({
-  //   title: map?.title,
-  //   description: map?.description || undefined,
-  //   // image: map?.image ?? "",
-  //   url: `https://buzztrip.co/app/map/${map?.uid}`,
-  // });
   return {
     title: map?.title,
   };
@@ -45,15 +39,6 @@ export default async function MapPage({
 
   const [foundCollections, collectionMarkers, foundMarkers, sharedMap, map] =
     await getAllMapData(db, params.map_id);
-
-  // const mapData = await db.query.maps.findFirst({
-  //   with: {
-  //     collection_markers: true,
-  //     map_users: true,
-  //     markers: true,
-  //     collections: true,
-  //   }
-  // })
 
   if (
     sharedMap &&
