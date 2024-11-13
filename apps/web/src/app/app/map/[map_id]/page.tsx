@@ -1,4 +1,6 @@
-import Map from "@/components/layouts/map/map-view";
+// import Map from "@/components/layouts/map/map-view";
+import { Map_page } from "@/components/layouts/map-new";
+import MapView from "@/components/layouts/map-new/map";
 import { MapStoreProvider } from "@/components/providers/map-state-provider";
 import { db } from "@/server/db";
 import { getAllMapData, getMarkersView } from "@buzztrip/db/queries";
@@ -63,7 +65,7 @@ export default async function MapPage({
         mapUsers: sharedMap,
       }}
     >
-      <Map />
+      <Map_page />
     </MapStoreProvider>
   );
 }
