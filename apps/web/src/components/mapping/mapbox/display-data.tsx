@@ -1,7 +1,7 @@
 "use client";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { useMap, Marker } from "react-map-gl";
-import MarkerPin from "../map/marker_pin";
+import MarkerPin from "../google-maps/marker_pin";
 
 const DisplayMapData = () => {
   const { current: map } = useMap();
