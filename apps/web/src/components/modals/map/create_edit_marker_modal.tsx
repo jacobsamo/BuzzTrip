@@ -379,7 +379,7 @@ function MarkerForm() {
 
               return (
                 <FormItem>
-                  <FormLabel>Color</FormLabel>
+                  <FormLabel>Icon</FormLabel>
                   <FormControl>
                     <div className="flex flex-wrap gap-2">
                       {popularIconsList.map((icon, index) => (

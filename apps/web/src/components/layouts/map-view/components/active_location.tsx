@@ -2,7 +2,7 @@ import { useMapStore } from "@/components/providers/map-state-provider";
 import { BookmarkCheck } from "lucide-react";
 import Image from "next/image";
 import { lazy } from "react";
-import OpenMarkerButton from "./open-marker";
+import OpenMarkerButton from "../../../mapping/google-maps/open-marker";
 
 const Icon = lazy(() => import("@buzztrip/components/icon"));
 

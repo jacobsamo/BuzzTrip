@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import CollectionModal from "@/components/modals/map/create_edit_collection_modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import ActiveLocation from "./active_location";
+import ActiveLocation from "../../layouts/map-view/components/active_location";
 import CollectionsView from "./collections-view";
 import MarkerModal from "@/components/modals/map/create_edit_marker_modal";
 
@@ -28,7 +28,7 @@ const MainView = () => {
         id="content"
         className="mb-4 flex w-full flex-col items-start justify-between"
       >
-        { !activeLocation && (
+        {!activeLocation && (
           <>
             {/* <h2 className="text-lg font-bold">{map!.title}</h2> */}
             <div className="inline-flex items-center gap-2">
@@ -54,7 +54,7 @@ const MainView = () => {
           </ScrollArea>
         )}
 
-        {(activeLocation) && (
+        {activeLocation && (
           <Button
             onClick={() => {
               setActiveLocation(null);

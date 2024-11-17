@@ -1,9 +1,9 @@
 "use client";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { env } from "env";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import { Map, MapProvider, Marker } from "react-map-gl";
-import MarkerPin from "../map/marker_pin";
+import MarkerPin from "../google-maps/marker_pin";
 import "mapbox-gl/dist/mapbox-gl.css";
 import DisplayMapData from "./display-data";
 
@@ -26,25 +26,23 @@ const MapView = () => {
     };
   }, []);
 
-  console.log("env", env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN);
-
   return (
     <MapProvider>
-        <Map
-          initialViewState={{
-            latitude: mapOptions.center.lat,
-            longitude: mapOptions.center.lng,
-            zoom: mapOptions.zoom,
-          }}
-          reuseMaps
-          accessToken={env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-          mapboxAccessToken={env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-          mapStyle="mapbox://styles/mapbox/streets-v9"
-        >
-          <DisplayMapData />
-        </Map>
+      <Map
+        initialViewState={{
+          latitude: mapOptions.center.lat,
+          longitude: mapOptions.center.lng,
+          zoom: mapOptions.zoom,
+        }}
+        reuseMaps
+        mapboxAccessToken={env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
+        mapStyle="mapbox://styles/mapbox/streets-v9"
+        style={{ width: "100%", height: "100%" }}
+      >
+        <DisplayMapData />
+      </Map>
     </MapProvider>
   );
 };
 
-export default MapView;
+export default memo(MapView);
