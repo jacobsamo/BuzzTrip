@@ -111,7 +111,11 @@ export const createStore = (initState: Partial<StoreState>) =>
 
         const updatedMarkers = Array.from(prevMarkersMap.values());
 
-        return { markers: updatedMarkers, searchValue: null, activeLocation: null };
+        return {
+          markers: updatedMarkers,
+          searchValue: null,
+          activeLocation: null,
+        };
       });
     },
     setRoute: (route: Route[] | null) => {
@@ -213,7 +217,13 @@ export const createStore = (initState: Partial<StoreState>) =>
 
     // Modals
     setActiveLocation: (location: CombinedMarker | null) =>
-      set(() => ({ activeLocation: location, snap: 0.5 })),
+      set(() => {
+        if (location) {
+          return { activeLocation: location, snap: 0.5 };
+        }
+
+        return { activeLocation: null, snap: 0.1, searchValue: null };
+      }),
     setCollectionsOpen: (open: boolean) =>
       set(() => ({ collectionsOpen: open })),
     setSearchValue: (value: string | null) =>
