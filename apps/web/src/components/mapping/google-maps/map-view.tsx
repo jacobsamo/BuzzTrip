@@ -18,11 +18,12 @@ import MapDrawer from "./map-drawer";
 import MapSideBar from "./map-sidebar";
 import { AutocompleteCustomInput, detailsRequestCallback } from "./search";
 import InfoBox from "./info-window";
+import DisplayMarkerInfo from "./display-marker-info";
+import Icon from "@buzztrip/components/icon";
 
 const MarkerPin = lazy(() => import("./marker_pin"));
 
 const Mapview = () => {
-  const [markerRef, marker] = useAdvancedMarkerRef();
   const map = useMap();
   const places = useMapsLibrary("places");
   const isMediumDevice = useMediaQuery("only screen and (min-width : 769px)");
@@ -45,39 +46,49 @@ const Mapview = () => {
   }, []);
 
   async function handleMapClick(e: MapMouseEvent) {
+
+    console.log("click event", e)
     if (!places || !map) return;
     e.domEvent?.stopPropagation();
+    e.stop()
     const placesService = new places.PlacesService(map);
 
-    const requestOptions: google.maps.places.PlaceDetailsRequest = {
-      placeId:
-        e.detail.placeId || `${e.detail.latLng?.lat}, ${e.detail.latLng?.lng}`,
-      fields: [
-        "geometry",
-        "name",
-        "formatted_address",
-        "place_id",
-        "photos",
-        "rating",
-        "price_level",
-        "types",
-        "website",
-        "formatted_phone_number",
-        "opening_hours",
-        "reviews",
-      ],
-    };
+    if (e.detail.placeId) {
 
-    placesService.getDetails(requestOptions, (data) => {
-      const res = detailsRequestCallback(map!, data);
-      console.log("res", res);
-      if (res) {
-        setActiveLocation(res.location);
-        setSearchValue(
-          res.placeDetails?.name ?? res.placeDetails?.formatted_address ?? ""
-        );
-      }
-    });
+      const requestOptions: google.maps.places.PlaceDetailsRequest = {
+        placeId:
+          e.detail.placeId || `${e.detail.latLng?.lat}, ${e.detail.latLng?.lng}`,
+        fields: [
+          "geometry",
+          "name",
+          "formatted_address",
+          "place_id",
+          "photos",
+          "rating",
+          "price_level",
+          "types",
+          "website",
+          "formatted_phone_number",
+          "opening_hours",
+          "reviews",
+        ],
+      };
+
+      placesService.getDetails(requestOptions, (data) => {
+        const res = detailsRequestCallback(map!, data);
+        console.log("res", res);
+        if (res) {
+          setActiveLocation(res.location);
+          setSearchValue(
+            res.placeDetails?.name ?? res.placeDetails?.formatted_address ?? ""
+          );
+        }
+      });
+    }
+
+    if (e.detail.latLng) {
+
+    }
   }
 
   return (
@@ -90,6 +101,7 @@ const Mapview = () => {
         disableDefaultUI={true}
         onClick={(e) => handleMapClick(e)}
         gestureHandling="greedy"
+        reuseMaps
       >
         {activeLocation && (
           // !markers?.some(
@@ -98,23 +110,7 @@ const Mapview = () => {
           //     marker.lng === activeLocation.lng
           // ) &&
           <>
-            <AdvancedMarker
-              ref={markerRef}
-              key={activeLocation.title}
-              position={{
-                lat: activeLocation.lat,
-                lng: activeLocation.lng,
-              }}
-            >
-              <Pin />
-            </AdvancedMarker>
-            <InfoBox
-              position={{
-                lat: activeLocation.lat,
-                lng: activeLocation.lng,
-              }}
-              activeLocation={activeLocation}
-            />
+            <DisplayMarkerInfo location={activeLocation} />
           </>
         )}
 
