@@ -35,11 +35,13 @@ import { toast } from "sonner";
 export interface MapModalProps {
   mode?: "create" | "edit";
   map?: Map | null;
+  setMap: (map: Map | null) => void;
 }
 
 export default function MapModal({
   mode = "create",
   map = null,
+  setMap,
 }: MapModalProps) {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -59,7 +61,7 @@ export default function MapModal({
             </DialogTitle>
             <DialogDescription>Start your travel plans here</DialogDescription>
           </DialogHeader>
-          <MapForm mode={mode} map={map} />
+          <MapForm mode={mode} map={map} setMap={setMap} />
         </DialogContent>
       </Dialog>
     );
@@ -77,7 +79,7 @@ export default function MapModal({
           <DrawerTitle>{mode == "create" ? "Create" : "Edit"} Map</DrawerTitle>
           <DrawerDescription>Start your travel plans here</DrawerDescription>
         </DrawerHeader>
-        <MapForm mode={mode} map={map} />
+        <MapForm mode={mode} map={map} setMap={setMap} />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -88,7 +90,7 @@ export default function MapModal({
   );
 }
 
-function MapForm({ mode, map }: MapModalProps) {
+function MapForm({ mode, map, setMap }: MapModalProps) {
   // const places = useMapsLibrary("places");
   // const [searchValue, setSearchValue] = useState("");
   // const locationInputRef = useRef<HTMLInputElement>(null);
@@ -126,9 +128,15 @@ function MapForm({ mode, map }: MapModalProps) {
 
         toast.promise(create, {
           loading: "Creating map...",
-          success: "Map created successfully!",
+          success: (data) => {
+            if (data?.data?.map) {
+              setMap(data.data.map);
+            }
+            return "Map created successfully!";
+          },
           error: "Failed to create map",
         });
+
       }
 
       // if (mode === "edit" && map) {
