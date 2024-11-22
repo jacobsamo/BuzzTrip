@@ -26,15 +26,15 @@ export const createStore = (initState: Partial<StoreState>) =>
         const prevCollectionMarkersMap = prevCollectionMarkers
           ? new Map(
               prevCollectionMarkers.map((collectionMarker) => [
-                collectionMarker.collection_id,
+                collectionMarker.link_id,
                 collectionMarker,
               ])
             )
           : new Map();
 
         collectionMarkers.forEach((collectionMarker) => {
-          prevCollectionMarkersMap.set(collectionMarker.collection_id, {
-            ...prevCollectionMarkersMap.get(collectionMarker.collection_id),
+          prevCollectionMarkersMap.set(collectionMarker.link_id, {
+            ...prevCollectionMarkersMap.get(collectionMarker.link_id),
             ...collectionMarker,
           });
         });
