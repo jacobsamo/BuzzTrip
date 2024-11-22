@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { Map } from "@buzztrip/db/types";
+import { Map, UserMap } from "@buzztrip/db/types";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Plus } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";

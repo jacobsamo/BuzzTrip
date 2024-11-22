@@ -1,14 +1,8 @@
 "use client";
-import React, { useState } from "react";
 import MapCard from "@/components/map-card";
 import MapModal from "@/components/modals/create_edit_map_modal";
-import { db } from "@/server/db";
-import { getUserMaps } from "@buzztrip/db/queries";
-import { maps, map_users } from "@buzztrip/db/schema";
-import { auth } from "@clerk/nextjs/server";
-import { eq } from "drizzle-orm";
-import { notFound } from "next/navigation";
 import { UserMap } from "@buzztrip/db/types";
+import { useState } from "react";
 
 interface UserMapsProps {
   userId: string;
@@ -17,6 +11,11 @@ interface UserMapsProps {
 
 const UserMaps = ({ userId, usersMaps }: UserMapsProps) => {
   const [maps, setMaps] = useState<UserMap[] | null>(usersMaps);
+
+  console.log("iuser maps", {
+    userId,
+    usersMaps,
+  });
 
   return (
     <>
@@ -27,11 +26,27 @@ const UserMaps = ({ userId, usersMaps }: UserMapsProps) => {
             Create, edit, and share your custom maps with ease.
           </p>
         </div>
-        <MapModal setMap={(map) => setMaps((prev) => [...prev, map])} />
+        <MapModal
+          setMap={(map) => {
+            if (map) {
+              const newMap: UserMap = {
+                title: map.title,
+                description: map.description,
+                map_id: map.map_id,
+                owner_id: map.owner_id,
+                image: map.image,
+                user_id: map.owner_id,
+                permission: "owner",
+              };
+              setMaps((prev) => (prev ? [...prev, newMap] : [newMap]));
+            }
+            return;
+          }}
+        />
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {maps.map((map) => (
+        {maps && maps.map((map) => (
           <MapCard
             key={map.map_id}
             map={{
