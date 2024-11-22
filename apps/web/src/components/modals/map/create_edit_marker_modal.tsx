@@ -1,16 +1,12 @@
 import { createMarker } from "@/actions/map/marker/create-marker";
 import { updateMarker } from "@/actions/map/marker/edit-marker";
-import {  popularIconsList } from "@buzztrip/components/icon";
-import type { IconType } from "@buzztrip/db/types";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  DialogTitle
 } from "@/components/ui/dialog";
 import {
   Drawer,
@@ -18,8 +14,7 @@ import {
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
+  DrawerTitle
 } from "@/components/ui/drawer";
 import {
   Form,
@@ -34,11 +29,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { popularIconsList } from "@buzztrip/components/icon";
+import type { IconType } from "@buzztrip/db/types";
 import { CombinedMarker } from "@buzztrip/db/types";
 import { combinedMarkersSchema } from "@buzztrip/db/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "@uidotdev/usehooks";
-import { Circle, CircleCheck, Edit, Plus } from "lucide-react";
+import { Circle, CircleCheck } from "lucide-react";
 import Image from "next/image";
 import * as React from "react";
 import { lazy, useEffect } from "react";
@@ -132,9 +129,9 @@ function MarkerForm() {
     map,
     markers,
     getCollectionsForMarker,
-    setCollectionMarkers,
-    removeCollectionMarkers,
-    collectionMarkers,
+    setCollectionLinks,
+    removeCollectionLinks,
+    collectionLinks,
     setMarkerOpen,
     markerOpen,
   } = useMapStore((store) => store);
@@ -228,10 +225,10 @@ function MarkerForm() {
 
         if (res && res.data) {
           if (res.data.collectionLinksDeleted) {
-            removeCollectionMarkers(res.data.collectionLinksDeleted);
+            removeCollectionLinks(res.data.collectionLinksDeleted);
           }
           if (res.data.collectionLinksCreated) {
-            setCollectionMarkers(res.data.collectionLinksCreated);
+            setCollectionLinks(res.data.collectionLinksCreated);
           }
           if (res.data.marker) {
             setMarkers([
@@ -261,7 +258,7 @@ function MarkerForm() {
           success: (data) => {
             if (data && data.data) {
               setMarkers(data.data.markers);
-              setCollectionMarkers(data.data.collectionLinks);
+              setCollectionLinks(data.data.collectionLinks);
             }
             return "Marker created successfully!";
           },

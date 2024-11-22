@@ -6,6 +6,7 @@ export function Map_page() {
   return (
     <SidebarProvider
       style={{
+        // @ts-ignore
         "--sidebar-width": "20rem",
         "--sidebar-width-mobile": "20rem",
       }}

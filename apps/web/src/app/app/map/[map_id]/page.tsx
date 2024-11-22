@@ -5,7 +5,7 @@ import { MapStoreProvider } from "@/components/providers/map-state-provider";
 import { db } from "@/server/db";
 import { getAllMapData, getMarkersView } from "@buzztrip/db/queries";
 import {
-  collection_markers,
+  collection_links,
   collections,
   map_users,
   maps,
@@ -39,7 +39,7 @@ export default async function MapPage({
     return notFound();
   }
 
-  const [foundCollections, collectionMarkers, foundMarkers, sharedMap, map] =
+  const [foundCollections, collectionLinks, foundMarkers, sharedMap, map] =
     await getAllMapData(db, params.map_id);
 
   if (
@@ -60,7 +60,7 @@ export default async function MapPage({
           lng: marker.lng as number,
           bounds: marker.bounds ?? null,
         })),
-        collectionMarkers: collectionMarkers,
+        collectionLinks: collectionLinks,
         map: map[0] ?? null,
         mapUsers: sharedMap,
       }}

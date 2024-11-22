@@ -1,9 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-// import * as Accordion from "@radix-ui/react-accordion";
 import { ArrowLeft } from "lucide-react";
-// import CollectionCard from "../collection_card";
-import CollectionModal from "@/components/modals/map/create_edit_collection_modal";
 import MarkerModal from "@/components/modals/map/create_edit_marker_modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import ActiveLocation from "./active_location";

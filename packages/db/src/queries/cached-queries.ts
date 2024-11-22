@@ -1,6 +1,6 @@
 import {
   getAllMapData,
-  getCollectionMarkersForMap,
+  getCollectionLinksForMap,
   getCollectionsForMap,
   getMap,
   getMapUsers,

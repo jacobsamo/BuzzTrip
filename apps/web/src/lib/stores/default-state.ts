@@ -1,6 +1,6 @@
 import type {
   Collection,
-  CollectionMarker,
+  CollectionLink,
   CombinedMarker,
   Map,
   MapUser,
@@ -9,7 +9,7 @@ import type {
 } from "@buzztrip/db/types";
 
 export type StoreState = {
-  collectionMarkers: CollectionMarker[] | null;
+  collectionLinks: CollectionLink[] | null;
   collections: Collection[] | null;
   mapUsers: MapUser[] | null;
   map: Map | null;
@@ -30,7 +30,7 @@ export type StoreState = {
 };
 
 export type StoreActions = {
-  setCollectionMarkers: (collectionMarkers: CollectionMarker[] | null) => void;
+  setCollectionLinks: (collectionLinks: CollectionLink[] | null) => void;
   setCollections: (collections: Collection[] | null) => void;
   setMapUsers: (mapUsers: MapUser[] | null) => void;
   setMap: (maps: Map | null) => void;
@@ -41,7 +41,7 @@ export type StoreActions = {
     collectionId: string | null
   ) => CombinedMarker[] | null;
   getCollectionsForMarker: (markerId: string | null) => Collection[] | null;
-  removeCollectionMarkers: (collectionIds: string | string[]) => void;
+  removeCollectionLinks: (collectionIds: string | string[]) => void;
 
   // Modals
   setActiveLocation: (location: CombinedMarker | null) => void;
@@ -56,7 +56,7 @@ export type StoreActions = {
 };
 
 export const defaultState: StoreState = {
-  collectionMarkers: null,
+  collectionLinks: null,
   collections: null,
   mapUsers: null,
   map: null,

@@ -5,7 +5,7 @@ import GooglePlacesSearch from "@/components/Search/GooglePlacesSearch";
 import Sheet from "../Sheet";
 import {
   Collection,
-  CollectionMarker,
+  CollectionLink,
   CombinedMarker,
   Map,
   MapUser,
@@ -14,7 +14,7 @@ import {
 export interface MapViewProps {
   initState: {
     collections: Collection[] | null;
-    collectionMarkers: CollectionMarker[] | null;
+    collectionLinks: CollectionLink[] | null;
     markers: CombinedMarker[] | null;
     mapUsers: MapUser[] | null;
     map: Map;
@@ -22,7 +22,7 @@ export interface MapViewProps {
 }
 
 export default function MapViewPage({ initState }: MapViewProps) {
-  const { collectionMarkers, collections, map, markers, mapUsers } = initState;
+  const { collectionLinks, collections, map, markers, mapUsers } = initState;
   const mapRef = useRef<any>();
   const [pin, setPin] = React.useState({
     latitude: 0,

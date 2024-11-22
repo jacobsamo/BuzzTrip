@@ -1,5 +1,5 @@
 import {
-  collection_markersSchema,
+  collection_linksSchema,
   collectionsSchema,
   combinedMarkersSchema,
   map_usersSchema,
@@ -27,7 +27,7 @@ export const MapDataSchema = z
   .object({
     markers: combinedMarkersSchema.array(),
     collections: collectionsSchema.array(),
-    collection_markers: collection_markersSchema.array(),
+    collection_links: collection_linksSchema.array(),
     mapUsers: map_usersSchema.array(),
     map: mapsSchema,
   })

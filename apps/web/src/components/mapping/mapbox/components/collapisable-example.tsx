@@ -1,7 +1,5 @@
 import * as React from "react"
 import { GalleryVerticalEnd, Minus, Plus } from "lucide-react"
-
-import { SearchForm } from "@/components/search-form"
 import {
   Collapsible,
   CollapsibleContent,
@@ -181,7 +179,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <SearchForm />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

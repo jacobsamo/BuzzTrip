@@ -37,6 +37,7 @@ const UserMaps = ({ userId, usersMaps }: UserMapsProps) => {
                 image: map.image,
                 user_id: map.owner_id,
                 permission: "owner",
+                map_user_id: map.owner_id
               };
               setMaps((prev) => (prev ? [...prev, newMap] : [newMap]));
             }

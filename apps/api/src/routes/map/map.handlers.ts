@@ -1,10 +1,7 @@
 import { AppRouteHandler } from "@/common/types";
 import { createDb } from "@buzztrip/db";
 import { getAllMapData } from "@buzztrip/db/queries";
-import {
-  map_users,
-  maps
-} from "@buzztrip/db/schema";
+import { map_users, maps } from "@buzztrip/db/schema";
 import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { createMap, editMap, getMap, getMapDataRoute } from "./map.routes";
@@ -37,7 +34,7 @@ export const getMapDataHandler: AppRouteHandler<
   const { mapId } = c.req.valid("param");
   const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
-  const [foundCollections, collectionMarkers, foundMarkers, sharedMap, map] =
+  const [foundCollections, collectionLinks, foundMarkers, sharedMap, map] =
     await getAllMapData(db, mapId);
 
   return c.json(
@@ -49,7 +46,7 @@ export const getMapDataHandler: AppRouteHandler<
         bounds: marker.bounds ?? null,
       })),
       collections: foundCollections,
-      collection_markers: collectionMarkers,
+      collection_links: collectionLinks,
       mapUsers: sharedMap,
       map: map[0]!,
     },

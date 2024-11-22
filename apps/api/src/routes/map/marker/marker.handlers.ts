@@ -1,8 +1,8 @@
 import { AppRouteHandler } from "@/common/types";
 import { createDb } from "@buzztrip/db";
 import { getMarkersView } from "@buzztrip/db/queries";
-import { collection_markers, locations, markers } from "@buzztrip/db/schema";
-import { NewCollectionMarker, NewLocation } from "@buzztrip/db/types";
+import { collection_links, locations, markers } from "@buzztrip/db/schema";
+import { NewCollectionLink, NewLocation } from "@buzztrip/db/types";
 import { getAuth } from "@hono/clerk-auth";
 import { and, eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
@@ -64,15 +64,13 @@ export const createMarkerHandler: AppRouteHandler<typeof createMarker> = async (
   if (newMarker.collectionIds) {
     await Promise.all(
       newMarker.collectionIds.map(async (collectionId) => {
-        const collectionMarker: NewCollectionMarker = {
+        const collectionLink: NewCollectionLink = {
           marker_id: id,
           collection_id: collectionId,
           map_id: newMarker.marker.map_id,
           user_id: auth.userId,
         };
-        const result = await db
-          .insert(collection_markers)
-          .values(collectionMarker);
+        const result = await db.insert(collection_links).values(collectionLink);
 
         if (!result) {
           throw new Error("Error creating new collection marker.", {
@@ -88,8 +86,8 @@ export const createMarkerHandler: AppRouteHandler<typeof createMarker> = async (
     getMarkersView(db, mapId),
     db
       .select()
-      .from(collection_markers)
-      .where(eq(collection_markers.marker_id, id)),
+      .from(collection_links)
+      .where(eq(collection_links.marker_id, id)),
   ]);
 
   return c.json(
@@ -109,7 +107,7 @@ export const editMarkerHandler: AppRouteHandler<typeof editMarker> = async (
   const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
   const auth = getAuth(c);
 
-  let collectionLinksCreated: NewCollectionMarker[] | null = null;
+  let collectionLinksCreated: NewCollectionLink[] | null = null;
   let collectionLinksDeleted: string[] | null = null;
 
   if (!auth || !auth.userId) {
@@ -126,7 +124,7 @@ export const editMarkerHandler: AppRouteHandler<typeof editMarker> = async (
   if (editMarker.collectionIds_to_add) {
     await Promise.all(
       editMarker.collectionIds_to_add.map(async (collectionId) => {
-        const collectionMarker: NewCollectionMarker = {
+        const collectionLink: NewCollectionLink = {
           marker_id: editMarker.marker_id,
           collection_id: collectionId,
           map_id: editMarker.marker.map_id,
@@ -134,8 +132,8 @@ export const editMarkerHandler: AppRouteHandler<typeof editMarker> = async (
         };
 
         const result = await db
-          .insert(collection_markers)
-          .values(collectionMarker)
+          .insert(collection_links)
+          .values(collectionLink)
           .returning();
 
         if (result) {
@@ -150,11 +148,11 @@ export const editMarkerHandler: AppRouteHandler<typeof editMarker> = async (
     await Promise.all(
       editMarker.collectionIds_to_remove.map(async (collectionId) => {
         const result = await db
-          .delete(collection_markers)
+          .delete(collection_links)
           .where(
             and(
-              eq(collection_markers.marker_id, markerId),
-              eq(collection_markers.collection_id, collectionId)
+              eq(collection_links.marker_id, markerId),
+              eq(collection_links.collection_id, collectionId)
             )
           );
 
