@@ -3,7 +3,7 @@ import { defaultState, StoreActions, type StoreState } from "./default-state";
 
 import type {
   Collection,
-  CollectionMarker,
+  CollectionLink,
   MapUser,
   Map,
   Marker,
@@ -19,31 +19,31 @@ export const createStore = (initState: Partial<StoreState>) =>
   createZustandStore<Store>()((set, get, api) => ({
     ...defaultState,
     ...initState,
-    setCollectionMarkers: (collectionMarkers: CollectionMarker[] | null) => {
-      if (!collectionMarkers) return;
+    setCollectionLinks: (collectionLinks: CollectionLink[] | null) => {
+      if (!collectionLinks) return;
 
-      return set(({ collectionMarkers: prevCollectionMarkers }) => {
-        const prevCollectionMarkersMap = prevCollectionMarkers
+      return set(({ collectionLinks: prevCollectionLinks }) => {
+        const prevCollectionLinksMap = prevCollectionLinks
           ? new Map(
-              prevCollectionMarkers.map((collectionMarker) => [
-                collectionMarker.link_id,
-                collectionMarker,
+              prevCollectionLinks.map((collectionLink) => [
+                collectionLink.link_id,
+                collectionLink,
               ])
             )
           : new Map();
 
-        collectionMarkers.forEach((collectionMarker) => {
-          prevCollectionMarkersMap.set(collectionMarker.link_id, {
-            ...prevCollectionMarkersMap.get(collectionMarker.link_id),
-            ...collectionMarker,
+        collectionLinks.forEach((collectionLink) => {
+          prevCollectionLinksMap.set(collectionLink.link_id, {
+            ...prevCollectionLinksMap.get(collectionLink.link_id),
+            ...collectionLink,
           });
         });
 
-        const updatedCollectionMarkers = Array.from(
-          prevCollectionMarkersMap.values()
+        const updatedCollectionLinks = Array.from(
+          prevCollectionLinksMap.values()
         );
 
-        return { collectionMarkers: updatedCollectionMarkers };
+        return { collectionLinks: updatedCollectionLinks };
       });
     },
     setCollections: (collections: Collection[] | null) => {
@@ -164,7 +164,7 @@ export const createStore = (initState: Partial<StoreState>) =>
     },
     getCollectionsForMarker: (markerId: string | null) => {
       if (!markerId) return null;
-      const links = get().collectionMarkers;
+      const links = get().collectionLinks;
       const collections = get().collections;
       if (!links || !collections) return null;
 
@@ -182,7 +182,7 @@ export const createStore = (initState: Partial<StoreState>) =>
     getMarkersForCollection: (collectionId: string | null) => {
       if (!collectionId) return null;
 
-      const links = get().collectionMarkers;
+      const links = get().collectionLinks;
       const markers = get().markers;
       if (!links || !markers) return null;
 
@@ -191,27 +191,27 @@ export const createStore = (initState: Partial<StoreState>) =>
         .map((link) => link.marker_id);
 
       // Get the markers that match the marker IDs
-      const collectionMarkers = markers.filter((marker) =>
+      const collectionLinks = markers.filter((marker) =>
         markerIds.includes(marker.marker_id!)
       );
 
-      return collectionMarkers;
+      return collectionLinks;
     },
-    removeCollectionMarkers: (collectionMarkers: string | string[]) => {
-      return set(({ collectionMarkers: prevLinks }) => {
+    removeCollectionLinks: (collectionLinks: string | string[]) => {
+      return set(({ collectionLinks: prevLinks }) => {
         let newLinks = prevLinks ? [...prevLinks] : [];
 
-        if (Array.isArray(collectionMarkers)) {
+        if (Array.isArray(collectionLinks)) {
           newLinks = newLinks.filter(
-            (link) => !collectionMarkers.includes(link.link_id)
+            (link) => !collectionLinks.includes(link.link_id)
           );
         } else {
           newLinks = newLinks.filter(
-            (link) => link.collection_id !== collectionMarkers
+            (link) => link.collection_id !== collectionLinks
           );
         }
 
-        return { collectionMarkers: newLinks };
+        return { collectionLinks: newLinks };
       });
     },
 

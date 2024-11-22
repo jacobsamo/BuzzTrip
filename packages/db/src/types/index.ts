@@ -1,11 +1,11 @@
 import {
-  collection_markers,
+  collection_links,
   collections,
   locations,
   map_users,
   maps,
   markers,
-  route,
+  routes,
   route_stops,
   users,
 } from "../schema";
@@ -34,14 +34,14 @@ export type NewLocation = typeof locations.$inferInsert;
 export type Collection = typeof collections.$inferSelect;
 export type NewCollection = typeof collections.$inferInsert;
 
-export type CollectionMarker = typeof collection_markers.$inferSelect;
-export type NewCollectionMarker = typeof collection_markers.$inferInsert;
+export type CollectionLink = typeof collection_links.$inferSelect;
+export type NewCollectionLink = typeof collection_links.$inferInsert;
 
 export type MapUser = typeof map_users.$inferSelect;
 export type NewMapUser = typeof map_users.$inferInsert;
 
-export type Route = typeof route.$inferSelect;
-export type NewRoute = typeof route.$inferInsert;
+export type Route = typeof routes.$inferSelect;
+export type NewRoute = typeof routes.$inferInsert;
 
 export type RouteStop = typeof route_stops.$inferSelect;
 export type NewRouteStop = typeof route_stops.$inferInsert;

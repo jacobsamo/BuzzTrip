@@ -1,10 +1,8 @@
 "use server";
 import { authAction } from "@/actions/safe-action";
 import { db } from "@/server/db";
-import { collection_markers, markers } from "@buzztrip/db/schema";
-import {
-  NewCollectionMarker
-} from "@buzztrip/db/types";
+import { collection_links, markers } from "@buzztrip/db/schema";
+import { NewCollectionLink } from "@buzztrip/db/types";
 import { combinedMarkersSchema } from "@buzztrip/db/zod-schemas";
 import { and, eq } from "drizzle-orm";
 import * as z from "zod";
@@ -20,13 +18,13 @@ export const updateMarker = authAction
   .schema(schema)
   .metadata({ name: "update-marker" })
   .action(async ({ parsedInput: params, ctx }) => {
-    let collectionLinksCreated: NewCollectionMarker[] | null = null;
+    let collectionLinksCreated: NewCollectionLink[] | null = null;
     let collectionLinksDeleted: string[] | null = null;
 
     if (params.collectionIds_to_add) {
       await Promise.all(
         params.collectionIds_to_add.map(async (collectionId) => {
-          const collectionMarker: NewCollectionMarker = {
+          const collectionLink: NewCollectionLink = {
             marker_id: params.marker_id,
             collection_id: collectionId,
             map_id: params.marker.map_id,
@@ -34,8 +32,8 @@ export const updateMarker = authAction
           };
 
           const result = await db
-            .insert(collection_markers)
-            .values(collectionMarker)
+            .insert(collection_links)
+            .values(collectionLink)
             .returning();
 
           if (result) {
@@ -50,11 +48,11 @@ export const updateMarker = authAction
       await Promise.all(
         params.collectionIds_to_remove.map(async (collectionId) => {
           const result = await db
-            .delete(collection_markers)
+            .delete(collection_links)
             .where(
               and(
-                eq(collection_markers.marker_id, params.marker_id),
-                eq(collection_markers.collection_id, collectionId)
+                eq(collection_links.marker_id, params.marker_id),
+                eq(collection_links.collection_id, collectionId)
               )
             );
 

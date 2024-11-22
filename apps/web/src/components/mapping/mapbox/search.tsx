@@ -17,26 +17,28 @@ const Search = () => {
 
   }
 
-  return (
+  // return (
+  //     <>
+      
+  //     <SearchBox
+  //       options={{
+  //         proximity: {
+  //           lng: -122.431297,
+  //           lat: 37.773972,
+  //         },
+  
+  //       }}
+  //       value={searchValue || undefined}
+  //       onChange={setSearchValue}
+  //       accessToken={env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
+  
+  //       onRetrieve={(res) => {
+  
+  //       }}
+  //     ></SearchBox>
+  //     </>
 
-    <SearchBox
-      options={{
-        proximity: {
-          lng: -122.431297,
-          lat: 37.773972,
-        },
-
-      }}
-      value={searchValue || undefined}
-      onChange={setSearchValue}
-      accessToken={env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-
-      onRetrieve={(res) => {
-
-      }}
-    />
-
-  )
+  // )
 }
 
 export default Search

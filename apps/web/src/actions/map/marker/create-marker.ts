@@ -3,12 +3,8 @@ import { authAction } from "@/actions/safe-action";
 import type { IconType } from "@buzztrip/db/types";
 import { db } from "@/server/db";
 import { getMarkersView } from "@buzztrip/db/queries";
-import { collection_markers, locations, markers } from "@buzztrip/db/schema";
-import {
-  NewCollectionMarker,
-  NewLocation,
-  NewMarker,
-} from "@buzztrip/db/types";
+import { collection_links, locations, markers } from "@buzztrip/db/schema";
+import { NewCollectionLink, NewLocation, NewMarker } from "@buzztrip/db/types";
 import { combinedMarkersSchema } from "@buzztrip/db/zod-schemas";
 import { and, eq } from "drizzle-orm";
 import { v4 as uuid } from "uuid";
@@ -64,15 +60,15 @@ export const createMarker = authAction
     if (params.collectionIds) {
       await Promise.all(
         params.collectionIds.map(async (collectionId) => {
-          const collectionMarker: NewCollectionMarker = {
+          const collectionLink: NewCollectionLink = {
             marker_id: id,
             collection_id: collectionId,
             map_id: params.marker.map_id,
             user_id: ctx.user.id,
           };
           const result = await db
-            .insert(collection_markers)
-            .values(collectionMarker);
+            .insert(collection_links)
+            .values(collectionLink);
           if (!result) {
             throw new Error("Error creating new collection marker.", {
               cause: result,
@@ -87,8 +83,8 @@ export const createMarker = authAction
       getMarkersView(db, params.marker.map_id!),
       db
         .select()
-        .from(collection_markers)
-        .where(eq(collection_markers.marker_id, id)),
+        .from(collection_links)
+        .where(eq(collection_links.marker_id, id)),
     ]);
 
     return {

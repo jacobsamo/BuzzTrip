@@ -4,7 +4,7 @@ import {
   maps,
   map_users,
   collections,
-  collection_markers,
+  collection_links,
 } from "../schema";
 import { eq } from "drizzle-orm";
 import { CombinedMarker, UserMap } from "../types";
@@ -61,14 +61,14 @@ export const getCollectionsForMap = async (db: Database, map_id: string) => {
   return db.select().from(collections).where(eq(collections.map_id, map_id));
 };
 
-export const getCollectionMarkersForMap = async (
+export const getCollectionLinksForMap = async (
   db: Database,
   map_id: string
 ) => {
   return db
     .select()
-    .from(collection_markers)
-    .where(eq(collection_markers.map_id, map_id));
+    .from(collection_links)
+    .where(eq(collection_links.map_id, map_id));
 };
 
 export const getMapUsers = async (db: Database, map_id: string) => {
@@ -82,7 +82,7 @@ export const getMap = async (db: Database, map_id: string) => {
 export const getAllMapData = async (db: Database, map_id: string) => {
   return Promise.all([
     getCollectionsForMap(db, map_id),
-    getCollectionMarkersForMap(db, map_id),
+    getCollectionLinksForMap(db, map_id),
     getMarkersView(db, map_id),
     getMapUsers(db, map_id),
     getMap(db, map_id),

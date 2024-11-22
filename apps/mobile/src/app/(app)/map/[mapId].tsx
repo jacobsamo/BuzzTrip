@@ -37,7 +37,7 @@ const MapView = () => {
         initState={{
           ...data,
           mapUsers: data?.mapUsers ?? null,
-          collectionMarkers: data?.collection_markers ?? null,
+          collectionLinks: data?.collection_links ?? null,
         }}
       />
     </View>

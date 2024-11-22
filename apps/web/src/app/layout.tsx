@@ -1,3 +1,4 @@
+import React from "react";
 import Providers from "@/components/providers";
 import "@/lib/styles/globals.css";
 import { ClerkProvider } from "@clerk/nextjs";

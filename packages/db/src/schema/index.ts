@@ -99,7 +99,7 @@ export const collections = sqliteTable("collections", {
   color: text("color"),
 });
 
-export const collection_markers = sqliteTable("collection_markers", {
+export const collection_links = sqliteTable("collection_links", {
   link_id: text("link_id")
     .primaryKey()
     .notNull()
@@ -113,22 +113,28 @@ export const collection_markers = sqliteTable("collection_markers", {
 });
 
 export const map_users = sqliteTable("map_users", {
-  map_id: text("map_id")
-    .references(() => maps.map_id)
-    .$defaultFn(() => uuid()),
+  map_user_id: text("map_user_id")
+    .primaryKey()
+    .notNull()
+    .$default(() => uuid()),
+  map_id: text("map_id").references(() => maps.map_id),
   user_id: text("user_id").references(() => users.user_id),
   permission: text("permission", {
-    enum: ["owner", "editor", "viewer", "commentor"],
+    enum: ["owner", "editor", "viewer", "commenter"],
   })
     .default("editor")
     .notNull(),
 });
 
-export const route = sqliteTable("route", {
+export const routes = sqliteTable("routes", {
   route_id: text("route_id")
     .primaryKey()
     .notNull()
     .$defaultFn(() => uuid()),
+  map_user_id: text("map_user_id")
+    .primaryKey()
+    .notNull()
+    .$default(() => uuid()),
   name: text("name").notNull(),
   description: text("description"),
   user_id: text("user_id").references(() => users.user_id),
@@ -139,120 +145,116 @@ export const route_stops = sqliteTable("route_stops", {
     .primaryKey()
     .notNull()
     .$defaultFn(() => uuid()),
-  route_id: text("route_id").references(() => route.route_id),
+  map_user_id: text("map_user_id")
+    .primaryKey()
+    .notNull()
+    .$default(() => uuid()),
+  route_id: text("route_id").references(() => routes.route_id),
   marker_id: text("marker_id").references(() => markers.marker_id),
   stop_order: integer("stop_order").notNull(),
 });
 
-// views
-// export const markersView = sqliteView("markers_view").as((qb) =>
-//   qb
-//     .select()
-//     .from(markers)
-//     .leftJoin(locations, eq(markers.location_id, locations.location_id))
-// );
+export const collectionLinksRelations = relations(
+  collection_links,
+  ({ one }) => ({
+    collection: one(collections, {
+      fields: [collection_links.collection_id],
+      references: [collections.collection_id],
+    }),
+    marker: one(markers, {
+      fields: [collection_links.marker_id],
+      references: [markers.marker_id],
+    }),
+    user: one(users, {
+      fields: [collection_links.user_id],
+      references: [users.user_id],
+    }),
+  })
+);
 
-// export const collectionMarkersRelations = relations(
-//   collection_markers,
-//   ({ one }) => ({
-//     collection: one(collections, {
-//       fields: [collection_markers.collection_id],
-//       references: [collections.collection_id],
-//     }),
-//     marker: one(markers, {
-//       fields: [collection_markers.marker_id],
-//       references: [markers.marker_id],
-//     }),
-//     user: one(users, {
-//       fields: [collection_markers.user_id],
-//       references: [users.user_id],
-//     }),
-//   })
-// );
+export const mapsRelations = relations(maps, ({ one, many }) => ({
+  collection_links: many(collection_links),
+  collections: many(collections),
+  map_users: many(map_users),
+  user: one(users, {
+    fields: [maps.owner_id],
+    references: [users.user_id],
+  }),
+  markers: many(markers),
+}));
 
-// export const mapsRelations = relations(maps, ({ one, many }) => ({
-//   collection_markers: many(collection_markers),
-//   collections: many(collections),
-//   map_users: many(map_users),
-//   user: one(users, {
-//     fields: [maps.owner_id],
-//     references: [users.user_id],
-//   }),
-//   markers: many(markers),
-// }));
+export const markersRelations = relations(markers, ({ one, many }) => ({
+  collection_links: many(collection_links),
+  map: one(maps, {
+    fields: [markers.map_id],
+    references: [maps.map_id],
+  }),
+  location: one(locations, {
+    fields: [markers.location_id],
+    references: [locations.location_id],
+  }),
+  user: one(users, {
+    fields: [markers.created_by],
+    references: [users.user_id],
+  }),
+  collection: one(collections, {
+    fields: [markers.collection_id],
+    references: [collections.collection_id],
+  }),
+  route_stops: many(route_stops),
+}));
 
-// export const markersRelations = relations(markers, ({ one, many }) => ({
-//   collection_markers: many(collection_markers),
-//   map: one(maps, {
-//     fields: [markers.map_id],
-//     references: [maps.map_id],
-//   }),
-//   location: one(locations, {
-//     fields: [markers.location_id],
-//     references: [locations.location_id],
-//   }),
-//   user: one(users, {
-//     fields: [markers.created_by],
-//     references: [users.user_id],
-//   }),
-//   collection: one(collections, {
-//     fields: [markers.collection_id],
-//     references: [collections.collection_id],
-//   }),
-//   route_stops: many(route_stops),
-// }));
+export const collectionsRelations = relations(collections, ({ one, many }) => ({
+  collection_links: many(collection_links),
+  user: one(users, {
+    fields: [collections.created_by],
+    references: [users.user_id],
+  }),
+  map: one(maps, {
+    fields: [collections.map_id],
+    references: [maps.map_id],
+  }),
+  markers: many(markers),
+}));
 
-// export const collectionsRelations = relations(collections, ({ one, many }) => ({
-//   collection_markers: many(collection_markers),
-//   user: one(users, {
-//     fields: [collections.created_by],
-//     references: [users.user_id],
-//   }),
-//   map: one(maps, {
-//     fields: [collections.map_id],
-//     references: [maps.map_id],
-//   }),
-//   markers: many(markers),
-// }));
+export const usersRelations = relations(users, ({ many }) => ({
+  collections: many(collections),
+  map_users: many(map_users),
+  maps: many(maps),
+  markers: many(markers),
+  routes: many(routes),
+}));
 
-// export const usersRelations = relations(users, ({ many }) => ({
-//   collections: many(collections),
-//   map_users: many(map_users),
-//   maps: many(maps),
-//   markers: many(markers),
-//   routes: many(route),
-// }));
+export const mapUsersRelations = relations(map_users, ({ one }) => ({
+  user: one(users, {
+    fields: [map_users.user_id],
+    references: [users.user_id],
+  }),
+  map: one(maps, {
+    fields: [map_users.map_id],
+    references: [maps.map_id],
+  }),
+}));
 
-// export const mapUsersRelations = relations(map_users, ({ one }) => ({
-//   user: one(users, {
-//     fields: [map_users.user_id],
-//     references: [users.user_id],
-//   }),
-//   map: one(maps, {
-//     fields: [map_users.map_id],
-//     references: [maps.map_id],
-//   }),
-// }));
+export const locationsRelations = relations(locations, ({ many }) => ({
+  markers: many(markers),
+}));
 
-// export const locationsRelations = relations(locations, ({ many }) => ({
-//   markers: many(markers),
-// }));
+export const routeRelations = relations(routes, ({ one, many }) => ({
+  user: one(users, {
+    fields: [routes.user_id],
+    references: [users.user_id],
+  }),
+  routeStops: many(route_stops),
+}));
 
-// export const routeRelations = relations(route, ({ one, many }) => ({
-//   user: one(users, {
-//     fields: [route.user_id],
-//     references: [users.user_id],
-//   }),
-//   routeStops: many(route_stops),
-// }));
-
-// export const routeStopsRelations = relations(route_stops, ({ one }) => ({
-//   marker: one(markers, {
-//     fields: [route_stops.marker_id],
-//     references: [markers.marker_id],
-//   }),
-//   route: one(route, {
-//     fields: [route_stops.route_id],
-//     references: [route.route_id],
-//   }),
-// }));
+export const routeStopsRelations = relations(route_stops, ({ one }) => ({
+  marker: one(markers, {
+    fields: [route_stops.marker_id],
+    references: [markers.marker_id],
+  }),
+  route: one(routes, {
+    fields: [route_stops.route_id],
+    references: [routes.route_id],
+  }),
+}));
