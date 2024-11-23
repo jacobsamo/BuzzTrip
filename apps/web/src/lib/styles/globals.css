@@ -20,7 +20,7 @@ body {
 
 /* Scroll bar for Chrome, Edge, and Safari */
 *::-webkit-scrollbar {
-  @apply w-1;
+  @apply w-[2px];
 }
 
 *::-webkit-scrollbar-track {

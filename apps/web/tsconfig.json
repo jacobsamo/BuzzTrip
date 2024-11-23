@@ -23,7 +23,7 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "env": ["./env.mjs"]
+      "env": ["env.ts"]
     },
     "types": ["google.maps"]
   },

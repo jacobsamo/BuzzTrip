@@ -10,17 +10,17 @@
   },
   "dependencies": {
     "@buzztrip/db": "workspace:*",
-    "@clerk/backend": "^1.13.8",
+    "@clerk/backend": "^1.18.0",
     "@hono/clerk-auth": "^2.0.0",
     "@hono/swagger-ui": "^0.4.1",
-    "@hono/zod-openapi": "^0.16.3",
-    "@hono/zod-validator": "^0.3.0",
-    "hono": "^4.6.7",
+    "@hono/zod-openapi": "^0.18.0",
+    "@hono/zod-validator": "^0.4.1",
+    "hono": "^4.6.11",
     "uuid": "^11.0.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240925.0",
-    "@types/bun": "^1.1.10",
-    "wrangler": "^3.79.0"
+    "@cloudflare/workers-types": "^4.20241112.0",
+    "@types/bun": "^1.1.13",
+    "wrangler": "^3.90.0"
   }
 }

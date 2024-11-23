@@ -8,13 +8,15 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
+  SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { Collection, CombinedMarker } from "@buzztrip/db/types";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Pencil } from "lucide-react";
 import MarkerPin from "../../../mapping/google-maps/marker_pin";
 import OpenMarkerButton from "../../../mapping/google-maps/open-marker";
 import { useMap } from "@vis.gl/react-google-maps";
+import { useMapStore } from "@/components/providers/map-state-provider";
 // import { useMap } from "react-map-gl";
 
 interface DisplayCollectionProps {
@@ -23,6 +25,8 @@ interface DisplayCollectionProps {
 }
 
 const DisplayCollection = ({ collection, markers }: DisplayCollectionProps) => {
+  const setMarkerOpen = useMapStore((store) => store.setMarkerOpen);
+
   // All for zooming to marker using google maps
   const map = useMap();
 
@@ -61,7 +65,7 @@ const DisplayCollection = ({ collection, markers }: DisplayCollectionProps) => {
             <SidebarMenuSub className="space-y-2">
               {markers.map((marker) => (
                 <SidebarMenuSubItem key={marker.marker_id}>
-                  <SidebarMenuButton
+                  <SidebarMenuSubButton
                     onClick={() => onMarkerClick(marker)}
                     className="flex items-center justify-between py-1"
                   >
@@ -69,13 +73,12 @@ const DisplayCollection = ({ collection, markers }: DisplayCollectionProps) => {
                     <span className="wrap text-center text-sm">
                       {marker.title}
                     </span>
-                    <SidebarMenuAction asChild>
-                      <OpenMarkerButton marker={marker} mode="edit" />
+                    <SidebarMenuAction
+                      onClick={() => setMarkerOpen(true, marker, "edit")}
+                    >
+                      <Pencil />
                     </SidebarMenuAction>
-                    {/* <SidebarMenuSubButton asChild>
-                    <h1>{marker.title}</h1>
-                  </SidebarMenuSubButton> */}
-                  </SidebarMenuButton>
+                  </SidebarMenuSubButton>
                 </SidebarMenuSubItem>
               ))}
             </SidebarMenuSub>

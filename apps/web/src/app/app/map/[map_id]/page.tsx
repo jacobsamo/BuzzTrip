@@ -14,11 +14,12 @@ import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { map_id: string };
-}) {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ map_id: string }>;
+  }
+) {
+  const params = await props.params;
   const map = await db.query.maps.findFirst({
     where: eq(maps.map_id, params.map_id),
   });
@@ -28,11 +29,12 @@ export async function generateMetadata({
   };
 }
 
-export default async function MapPage({
-  params,
-}: {
-  params: { map_id: string };
-}) {
+export default async function MapPage(
+  props: {
+    params: Promise<{ map_id: string }>;
+  }
+) {
+  const params = await props.params;
   const { userId } = await auth();
 
   if (!userId || !params.map_id) {

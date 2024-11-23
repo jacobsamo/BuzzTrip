@@ -1,4 +1,4 @@
-CREATE TABLE `collection_markers` (
+CREATE TABLE `collection_links` (
 	`link_id` text PRIMARY KEY NOT NULL,
 	`collection_id` text,
 	`marker_id` text,
@@ -46,6 +46,7 @@ CREATE TABLE `locations` (
 );
 --> statement-breakpoint
 CREATE TABLE `map_users` (
+	`map_user_id` text PRIMARY KEY NOT NULL,
 	`map_id` text,
 	`user_id` text,
 	`permission` text DEFAULT 'editor' NOT NULL,
@@ -81,21 +82,25 @@ CREATE TABLE `markers` (
 	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE TABLE `route` (
-	`route_id` text PRIMARY KEY NOT NULL,
-	`name` text NOT NULL,
-	`description` text,
-	`user_id` text,
-	FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON UPDATE no action ON DELETE no action
-);
---> statement-breakpoint
 CREATE TABLE `route_stops` (
 	`route_stop_id` text PRIMARY KEY NOT NULL,
+	`map_user_id` text NOT NULL,
 	`route_id` text,
 	`marker_id` text,
 	`stop_order` integer NOT NULL,
-	FOREIGN KEY (`route_id`) REFERENCES `route`(`route_id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`map_user_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`route_id`) REFERENCES `routes`(`route_id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`marker_id`) REFERENCES `markers`(`marker_id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE TABLE `routes` (
+	`route_id` text PRIMARY KEY NOT NULL,
+	`map_user_id` text NOT NULL,
+	`name` text NOT NULL,
+	`description` text,
+	`user_id` text,
+	FOREIGN KEY (`map_user_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `users` (

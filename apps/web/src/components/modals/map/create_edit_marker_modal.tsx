@@ -1,12 +1,12 @@
 import { createMarker } from "@/actions/map/marker/create-marker";
 import { updateMarker } from "@/actions/map/marker/edit-marker";
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import {
   Drawer,
@@ -14,7 +14,7 @@ import {
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
-  DrawerTitle
+  DrawerTitle,
 } from "@/components/ui/drawer";
 import {
   Form,
@@ -43,6 +43,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import IconPickerModal from "../icon-picker-modal";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Icon = lazy(() => import("@buzztrip/components/icon"));
 
@@ -379,6 +380,17 @@ function MarkerForm() {
                   <FormLabel>Icon</FormLabel>
                   <FormControl>
                     <div className="flex flex-wrap gap-2">
+                      {!popularIconsList.includes(selectedIcon as any) && (
+                        <div
+                          className={buttonVariants({
+                            variant: "ghost",
+                            className:
+                              "scale-105 border border-gray-500 text-black shadow-lg",
+                          })}
+                        >
+                          <Icon name={selectedIcon} size={24} />
+                        </div>
+                      )}
                       {popularIconsList.map((icon, index) => (
                         <Button
                           key={index}
@@ -406,7 +418,7 @@ function MarkerForm() {
             }}
           />
 
-          <div>
+          <ScrollArea className="h-36 w-full">
             {collections &&
               collections.map((collection, index) => {
                 const isChecked = watch("collection_ids")?.includes(
@@ -443,22 +455,24 @@ function MarkerForm() {
                   </Button>
                 );
               })}
-          </div>
+          </ScrollArea>
 
-          <Button aria-label="Create Marker" type="submit">
-            {mode === "create" ? "Create" : "Save changes"}
-          </Button>
+          <div className="inline-flex items-center gap-2 justify-end mt-4">
+            {mode === "edit" && marker && (
+              <Button
+                aria-label="delete marker"
+                variant="destructive"
+                type="button"
+                onClick={() => handleDelete()}
+              >
+                Delete
+              </Button>
+            )}
+            <Button aria-label="Create Marker" type="submit">
+              {mode === "create" ? "Create" : "Save changes"}
+            </Button>
+          </div>
         </form>
-        {mode === "edit" && marker && (
-          <Button
-            aria-label="delete marker"
-            variant="destructive"
-            type="submit"
-            onClick={() => handleDelete()}
-          >
-            Delete
-          </Button>
-        )}
       </Form>
     </div>
   );
