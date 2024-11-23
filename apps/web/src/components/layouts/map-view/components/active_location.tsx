@@ -3,6 +3,7 @@ import { BookmarkCheck } from "lucide-react";
 import Image from "next/image";
 import { lazy } from "react";
 import OpenMarkerButton from "../../../mapping/google-maps/open-marker";
+import MarkerPin from "@/components/mapping/google-maps/marker_pin";
 
 const Icon = lazy(() => import("@buzztrip/components/icon"));
 
@@ -16,7 +17,7 @@ const ActiveLocation = () => {
       <div className="flex flex-col pl-3">
         <div className="relative flex w-full flex-row justify-between">
           <span className="flex flex-row gap-2">
-            <Icon name="MapPin" size={24} color="#000" />
+            <MarkerPin marker={activeLocation}  />
             <h1 className="text-2xl text-gray-900">{activeLocation.title}</h1>
           </span>
           <span>

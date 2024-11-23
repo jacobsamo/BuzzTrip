@@ -18,8 +18,8 @@ export default async function MapPage() {
   const usersMaps = await getUserMaps(db, userId);
 
   return (
-    <main className="container mx-auto p-4">
+
       <UserMaps userId={userId} usersMaps={usersMaps} />
-    </main>
+
   );
 }

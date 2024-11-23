@@ -219,10 +219,14 @@ export const createStore = (initState: Partial<StoreState>) =>
     setActiveLocation: (location: CombinedMarker | null) =>
       set(() => {
         if (location) {
-          return { activeLocation: location, snap: 0.5 };
+          return {
+            activeLocation: location,
+            snap: 0.5,
+            searchValue: location.address,
+          };
         }
 
-        return { activeLocation: null, snap: 0.1, searchValue: null };
+        return { activeLocation: null, snap: 0.1, searchValue: "" };
       }),
     setCollectionsOpen: (open: boolean) =>
       set(() => ({ collectionsOpen: open })),

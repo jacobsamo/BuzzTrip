@@ -101,8 +101,8 @@ export default function MarkerModal() {
         </DrawerHeader>
         <MarkerForm />
         <DrawerFooter className="pt-2">
-          <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+          <DrawerClose className={buttonVariants({ variant: "outline" })}>
+            Cancel
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
@@ -457,7 +457,7 @@ function MarkerForm() {
               })}
           </ScrollArea>
 
-          <div className="inline-flex items-center gap-2 justify-end mt-4">
+          <div className="mt-4 inline-flex items-center justify-end gap-2">
             {mode === "edit" && marker && (
               <Button
                 aria-label="delete marker"

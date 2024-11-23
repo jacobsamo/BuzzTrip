@@ -33,21 +33,6 @@ const DisplayActiveState = () => {
         </div>
       )}
 
-      {activeLocation && (
-        <Button
-          onClick={() => {
-            setActiveLocation(null);
-            setSearchValue("");
-            setSnap(0.2);
-            setActiveLocation(null);
-          }}
-          variant={"link"}
-          className="text-base"
-        >
-          <ArrowLeft /> Back
-        </Button>
-      )}
-
       {activeLocation !== null && <ActiveLocation />}
 
       <MarkerModal />
