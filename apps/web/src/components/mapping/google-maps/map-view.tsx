@@ -14,7 +14,7 @@ import {
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
 import { lazy, memo, useMemo } from "react";
-import MapDrawer from "./map-drawer";
+import MapDrawer from "../../layouts/map-view/components/map-drawer";
 import MapSideBar from "./map-sidebar";
 import { AutocompleteCustomInput, detailsRequestCallback } from "./search";
 import InfoBox from "./info-window";
@@ -26,7 +26,6 @@ const MarkerPin = lazy(() => import("./marker_pin"));
 const Mapview = () => {
   const map = useMap();
   const places = useMapsLibrary("places");
-  const isMediumDevice = useMediaQuery("only screen and (min-width : 769px)");
   const {
     activeLocation,
     markers,
@@ -46,18 +45,17 @@ const Mapview = () => {
   }, []);
 
   async function handleMapClick(e: MapMouseEvent) {
-
-    console.log("click event", e)
+    console.log("click event", e);
     if (!places || !map) return;
     e.domEvent?.stopPropagation();
-    e.stop()
+    e.stop();
     const placesService = new places.PlacesService(map);
 
     if (e.detail.placeId) {
-
       const requestOptions: google.maps.places.PlaceDetailsRequest = {
         placeId:
-          e.detail.placeId || `${e.detail.latLng?.lat}, ${e.detail.latLng?.lng}`,
+          e.detail.placeId ||
+          `${e.detail.latLng?.lat}, ${e.detail.latLng?.lng}`,
         fields: [
           "geometry",
           "name",
@@ -87,7 +85,6 @@ const Mapview = () => {
     }
 
     if (e.detail.latLng) {
-
     }
   }
 

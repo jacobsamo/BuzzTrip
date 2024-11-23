@@ -195,17 +195,8 @@ export const AutocompleteCustomInput = () => {
   );
 
   return (
-    <div className="fixed inset-x-0 top-4 z-10 mx-auto w-[95%] md:w-1/2">
+    <div className="fixed left-0 right-0 md:mx-0 mx-auto top-4 z-10 w-[95%] md:left-[calc(var(--sidebar-width)_+_2rem)] md:right-4 md:max-w-[30rem]">
       <div className="dark:bg-grey flex resize items-center justify-center rounded-xl bg-white p-1 pr-5 dark:text-white">
-        {/* <SearchIcon className="h-5 w-5" />
-        <Input
-          className="mt-2 rounded-full outline-none "
-          placeholder="Search maps"
-          type="search"
-          id="search"
-          value={searchValue}
-          onChange={(e) => onInputChange(e.target.value)}
-        /> */}
         <Command
           loop
           className="flex h-full w-full flex-col overflow-hidden rounded-md bg-white text-slate-950 dark:bg-slate-950 dark:text-slate-50"
@@ -215,7 +206,7 @@ export const AutocompleteCustomInput = () => {
 
             <Command.Input
               className="flex h-10 w-full rounded-md bg-white py-2 text-base placeholder:text-slate-500 focus:outline-none dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
-              placeholder="Search maps"
+              placeholder="Search locations"
               id="search"
               value={searchValue ?? ""}
               onValueChange={onInputChange}

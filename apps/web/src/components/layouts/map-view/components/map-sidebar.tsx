@@ -45,23 +45,29 @@ const MapSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
       <SidebarHeader className="inline-flex items-center gap-2 p-2">
         <SidebarMenu className="flex flex-row items-center gap-2">
           <SidebarMenuItem>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <SidebarMenuButton asChild>
-                    <Link href="/app">
-                      <ArrowLeft />
-                    </Link>
-                  </SidebarMenuButton>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Back to Home</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            {activeLocation ? (
+              <SidebarMenuButton onClick={() => setActiveLocation(null)}>
+                <ArrowLeft />
+              </SidebarMenuButton>
+            ) : (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <SidebarMenuButton asChild>
+                      <Link href="/app">
+                        <ArrowLeft />
+                      </Link>
+                    </SidebarMenuButton>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Back to Home</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <h1>{map!.title}</h1>
+            <h1>{activeLocation ? activeLocation.title : map!.title}</h1>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>

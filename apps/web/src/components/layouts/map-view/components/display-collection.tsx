@@ -25,7 +25,7 @@ interface DisplayCollectionProps {
 }
 
 const DisplayCollection = ({ collection, markers }: DisplayCollectionProps) => {
-  const setMarkerOpen = useMapStore((store) => store.setMarkerOpen);
+  const { setMarkerOpen, setActiveLocation } = useMapStore((store) => store);
 
   // All for zooming to marker using google maps
   const map = useMap();
@@ -34,6 +34,7 @@ const DisplayCollection = ({ collection, markers }: DisplayCollectionProps) => {
     if (map) {
       map.panTo({ lat: marker.lat, lng: marker.lng });
       map.moveCamera({ zoom: 15 });
+      setActiveLocation(marker);
     }
   };
 
@@ -67,7 +68,7 @@ const DisplayCollection = ({ collection, markers }: DisplayCollectionProps) => {
                 <SidebarMenuSubItem key={marker.marker_id}>
                   <SidebarMenuSubButton
                     onClick={() => onMarkerClick(marker)}
-                    className="flex items-center justify-between py-1"
+                    className="flex flex-row items-center justify-between py-1 gap-0"
                   >
                     <MarkerPin marker={marker} size={16} />
                     <span className="wrap text-center text-sm">
