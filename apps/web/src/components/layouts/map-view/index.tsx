@@ -14,9 +14,7 @@ export function Map_page() {
       <div className="flex h-screen w-full">
         <MapSidebar />
         <SidebarTrigger className="z-50 mt-2" />
-        <div className="absolute inset-0 h-screen w-full flex-1">
-          <MapView />
-        </div>
+        <MapView />
       </div>
     </SidebarProvider>
   );

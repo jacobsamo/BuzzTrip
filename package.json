@@ -12,11 +12,11 @@
   },
   "devDependencies": {
     "@buzztrip/tsconfig": "workspace:*",
-    "drizzle-orm": "^0.35.3",
+    "drizzle-orm": "^0.36.4",
     "prettier": "^3.3.3",
-    "prettier-plugin-tailwindcss": "^0.6.8",
-    "turbo": "^2.2.3",
-    "typescript": "^5.6.3"
+    "prettier-plugin-tailwindcss": "^0.6.9",
+    "turbo": "^2.3.1",
+    "typescript": "^5.7.2"
   },
   "packageManager": "bun@1.1.26",
   "workspaces": [
@@ -34,6 +34,6 @@
     "workerd"
   ],
   "resolutions": {
-    "drizzle-orm": "^0.35.3"
+    "drizzle-orm": "^0.36.4"
   }
 }

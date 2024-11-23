@@ -131,10 +131,9 @@ export const routes = sqliteTable("routes", {
     .primaryKey()
     .notNull()
     .$defaultFn(() => uuid()),
-  map_user_id: text("map_user_id")
-    .primaryKey()
+  map_id: text("map_user_id")
     .notNull()
-    .$default(() => uuid()),
+    .references(() => maps.map_id),
   name: text("name").notNull(),
   description: text("description"),
   user_id: text("user_id").references(() => users.user_id),
@@ -145,10 +144,9 @@ export const route_stops = sqliteTable("route_stops", {
     .primaryKey()
     .notNull()
     .$defaultFn(() => uuid()),
-  map_user_id: text("map_user_id")
-    .primaryKey()
+  map_id: text("map_user_id")
     .notNull()
-    .$default(() => uuid()),
+    .references(() => maps.map_id),
   route_id: text("route_id").references(() => routes.route_id),
   marker_id: text("marker_id").references(() => markers.marker_id),
   stop_order: integer("stop_order").notNull(),

@@ -1,6 +1,6 @@
 "use client";
 import { APIProvider } from "@vis.gl/react-google-maps";
-import { env } from "env.mjs";
+import { env } from "env";
 
 export default function RootLayout({
   children,

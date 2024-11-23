@@ -92,7 +92,7 @@ const Mapview = () => {
   }
 
   return (
-    <div style={{ height: "100vh", width: "100%" }}>
+    <div className="absolute inset-0 h-screen w-full flex-1">
       <AutocompleteCustomInput />
       <GoogleMap
         defaultCenter={mapOptions.center}

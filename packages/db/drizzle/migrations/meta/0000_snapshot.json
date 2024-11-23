@@ -1,11 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "0f64b242-9677-4a08-b18d-2760f7b9dda7",
+  "id": "afe1b188-39b1-4014-9476-020789e6d8f9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "collection_markers": {
-      "name": "collection_markers",
+    "collection_links": {
+      "name": "collection_links",
       "columns": {
         "link_id": {
           "name": "link_id",
@@ -45,9 +45,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "collection_markers_collection_id_collections_collection_id_fk": {
-          "name": "collection_markers_collection_id_collections_collection_id_fk",
-          "tableFrom": "collection_markers",
+        "collection_links_collection_id_collections_collection_id_fk": {
+          "name": "collection_links_collection_id_collections_collection_id_fk",
+          "tableFrom": "collection_links",
           "tableTo": "collections",
           "columnsFrom": [
             "collection_id"
@@ -58,9 +58,9 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "collection_markers_marker_id_markers_marker_id_fk": {
-          "name": "collection_markers_marker_id_markers_marker_id_fk",
-          "tableFrom": "collection_markers",
+        "collection_links_marker_id_markers_marker_id_fk": {
+          "name": "collection_links_marker_id_markers_marker_id_fk",
+          "tableFrom": "collection_links",
           "tableTo": "markers",
           "columnsFrom": [
             "marker_id"
@@ -71,9 +71,9 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "collection_markers_map_id_maps_map_id_fk": {
-          "name": "collection_markers_map_id_maps_map_id_fk",
-          "tableFrom": "collection_markers",
+        "collection_links_map_id_maps_map_id_fk": {
+          "name": "collection_links_map_id_maps_map_id_fk",
+          "tableFrom": "collection_links",
           "tableTo": "maps",
           "columnsFrom": [
             "map_id"
@@ -84,9 +84,9 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "collection_markers_user_id_users_user_id_fk": {
-          "name": "collection_markers_user_id_users_user_id_fk",
-          "tableFrom": "collection_markers",
+        "collection_links_user_id_users_user_id_fk": {
+          "name": "collection_links_user_id_users_user_id_fk",
+          "tableFrom": "collection_links",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -99,7 +99,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "collections": {
       "name": "collections",
@@ -192,7 +193,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "locations": {
       "name": "locations",
@@ -336,11 +338,19 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "map_users": {
       "name": "map_users",
       "columns": {
+        "map_user_id": {
+          "name": "map_user_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
         "map_id": {
           "name": "map_id",
           "type": "text",
@@ -394,7 +404,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "maps": {
       "name": "maps",
@@ -452,7 +463,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "markers": {
       "name": "markers",
@@ -599,58 +611,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "route": {
-      "name": "route",
-      "columns": {
-        "route_id": {
-          "name": "route_id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "route_user_id_users_user_id_fk": {
-          "name": "route_user_id_users_user_id_fk",
-          "tableFrom": "route",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "user_id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "route_stops": {
       "name": "route_stops",
@@ -659,6 +621,13 @@
           "name": "route_stop_id",
           "type": "text",
           "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "map_user_id": {
+          "name": "map_user_id",
+          "type": "text",
+          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
@@ -686,10 +655,23 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "route_stops_route_id_route_route_id_fk": {
-          "name": "route_stops_route_id_route_route_id_fk",
+        "route_stops_map_user_id_maps_map_id_fk": {
+          "name": "route_stops_map_user_id_maps_map_id_fk",
           "tableFrom": "route_stops",
-          "tableTo": "route",
+          "tableTo": "maps",
+          "columnsFrom": [
+            "map_user_id"
+          ],
+          "columnsTo": [
+            "map_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "route_stops_route_id_routes_route_id_fk": {
+          "name": "route_stops_route_id_routes_route_id_fk",
+          "tableFrom": "route_stops",
+          "tableTo": "routes",
           "columnsFrom": [
             "route_id"
           ],
@@ -714,7 +696,80 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "routes": {
+      "name": "routes",
+      "columns": {
+        "route_id": {
+          "name": "route_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "map_user_id": {
+          "name": "map_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "routes_map_user_id_maps_map_id_fk": {
+          "name": "routes_map_user_id_maps_map_id_fk",
+          "tableFrom": "routes",
+          "tableTo": "maps",
+          "columnsFrom": [
+            "map_user_id"
+          ],
+          "columnsTo": [
+            "map_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "routes_user_id_users_user_id_fk": {
+          "name": "routes_user_id_users_user_id_fk",
+          "tableFrom": "routes",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "user_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "users": {
       "name": "users",
@@ -789,9 +844,11 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     }
   },
+  "views": {},
   "enums": {},
   "_meta": {
     "schemas": {},
