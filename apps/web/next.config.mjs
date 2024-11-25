@@ -1,7 +1,8 @@
-import type { NextConfig } from "next";
-import "./env";
 
-const nextConfig: NextConfig = {
+import "./env.mjs";
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     unoptimized: true,
     remotePatterns: [
