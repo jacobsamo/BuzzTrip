@@ -10,7 +10,7 @@ const webhookSecret = process.env.CLERK_WEBHOOK_SECRET || ``;
 
 async function validateRequest(request: Request) {
   const payloadString = await request.text();
-  const headerPayload = await headers();
+  const headerPayload = headers();
 
   const svixHeaders = {
     "svix-id": headerPayload.get("svix-id")!,

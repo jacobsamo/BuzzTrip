@@ -17,9 +17,5 @@ export default async function MapPage() {
 
   const usersMaps = await getUserMaps(db, userId);
 
-  return (
-
-      <UserMaps userId={userId} usersMaps={usersMaps} />
-
-  );
+  return <UserMaps userId={userId} usersMaps={usersMaps} />;
 }
