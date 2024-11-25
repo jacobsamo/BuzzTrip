@@ -5,8 +5,9 @@ import {
   map_users,
   collections,
   collection_links,
+  users,
 } from "../schema";
-import { eq } from "drizzle-orm";
+import { eq, like, or } from "drizzle-orm";
 import { CombinedMarker, UserMap } from "../types";
 import { getTableColumns } from "drizzle-orm";
 import { Database } from "..";
@@ -99,4 +100,18 @@ export const getUserMaps = async (db: Database, userId: string) => {
     .from(map_users)
     .leftJoin(maps, eq(map_users.map_id, maps.map_id))
     .where(eq(maps.owner_id, userId!)) as Promise<UserMap[]>;
+};
+
+export const searchUsers = async (db: Database, query: string) => {
+  return db
+    .select()
+    .from(users)
+    .where(
+      or(
+        like(users.username, `%${query}%`),
+        like(users.email, `%${query}%`),
+        like(users.first_name, `%${query}%`),
+        like(users.last_name, `%${query}%`)
+      )
+    );
 };

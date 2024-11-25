@@ -9,6 +9,7 @@ import {
   route_stops,
   users,
   locations,
+  permissionEnum,
 } from "../schema";
 import * as z from "zod";
 import { iconsList } from "../types";
@@ -64,6 +65,8 @@ export const collection_linksEditSchema = createInsertSchema(collection_links);
 
 export const map_usersSchema = createSelectSchema(map_users);
 export const map_usersEditSchema = createInsertSchema(map_users);
+
+export const permissionEnumSchema = z.enum(permissionEnum);
 
 export const routesSchema = createSelectSchema(routes);
 export const routesEditSchema = createInsertSchema(routes);
