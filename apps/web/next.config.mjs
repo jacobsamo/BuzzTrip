@@ -35,8 +35,6 @@ export default withSentryConfig(nextConfig, {
   hideSourceMaps: true,
   disableLogger: true,
   sourcemaps: {
-    disable: true,
     deleteSourcemapsAfterUpload: true,
   },
-  
 });
