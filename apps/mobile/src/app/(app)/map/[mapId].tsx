@@ -21,7 +21,7 @@ const MapView = () => {
         });
         return res.ok ? res.json() : null;
       } catch (error) {
-        console.log("Error fetching data", error);
+        console.error("Error fetching data", error);
         return null;
       }
     },

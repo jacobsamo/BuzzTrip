@@ -1,15 +1,20 @@
-import type { IconType } from "../types";
-import { Bounds, Review } from "../types";
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
+import { relations } from "drizzle-orm/relations";
 import {
   integer,
   real,
-  text,
+  type ReferenceConfig,
   sqliteTable,
-  sqliteView,
+  text,
 } from "drizzle-orm/sqlite-core";
-import { relations } from "drizzle-orm/relations";
 import { v4 as uuid } from "uuid";
+import type { IconType } from "../types";
+import { Bounds, Review } from "../types";
+
+const onUpdateOptions: ReferenceConfig["actions"] = {
+  onDelete: "cascade",
+  onUpdate: "no action",
+};
 
 export const users = sqliteTable("users", {
   user_id: text("user_id").primaryKey().notNull(),
@@ -30,8 +35,33 @@ export const maps = sqliteTable("maps", {
   description: text("description"),
   image: text("image"),
   owner_id: text("owner_id")
+    .references(() => users.user_id)
+    .notNull(),
+});
+
+export const permissionEnum = [
+  "owner",
+  "editor",
+  "viewer",
+  "commenter",
+] as const;
+
+export const map_users = sqliteTable("map_users", {
+  map_user_id: text("map_user_id")
+    .primaryKey()
     .notNull()
-    .references(() => users.user_id),
+    .$default(() => uuid()),
+  map_id: text("map_id")
+    .references(() => maps.map_id, onUpdateOptions)
+    .notNull(),
+  user_id: text("user_id")
+    .references(() => users.user_id)
+    .notNull(),
+  permission: text("permission", {
+    enum: permissionEnum,
+  })
+    .default("editor")
+    .notNull(),
 });
 
 export const markers = sqliteTable("markers", {
@@ -39,9 +69,6 @@ export const markers = sqliteTable("markers", {
     .primaryKey()
     .notNull()
     .$defaultFn(() => uuid()),
-  collection_id: text("collection_id").references(
-    () => collections.collection_id
-  ),
   title: text("title").notNull(),
   note: text("note"),
   lat: real("lat").notNull(),
@@ -52,8 +79,12 @@ export const markers = sqliteTable("markers", {
   created_at: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
   icon: text("icon").$type<IconType>().notNull(),
   color: text("color"),
-  location_id: text("location_id").references(() => locations.location_id),
-  map_id: text("map_id").references(() => maps.map_id),
+  location_id: text("location_id")
+    .references(() => locations.location_id)
+    .notNull(),
+  map_id: text("map_id")
+    .references(() => maps.map_id, onUpdateOptions)
+    .notNull(),
 });
 
 export const locations = sqliteTable("locations", {
@@ -88,7 +119,9 @@ export const collections = sqliteTable("collections", {
     .primaryKey()
     .notNull()
     .$defaultFn(() => uuid()),
-  map_id: text("map_id").references(() => maps.map_id),
+  map_id: text("map_id")
+    .references(() => maps.map_id, onUpdateOptions)
+    .notNull(),
   title: text("title").notNull(),
   description: text("description"),
   created_by: text("created_by")
@@ -107,23 +140,13 @@ export const collection_links = sqliteTable("collection_links", {
   collection_id: text("collection_id").references(
     () => collections.collection_id
   ),
-  marker_id: text("marker_id").references(() => markers.marker_id),
-  map_id: text("map_id").references(() => maps.map_id),
-  user_id: text("user_id").references(() => users.user_id),
-});
-
-export const map_users = sqliteTable("map_users", {
-  map_user_id: text("map_user_id")
-    .primaryKey()
-    .notNull()
-    .$default(() => uuid()),
-  map_id: text("map_id").references(() => maps.map_id),
-  user_id: text("user_id").references(() => users.user_id),
-  permission: text("permission", {
-    enum: ["owner", "editor", "viewer", "commenter"],
-  })
-    .default("editor")
+  marker_id: text("marker_id")
+    .references(() => markers.marker_id, onUpdateOptions)
     .notNull(),
+  map_id: text("map_id")
+    .references(() => maps.map_id, onUpdateOptions)
+    .notNull(),
+  user_id: text("user_id").references(() => users.user_id),
 });
 
 export const routes = sqliteTable("routes", {
@@ -133,7 +156,8 @@ export const routes = sqliteTable("routes", {
     .$defaultFn(() => uuid()),
   map_id: text("map_user_id")
     .notNull()
-    .references(() => maps.map_id),
+    .references(() => maps.map_id, onUpdateOptions)
+    .notNull(),
   name: text("name").notNull(),
   description: text("description"),
   user_id: text("user_id").references(() => users.user_id),
@@ -146,8 +170,11 @@ export const route_stops = sqliteTable("route_stops", {
     .$defaultFn(() => uuid()),
   map_id: text("map_user_id")
     .notNull()
-    .references(() => maps.map_id),
-  route_id: text("route_id").references(() => routes.route_id),
+    .references(() => maps.map_id, onUpdateOptions)
+    .notNull(),
+  route_id: text("route_id")
+    .references(() => routes.route_id, onUpdateOptions)
+    .notNull(),
   marker_id: text("marker_id").references(() => markers.marker_id),
   stop_order: integer("stop_order").notNull(),
 });
@@ -194,10 +221,6 @@ export const markersRelations = relations(markers, ({ one, many }) => ({
   user: one(users, {
     fields: [markers.created_by],
     references: [users.user_id],
-  }),
-  collection: one(collections, {
-    fields: [markers.collection_id],
-    references: [collections.collection_id],
   }),
   route_stops: many(route_stops),
 }));

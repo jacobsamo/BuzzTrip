@@ -1,5 +1,8 @@
+<<<<<<<< HEAD:packages/db/drizzle/migrations/0000_wakeful_silhouette.sql
 PRAGMA foreign_keys = ON; -- Enable foreign key constraints for sqlite
 
+========
+>>>>>>>> 047f959aaf88e062f39c8aae2db961657a5417aa:packages/db/drizzle/migrations/0000_easy_bullseye.sql
 CREATE TABLE `collection_links` (
 	`link_id` text PRIMARY KEY NOT NULL,
 	`collection_id` text,
@@ -49,8 +52,13 @@ CREATE TABLE `locations` (
 --> statement-breakpoint
 CREATE TABLE `map_users` (
 	`map_user_id` text PRIMARY KEY NOT NULL,
+<<<<<<<< HEAD:packages/db/drizzle/migrations/0000_wakeful_silhouette.sql
 	`map_id` text NOT NULL,
 	`user_id` text NOT NULL,
+========
+	`map_id` text,
+	`user_id` text,
+>>>>>>>> 047f959aaf88e062f39c8aae2db961657a5417aa:packages/db/drizzle/migrations/0000_easy_bullseye.sql
 	`permission` text DEFAULT 'editor' NOT NULL,
 	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON UPDATE no action ON DELETE no action
@@ -79,17 +87,29 @@ CREATE TABLE `markers` (
 	`map_id` text NOT NULL,
 	FOREIGN KEY (`created_by`) REFERENCES `users`(`user_id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`location_id`) REFERENCES `locations`(`location_id`) ON UPDATE no action ON DELETE no action,
+<<<<<<<< HEAD:packages/db/drizzle/migrations/0000_wakeful_silhouette.sql
 	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE cascade
+========
+	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE no action
+>>>>>>>> 047f959aaf88e062f39c8aae2db961657a5417aa:packages/db/drizzle/migrations/0000_easy_bullseye.sql
 );
 --> statement-breakpoint
 CREATE TABLE `route_stops` (
 	`route_stop_id` text PRIMARY KEY NOT NULL,
 	`map_user_id` text NOT NULL,
+<<<<<<<< HEAD:packages/db/drizzle/migrations/0000_wakeful_silhouette.sql
 	`route_id` text NOT NULL,
 	`marker_id` text,
 	`stop_order` integer NOT NULL,
 	FOREIGN KEY (`map_user_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`route_id`) REFERENCES `routes`(`route_id`) ON UPDATE no action ON DELETE cascade,
+========
+	`route_id` text,
+	`marker_id` text,
+	`stop_order` integer NOT NULL,
+	FOREIGN KEY (`map_user_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`route_id`) REFERENCES `routes`(`route_id`) ON UPDATE no action ON DELETE no action,
+>>>>>>>> 047f959aaf88e062f39c8aae2db961657a5417aa:packages/db/drizzle/migrations/0000_easy_bullseye.sql
 	FOREIGN KEY (`marker_id`) REFERENCES `markers`(`marker_id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
@@ -99,7 +119,11 @@ CREATE TABLE `routes` (
 	`name` text NOT NULL,
 	`description` text,
 	`user_id` text,
+<<<<<<<< HEAD:packages/db/drizzle/migrations/0000_wakeful_silhouette.sql
 	FOREIGN KEY (`map_user_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE cascade,
+========
+	FOREIGN KEY (`map_user_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE no action,
+>>>>>>>> 047f959aaf88e062f39c8aae2db961657a5417aa:packages/db/drizzle/migrations/0000_easy_bullseye.sql
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint

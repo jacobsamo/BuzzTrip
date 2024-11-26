@@ -45,7 +45,6 @@ const Mapview = () => {
   }, []);
 
   async function handleMapClick(e: MapMouseEvent) {
-    console.log("click event", e);
     if (!places || !map) return;
     e.domEvent?.stopPropagation();
     e.stop();
@@ -74,7 +73,6 @@ const Mapview = () => {
 
       placesService.getDetails(requestOptions, (data) => {
         const res = detailsRequestCallback(map!, data);
-        console.log("res", res);
         if (res) {
           setActiveLocation(res.location);
           setSearchValue(
@@ -119,7 +117,7 @@ const Mapview = () => {
               title={marker.title}
               onClick={() => {
                 map!.panTo({ lat: marker.lat, lng: marker.lng });
-                setActiveLocation(marker as Location);
+                setActiveLocation(marker);
               }}
             >
               <MarkerPin marker={marker} size={16} />

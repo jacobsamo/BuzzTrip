@@ -53,7 +53,6 @@ export default function MarkerModal() {
 
   const handleClose = () => {
     setMarkerOpen(false, null, null);
-    console.log("Marker open-fire close: ", markerOpen);
   };
 
   const Header = () => {
@@ -150,8 +149,8 @@ function MarkerForm() {
       ...marker,
       icon: marker?.icon ?? "MapPin",
       color: marker?.color ?? "#0B7138",
-      map_id: map?.map_id ?? null,
-      bounds: marker?.bounds ?? undefined,
+      bounds: marker?.bounds ?? null,
+      map_id: map!.map_id,
     },
   });
 
@@ -178,14 +177,6 @@ function MarkerForm() {
       ) ?? null;
     setInCollections(inCols);
     setValue("collection_ids", inCols);
-
-    console.log("Data change: ", {
-      markerOpen,
-      markers,
-      collections,
-      inCols,
-      inCollections,
-    });
   }, [markers, collections, getCollectionsForMarker, setValue, markerOpen]);
 
   useEffect(() => {
@@ -193,10 +184,6 @@ function MarkerForm() {
   }, [errors]);
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async (data) => {
-    console.log("Data: ", {
-      data,
-      markerOpen,
-    });
     try {
       setIsLoading(true);
       const cols = data.collection_ids ?? null;
@@ -220,7 +207,6 @@ function MarkerForm() {
           collectionIds_to_add: collectionsToAdd,
           collectionIds_to_remove: collectionsToRemove,
         };
-        console.log("Edit marker", updatedMarker);
 
         const res = await updateMarker(updatedMarker);
 
@@ -251,8 +237,6 @@ function MarkerForm() {
           collectionIds: cols,
         };
         const create = createMarker(newMarker);
-
-        console.log("Create: ", newMarker);
 
         toast.promise(create, {
           loading: "Creating marker...",

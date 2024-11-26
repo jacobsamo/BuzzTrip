@@ -5,8 +5,9 @@ import {
   map_users,
   collections,
   collection_links,
+  users,
 } from "../schema";
-import { eq } from "drizzle-orm";
+import { desc, eq, like, or } from "drizzle-orm";
 import { CombinedMarker, UserMap } from "../types";
 import { getTableColumns } from "drizzle-orm";
 import { Database } from "..";
@@ -19,31 +20,11 @@ export const getMarkersView = async (
 ) => {
   let getMarkers = db
     .select({
-      marker_id: markers.marker_id,
-      collection_id: markers.collection_id,
-      title: markers.title,
-      note: markers.note,
-      created_by: markers.created_by,
-      created_at: markers.created_at,
-      icon: markers.icon,
-      color: markers.color,
-      location_id: locations.location_id,
-      map_id: markers.map_id,
-      description: locations.description,
+      ...getTableColumns(markers),
+      ...getTableColumns(locations),
       lat: locations.lat,
       lng: locations.lng,
-      bounds: locations.bounds,
-      address: locations.address,
-      gm_place_id: locations.gm_place_id,
-      photos: locations.photos,
-      reviews: locations.reviews,
-      rating: locations.rating,
-      avg_price: locations.avg_price,
-      types: locations.types,
-      website: locations.website,
-      phone: locations.phone,
-      opening_times: locations.opening_times,
-      updated_at: locations.updated_at,
+      location_id: locations.location_id,
     })
     .from(markers)
     .leftJoin(locations, eq(locations.location_id, markers.location_id))
@@ -99,4 +80,18 @@ export const getUserMaps = async (db: Database, userId: string) => {
     .from(map_users)
     .leftJoin(maps, eq(map_users.map_id, maps.map_id))
     .where(eq(maps.owner_id, userId!)) as Promise<UserMap[]>;
+};
+
+export const searchUsers = async (db: Database, query: string) => {
+  return db
+    .select()
+    .from(users)
+    .where(
+      or(
+        like(users.username, `%${query}%`),
+        like(users.email, `%${query}%`),
+        like(users.first_name, `%${query}%`),
+        like(users.last_name, `%${query}%`)
+      )
+    );
 };

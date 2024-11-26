@@ -1,5 +1,6 @@
-
+import { withSentryConfig } from "@sentry/nextjs";
 import "./env.mjs";
+import { env } from "./env.mjs";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -26,4 +27,14 @@ const nextConfig = {
   skipTrailingSlashRedirect: true,
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: env.SENTRY_ORG,
+  project: env.SENTRY_PROJECT,
+  authToken: env.SENTRY_AUTH_TOKEN,
+  telemetry: false,
+  hideSourceMaps: true,
+  disableLogger: true,
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
+});

@@ -12,11 +12,6 @@ interface UserMapsProps {
 const UserMaps = ({ userId, usersMaps }: UserMapsProps) => {
   const [maps, setMaps] = useState<UserMap[] | null>(usersMaps);
 
-  console.log("iuser maps", {
-    userId,
-    usersMaps,
-  });
-
   return (
     <>
       <div className="inline-flex w-full items-center justify-between">

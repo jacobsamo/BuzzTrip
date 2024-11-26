@@ -39,8 +39,8 @@ export const detailsRequestCallback = (
   const location: CombinedMarker = {
     marker_id: undefined,
     note: null,
-    collection_id: null,
     color: null,
+    map_id: "",
     gm_place_id: placeDetails.place_id ?? null,
     lat: placeDetails.geometry.location.lat(),
     lng: placeDetails.geometry.location.lng(),

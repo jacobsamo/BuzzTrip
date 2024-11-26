@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "afe1b188-39b1-4014-9476-020789e6d8f9",
+  "id": "9957f892-ca10-4891-937f-7d839bcc557b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "collection_links": {
@@ -25,14 +25,14 @@
           "name": "marker_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "map_id": {
           "name": "map_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "user_id": {
@@ -68,7 +68,7 @@
           "columnsTo": [
             "marker_id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "collection_links_map_id_maps_map_id_fk": {
@@ -81,7 +81,7 @@
           "columnsTo": [
             "map_id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "collection_links_user_id_users_user_id_fk": {
@@ -116,7 +116,7 @@
           "name": "map_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "title": {
@@ -175,7 +175,7 @@
           "columnsTo": [
             "map_id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "collections_created_by_users_user_id_fk": {
@@ -355,14 +355,14 @@
           "name": "map_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "user_id": {
           "name": "user_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "permission": {
@@ -386,7 +386,7 @@
           "columnsTo": [
             "map_id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "map_users_user_id_users_user_id_fk": {
@@ -476,13 +476,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "collection_id": {
-          "name": "collection_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "title": {
           "name": "title",
           "type": "text",
@@ -544,32 +537,19 @@
           "name": "location_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "map_id": {
           "name": "map_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "markers_collection_id_collections_collection_id_fk": {
-          "name": "markers_collection_id_collections_collection_id_fk",
-          "tableFrom": "markers",
-          "tableTo": "collections",
-          "columnsFrom": [
-            "collection_id"
-          ],
-          "columnsTo": [
-            "collection_id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
         "markers_created_by_users_user_id_fk": {
           "name": "markers_created_by_users_user_id_fk",
           "tableFrom": "markers",
@@ -606,7 +586,7 @@
           "columnsTo": [
             "map_id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -635,7 +615,7 @@
           "name": "route_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "marker_id": {
@@ -665,7 +645,7 @@
           "columnsTo": [
             "map_id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "route_stops_route_id_routes_route_id_fk": {
@@ -678,7 +658,7 @@
           "columnsTo": [
             "route_id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "route_stops_marker_id_markers_marker_id_fk": {
@@ -750,7 +730,7 @@
           "columnsTo": [
             "map_id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "routes_user_id_users_user_id_fk": {
