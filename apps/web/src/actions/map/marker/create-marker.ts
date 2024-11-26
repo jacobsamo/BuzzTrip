@@ -21,7 +21,8 @@ export const createMarker = authAction
   .action(async ({ parsedInput: params, ctx }) => {
     const id = uuid();
 
-    // Check for existing location or create a new one
+    // Wrap in a transaction as we don't want to create a marker without a location
+
     await db.transaction(async (tx) => {
       let locationId = uuid();
       const [location] = await tx
@@ -34,15 +35,30 @@ export const createMarker = authAction
           )
         );
 
+      // if location exists set the location id
       if (location) {
         locationId = location.location_id;
       } else {
+        // otherwise create a new location
         const newLocation: NewLocation = {
           ...params.marker,
           location_id: locationId,
           icon: params.marker.icon as IconType,
         };
-        await tx.insert(locations).values(newLocation);
+
+        const lo = await tx
+          .insert(locations)
+          .values(newLocation)
+          .returning({ locationId: locations.location_id });
+
+        if (!lo[0]) {
+          tx.rollback();
+          throw Error("Failed to create location", {
+            cause: lo,
+          });
+        }
+
+        locationId = lo[0].locationId;
       }
 
       await tx.insert(markers).values({
@@ -54,29 +70,40 @@ export const createMarker = authAction
       });
     });
 
-    // Create the new marker
-
     // Create collection marker links if collectionIds exist
+    let collectionsLinks: NewCollectionLink[] = [];
+    // if (params.collectionIds) {
+    //   await Promise.all(
+    //     params.collectionIds.map(async (collectionId) => {
+    //       const collectionLink: NewCollectionLink = {
+    //         marker_id: id,
+    //         collection_id: collectionId,
+    //         map_id: params.marker.map_id,
+    //         user_id: ctx.user.id,
+    //       };
+    //       const result = await db
+    //         .insert(collection_links)
+    //         .values(collectionLink);
+    //       if (!result) {
+    //         throw new Error("Error creating new collection marker.", {
+    //           cause: result,
+    //         });
+    //       }
+    //     })
+    //   );
+    // }
     if (params.collectionIds) {
-      await Promise.all(
-        params.collectionIds.map(async (collectionId) => {
-          const collectionLink: NewCollectionLink = {
-            marker_id: id,
-            collection_id: collectionId,
-            map_id: params.marker.map_id,
-            user_id: ctx.user.id,
-          };
-          const result = await db
-            .insert(collection_links)
-            .values(collectionLink);
-          if (!result) {
-            throw new Error("Error creating new collection marker.", {
-              cause: result,
-            });
-          }
-        })
-      );
+      params.collectionIds.map(async (collectionId) => {
+        collectionsLinks.push({
+          marker_id: id,
+          collection_id: collectionId,
+          map_id: params.marker.map_id,
+          user_id: ctx.user.id,
+        });
+      });
     }
+    
+    await db.insert(collection_links).values(collectionsLinks);
 
     // Fetch new markers and collection links
     const [newMarkers, collectionLinks] = await Promise.all([

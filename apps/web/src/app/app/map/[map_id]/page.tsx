@@ -13,6 +13,7 @@ import {
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
+import { type Metadata } from "next";
 
 export async function generateMetadata({
   params,
@@ -25,7 +26,8 @@ export async function generateMetadata({
 
   return {
     title: map?.title,
-  };
+    description: map?.description,
+  } as Metadata;
 }
 
 export default async function MapPage({

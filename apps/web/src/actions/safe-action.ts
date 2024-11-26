@@ -4,6 +4,8 @@ import {
 } from "next-safe-action";
 import { z } from "zod";
 import { currentUser } from "@clerk/nextjs/server";
+import logger from "@/server/logger";
+import * as Sentry from "@sentry/nextjs";
 
 export const actionWithMeta = createSafeActionClient({
   defineMetadataSchema() {
@@ -13,13 +15,6 @@ export const actionWithMeta = createSafeActionClient({
   },
   handleServerError(error, utils) {
     const { clientInput, bindArgsClientInputs, metadata, ctx } = utils;
-    console.error("Action Error: ", {
-      error,
-      clientInput: JSON.stringify(clientInput),
-      // bindArgsClientInputs,
-      // metadata,
-      // ctx,
-    });
     return DEFAULT_SERVER_ERROR_MESSAGE;
   },
 });
@@ -29,9 +24,11 @@ export const authAction = actionWithMeta.use(async ({ next, metadata }) => {
 
   if (!user) throw new Error("Not authenticated");
 
-  return next({
-    ctx: {
-      user,
-    },
+  return Sentry.withServerActionInstrumentation(metadata.name, async () => {
+    return next({
+      ctx: {
+        user,
+      },
+    });
   });
 });

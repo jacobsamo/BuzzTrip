@@ -132,7 +132,6 @@ export const createStore = (initState: Partial<StoreState>) =>
             ...route,
           });
         });
-        console.log(prevRouteMap);
         const updatedRoute = Array.from(prevRouteMap.values());
 
         return { route: updatedRoute };

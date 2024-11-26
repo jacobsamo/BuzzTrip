@@ -1,25 +1,27 @@
+PRAGMA foreign_keys = ON; -- Enable foreign key constraints for sqlite
+
 CREATE TABLE `collection_links` (
 	`link_id` text PRIMARY KEY NOT NULL,
 	`collection_id` text,
-	`marker_id` text,
-	`map_id` text,
+	`marker_id` text NOT NULL,
+	`map_id` text NOT NULL,
 	`user_id` text,
 	FOREIGN KEY (`collection_id`) REFERENCES `collections`(`collection_id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`marker_id`) REFERENCES `markers`(`marker_id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`marker_id`) REFERENCES `markers`(`marker_id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `collections` (
 	`collection_id` text PRIMARY KEY NOT NULL,
-	`map_id` text,
+	`map_id` text NOT NULL,
 	`title` text NOT NULL,
 	`description` text,
 	`created_by` text NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP),
 	`icon` text NOT NULL,
 	`color` text,
-	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`created_by`) REFERENCES `users`(`user_id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
@@ -47,10 +49,10 @@ CREATE TABLE `locations` (
 --> statement-breakpoint
 CREATE TABLE `map_users` (
 	`map_user_id` text PRIMARY KEY NOT NULL,
-	`map_id` text,
-	`user_id` text,
+	`map_id` text NOT NULL,
+	`user_id` text NOT NULL,
 	`permission` text DEFAULT 'editor' NOT NULL,
-	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
@@ -65,7 +67,6 @@ CREATE TABLE `maps` (
 --> statement-breakpoint
 CREATE TABLE `markers` (
 	`marker_id` text PRIMARY KEY NOT NULL,
-	`collection_id` text,
 	`title` text NOT NULL,
 	`note` text,
 	`lat` real NOT NULL,
@@ -74,22 +75,21 @@ CREATE TABLE `markers` (
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP),
 	`icon` text NOT NULL,
 	`color` text,
-	`location_id` text,
-	`map_id` text,
-	FOREIGN KEY (`collection_id`) REFERENCES `collections`(`collection_id`) ON UPDATE no action ON DELETE no action,
+	`location_id` text NOT NULL,
+	`map_id` text NOT NULL,
 	FOREIGN KEY (`created_by`) REFERENCES `users`(`user_id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`location_id`) REFERENCES `locations`(`location_id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `route_stops` (
 	`route_stop_id` text PRIMARY KEY NOT NULL,
 	`map_user_id` text NOT NULL,
-	`route_id` text,
+	`route_id` text NOT NULL,
 	`marker_id` text,
 	`stop_order` integer NOT NULL,
-	FOREIGN KEY (`map_user_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`route_id`) REFERENCES `routes`(`route_id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`map_user_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`route_id`) REFERENCES `routes`(`route_id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`marker_id`) REFERENCES `markers`(`marker_id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
@@ -99,7 +99,7 @@ CREATE TABLE `routes` (
 	`name` text NOT NULL,
 	`description` text,
 	`user_id` text,
-	FOREIGN KEY (`map_user_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`map_user_id`) REFERENCES `maps`(`map_id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
