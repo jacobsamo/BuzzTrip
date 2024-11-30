@@ -2,14 +2,16 @@ import { ErrorSchema } from "@/common/schema";
 import { createRoute } from "@hono/zod-openapi";
 import { MapParamsSchema } from "../schema";
 import {
-    CreateMarkerSchema,
-    CreateMarkersReturnSchema,
-    EditMarkerReturnSchema,
-    EditMarkerSchema,
-    MarkerParamsSchema,
+  EditMarkerReturnSchema,
+  EditMarkerSchema,
+  MarkerParamsSchema,
 } from "./schema";
+import {
+  CreateMarkerSchema,
+  CreateMarkersReturnSchema,
+} from "@buzztrip/db/queries";
 
-export const createMarker = createRoute({
+export const createMarkerRoute = createRoute({
   method: "post",
   path: "/map/{mapId}/marker/create",
   summary: "Create a new marker",
@@ -47,7 +49,7 @@ export const createMarker = createRoute({
   },
 });
 
-export const editMarker = createRoute({
+export const editMarkerRoute = createRoute({
   method: "put",
   path: "/map/{mapId}/marker/{markerId}",
   summary: "Edit a marker",

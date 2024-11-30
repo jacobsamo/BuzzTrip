@@ -9,6 +9,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { DrawerFooter } from "@/components/ui/drawer";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import CollectionModal from "@/components/modals/map/create_edit_collection_modal";
 
 export default function MapDrawer() {
   const { snap, setSnap, activeLocation, setActiveLocation, map } = useMapStore(
@@ -46,13 +47,16 @@ export default function MapDrawer() {
         </Drawer.Title>
 
         <DisplayActiveState />
-        {activeLocation && (
-          <DrawerFooter className="pt-2">
+
+        <DrawerFooter className="pt-2">
+          <CollectionModal />
+
+          {activeLocation && (
             <DrawerClose className={buttonVariants({ variant: "outline" })}>
               Cancel
             </DrawerClose>
-          </DrawerFooter>
-        )}
+          )}
+        </DrawerFooter>
       </Drawer.Content>
     </Drawer.Root>
   );
