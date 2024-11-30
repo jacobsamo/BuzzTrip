@@ -1,12 +1,14 @@
 import { getMarkersView } from "@buzztrip/db/queries";
 import { collection_links, locations, markers } from "@buzztrip/db/schema";
-import type { IconType } from "@buzztrip/db/types";
+import type { CollectionLink, IconType } from "@buzztrip/db/types";
 import { NewCollectionLink, NewLocation } from "@buzztrip/db/types";
 import { and, eq } from "drizzle-orm";
 import { v4 as uuid } from "uuid";
 import { z } from "zod";
 import { Database } from "..";
 import { collection_linksSchema, combinedMarkersSchema } from "../zod-schemas";
+
+// =========== Create marker ============
 
 export const CreateMarkerSchema = z.object({
   marker: combinedMarkersSchema,
@@ -61,19 +63,19 @@ export const createMarker = async (
         icon: input.marker.icon as IconType,
       };
 
-      const lo = await tx
+      const [lo] = await tx
         .insert(locations)
         .values(newLocation)
         .returning({ locationId: locations.location_id });
 
-      if (!lo[0]) {
+      if (!lo) {
         tx.rollback();
         throw Error("Failed to create location", {
           cause: lo,
         });
       }
 
-      locationId = lo[0].locationId;
+      locationId = lo.locationId;
     }
 
     await tx.insert(markers).values({
@@ -114,4 +116,107 @@ export const createMarker = async (
     markers: newMarkers,
     collectionLinks,
   };
+};
+
+// =========== Edit marker ============
+
+export const EditMarkerSchema = z.object({
+  marker_id: z.string(),
+  marker: combinedMarkersSchema,
+  collectionIds_to_add: z.string().array().nullable(),
+  collectionIds_to_remove: z.string().array().nullable(),
+});
+
+export const EditMarkerReturnSchema = z.object({
+  collectionLinksCreated: collection_linksSchema.array().nullable(),
+  collectionLinksDeleted: z.string().array().nullable(),
+  marker: combinedMarkersSchema,
+});
+
+export type EditMarkerParams = {
+  userId: string;
+  mapId: string;
+  input: z.infer<typeof EditMarkerSchema>;
+};
+
+export const editMarker = async (
+  db: Database,
+  { userId, mapId, input }: EditMarkerParams
+): Promise<z.infer<typeof EditMarkerReturnSchema>> => {
+  let collectionLinksCreated: CollectionLink[] | null = null;
+  if (input.collectionIds_to_add) {
+    collectionLinksCreated = await db
+      .insert(collection_links)
+      .values(
+        input.collectionIds_to_add.map((collectionId) => {
+          return {
+            marker_id: input.marker_id,
+            collection_id: collectionId,
+            map_id: mapId,
+            user_id: userId,
+          };
+        })
+      )
+      .returning();
+  }
+
+  let collectionLinksDeleted: string[] = [];
+  if (input.collectionIds_to_remove) {
+    await Promise.all(
+      input.collectionIds_to_remove.map(async (collectionId) => {
+        const result = await db
+          .delete(collection_links)
+          .where(
+            and(
+              eq(collection_links.marker_id, input.marker_id),
+              eq(collection_links.collection_id, collectionId)
+            )
+          );
+
+        collectionLinksDeleted = collectionLinksDeleted ?? [];
+        collectionLinksDeleted.push(collectionId);
+      })
+    );
+  }
+
+  const result = await db
+    .update(markers)
+    .set(input.marker)
+    .where(eq(markers.marker_id, input.marker_id));
+
+  return {
+    collectionLinksDeleted: collectionLinksDeleted,
+    collectionLinksCreated: collectionLinksCreated,
+    marker: input.marker,
+  };
+};
+
+// =========== Delete marker ============
+export const DeleteMarkerSchema = z.object({
+  markerId: z.string(),
+});
+
+export const DeleteMarkerReturnSchema = DeleteMarkerSchema;
+
+export type DeleteMarkerParams = {
+  mapId: string;
+  markerId: string;
+};
+
+export const deleteMarker = async (
+  db: Database,
+  { mapId, markerId }: DeleteMarkerParams
+): Promise<z.infer<typeof DeleteMarkerReturnSchema>> => {
+  const [deletedMarker] = await db
+    .delete(markers)
+    .where(eq(markers.marker_id, markerId))
+    .returning({ deletedId: markers.marker_id });
+
+  if (!deletedMarker) {
+    throw new Error("Error deleting marker.", {
+      cause: deletedMarker,
+    });
+  }
+
+  return { markerId: deletedMarker.deletedId };
 };

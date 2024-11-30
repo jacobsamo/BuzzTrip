@@ -1,5 +1,5 @@
-import { createMarker } from "@/actions/map/marker/create-marker";
-import { updateMarker } from "@/actions/map/marker/edit-marker";
+import { createMarkerAction } from "@/actions/map/marker/create-marker";
+import { updateMarkerAction } from "@/actions/map/marker/edit-marker";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -26,6 +26,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -43,7 +44,6 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import IconPickerModal from "../icon-picker-modal";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Icon = lazy(() => import("@buzztrip/components/icon"));
 
@@ -208,7 +208,7 @@ function MarkerForm() {
           collectionIds_to_remove: collectionsToRemove,
         };
 
-        const res = await updateMarker(updatedMarker);
+        const res = await updateMarkerAction(updatedMarker);
 
         if (res && res.data) {
           if (res.data.collectionLinksDeleted) {
@@ -236,7 +236,7 @@ function MarkerForm() {
           },
           collectionIds: cols,
         };
-        const create = createMarker(newMarker);
+        const create = createMarkerAction(newMarker);
 
         toast.promise(create, {
           loading: "Creating marker...",

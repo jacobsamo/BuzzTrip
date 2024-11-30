@@ -40,22 +40,24 @@ export const boundsSchema = z.union([bounds, latlng]);
 
 // Table generated schemas with drizzle-zod
 export const usersSchema = createSelectSchema(users);
-export const usersEditSchema = createInsertSchema(users).extend({
-  icon: iconSchema,
-});
+export const usersEditSchema = createInsertSchema(users);
 
 export const mapsSchema = createSelectSchema(maps);
 export const mapsEditSchema = mapsSchema.extend({
   map_id: z.string().optional(),
 });
 
-export const markersSchema = createSelectSchema(markers);
+export const markersSchema = createSelectSchema(markers).extend({
+  icon: iconSchema,
+});
 export const markersEditSchema = createInsertSchema(markers).extend({
   icon: iconSchema,
   created_by: z.string().optional(),
 });
 
-export const collectionsSchema = createSelectSchema(collections);
+export const collectionsSchema = createSelectSchema(collections).extend({
+  icon: iconSchema,
+});
 export const collectionsEditSchema = createInsertSchema(collections).extend({
   icon: iconSchema,
 });

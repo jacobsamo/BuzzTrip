@@ -2,13 +2,13 @@ import { ErrorSchema } from "@/common/schema";
 import { createRoute } from "@hono/zod-openapi";
 import { MapParamsSchema } from "../schema";
 import {
-    CollectionParamsSchema,
-    CollectionReturnSchema,
-    CreateCollectionSchema,
-    EditCollectionSchema,
+  CollectionParamsSchema,
+  CollectionReturnSchema,
+  EditCollectionSchema,
 } from "./schema";
+import { CreateCollectionReturnSchema, CreateCollectionSchema } from "@buzztrip/db/mutations";
 
-export const createCollection = createRoute({
+export const createCollectionRoute = createRoute({
   method: "post",
   path: "/map/{mapId}/collection/create",
   summary: "Create a new collection",
@@ -22,7 +22,7 @@ export const createCollection = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: CollectionReturnSchema,
+          schema: CreateCollectionReturnSchema,
         },
       },
       description: "Create a new collection",
@@ -46,7 +46,7 @@ export const createCollection = createRoute({
   },
 });
 
-export const editCollection = createRoute({
+export const editCollectionRoute = createRoute({
   method: "put",
   path: "/map/{mapId}/collection/{collectionId}",
   summary: "Edit a collection",

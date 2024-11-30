@@ -1,6 +1,5 @@
 // import ConfirmDeleteModal from "@/components/shared/modals/comfirm_delete_modal";
-import { createCollection } from "@/actions/map/collection/create-collection";
-import Icon, { otherIconsList } from "@buzztrip/components/icon";
+import { createCollectionAction } from "@/actions/map/collection/create-collection";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import Icon, { otherIconsList } from "@buzztrip/components/icon";
 import { Collection } from "@buzztrip/db/types";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Edit, Plus } from "lucide-react";
@@ -135,7 +135,7 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
   const onSubmit: SubmitHandler<Collection> = async (data: Collection) => {
     try {
       if (mode === "create") {
-        const create = createCollection({
+        const create = createCollectionAction({
           ...data,
           color: "#fff",
           map_id: map!.map_id,

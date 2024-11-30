@@ -9,7 +9,7 @@ import {
 import {
   CreateMarkerSchema,
   CreateMarkersReturnSchema,
-} from "@buzztrip/db/queries";
+} from "@buzztrip/db/mutations";
 
 export const createMarkerRoute = createRoute({
   method: "post",

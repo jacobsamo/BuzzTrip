@@ -1,6 +1,6 @@
 import { AppRouteHandler } from "@/common/types";
 import { createDb } from "@buzztrip/db";
-import { createMarker } from "@buzztrip/db/queries";
+import { createMarker } from "@buzztrip/db/mutations";
 import { collection_links, markers } from "@buzztrip/db/schema";
 import { NewCollectionLink } from "@buzztrip/db/types";
 import { getAuth } from "@hono/clerk-auth";

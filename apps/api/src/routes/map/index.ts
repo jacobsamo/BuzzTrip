@@ -6,14 +6,14 @@ import {
   getMapDataHandler,
   getMapHandler,
 } from "./map.handlers";
-import { createMap, editMap, getMap, getMapDataRoute } from "./map.routes";
+import { createMapRoute, editMapRoute, getMapRoute, getMapDataRoute } from "./map.routes";
 
 const app = new OpenAPIHono<{ Bindings: Bindings }>();
 
 const routes = app
-  .openapi(getMap, getMapHandler)
+  .openapi(getMapRoute, getMapHandler)
   .openapi(getMapDataRoute, getMapDataHandler)
-  .openapi(createMap, createMapHandler)
-  .openapi(editMap, editMapHandler);
+  .openapi(createMapRoute, createMapHandler)
+  .openapi(editMapRoute, editMapHandler);
 
 export default routes;

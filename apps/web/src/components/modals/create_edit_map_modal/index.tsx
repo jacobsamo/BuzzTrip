@@ -1,5 +1,5 @@
 "use client";
-import { createMap } from "@/actions/map/create-map";
+import { createMapAction } from "@/actions/map/create-map";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -124,7 +124,7 @@ function MapForm({ mode, map, setMap }: MapModalProps) {
   const onSubmit: SubmitHandler<Map> = async (data) => {
     try {
       if (mode === "create") {
-        const create = createMap(data);
+        const create = createMapAction(data);
 
         toast.promise(create, {
           loading: "Creating map...",

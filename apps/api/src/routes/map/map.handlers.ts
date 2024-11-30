@@ -1,12 +1,18 @@
 import { AppRouteHandler } from "@/common/types";
 import { createDb } from "@buzztrip/db";
+import { createMap } from "@buzztrip/db/mutations/maps";
 import { getAllMapData } from "@buzztrip/db/queries";
-import { map_users, maps } from "@buzztrip/db/schema";
+import { maps } from "@buzztrip/db/schema";
+import { getAuth } from "@hono/clerk-auth";
 import { eq } from "drizzle-orm";
-import { v4 as uuidv4 } from "uuid";
-import { createMap, editMap, getMap, getMapDataRoute } from "./map.routes";
+import {
+  createMapRoute,
+  editMapRoute,
+  getMapDataRoute,
+  getMapRoute,
+} from "./map.routes";
 
-export const getMapHandler: AppRouteHandler<typeof getMap> = async (c) => {
+export const getMapHandler: AppRouteHandler<typeof getMapRoute> = async (c) => {
   const { mapId } = c.req.valid("param");
   const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
@@ -54,45 +60,31 @@ export const getMapDataHandler: AppRouteHandler<
   );
 };
 
-export const createMapHandler: AppRouteHandler<typeof createMap> = async (
+export const createMapHandler: AppRouteHandler<typeof createMapRoute> = async (
   c
 ) => {
   const req = c.req.valid("json");
   try {
     const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+    const auth = getAuth(c);
 
-    const createMap = await db.transaction(async (trx) => {
-      const mapId = uuidv4();
-      const [map] = await trx
-        .insert(maps)
-        .values({
-          title: req.title,
-          description: req.description,
-          owner_id: req.owner_id,
-          map_id: mapId,
-        })
-        .returning();
-
-      const [mapUser] = await trx
-        .insert(map_users)
-        .values({
-          map_id: mapId,
-          user_id: req.owner_id,
-          permission: "owner",
-        })
-        .returning();
-
-      return {
-        map,
-        mapUser,
-      };
-    });
-
-    if (!!createMap.map || !!createMap.mapUser) {
-      throw new Error("Error creating map");
+    if (!auth || !auth.userId) {
+      return c.json(
+        {
+          code: "unauthorized",
+          message: "Unauthorized",
+          requestId: c.get("requestId"),
+        },
+        401
+      );
     }
 
-    return c.json(createMap, 200);
+    const data = await createMap(db, {
+      userId: auth.userId,
+      input: req,
+    })
+
+    return c.json(data, 200);
   } catch (error) {
     return c.json(
       {
@@ -105,7 +97,9 @@ export const createMapHandler: AppRouteHandler<typeof createMap> = async (
   }
 };
 
-export const editMapHandler: AppRouteHandler<typeof editMap> = async (c) => {
+export const editMapHandler: AppRouteHandler<typeof editMapRoute> = async (
+  c
+) => {
   const { mapId } = c.req.valid("param");
   const editMap = c.req.valid("json");
   const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);

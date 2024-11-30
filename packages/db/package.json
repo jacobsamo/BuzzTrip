@@ -26,8 +26,12 @@
     ".": "./src/index.ts",
     "./schema": "./src/schema/index.ts",
     "./zod-schemas": "./src/zod-schemas/index.ts",
+    "./types": "./src/types/index.ts",
     "./queries": "./src/queries/index.ts",
     "./cached-queries": "./src/queries/cached-queries.ts",
-    "./types": "./src/types/index.ts"
+    "./mutations": "./src/mutations/index.ts",
+    "./mutations/maps": "./src/mutations/maps.ts",
+    "./mutations/markers": "./src/mutations/markers.ts",
+    "./mutations/collections": "./src/mutations/collections.ts"
   }
 }

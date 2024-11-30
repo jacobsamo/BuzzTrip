@@ -1,15 +1,14 @@
 import { ErrorSchema } from "@/common/schema";
+import { CreateMapReturnSchema, CreateMapSchema } from "@buzztrip/db/mutations/maps";
 import { createRoute } from "@hono/zod-openapi";
 import {
-  CreateMapReturnSchema,
-  CreateMapSchema,
   EditMapSchema,
   MapDataSchema,
   MapParamsSchema,
   MapSchema,
 } from "./schema";
 
-export const getMap = createRoute({
+export const getMapRoute = createRoute({
   method: "get",
   path: "/map/{mapId}",
   summary: "Get get the map",
@@ -32,6 +31,14 @@ export const getMap = createRoute({
         },
       },
       description: "Returns an error",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Returns an error if user is not authenticated",
     },
   },
 });
@@ -60,10 +67,18 @@ export const getMapDataRoute = createRoute({
       },
       description: "Returns an error",
     },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Returns an error if user is not authenticated",
+    },
   },
 });
 
-export const createMap = createRoute({
+export const createMapRoute = createRoute({
   method: "post",
   path: "/map/create",
   summary: "Create a new map",
@@ -89,10 +104,18 @@ export const createMap = createRoute({
       },
       description: "Returns an error",
     },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Returns an error if user is not authenticated",
+    },
   },
 });
 
-export const editMap = createRoute({
+export const editMapRoute = createRoute({
   method: "put",
   path: "/map/{mapId}",
   summary: "Edit a map",
@@ -118,6 +141,14 @@ export const editMap = createRoute({
         },
       },
       description: "Returns an error",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Returns an error if user is not authenticated",
     },
   },
 });
