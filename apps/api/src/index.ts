@@ -11,6 +11,7 @@ import mapRoutes from "./routes/map";
 import userRoutes from "./routes/user";
 import markerRoutes from "./routes/map/marker";
 import collectionRoutes from "./routes/map/collection";
+import { cors } from "hono/cors";
 
 const app = new OpenAPIHono<{ Bindings: Bindings }>({
   defaultHook: (result, c) => {
@@ -20,6 +21,14 @@ const app = new OpenAPIHono<{ Bindings: Bindings }>({
     }
   },
 });
+
+
+app.use("*", cors({
+  origin: "http://localhost:5173", // Replace with your frontend's origin
+  allowMethods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
+  allowHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+}));
+
 
 app.use("*", requestId());
 app.use(authMiddleware);
@@ -44,11 +53,18 @@ app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
 const map = [mapRoutes, markerRoutes, collectionRoutes];
 const user = [userRoutes];
 
-map.forEach((route) => app.route("/", route));
-type UserRouteTypes = typeof userRoutes;
 
-user.forEach((route) => app.route("/", route));
-type MapRouteTypes = typeof mapRoutes;
+app.route("/", userRoutes);
+type UserRouteType = typeof userRoutes;
 
-export type AppType = MapRouteTypes & UserRouteTypes;
+app.route("/", mapRoutes);
+type MapRouteType = typeof mapRoutes;
+
+app.route("/", markerRoutes);
+type MarkerRoute = typeof markerRoutes;
+
+app.route("/", collectionRoutes);
+type CollectionRoute = typeof collectionRoutes;
+
+export type AppType = MapRouteType & UserRouteType & MarkerRoute & CollectionRoute;
 export default app;

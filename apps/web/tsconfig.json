@@ -27,6 +27,18 @@
     },
     "types": ["google.maps"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "env.mjs", "next.config.mjs"],
+  "references": [
+    {
+      "path": "../api/tsconfig.json"
+    }
+  ],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "env.mjs",
+    "next.config.mjs"
+  ],
   "exclude": ["node_modules"]
 }

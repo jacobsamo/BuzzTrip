@@ -19,6 +19,8 @@ export const env = createEnv({
     NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL: z.string().optional(),
     NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: z.string(),
     NEXT_PUBLIC_GOOGLE_MAPS_MAPID: z.string(),
+    NEXT_PUBLIC_API_URL: z.string(),
+    NEXT_PUBLIC_API_SECRET_KEY: z.string(),
     NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: z.string(),
     NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
   },
@@ -50,6 +52,8 @@ export const env = createEnv({
     NEXT_PUBLIC_GOOGLE_MAPS_MAPID: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID,
     NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN:
       process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_API_SECRET_KEY: process.env.NEXT_PUBLIC_API_SECRET_KEY,
   },
   // For Next.js >= 13.4.4, you only need to destructure client variables:
   // experimental__runtimeEnv: {

@@ -12,8 +12,6 @@ import { CombinedMarker, UserMap } from "../types";
 import { getTableColumns } from "drizzle-orm";
 import { Database } from "..";
 
-export * from "./mutations";
-
 // map data items
 export const getMarkersView = async (
   db: Database,

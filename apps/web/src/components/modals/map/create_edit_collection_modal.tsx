@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { apiClient } from "@/server/api.client";
 import Icon, { otherIconsList } from "@buzztrip/components/icon";
 import { Collection } from "@buzztrip/db/types";
 import { useMediaQuery } from "@uidotdev/usehooks";
@@ -135,17 +136,17 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
   const onSubmit: SubmitHandler<Collection> = async (data: Collection) => {
     try {
       if (mode === "create") {
-        const create = createCollectionAction({
-          ...data,
-          color: "#fff",
-          map_id: map!.map_id,
+        const create = apiClient.map[":mapId"].collection.create.$post({
+          param: { mapId: map!.map_id },
+          json: data,
         });
 
         toast.promise(create, {
           loading: "Creating collection...",
-          success: (data) => {
-            if (data?.data) {
-              setCollections(data.data);
+          success: async (res) => {
+            if (res.status == 200) {
+              const data = await res.json();
+              setCollections([data]);
             }
             return "Collection created successfully!";
           },

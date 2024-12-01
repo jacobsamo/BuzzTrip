@@ -44,6 +44,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import IconPickerModal from "../icon-picker-modal";
+import { apiClient } from "@/server/api.client";
 
 const Icon = lazy(() => import("@buzztrip/components/icon"));
 
@@ -201,49 +202,62 @@ function MarkerForm() {
         const collectionsToRemove = inCollections!.filter(
           (collectionId) => !selectedCollections.includes(collectionId)
         );
-        const updatedMarker = {
-          marker_id: markerId!,
-          marker: data,
-          collectionIds_to_add: collectionsToAdd,
-          collectionIds_to_remove: collectionsToRemove,
-        };
 
-        const res = await updateMarkerAction(updatedMarker);
+        const updatedMarker = apiClient.map[":mapId"].marker[":markerId"].$put({
+          param: { mapId: map!.map_id, markerId: markerId! },
+          json: {
+            marker_id: markerId!,
+            marker: data,
+            collectionIds_to_add: collectionsToAdd,
+            collectionIds_to_remove: collectionsToRemove,
+          },
+        });
 
-        if (res && res.data) {
-          if (res.data.collectionLinksDeleted) {
-            removeCollectionLinks(res.data.collectionLinksDeleted);
-          }
-          if (res.data.collectionLinksCreated) {
-            setCollectionLinks(res.data.collectionLinksCreated);
-          }
-          if (res.data.marker) {
-            setMarkers([
-              {
-                ...res.data.marker,
-                location_id: res.data.marker.location_id ?? undefined,
-              },
-            ]);
-          }
-          toast.success("Updated Bookmark");
-        }
+        toast.promise(updatedMarker, {
+          loading: "Updating marker...",
+          success: async (res) => {
+            if (res.status == 200) {
+              const data = await res.json();
+
+              if (data.collectionLinksDeleted) {
+                removeCollectionLinks(data.collectionLinksDeleted);
+              }
+              if (data.collectionLinksCreated) {
+                setCollectionLinks(data.collectionLinksCreated);
+              }
+              if (data.marker) {
+                setMarkers([
+                  {
+                    ...data.marker,
+                    location_id: data.marker.location_id ?? undefined,
+                  },
+                ]);
+              }
+            }
+            return "Marker updated successfully!";
+          },
+          error: "Failed to update marker",
+        });
       }
 
       if (mode == "create") {
-        const newMarker = {
-          marker: {
-            ...data,
+        const createMarker = apiClient.map[":mapId"].marker.create.$post({
+          param: { mapId: map!.map_id },
+          json: {
+            marker: {
+              ...data,
+            },
+            collectionIds: cols,
           },
-          collectionIds: cols,
-        };
-        const create = createMarkerAction(newMarker);
+        });
 
-        toast.promise(create, {
+        toast.promise(createMarker, {
           loading: "Creating marker...",
-          success: (data) => {
-            if (data && data.data) {
-              setMarkers(data.data.markers);
-              setCollectionLinks(data.data.collectionLinks);
+          success: async (res) => {
+            if (res.status == 200) {
+              const data = await res.json();
+              setMarkers(data.markers);
+              setCollectionLinks(data.collectionLinks);
             }
             return "Marker created successfully!";
           },

@@ -1,6 +1,7 @@
 import UserMaps from "@/components/layouts/user-maps";
 import { db } from "@/server/db";
 import { getUserMaps } from "@buzztrip/db/queries";
+import { UserButton, UserProfile } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 
@@ -13,5 +14,13 @@ export default async function MapPage() {
 
   const usersMaps = await getUserMaps(db, userId);
 
-  return <UserMaps userId={userId} usersMaps={usersMaps} />;
+  return (
+    <>
+      <nav>
+        <h1>BuzzTrip</h1>
+        <UserButton />
+      </nav>
+      <UserMaps userId={userId} usersMaps={usersMaps} />
+    </>
+  );
 }

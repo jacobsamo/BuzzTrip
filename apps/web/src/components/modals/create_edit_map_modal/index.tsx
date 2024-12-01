@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { apiClient } from "@/server/api.client";
 import { Map, UserMap } from "@buzztrip/db/types";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Plus } from "lucide-react";
@@ -124,19 +125,19 @@ function MapForm({ mode, map, setMap }: MapModalProps) {
   const onSubmit: SubmitHandler<Map> = async (data) => {
     try {
       if (mode === "create") {
-        const create = createMapAction(data);
+        const create = apiClient.map.create.$post({ json: data });
 
         toast.promise(create, {
           loading: "Creating map...",
-          success: (data) => {
-            if (data?.data?.map) {
-              setMap(data.data.map);
+          success: async (res) => {
+            if (res.status == 200) {
+              const data = await res.json();
+              setMap(data.map);
             }
             return "Map created successfully!";
           },
           error: "Failed to create map",
         });
-
       }
 
       // if (mode === "edit" && map) {
@@ -189,11 +190,11 @@ function MapForm({ mode, map, setMap }: MapModalProps) {
     >
       <div className="grid gap-2">
         <Label htmlFor="title">Title</Label>
-        <Input type="text" placeholder="Roadtrip" {...register("title")} />
+        <Input type="text" placeholder="" {...register("title")} />
       </div>
       <div className="grid gap-2">
         <Label htmlFor="description">Description</Label>
-        <Textarea placeholder="epic roadtrip!!" {...register("description")} />
+        <Textarea placeholder="" {...register("description")} />
       </div>
 
       {/* <div>
