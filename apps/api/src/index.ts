@@ -26,7 +26,7 @@ const app = new OpenAPIHono<{ Bindings: Bindings }>({
 app.use("*", cors({
   origin: "http://localhost:5173", // Replace with your frontend's origin
   allowMethods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
-  allowHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+  allowHeaders: ["Content-Type", "Authorization", "Cookie"], // Allow specific headers
 }));
 
 

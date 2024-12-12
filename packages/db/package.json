@@ -12,15 +12,15 @@
   },
   "devDependencies": {
     "@buzztrip/tsconfig": "workspace:*",
-    "@types/node": "^22.9.3",
+    "@types/node": "^22.10.2",
     "cross-env": "^7.0.3",
-    "dotenv": "^16.4.5",
-    "drizzle-kit": "^0.28.1",
+    "dotenv": "^16.4.7",
+    "drizzle-kit": "^0.30.0",
     "typescript": "^5.7.2"
   },
   "dependencies": {
     "@libsql/client": "^0.14.0",
-    "drizzle-zod": "^0.5.1"
+    "drizzle-zod": "^0.6.0"
   },
   "exports": {
     ".": "./src/index.ts",
