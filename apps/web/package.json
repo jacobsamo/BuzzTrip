@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "clean:all": "rm -rf node_modules/ && rm -rf .next",
-    "dev": "next dev --port 5173",
+    "dev": "next dev --port 5173 ",
+    "dev:secure": "bun dev --experimental-https",
     "build": "next build",
     "start": "next start --port 5173",
     "lint": "next lint"

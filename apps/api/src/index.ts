@@ -1,4 +1,4 @@
-import { clerkMiddleware } from "@hono/clerk-auth";
+import { clerkMiddleware } from "@hono/clerk";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { requestId } from "hono/request-id";
 import { Bindings } from "./common/bindings";
@@ -12,6 +12,7 @@ import userRoutes from "./routes/user";
 import markerRoutes from "./routes/map/marker";
 import collectionRoutes from "./routes/map/collection";
 import { cors } from "hono/cors";
+import authRoutes from "./routes/auth";
 
 const app = new OpenAPIHono<{ Bindings: Bindings }>({
   defaultHook: (result, c) => {
@@ -22,13 +23,14 @@ const app = new OpenAPIHono<{ Bindings: Bindings }>({
   },
 });
 
-
-app.use("*", cors({
-  origin: "http://localhost:5173", // Replace with your frontend's origin
-  allowMethods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
-  allowHeaders: ["Content-Type", "Authorization"], // Allow specific headers
-}));
-
+app.use(
+  "*",
+  cors({
+    origin: "http://localhost:5173", // Replace with your frontend's origin
+    allowMethods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
+    allowHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+  })
+);
 
 app.use("*", requestId());
 app.use(authMiddleware);
@@ -53,6 +55,7 @@ app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
 const map = [mapRoutes, markerRoutes, collectionRoutes];
 const user = [userRoutes];
 
+app.route("/", authRoutes);
 
 app.route("/", userRoutes);
 type UserRouteType = typeof userRoutes;
@@ -66,5 +69,8 @@ type MarkerRoute = typeof markerRoutes;
 app.route("/", collectionRoutes);
 type CollectionRoute = typeof collectionRoutes;
 
-export type AppType = MapRouteType & UserRouteType & MarkerRoute & CollectionRoute;
+export type AppType = MapRouteType &
+  UserRouteType &
+  MarkerRoute &
+  CollectionRoute;
 export default app;

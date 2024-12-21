@@ -5,9 +5,13 @@ main = "src/index.ts"
 minify = true
 workers_dev = false
 
+
 [dev]
 port = 8181
-ip = "0.0.0.0" #used to access the api from the mobile app
+# ip = "0.0.0.0" #used to access the api from the mobile app
+local_protocol = "https"
+
+
 
 [env.production]
 name = "api"

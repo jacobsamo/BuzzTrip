@@ -34,8 +34,6 @@ const loggingMiddleware: MiddlewareHandler = async (c, next) => {
   try {
     await next();
 
-    console.log("All data", c.);
-
     // If the response status is 401, log request and user info
     if (c.res.status === 401) {
       console.error("Unauthorized access detected:");

@@ -26,7 +26,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      allowedRedirectOrigins={[
+        "https://localhost:8181",
+        "http://localhost:5173",
+        "https://localhost:5173",
+      ]}
+    >
       <html lang="en">
         <body className={inter.className}>
           <Providers>{children}</Providers>
