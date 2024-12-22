@@ -33,6 +33,16 @@ const securityMiddleware = secureHeaders();
 const loggingMiddleware: MiddlewareHandler = async (c, next) => {
   try {
     await next();
+
+    console.log("req", {
+      req: c.req,
+      res: c.res,
+      method: c.req.method,
+      body: c.body,
+      json: c.req.json(),
+      err: c.error,
+      context: c
+    })
   } catch (err) {
     console.error("Error in request handling:", err);
     throw err; // Re-throw error for further handling

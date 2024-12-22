@@ -108,12 +108,10 @@ export default function CollectionModal({
 }
 
 const Close = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <DialogClose asChild>
-      <DrawerClose asChild>{children}</DrawerClose>
-    </DialogClose>
-  );
-};
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  return isDesktop ? <DialogClose asChild>{children}</DialogClose> : <DrawerClose asChild>{children}</DrawerClose>;
+}
 
 function CollectionForm({ mode, collection }: CollectionModalProps) {
   const { setCollections, map } = useMapStore((store) => store);
@@ -142,6 +140,7 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
           json: {
             ...data,
             created_by: userId!,
+            map_id: map!.map_id,
           },
         });
 

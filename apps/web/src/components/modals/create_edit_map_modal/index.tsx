@@ -90,6 +90,13 @@ export default function MapModal({
   );
 }
 
+const Close = ({ children }: { children: React.ReactNode }) => {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  return isDesktop ? <DialogClose asChild>{children}</DialogClose> : <DrawerClose asChild>{children}</DrawerClose>;
+}
+
+
 function MapForm({ mode, map, setMap }: MapModalProps) {
   // const places = useMapsLibrary("places");
   // const [searchValue, setSearchValue] = useState("");
@@ -212,11 +219,11 @@ function MapForm({ mode, map, setMap }: MapModalProps) {
         />
       </div> */}
 
-    
+      <Close>
         <Button aria-label="create map" type="submit">
           Create Map
         </Button>
-    
-    </form>
+      </Close>
+    </form >
   );
 }
