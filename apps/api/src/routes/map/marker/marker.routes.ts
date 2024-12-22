@@ -1,4 +1,4 @@
-import { ErrorSchema } from "@/common/schema";
+import { ErrorSchema } from "../../../common/schema";
 import { createRoute } from "@hono/zod-openapi";
 import { MapParamsSchema } from "../schema";
 import {

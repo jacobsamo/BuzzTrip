@@ -1,4 +1,4 @@
-import { AppRouteHandler } from "@/common/types";
+import { AppRouteHandler } from "../../common/types";
 import { createDb } from "@buzztrip/db";
 import { getUserMaps } from "@buzztrip/db/queries";
 import { getUserMapsRoute } from "./user.routes";

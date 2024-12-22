@@ -1,13 +1,12 @@
-import { AppRouteHandler } from "@/common/types";
 import { createDb } from "@buzztrip/db";
+import { createCollection } from "@buzztrip/db/mutations";
 import { collections } from "@buzztrip/db/schema";
-import { getAuth } from "@hono/clerk-auth";
 import { eq } from "drizzle-orm";
+import { AppRouteHandler } from "../../../common/types";
 import {
   createCollectionRoute,
   editCollectionRoute,
 } from "./collection.routes";
-import { createCollection } from "@buzztrip/db/mutations";
 
 export const createCollectionHandler: AppRouteHandler<
   typeof createCollectionRoute
@@ -15,21 +14,9 @@ export const createCollectionHandler: AppRouteHandler<
   const { mapId } = c.req.valid("param");
   const newCollection = c.req.valid("json");
   const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
-  const auth = getAuth(c);
-
-  if (!auth || !auth.userId) {
-    return c.json(
-      {
-        code: "unauthorized",
-        message: "Unauthorized",
-        requestId: c.get("requestId"),
-      },
-      401
-    );
-  }
 
   const collection = await createCollection(db, {
-    userId: auth.userId,
+    userId: newCollection.created_by,
     mapId: mapId,
     input: newCollection,
   });
@@ -54,18 +41,6 @@ export const editCollectionHandler: AppRouteHandler<
   const { mapId, collectionId } = c.req.valid("param");
   const editCollection = c.req.valid("json");
   const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
-  const auth = getAuth(c);
-
-  if (!auth || !auth.userId) {
-    return c.json(
-      {
-        code: "unauthorized",
-        message: "Unauthorized",
-        requestId: c.get("requestId"),
-      },
-      401
-    );
-  }
 
   const [updatedCollection] = await db
     .update(collections)

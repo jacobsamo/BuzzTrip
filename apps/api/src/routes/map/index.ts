@@ -1,4 +1,4 @@
-import { Bindings } from "@/common/bindings";
+import { Bindings } from "../../common/bindings";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import {
   createMapHandler,

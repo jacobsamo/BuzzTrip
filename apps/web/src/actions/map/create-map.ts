@@ -1,8 +1,6 @@
 "use server";
 import { db } from "@/server/db";
-import {
-  createMap
-} from "@buzztrip/db/mutations";
+import { createMap } from "@buzztrip/db/mutations";
 import { z } from "zod";
 import { authAction } from "../safe-action";
 
@@ -17,7 +15,10 @@ export const createMapAction = authAction
   .action(async ({ parsedInput: params, ctx }) => {
     const { map, shared_map } = await createMap(db, {
       userId: ctx.user.id,
-      input: params,
+      input: {
+        ...params,
+        userId: ctx.user.id,
+      },
     });
 
     return {

@@ -45,6 +45,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import IconPickerModal from "../icon-picker-modal";
 import { apiClient } from "@/server/api.client";
+import { useAuth } from "@clerk/nextjs";
 
 const Icon = lazy(() => import("@buzztrip/components/icon"));
 
@@ -136,7 +137,7 @@ function MarkerForm() {
     setMarkerOpen,
     markerOpen,
   } = useMapStore((store) => store);
-
+  const { userId } = useAuth();
   const { mode, marker } = markerOpen;
   const [inCollections, setInCollections] = React.useState<string[] | null>(
     null
@@ -210,6 +211,7 @@ function MarkerForm() {
             marker: data,
             collectionIds_to_add: collectionsToAdd,
             collectionIds_to_remove: collectionsToRemove,
+            userId: userId!,
           },
         });
 
@@ -248,6 +250,7 @@ function MarkerForm() {
               ...data,
             },
             collectionIds: cols,
+            userId: userId!,
           },
         });
 

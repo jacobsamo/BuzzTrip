@@ -26,6 +26,7 @@ export const EditMarkerSchema = z
     marker: combinedMarkersSchema,
     collectionIds_to_add: z.string().array().optional(),
     collectionIds_to_remove: z.string().array().optional(),
+    userId: z.string(),
   })
   .openapi("EditMarkerSchema");
 

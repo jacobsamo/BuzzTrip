@@ -1,5 +1,4 @@
 "use client";
-import { createMapAction } from "@/actions/map/create-map";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,10 +24,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { apiClient } from "@/server/api.client";
-import { Map, UserMap } from "@buzztrip/db/types";
+import { Map } from "@buzztrip/db/types";
+import { useAuth } from "@clerk/nextjs";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Plus } from "lucide-react";
-import { useAction } from "next-safe-action/hooks";
 import * as React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -114,7 +113,7 @@ function MapForm({ mode, map, setMap }: MapModalProps) {
       description: map?.description || undefined,
     },
   });
-
+  const { userId } = useAuth();
   React.useEffect(() => {
     console.log("Errors: ", {
       errors,
@@ -125,7 +124,12 @@ function MapForm({ mode, map, setMap }: MapModalProps) {
   const onSubmit: SubmitHandler<Map> = async (data) => {
     try {
       if (mode === "create") {
-        const create = apiClient.map.create.$post({ json: data });
+        const create = apiClient.map.create.$post({
+          json: {
+            ...data,
+            userId: userId!,
+          },
+        });
 
         toast.promise(create, {
           loading: "Creating map...",
@@ -208,13 +212,11 @@ function MapForm({ mode, map, setMap }: MapModalProps) {
         />
       </div> */}
 
-      <DialogClose asChild>
-        <DrawerClose asChild>
-          <Button aria-label="create map" type="submit">
-            Create Map
-          </Button>
-        </DrawerClose>
-      </DialogClose>
+    
+        <Button aria-label="create map" type="submit">
+          Create Map
+        </Button>
+    
     </form>
   );
 }

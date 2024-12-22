@@ -8,8 +8,6 @@ workers_dev = false
 
 [dev]
 port = 8181
-# ip = "0.0.0.0" #used to access the api from the mobile app
-local_protocol = "https"
 
 
 

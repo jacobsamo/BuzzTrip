@@ -4,7 +4,8 @@
   "main": "src/index.ts",
   "scripts": {
     "clean:all": "rm -rf node_modules/",
-    "dev": "NODE_ENV=development wrangler dev src/index.ts --https-cert-path certificates/localhost+3.pem --https-key-path certificates/localhost+3-key.pem",
+    "dev": "NODE_ENV=development wrangler dev src/index.ts",
+    "dev:custom-cert": "--https-cert-path certificates/localhost+3.pem --https-key-path certificates/localhost+3-key.pem --local-protocol=https",
     "deploy": "wrangler deploy --minify src/index.ts",
     "check:types": "tsc --noEmit"
   },
@@ -12,8 +13,6 @@
     "@buzztrip/db": "workspace:*",
     "@clerk/backend": "^1.21.4",
     "@hono/clerk-auth": "^2.0.0",
-    "@hono/swagger-ui": "^0.5.0",
-    "@hono/zod-openapi": "^0.18.3",
     "@hono/swagger-ui": "^0.5.0",
     "@hono/zod-openapi": "^0.18.3",
     "@hono/zod-validator": "^0.4.1",

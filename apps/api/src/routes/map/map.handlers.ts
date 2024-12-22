@@ -1,9 +1,8 @@
-import { AppRouteHandler } from "@/common/types";
+import { AppRouteHandler } from "../../common/types";
 import { createDb } from "@buzztrip/db";
 import { createMap } from "@buzztrip/db/mutations/maps";
 import { getAllMapData } from "@buzztrip/db/queries";
 import { maps } from "@buzztrip/db/schema";
-import { getAuth } from "@hono/clerk-auth";
 import { eq } from "drizzle-orm";
 import {
   createMapRoute,
@@ -66,23 +65,10 @@ export const createMapHandler: AppRouteHandler<typeof createMapRoute> = async (
   const req = c.req.valid("json");
   try {
     const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
-    const auth = getAuth(c);
-
-    if (!auth || !auth.userId) {
-      return c.json(
-        {
-          code: "unauthorized",
-          message: "Unauthorized",
-          requestId: c.get("requestId"),
-        },
-        401
-      );
-    }
-
     const data = await createMap(db, {
-      userId: auth.userId,
+      userId: req.userId,
       input: req,
-    })
+    });
 
     return c.json(data, 200);
   } catch (error) {

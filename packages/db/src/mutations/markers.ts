@@ -13,6 +13,7 @@ import { collection_linksSchema, combinedMarkersSchema } from "../zod-schemas";
 export const CreateMarkerSchema = z.object({
   marker: combinedMarkersSchema,
   collectionIds: z.string().array().nullish(),
+  userId: z.string()
 });
 
 export const CreateMarkersReturnSchema = z.object({

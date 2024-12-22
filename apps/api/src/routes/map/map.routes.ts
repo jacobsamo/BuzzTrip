@@ -1,5 +1,8 @@
-import { ErrorSchema } from "@/common/schema";
-import { CreateMapReturnSchema, CreateMapSchema } from "@buzztrip/db/mutations/maps";
+import { ErrorSchema } from "../../common/schema";
+import {
+  CreateMapReturnSchema,
+  CreateMapSchema,
+} from "@buzztrip/db/mutations/maps";
 import { createRoute } from "@hono/zod-openapi";
 import {
   EditMapSchema,

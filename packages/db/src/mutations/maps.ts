@@ -12,6 +12,7 @@ import { eq } from "drizzle-orm";
 export const CreateMapSchema = z.object({
   title: z.string(),
   description: z.string().nullish(),
+  userId: z.string()
 });
 
 export const CreateMapReturnSchema = z.object({

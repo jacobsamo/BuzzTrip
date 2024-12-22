@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { apiClient } from "@/server/api.client";
 import Icon, { otherIconsList } from "@buzztrip/components/icon";
 import { Collection } from "@buzztrip/db/types";
+import { useAuth } from "@clerk/nextjs";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Edit, Plus } from "lucide-react";
 import * as React from "react";
@@ -116,7 +117,7 @@ const Close = ({ children }: { children: React.ReactNode }) => {
 
 function CollectionForm({ mode, collection }: CollectionModalProps) {
   const { setCollections, map } = useMapStore((store) => store);
-  const allItems = useMapStore((store) => store);
+  const { userId } = useAuth();
 
   const {
     register,
@@ -138,7 +139,10 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
       if (mode === "create") {
         const create = apiClient.map[":mapId"].collection.create.$post({
           param: { mapId: map!.map_id },
-          json: data,
+          json: {
+            ...data,
+            created_by: userId!,
+          },
         });
 
         toast.promise(create, {

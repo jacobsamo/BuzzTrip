@@ -13,9 +13,9 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": ".",
     "declaration": false,
     "declarationMap": false,
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
@@ -27,11 +27,6 @@
     },
     "types": ["google.maps"]
   },
-  "references": [
-    {
-      "path": "../api/tsconfig.json"
-    }
-  ],
   "include": [
     "next-env.d.ts",
     "**/*.ts",

@@ -1,4 +1,4 @@
-import { ErrorSchema } from "@/common/schema";
+import { ErrorSchema } from "../../../common/schema";
 import { createRoute } from "@hono/zod-openapi";
 import { MapParamsSchema } from "../schema";
 import {
@@ -6,7 +6,10 @@ import {
   CollectionReturnSchema,
   EditCollectionSchema,
 } from "./schema";
-import { CreateCollectionReturnSchema, CreateCollectionSchema } from "@buzztrip/db/mutations";
+import {
+  CreateCollectionReturnSchema,
+  CreateCollectionSchema,
+} from "@buzztrip/db/mutations";
 
 export const createCollectionRoute = createRoute({
   method: "post",

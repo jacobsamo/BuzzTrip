@@ -15,9 +15,7 @@ import { collections } from "@buzztrip/db/schema";
 import { NewCollection } from "@buzztrip/db/types";
 import { collectionsEditSchema } from "@buzztrip/db/zod-schemas";
 
-export const CreateCollectionSchema = collectionsEditSchema.omit({
-  created_by: true,
-});
+export const CreateCollectionSchema = collectionsEditSchema;
 
 export const CreateCollectionReturnSchema = collectionsSchema;
 
