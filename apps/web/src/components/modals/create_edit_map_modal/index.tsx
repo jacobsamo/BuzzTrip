@@ -19,29 +19,52 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
 import { apiClient } from "@/server/api.client";
+import { CreateMapSchema } from "@buzztrip/api/src/routes/map/schema";
 import { Map } from "@buzztrip/db/types";
 import { useAuth } from "@clerk/nextjs";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Plus } from "lucide-react";
 import * as React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
+import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
+
+type EditMap = {
+  mode: "edit";
+  map: Map;
+  updateMap: (map: Partial<Map>) => void;
+};
+
+type CreateMap = {
+  mode: "create";
+  setMap: (map: Map | null) => void;
+};
 
 export interface MapModalProps {
   mode?: "create" | "edit";
   map?: Map | null;
-  setMap: (map: Map | null) => void;
+  setMap?: (map: Map | null) => void;
+  updateMap?: (map: Partial<Map>) => void;
 }
 
 export default function MapModal({
   mode = "create",
   map = null,
   setMap,
+  updateMap,
 }: MapModalProps) {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -61,7 +84,12 @@ export default function MapModal({
             </DialogTitle>
             <DialogDescription>Start your travel plans here</DialogDescription>
           </DialogHeader>
-          <MapForm mode={mode} map={map} setMap={setMap} />
+          <MapForm
+            mode={mode}
+            map={map}
+            setMap={setMap}
+            updateMap={updateMap}
+          />
         </DialogContent>
       </Dialog>
     );
@@ -79,7 +107,7 @@ export default function MapModal({
           <DrawerTitle>{mode == "create" ? "Create" : "Edit"} Map</DrawerTitle>
           <DrawerDescription>Start your travel plans here</DrawerDescription>
         </DrawerHeader>
-        <MapForm mode={mode} map={map} setMap={setMap} />
+        <MapForm mode={mode} map={map} setMap={setMap} updateMap={updateMap} />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -93,43 +121,46 @@ export default function MapModal({
 const Close = ({ children }: { children: React.ReactNode }) => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  return isDesktop ? <DialogClose asChild>{children}</DialogClose> : <DrawerClose asChild>{children}</DrawerClose>;
-}
+  return isDesktop ? (
+    <DialogClose asChild>{children}</DialogClose>
+  ) : (
+    <DrawerClose asChild>{children}</DrawerClose>
+  );
+};
 
-
-function MapForm({ mode, map, setMap }: MapModalProps) {
-  // const places = useMapsLibrary("places");
-  // const [searchValue, setSearchValue] = useState("");
-  // const locationInputRef = useRef<HTMLInputElement>(null);
-
-  // const [placeAutocomplete, setPlaceAutocomplete] =
-  //   useState<google.maps.places.Autocomplete | null>(null);
-
-  // const [fetchingData, setFetchingData] = useState<boolean>(false);
+function MapForm({ mode, map, setMap, updateMap }: MapModalProps) {
+  const { userId } = useAuth();
+  const form = useForm<z.infer<typeof mapsEditSchema>>({
+    resolver: zodResolver(mapsEditSchema),
+    defaultValues: {
+      title: map?.title ?? "",
+      description: map?.description ?? undefined,
+      owner_id: userId!,
+    },
+    shouldUnregister: true,
+  });
 
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
     getValues,
+    control,
     formState: { errors },
-  } = useForm<Map>({
-    defaultValues: {
-      title: map?.title || undefined,
-      description: map?.description || undefined,
-    },
-  });
-  const { userId } = useAuth();
+  } = form;
+
   React.useEffect(() => {
     console.log("Errors: ", {
       errors,
       values: getValues(),
+      ui: userId,
     });
   }, [errors]);
 
-  const onSubmit: SubmitHandler<Map> = async (data) => {
+  const onSubmit: SubmitHandler<z.infer<typeof mapsEditSchema>> = async (
+    data
+  ) => {
     try {
+      console.log("data: ", data);
       if (mode === "create") {
         const create = apiClient.map.create.$post({
           json: {
@@ -141,9 +172,9 @@ function MapForm({ mode, map, setMap }: MapModalProps) {
         toast.promise(create, {
           loading: "Creating map...",
           success: async (res) => {
-            if (res.status == 200) {
-              const data = await res.json();
-              setMap(data.map);
+            if (res.status == 200 && setMap) {
+              const d = await res.json();
+              setMap(d.map);
             }
             return "Map created successfully!";
           },
@@ -151,79 +182,79 @@ function MapForm({ mode, map, setMap }: MapModalProps) {
         });
       }
 
-      // if (mode === "edit" && map) {
-      //   const edit = fetch(`/api/map/${map.uid}`, {
-      //     method: "PUT",
-      //     body: JSON.stringify(data),
-      //   });
+      if (mode === "edit" && map) {
+        console.log("map: ", map);
+        const edit = apiClient.map[":mapId"].$put({
+          param: { mapId: map.map_id },
+          json: {
+            ...data,
+            title: data.title,
+            description: data.description,
+            map_id: map.map_id,
+            image: data.image ?? undefined,
+          },
+        });
 
-      //   toast.promise(edit, {
-      //     loading: "Updating map...",
-      //     success: "Map updated successfully",
-      //     error: "Failed to update map",
-      //   });
-      // }
+        toast.promise(edit, {
+          loading: "Updating map...",
+          success: async (res) => {
+            if (res.status == 200 && updateMap) {
+              const d = await res.json();
+              console.log("updated", d);
+              updateMap(d);
+            }
+            return "Map updated successfully";
+          },
+          error: "Failed to update map",
+        });
+      }
     } catch (error) {
       console.error(error);
     }
   };
 
-  // useEffect(() => {
-  //   if (!places || !locationInputRef.current) return;
-
-  //   const options: google.maps.places.AutocompleteOptions = {
-  //     fields: ["formatted_address", "geometry/viewport", "name", "type"],
-  //     types: ["country", "continent", "(regions)"],
-  //   };
-
-  //   setPlaceAutocomplete(
-  //     new places.Autocomplete(locationInputRef.current, options)
-  //   );
-  // }, [places]);
-
-  // useEffect(() => {
-  //   if (!placeAutocomplete) return;
-
-  //   placeAutocomplete.addListener("place_changed", () => {
-  //     const place = placeAutocomplete.getPlace();
-  //     if (!place.geometry || !place.geometry.location) {
-  //       console.log("Returned place contains no geometry");
-  //       return;
-  //     }
-  //     console.log("Places: ", place);
-  //   });
-  // }, [placeAutocomplete]);
-
   return (
-    <form
-      className={cn("grid items-start gap-4")}
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <div className="grid gap-2">
-        <Label htmlFor="title">Title</Label>
-        <Input type="text" placeholder="" {...register("title")} />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea placeholder="" {...register("description")} />
-      </div>
-
-      {/* <div>
-        <Label htmlFor="location">Location</Label>
-        <Input
-          className="mt-2 rounded-full outline-none"
-          placeholder="Search location"
-          type="search"
-          id="search"
-          ref={locationInputRef}
+    <Form {...form}>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
+        <input type="hidden" {...register("owner_id", { value: userId! })} />
+        <FormField
+          control={control}
+          name="title"
+          rules={{ required: true }}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title</FormLabel>
+              <FormControl className="flex">
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div> */}
+        <FormField
+          control={control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title</FormLabel>
+              <FormControl className="flex">
+                <Textarea {...field} value={field?.value ?? undefined} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <Close>
-        <Button aria-label="create map" type="submit">
-          Create Map
-        </Button>
-      </Close>
-    </form >
+        <Close>
+          <Button
+            aria-label="create map"
+            type="submit"
+            onClick={handleSubmit(onSubmit)}
+          >
+            {mode == "create" ? "Create" : "Update"} Map
+          </Button>
+        </Close>
+      </form>
+    </Form>
   );
 }

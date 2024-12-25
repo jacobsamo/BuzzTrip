@@ -5,14 +5,14 @@ import {
   mapsEditSchema,
   mapsSchema,
 } from "@buzztrip/db/zod-schemas";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { Database } from "..";
-import { eq } from "drizzle-orm";
 
 export const CreateMapSchema = z.object({
   title: z.string(),
   description: z.string().nullish(),
-  userId: z.string()
+  userId: z.string(),
 });
 
 export const CreateMapReturnSchema = z.object({
@@ -115,4 +115,41 @@ export const deleteMap = async (
   }
 
   return { mapId: deletedMap.deletedId };
+};
+
+export const ShareMapUserSchema = map_usersSchema.omit({
+  map_id: true,
+  map_user_id: true,
+});
+
+export type TShareMapUserSchema = z.infer<typeof ShareMapUserSchema>;
+
+export const ShareMapSchema = z.object({
+  users: ShareMapUserSchema.array(),
+  mapId: z.string(),
+});
+
+export const ShareMapReturnSchema = z.object({
+  users: map_usersSchema.array(),
+});
+
+export const shareMap = async (
+  db: Database,
+  { users, mapId }: z.infer<typeof ShareMapSchema>
+): Promise<z.infer<typeof ShareMapReturnSchema>> => {
+  let newMapUsers: NewMapUser[] = [];
+
+  users.forEach((user) => {
+    newMapUsers.push({
+      map_id: mapId,
+      user_id: user.user_id,
+      permission: user.permission,
+    });
+  });
+
+  const mapUsers = await db.insert(map_users).values(newMapUsers).returning();
+
+  return {
+    users: mapUsers,
+  };
 };

@@ -2,11 +2,9 @@
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -15,35 +13,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Map } from "@buzztrip/db/types";
-import { Edit, MapPin, MoreVertical, Share2 } from "lucide-react";
-import Image from "next/image";
+import { MoreVertical } from "lucide-react";
 import Link from "next/link";
+import MapModal from "./modals/create_edit_map_modal";
+import ShareModal from "./modals/share_map_modal";
 
 interface MapCardProps {
   map: Map;
+  updateMap?: (map: Partial<Map>) => void;
 }
 
-const MapCard = ({ map }: MapCardProps) => {
-  const handleShareMap = (mapId: string) => {
-    console.log("Sharing map: ", mapId);
-  };
-
-  const handleEditMap = (mapId: string) => {
-    console.log("Editing map: ", mapId);
-  };
-
-  const handleEditSharing = (mapId: string) => {
-    console.log("Editing sharing: ", mapId);
-  };
-
+const MapCard = ({ map, updateMap }: MapCardProps) => {
   return (
     <Card key={map.map_id} className="w-full bg-white shadow-md">
       <Link href={`/app/map/${map.map_id}`}>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-
-          <CardTitle>{map.title}</CardTitle>
-          <CardDescription>{map.description}</CardDescription>
+            <CardTitle>{map.title}</CardTitle>
+            <CardDescription>{map.description}</CardDescription>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -51,23 +38,21 @@ const MapCard = ({ map }: MapCardProps) => {
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleShareMap(map.map_id)}>
-                <Share2 className="mr-2 h-4 w-4" />
-                <span>Share</span>
+            <DropdownMenuContent align="end" className="z-50">
+              <DropdownMenuItem onClick={(e) => e.preventDefault()}>
+                <ShareModal map_id={map.map_id} />
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleEditMap(map.map_id)}>
-                <Edit className="mr-2 h-4 w-4" />
-                <span>Edit</span>
+              <DropdownMenuItem onClick={(e) => e.preventDefault()}>
+                <MapModal map={map} mode="edit" updateMap={updateMap} />
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleEditSharing(map.map_id)}>
+              {/* <DropdownMenuItem onClick={() => handleEditSharing(map.map_id)}>
                 <Share2 className="mr-2 h-4 w-4" />
                 <span>Edit Sharing</span>
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
         </CardHeader>
-        <CardContent className="p-0">
+        {/* <CardContent className="p-0">
           <div className="relative h-48">
             <Image
               src={map.image ?? "/placeholder.png"}
@@ -76,7 +61,7 @@ const MapCard = ({ map }: MapCardProps) => {
               objectFit="cover"
             />
           </div>
-        </CardContent>
+        </CardContent> */}
       </Link>
     </Card>
   );

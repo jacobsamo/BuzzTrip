@@ -1,7 +1,6 @@
 import type { Context, MiddlewareHandler, Next } from "hono";
 import { env } from "hono/adapter";
 import { bearerAuth } from "hono/bearer-auth";
-import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 
 const PUBLIC_PATHS = ["/", "/health", "/webhook"];
@@ -34,15 +33,17 @@ const loggingMiddleware: MiddlewareHandler = async (c, next) => {
   try {
     await next();
 
-    console.log("req", {
-      req: c.req,
-      res: c.res,
-      method: c.req.method,
-      body: c.body,
-      json: c.req.json(),
-      err: c.error,
-      context: c
-    })
+    if (c.res.status !== 200) {
+      console.log("req", {
+        req: c.req,
+        res: c.res,
+        method: c.req.method,
+        body: c.body,
+        json: c.req.json(),
+        err: c.error,
+        context: c,
+      });
+    }
   } catch (err) {
     console.error("Error in request handling:", err);
     throw err; // Re-throw error for further handling

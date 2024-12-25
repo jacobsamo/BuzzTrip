@@ -16,3 +16,20 @@ export const MapsParamsSchema = z.object({
 });
 
 export const MapsSchema = userMapsSchema.array().openapi("MapsSchema");
+
+export const SearchUsersSchema = z.object({
+  q: z.string(),
+});
+
+export const SearchUserReturnSchema = z.object({
+  users: z
+    .object({
+      userId: z.string(),
+      username: z.string().nullable(),
+      firstName: z.string().nullable(),
+      lastName: z.string().nullable(),
+      email: z.string(),
+    })
+    .array()
+    .nullable(),
+});

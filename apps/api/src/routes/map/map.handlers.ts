@@ -1,14 +1,15 @@
-import { AppRouteHandler } from "../../common/types";
 import { createDb } from "@buzztrip/db";
-import { createMap } from "@buzztrip/db/mutations/maps";
+import { createMap, shareMap } from "@buzztrip/db/mutations/maps";
 import { getAllMapData } from "@buzztrip/db/queries";
 import { maps } from "@buzztrip/db/schema";
 import { eq } from "drizzle-orm";
+import { AppRouteHandler } from "../../common/types";
 import {
   createMapRoute,
   editMapRoute,
   getMapDataRoute,
   getMapRoute,
+  shareMapRoute,
 } from "./map.routes";
 
 export const getMapHandler: AppRouteHandler<typeof getMapRoute> = async (c) => {
@@ -90,10 +91,11 @@ export const editMapHandler: AppRouteHandler<typeof editMapRoute> = async (
   const editMap = c.req.valid("json");
   const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
-  const updatedMap = await db
+  const [updatedMap] = await db
     .update(maps)
     .set(editMap)
-    .where(eq(maps.map_id, mapId));
+    .where(eq(maps.map_id, mapId))
+    .returning();
 
   if (!updatedMap) {
     return c.json(
@@ -107,4 +109,19 @@ export const editMapHandler: AppRouteHandler<typeof editMapRoute> = async (
   }
 
   return c.json(updatedMap, 200);
+};
+
+export const shareMapHandler: AppRouteHandler<typeof shareMapRoute> = async (
+  c
+) => {
+  const { mapId } = c.req.valid("param");
+  const mapUsers = c.req.valid("json");
+  const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+
+  const newMapUsers = await shareMap(db, {
+    mapId: mapId,
+    users: mapUsers.users,
+  });
+
+  return c.json(newMapUsers, 200);
 };

@@ -1,12 +1,14 @@
-export const metadata = {
+import { constructMetadata } from "@/lib/utils/metadata";
+
+export const metadata = constructMetadata({
   title: "Terms of Service",
   description: "Terms of Service for BuzzTrip",
   date: "2024-12-08",
-};
+});
 
 # BuzzTrip Terms of Service
 
-## Last updated:  2024/12/08
+## Last updated: 2024/12/08
 
 ## 1. Acceptance of Terms
 
@@ -72,7 +74,7 @@ The Service is provided on an "as is" and "as available" basis. BuzzTrip makes n
 
 ## 10. Changes to Terms
 
-We reserve the right to modify or replace these Terms at any time. 
+We reserve the right to modify or replace these Terms at any time.
 
 ## 11. Contact Us
 

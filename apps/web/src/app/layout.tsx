@@ -1,13 +1,11 @@
-import React from "react";
 import Providers from "@/components/providers";
 import "@/lib/styles/globals.css";
+import { constructMetadata } from "@/lib/utils/metadata";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata, Viewport } from "next";
+import React from "react";
 
-export const metadata: Metadata = {
-  title: "BuzzTrip",
-  description: "Plan the trip you've always dreamed of",
-};
+export const metadata: Metadata = constructMetadata();
 
 export const viewport: Viewport = {
   maximumScale: 1,

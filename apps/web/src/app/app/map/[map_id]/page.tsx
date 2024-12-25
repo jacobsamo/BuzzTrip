@@ -1,19 +1,15 @@
 // import Map from "@/components/layouts/map/map-view";
 import { Map_page } from "@/components/layouts/map-view";
-import MapView from "@/components/mapping/mapbox/map";
 import { MapStoreProvider } from "@/components/providers/map-state-provider";
+import { constructMetadata } from "@/lib/utils/metadata";
 import { db } from "@/server/db";
-import { getAllMapData, getMarkersView } from "@buzztrip/db/queries";
+import { getAllMapData } from "@buzztrip/db/queries";
 import {
-  collection_links,
-  collections,
-  map_users,
-  maps,
+  maps
 } from "@buzztrip/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
-import { type Metadata } from "next";
 
 export async function generateMetadata({
   params,
@@ -24,10 +20,10 @@ export async function generateMetadata({
     where: eq(maps.map_id, params.map_id),
   });
 
-  return {
+  return constructMetadata({
     title: map?.title,
-    description: map?.description,
-  } as Metadata;
+    description: map?.description ?? "Plan the trip you've always dreamed of",
+  });
 }
 
 export default async function MapPage({

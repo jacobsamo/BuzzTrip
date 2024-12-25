@@ -1,17 +1,17 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import * as z from "zod";
 import {
   collection_links,
   collections,
+  locations,
   map_users,
   maps,
   markers,
-  routes,
-  route_stops,
-  users,
-  locations,
   permissionEnum,
+  route_stops,
+  routes,
+  users,
 } from "../schema";
-import * as z from "zod";
 import { iconsList } from "../types";
 
 // Custom schemas
@@ -43,9 +43,7 @@ export const usersSchema = createSelectSchema(users);
 export const usersEditSchema = createInsertSchema(users);
 
 export const mapsSchema = createSelectSchema(maps);
-export const mapsEditSchema = mapsSchema.extend({
-  map_id: z.string().optional(),
-});
+export const mapsEditSchema = createInsertSchema(maps);
 
 export const markersSchema = createSelectSchema(markers).extend({
   icon: iconSchema,

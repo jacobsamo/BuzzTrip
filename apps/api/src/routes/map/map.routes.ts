@@ -1,9 +1,10 @@
-import { ErrorSchema } from "../../common/schema";
 import {
   CreateMapReturnSchema,
   CreateMapSchema,
+  ShareMapReturnSchema
 } from "@buzztrip/db/mutations/maps";
 import { createRoute } from "@hono/zod-openapi";
+import { ErrorSchema } from "../../common/schema";
 import {
   EditMapSchema,
   MapDataSchema,
@@ -152,6 +153,40 @@ export const editMapRoute = createRoute({
         },
       },
       description: "Returns an error if user is not authenticated",
+    },
+  },
+});
+
+export const shareMapRoute = createRoute({
+  method: "post",
+  path: "/map/{mapId}/share",
+  summary: "Share a map with other users",
+  request: {
+    params: MapParamsSchema,
+    body: {
+      content: {
+        "application/json": {
+          schema: ShareMapReturnSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: ShareMapReturnSchema,
+        },
+      },
+      description: "Share a map",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Returns an error",
     },
   },
 });

@@ -15,13 +15,13 @@
     "@hono/clerk-auth": "^2.0.0",
     "@hono/swagger-ui": "^0.5.0",
     "@hono/zod-openapi": "^0.18.3",
-    "@hono/zod-validator": "^0.4.1",
+    "@hono/zod-validator": "^0.4.2",
     "hono": "^4.6.14",
     "uuid": "^11.0.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241205.0",
+    "@cloudflare/workers-types": "^4.20241224.0",
     "@types/bun": "^1.1.14",
-    "wrangler": "^3.95.0"
+    "wrangler": "^3.99.0"
   }
 }
