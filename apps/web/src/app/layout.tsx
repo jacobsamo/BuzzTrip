@@ -21,13 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider
-      allowedRedirectOrigins={[
-        "https://localhost:8181",
-        "http://localhost:5173",
-        "https://localhost:5173",
-      ]}
-    >
+    <ClerkProvider>
       <html lang="en">
         <body>
           <Providers>{children}</Providers>

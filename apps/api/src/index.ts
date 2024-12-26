@@ -22,13 +22,16 @@ const app = new OpenAPIHono<{ Bindings: Bindings }>({
   },
 });
 
+
 app.use(
   "*",
-  cors({
-    origin: "http://localhost:5173", // Replace with your frontend's origin
-    allowMethods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
-    allowHeaders: ["Content-Type", "Authorization", "Cookie"], // Allow specific headers
-  })
+  (c, next) => {
+    return   cors({
+      origin: c.env.FRONT_END_URL, // Front end url for cors
+      allowMethods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
+      allowHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+    })(c, next);
+  }
 );
 
 app.use("*", requestId());

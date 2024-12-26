@@ -40,7 +40,7 @@ export const getMapDataHandler: AppRouteHandler<
   const { mapId } = c.req.valid("param");
   const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
-  const [foundCollections, collectionLinks, foundMarkers, sharedMap, map] =
+  const [foundCollections, collectionLinks, foundMarkers, sharedMap, [map]] =
     await getAllMapData(db, mapId);
 
   return c.json(
@@ -54,7 +54,7 @@ export const getMapDataHandler: AppRouteHandler<
       collections: foundCollections,
       collection_links: collectionLinks,
       mapUsers: sharedMap,
-      map: map[0]!,
+      map: map,
     },
     200
   );

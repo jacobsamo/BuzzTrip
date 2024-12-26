@@ -4,9 +4,7 @@ import { MapStoreProvider } from "@/components/providers/map-state-provider";
 import { constructMetadata } from "@/lib/utils/metadata";
 import { db } from "@/server/db";
 import { getAllMapData } from "@buzztrip/db/queries";
-import {
-  maps
-} from "@buzztrip/db/schema";
+import { maps } from "@buzztrip/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
@@ -37,13 +35,14 @@ export default async function MapPage({
     return notFound();
   }
 
-  const [foundCollections, collectionLinks, foundMarkers, sharedMap, map] =
+  const [foundCollections, collectionLinks, foundMarkers, sharedMap, [map]] =
     await getAllMapData(db, params.map_id);
 
   if (
-    sharedMap &&
-    sharedMap.length > 0 &&
-    !sharedMap.find((sm) => sm.user_id == userId)
+    (sharedMap &&
+      sharedMap.length > 0 &&
+      !sharedMap.find((sm) => sm.user_id == userId)) ||
+    !map
   ) {
     return notFound();
   }
@@ -59,7 +58,7 @@ export default async function MapPage({
           bounds: marker.bounds ?? null,
         })),
         collectionLinks: collectionLinks,
-        map: map[0] ?? null,
+        map: map,
         mapUsers: sharedMap,
       }}
     >

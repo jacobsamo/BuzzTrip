@@ -89,6 +89,7 @@ export default function MapModal({
             map={map}
             setMap={setMap}
             updateMap={updateMap}
+            setOpen={setOpen}
           />
         </DialogContent>
       </Dialog>
@@ -107,7 +108,13 @@ export default function MapModal({
           <DrawerTitle>{mode == "create" ? "Create" : "Edit"} Map</DrawerTitle>
           <DrawerDescription>Start your travel plans here</DrawerDescription>
         </DrawerHeader>
-        <MapForm mode={mode} map={map} setMap={setMap} updateMap={updateMap} />
+        <MapForm
+          mode={mode}
+          map={map}
+          setMap={setMap}
+          updateMap={updateMap}
+          setOpen={setOpen}
+        />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -128,7 +135,13 @@ const Close = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-function MapForm({ mode, map, setMap, updateMap }: MapModalProps) {
+function MapForm({
+  mode,
+  map,
+  setMap,
+  updateMap,
+  setOpen,
+}: MapModalProps & { setOpen: (open: boolean) => void }) {
   const { userId } = useAuth();
   const form = useForm<z.infer<typeof mapsEditSchema>>({
     resolver: zodResolver(mapsEditSchema),
@@ -175,6 +188,7 @@ function MapForm({ mode, map, setMap, updateMap }: MapModalProps) {
             if (res.status == 200 && setMap) {
               const d = await res.json();
               setMap(d.map);
+              setOpen(false);
             }
             return "Map created successfully!";
           },
@@ -202,6 +216,7 @@ function MapForm({ mode, map, setMap, updateMap }: MapModalProps) {
               const d = await res.json();
               console.log("updated", d);
               updateMap(d);
+              setOpen(false);
             }
             return "Map updated successfully";
           },

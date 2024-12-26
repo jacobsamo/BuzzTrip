@@ -13,7 +13,7 @@ import { collection_linksSchema, combinedMarkersSchema } from "../zod-schemas";
 export const CreateMarkerSchema = z.object({
   marker: combinedMarkersSchema,
   collectionIds: z.string().array().nullish(),
-  userId: z.string()
+  userId: z.string(),
 });
 
 export const CreateMarkersReturnSchema = z.object({
@@ -92,7 +92,7 @@ export const createMarker = async (
   // Create collection marker links if collectionIds exist
   let collectionsLinks: NewCollectionLink[] = [];
   if (input.collectionIds) {
-    input.collectionIds.forEach((collectionId) => {
+    await input.collectionIds.forEach((collectionId) => {
       collectionsLinks.push({
         marker_id: id,
         collection_id: collectionId,
@@ -102,11 +102,12 @@ export const createMarker = async (
     });
   }
 
-  await db.insert(collection_links).values(collectionsLinks);
+  if (collectionsLinks.length > 0)
+    await db.insert(collection_links).values(collectionsLinks);
 
   // Fetch new markers and collection links
   const [newMarkers, collectionLinks] = await Promise.all([
-    getMarkersView(db, input.marker.map_id!),
+    getMarkersView(db, mapId),
     db
       .select()
       .from(collection_links)

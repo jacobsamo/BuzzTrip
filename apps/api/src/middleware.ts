@@ -3,7 +3,7 @@ import { env } from "hono/adapter";
 import { bearerAuth } from "hono/bearer-auth";
 import { secureHeaders } from "hono/secure-headers";
 
-const PUBLIC_PATHS = ["/", "/health", "/webhook"];
+const PUBLIC_PATHS = ["/", "/health", "/webhook", "/webhook/auth"];
 
 const authMiddleware = (c: Context, next: Next) => {
   if (PUBLIC_PATHS.includes(c.req.path)) {
@@ -38,10 +38,8 @@ const loggingMiddleware: MiddlewareHandler = async (c, next) => {
         req: c.req,
         res: c.res,
         method: c.req.method,
-        body: c.body,
         json: c.req.json(),
         err: c.error,
-        context: c,
       });
     }
   } catch (err) {

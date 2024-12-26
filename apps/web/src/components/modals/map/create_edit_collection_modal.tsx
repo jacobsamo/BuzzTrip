@@ -127,7 +127,7 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
     defaultValues: {
       title: collection?.title || "",
       description: collection?.description || "",
-      icon: collection?.icon || "MapPin",
+      icon: collection?.icon || "Folder",
       color: collection?.color || "#fff",
     },
   });
