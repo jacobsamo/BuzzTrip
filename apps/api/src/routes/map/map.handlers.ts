@@ -43,6 +43,15 @@ export const getMapDataHandler: AppRouteHandler<
   const [foundCollections, collectionLinks, foundMarkers, sharedMap, [map]] =
     await getAllMapData(db, mapId);
 
+  if (!map) {
+    return c.json({
+      code: "data_not_found",
+      message: "Map not found",
+      requestId: c.get("requestId"),
+    }, 400);
+  }
+
+
   return c.json(
     {
       markers: foundMarkers.map((marker) => ({
