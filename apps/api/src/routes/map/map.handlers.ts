@@ -53,7 +53,7 @@ export const getMapDataHandler: AppRouteHandler<
 
 
   return c.json(
-    {
+    { 
       markers: foundMarkers.map((marker) => ({
         ...marker,
         lat: marker.lat as number,

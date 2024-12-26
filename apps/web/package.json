@@ -19,6 +19,8 @@
     "@hookform/resolvers": "^3.9.1",
     "@libsql/client": "^0.14.0",
     "@mapbox/search-js-react": "^1.0.0-beta.24",
+    "@mdx-js/loader": "^3.1.0",
+    "@mdx-js/react": "^3.1.0",
     "@next/mdx": "^15.1.2",
     "@phosphor-icons/react": "^2.1.7",
     "@radix-ui/react-accordion": "^1.2.2",
@@ -71,6 +73,7 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@types/mdx": "^2.0.13",
     "@buzztrip/tsconfig": "workspace:*",
     "@tanstack/eslint-plugin-query": "^5.62.9",
     "@types/google.maps": "^3.58.1",
