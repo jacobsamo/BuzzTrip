@@ -6,7 +6,6 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
-    CLERK_WEBHOOK_SECRET: z.string(),
     CLERK_SECRET_KEY: z.string(),
     TURSO_CONNECTION_URL: z.string(),
     TURSO_AUTH_TOKEN: z.string(),
@@ -35,7 +34,6 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     TURSO_CONNECTION_URL: process.env.TURSO_CONNECTION_URL,
     TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN,
-    CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET,
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
 
     // Sentry

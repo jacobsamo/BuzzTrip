@@ -1,9 +1,5 @@
-import type { Env } from "hono";
-
 export interface Bindings {
-  CLERK_PUBLISHABLE_KEY: string;
   CLERK_WEBHOOK_SECRET: string;
-  CLERK_SECRET_KEY: string;
   TURSO_CONNECTION_URL: string;
   TURSO_AUTH_TOKEN: string;
   API_SECRET_KEY: string;

@@ -49,7 +49,7 @@ const DisplayActiveState = () => {
           <TabsContent value="markers" className="p-1">
             <ScrollArea>
               {markers ? (
-                markers.map((marker) => <DisplayMarker marker={marker} />)
+                markers.map((marker) => <DisplayMarker marker={marker} key={marker.marker_id} />)
               ) : (
                 <p>No Markers</p>
               )}
