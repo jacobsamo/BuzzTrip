@@ -1,7 +1,8 @@
 import {
   CreateMapReturnSchema,
   CreateMapSchema,
-  ShareMapReturnSchema
+  ShareMapReturnSchema,
+  ShareMapSchema
 } from "@buzztrip/db/mutations/maps";
 import { createRoute } from "@hono/zod-openapi";
 import { ErrorSchema } from "../../common/schema";
@@ -166,7 +167,7 @@ export const shareMapRoute = createRoute({
     body: {
       content: {
         "application/json": {
-          schema: ShareMapReturnSchema,
+          schema: ShareMapSchema,
         },
       },
     },

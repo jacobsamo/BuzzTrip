@@ -20,7 +20,6 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -39,7 +38,6 @@ import * as React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ScrollArea } from "../ui/scroll-area";
-import { Command } from "cmdk";
 
 export interface ShareMapProps {
   map_id: string;
@@ -153,6 +151,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
       param: { mapId: map_id },
       json: {
         users: selectedUsers,
+        mapId: map_id,
       },
     });
 

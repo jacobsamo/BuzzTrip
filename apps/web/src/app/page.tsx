@@ -1,8 +1,7 @@
 import Navbar from "@/components/navbar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Layers, MapPin, Palette, Search, Tag, Users } from "lucide-react";
-
+import Link from "next/link";
 
 export default function LandingPage() {
   return (
@@ -27,17 +26,23 @@ export default function LandingPage() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Button size="lg">Get Started</Button>
+                  <Link
+                    href="/auth/sign-up"
+                    className={buttonVariants({ size: "lg" })}
+                  >
+                    Get Started
+                  </Link>
+                  {/*   
                   <Button size="lg" variant="outline">
                     Learn More
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
               <div className="flex items-center justify-center">
                 <div className="relative h-[300px] w-[300px] sm:h-[400px] sm:w-[400px] lg:h-[500px] lg:w-[500px]">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 opacity-50 blur-2xl"></div>
                   <div className="absolute inset-4 overflow-hidden rounded-2xl bg-white shadow-2xl">
-                    <div className="h-full w-full bg-[url('/placeholder.svg?height=500&width=500')] bg-cover bg-center"></div>
+                    <div className="h-full w-full bg-[url('/assets/app-screenshot.webp')] bg-cover bg-center"></div>
                     <div className="absolute left-4 top-4 rounded-full bg-white p-2 shadow-md">
                       <MapPin className="h-6 w-6 text-primary" />
                     </div>
@@ -284,25 +289,14 @@ export default function LandingPage() {
                   Start Mapping Today
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl">
-                  Join thousands of users who are already creating amazing
-                  custom maps with BuzzTrip.
+                  Join users who are already creating amazing custom maps with
+                  BuzzTrip.
                 </p>
               </div>
               <div className="w-full max-w-sm space-y-2">
-                <form className="flex space-x-2">
-                  <Input
-                    className="max-w-lg flex-1"
-                    placeholder="Enter your email"
-                    type="email"
-                  />
-                  <Button type="submit">Sign Up</Button>
-                </form>
-                {/* <p className="text-xs text-muted-foreground">
-                  By signing up, you agree to our{" "}
-                  <Link className="underline underline-offset-2" href="#">
-                    Terms & Conditions
-                  </Link>
-                </p> */}
+                <Link href="/auth/sign-up" className={buttonVariants()}>
+                  Sign Up
+                </Link>
               </div>
             </div>
           </div>

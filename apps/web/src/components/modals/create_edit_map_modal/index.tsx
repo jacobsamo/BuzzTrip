@@ -217,6 +217,7 @@ function MapForm({ mode, map, setMap, updateMap }: MapModalProps) {
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
         <input type="hidden" {...register("owner_id", { value: userId! })} />
+
         <FormField
           control={control}
           name="title"
@@ -236,7 +237,7 @@ function MapForm({ mode, map, setMap, updateMap }: MapModalProps) {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Title</FormLabel>
+              <FormLabel>Description</FormLabel>
               <FormControl className="flex">
                 <Textarea {...field} value={field?.value ?? undefined} />
               </FormControl>

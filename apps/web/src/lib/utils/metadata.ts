@@ -13,7 +13,7 @@ import { Metadata } from "next";
 export function constructMetadata({
   title = "BuzzTrip",
   description = "Plan the trip you've always dreamed of",
-  image = "/images/landing-page.jpg",
+  image = "/assets/open-graph.jpg",
   url = "https://buzztrip.co",
   noIndex = false,
   keywords = [
@@ -51,7 +51,7 @@ export function constructMetadata({
       title,
       description,
       images: {
-        url: image || "/images/landing-page.jpg",
+        url: image || "/assets/open-graph.jpg",
         alt: title,
       },
       url: url,
@@ -61,7 +61,7 @@ export function constructMetadata({
       card: "summary_large_image",
       title: title,
       description: description,
-      images: image || "/images/landing-page.jpg",
+      images: image || "/assets/open-graph.jpg",
       creator: "@buzztrip",
     },
     icons: {

@@ -4,11 +4,10 @@ import Image from "next/image";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { buttonVariants } from "@/components/ui/button";
 
-
 const Navbar = () => {
   return (
     <header className="m-auto flex h-14 items-center px-4 lg:px-6">
-      <Link className="flex items-center justify-center" href="#">
+      <Link className="flex items-center justify-center" href="/">
         <Image
           width={44}
           height={44}
@@ -29,7 +28,7 @@ const Navbar = () => {
           <SignedOut>
             <SignInButton />
           </SignedOut>
-          <SignedIn >
+          <SignedIn>
             <Link href={"/app"} className={buttonVariants({ variant: "link" })}>
               Go To app
             </Link>
@@ -49,9 +48,7 @@ const Navbar = () => {
           </Link> */}
       </nav>
     </header>
+  );
+};
 
-  )
-
-}
-
-export default Navbar
+export default Navbar;

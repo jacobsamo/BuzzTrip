@@ -48,14 +48,8 @@ export default function MapDrawer() {
 
         <DisplayActiveState />
 
-        <DrawerFooter className="pt-2">
+        <DrawerFooter className="mb-12">
           <CollectionModal />
-
-          {activeLocation && (
-            <DrawerClose className={buttonVariants({ variant: "outline" })}>
-              Cancel
-            </DrawerClose>
-          )}
         </DrawerFooter>
       </Drawer.Content>
     </Drawer.Root>

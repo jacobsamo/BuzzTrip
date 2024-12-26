@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ActiveLocation from "./active_location";
 import DisplayCollection from "./display-collection";
 import DisplayMarker from "./display-marker";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const DisplayActiveState = () => {
   const {
@@ -26,28 +27,33 @@ const DisplayActiveState = () => {
             <TabsTrigger value="markers">Markers</TabsTrigger>
           </TabsList>
           <TabsContent value="collections" className="p-1">
-            {" "}
-            {collections ? (
-              collections?.map((collection) => {
-                const mark = getMarkersForCollection(collection.collection_id);
-                return (
-                  <DisplayCollection
-                    key={collection.collection_id}
-                    collection={collection}
-                    markers={mark}
-                  />
-                );
-              })
-            ) : (
-              <p>No Collections</p>
-            )}
+            <ScrollArea>
+              {collections ? (
+                collections?.map((collection) => {
+                  const mark = getMarkersForCollection(
+                    collection.collection_id
+                  );
+                  return (
+                    <DisplayCollection
+                      key={collection.collection_id}
+                      collection={collection}
+                      markers={mark}
+                    />
+                  );
+                })
+              ) : (
+                <p>No Collections</p>
+              )}
+            </ScrollArea>
           </TabsContent>
           <TabsContent value="markers" className="p-1">
-            {markers ? (
-              markers.map((marker) => <DisplayMarker marker={marker} />)
-            ) : (
-              <p>No Markers</p>
-            )}
+            <ScrollArea>
+              {markers ? (
+                markers.map((marker) => <DisplayMarker marker={marker} />)
+              ) : (
+                <p>No Markers</p>
+              )}
+            </ScrollArea>
           </TabsContent>
         </Tabs>
       )}
