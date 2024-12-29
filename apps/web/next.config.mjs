@@ -56,7 +56,7 @@ const nextConfig = {
 };
 
 const withMDX = nextMdx({
-  // extension: /\.mdx?$/,
+  extension: /\.mdx?$/,
   options: {
     remarkPlugins: [remarkGfm],
     rehypePlugins: [],
@@ -67,11 +67,13 @@ export default withSentryConfig(withMDX(nextConfig), {
   org: env.SENTRY_ORG,
   project: env.SENTRY_PROJECT,
   authToken: env.SENTRY_AUTH_TOKEN,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
   telemetry: false,
   disableLogger: true,
   hideSourceMaps: true,
   sourcemaps: {
     disable: true,
   },
-  automaticVercelMonitors: false,
+  automaticVercelMonitors: true,
 });
