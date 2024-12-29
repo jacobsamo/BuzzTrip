@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   crossOrigin: "use-credentials",
   images: {
@@ -43,7 +44,13 @@ const nextConfig = {
     ];
   },
   experimental: {
-    optimizePackageImports: ["lucide-react", "@phosphor-icons/react"],
+    optimizePackageImports: [
+      "lucide-react",
+      "@phosphor-icons/react",
+      "posthog-js",
+      "@sentry/nextjs",
+    ],
+    instrumentationHook: true,
   },
   skipTrailingSlashRedirect: true,
 };
@@ -61,10 +68,9 @@ export default withSentryConfig(withMDX(nextConfig), {
   project: env.SENTRY_PROJECT,
   authToken: env.SENTRY_AUTH_TOKEN,
   telemetry: false,
-  hideSourceMaps: true,
   disableLogger: true,
+  hideSourceMaps: true,
   sourcemaps: {
-    deleteSourcemapsAfterUpload: true,
     disable: true,
   },
 });

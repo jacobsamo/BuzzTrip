@@ -11,17 +11,17 @@ Sentry.init({
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
   enabled: process.env.NODE_ENV === "production",
-  replaysSessionSampleRate: 0.1,
+  
+  // // If the entire session is not sampled, use the below sample rate to sample
+  // // sessions when an error occurs.
+  // replaysSessionSampleRate: 0.1,
+  // replaysOnErrorSampleRate: 1.0,
 
-  // If the entire session is not sampled, use the below sample rate to sample
-  // sessions when an error occurs.
-  replaysOnErrorSampleRate: 1.0,
-
-  integrations: [
-    Sentry.replayIntegration({
-      // Additional SDK configuration goes in here, for example:
-      maskAllText: false, // as errors can occur in the UI, we want to see the full error
-      blockAllMedia: false,
-    }),
-  ],
+  // integrations: [
+  //   Sentry.replayIntegration({
+  //     // Additional SDK configuration goes in here, for example:
+  //     maskAllText: false, // as errors can occur in the UI, we want to see the full error
+  //     blockAllMedia: false,
+  //   }),
+  // ],
 });
