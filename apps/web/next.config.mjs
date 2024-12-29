@@ -65,5 +65,6 @@ export default withSentryConfig(withMDX(nextConfig), {
   disableLogger: true,
   sourcemaps: {
     deleteSourcemapsAfterUpload: true,
+    disable: true,
   },
 });
