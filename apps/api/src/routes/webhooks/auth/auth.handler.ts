@@ -1,29 +1,27 @@
-import { WebhookEvent } from "@clerk/nextjs/server";
-import { headers } from "next/headers";
-import { Webhook } from "svix";
-import { db } from "@/server/db";
+import { createDb } from "@buzztrip/db";
 import { users } from "@buzztrip/db/schema";
 import { NewUser } from "@buzztrip/db/types";
+import { WebhookEvent } from "@clerk/backend";
 import { eq } from "drizzle-orm";
+import { Webhook } from "svix";
+import { AppRouteHandler } from "../../../common/types";
+import { clerkWebhookRoute } from "./auth.routes";
 
-const webhookSecret = process.env.CLERK_WEBHOOK_SECRET || ``;
-
-async function validateRequest(request: Request) {
-  const payloadString = await request.text();
-  const headerPayload = headers();
-
-  const svixHeaders = {
-    "svix-id": headerPayload.get("svix-id")!,
-    "svix-timestamp": headerPayload.get("svix-timestamp")!,
-    "svix-signature": headerPayload.get("svix-signature")!,
-  };
-  const wh = new Webhook(webhookSecret);
-  return wh.verify(payloadString, svixHeaders) as WebhookEvent;
-}
-
-export async function POST(request: Request) {
+export const clerkWebhookHandler: AppRouteHandler<
+  typeof clerkWebhookRoute
+> = async (c) => {
   try {
-    const payload = await validateRequest(request);
+    const payloadString = await c.req.text();
+
+    const svixHeaders = {
+      "svix-id": c.header("svix-id")!,
+      "svix-timestamp": c.header("svix-timestamp")!,
+      "svix-signature": c.header("svix-signature")!,
+    };
+    const wh = new Webhook(c.env.CLERK_WEBHOOK_SECRET);
+    const payload = wh.verify(payloadString, svixHeaders) as WebhookEvent;
+
+    const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
     switch (payload.type) {
       case "user.created":
@@ -62,10 +60,15 @@ export async function POST(request: Request) {
         break;
     }
 
-    return Response.json({ message: "Received" });
+    return c.json({ message: "Received" }, 200);
   } catch (error) {
-    console.error("Error on /api/auth/webhook", error);
-
-    return new Response("Error on /api/auth/webhook", { status: 500 });
+    return c.json(
+      {
+        code: "failed_to_object",
+        message: "Failed to process clerk webhook request",
+        requestId: c.get("requestId"),
+      },
+      400
+    );
   }
-}
+};

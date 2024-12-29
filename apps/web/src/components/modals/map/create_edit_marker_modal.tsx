@@ -1,5 +1,5 @@
-import { createMarker } from "@/actions/map/marker/create-marker";
-import { updateMarker } from "@/actions/map/marker/edit-marker";
+import { createMarkerAction } from "@/actions/map/marker/create-marker";
+import { updateMarkerAction } from "@/actions/map/marker/edit-marker";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -26,6 +26,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -43,7 +44,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import IconPickerModal from "../icon-picker-modal";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { apiClient } from "@/server/api.client";
+import { useAuth } from "@clerk/nextjs";
 
 const Icon = lazy(() => import("@buzztrip/components/icon"));
 
@@ -135,7 +137,7 @@ function MarkerForm() {
     setMarkerOpen,
     markerOpen,
   } = useMapStore((store) => store);
-
+  const { userId } = useAuth();
   const { mode, marker } = markerOpen;
   const [inCollections, setInCollections] = React.useState<string[] | null>(
     null
@@ -201,49 +203,64 @@ function MarkerForm() {
         const collectionsToRemove = inCollections!.filter(
           (collectionId) => !selectedCollections.includes(collectionId)
         );
-        const updatedMarker = {
-          marker_id: markerId!,
-          marker: data,
-          collectionIds_to_add: collectionsToAdd,
-          collectionIds_to_remove: collectionsToRemove,
-        };
 
-        const res = await updateMarker(updatedMarker);
+        const updatedMarker = apiClient.map[":mapId"].marker[":markerId"].$put({
+          param: { mapId: map!.map_id, markerId: markerId! },
+          json: {
+            marker_id: markerId!,
+            marker: data,
+            collectionIds_to_add: collectionsToAdd,
+            collectionIds_to_remove: collectionsToRemove,
+            userId: userId!,
+          },
+        });
 
-        if (res && res.data) {
-          if (res.data.collectionLinksDeleted) {
-            removeCollectionLinks(res.data.collectionLinksDeleted);
-          }
-          if (res.data.collectionLinksCreated) {
-            setCollectionLinks(res.data.collectionLinksCreated);
-          }
-          if (res.data.marker) {
-            setMarkers([
-              {
-                ...res.data.marker,
-                location_id: res.data.marker.location_id ?? undefined,
-              },
-            ]);
-          }
-          toast.success("Updated Bookmark");
-        }
+        toast.promise(updatedMarker, {
+          loading: "Updating marker...",
+          success: async (res) => {
+            if (res.status == 200) {
+              const data = await res.json();
+
+              if (data.collectionLinksDeleted) {
+                removeCollectionLinks(data.collectionLinksDeleted);
+              }
+              if (data.collectionLinksCreated) {
+                setCollectionLinks(data.collectionLinksCreated);
+              }
+              if (data.marker) {
+                setMarkers([
+                  {
+                    ...data.marker,
+                    location_id: data.marker.location_id ?? undefined,
+                  },
+                ]);
+              }
+            }
+            return "Marker updated successfully!";
+          },
+          error: "Failed to update marker",
+        });
       }
 
       if (mode == "create") {
-        const newMarker = {
-          marker: {
-            ...data,
+        const createMarker = apiClient.map[":mapId"].marker.create.$post({
+          param: { mapId: map!.map_id },
+          json: {
+            marker: {
+              ...data,
+            },
+            collectionIds: cols,
+            userId: userId!,
           },
-          collectionIds: cols,
-        };
-        const create = createMarker(newMarker);
+        });
 
-        toast.promise(create, {
+        toast.promise(createMarker, {
           loading: "Creating marker...",
-          success: (data) => {
-            if (data && data.data) {
-              setMarkers(data.data.markers);
-              setCollectionLinks(data.data.collectionLinks);
+          success: async (res) => {
+            if (res.status == 200) {
+              const data = await res.json();
+              setMarkers(data.markers);
+              setCollectionLinks(data.collectionLinks);
             }
             return "Marker created successfully!";
           },

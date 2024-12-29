@@ -1,11 +1,9 @@
-import type { Context, Next } from "hono";
+import type { Context, MiddlewareHandler, Next } from "hono";
 import { env } from "hono/adapter";
 import { bearerAuth } from "hono/bearer-auth";
-import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 
-
-const PUBLIC_PATHS = ["/", "/health"];
+const PUBLIC_PATHS = ["/", "/health", "/webhook", "/webhook/auth"];
 
 const authMiddleware = (c: Context, next: Next) => {
   if (PUBLIC_PATHS.includes(c.req.path)) {
@@ -24,14 +22,30 @@ const authMiddleware = (c: Context, next: Next) => {
 //   }
 
 //   return cache({
-//     cacheName: "engine",
+//     cacheName: "buzztrip",
 //     cacheControl: "max-age=3600",
 //   })(c, next);
 // };
 
 const securityMiddleware = secureHeaders();
-const loggingMiddleware = logger(console.log);
 
-export {
-  authMiddleware, loggingMiddleware, securityMiddleware
+const loggingMiddleware: MiddlewareHandler = async (c, next) => {
+  try {
+    await next();
+
+    if (c.res.status !== 200) {
+      console.log("req", {
+        req: c.req,
+        res: c.res,
+        method: c.req.method,
+        json: c.req.json(),
+        err: c.error,
+      });
+    }
+  } catch (err) {
+    console.error("Error in request handling:", err);
+    throw err; // Re-throw error for further handling
+  }
 };
+
+export { authMiddleware, loggingMiddleware, securityMiddleware };

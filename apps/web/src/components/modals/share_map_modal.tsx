@@ -20,7 +20,6 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -28,16 +27,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useMediaQuery } from "@uidotdev/usehooks";
 import { cn } from "@/lib/utils";
-import { Share } from "lucide-react";
-import * as React from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { apiClient } from "@/server/api.client";
+import { TShareMapUserSchema } from "@buzztrip/db/mutations/maps";
+import { PermissionEnum } from "@buzztrip/db/types";
 import { useQuery } from "@tanstack/react-query";
-import Image from "next/image";
-import { NewMapUser } from "@buzztrip/db/types";
+import { useMediaQuery } from "@uidotdev/usehooks";
+import { Circle, CircleCheck, SearchIcon, Share2, X } from "lucide-react";
+import * as React from "react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { ScrollArea } from "../ui/scroll-area";
 
 export interface ShareMapProps {
   map_id: string;
@@ -50,10 +50,9 @@ export default function ShareModal({ map_id }: ShareMapProps) {
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger>
-          <Button variant="outline">
-            <Share /> Share
-          </Button>
+        <DialogTrigger className="inline-flex items-center gap-2">
+          <Share2 className="mr-2 h-4 w-4" />
+          <span>Share</span>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -68,10 +67,9 @@ export default function ShareModal({ map_id }: ShareMapProps) {
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button variant="outline">
-          <Share /> Share
-        </Button>
+      <DrawerTrigger className="inline-flex items-center gap-2">
+        <Share2 className="mr-2 h-4 w-4" />
+        <span>Share</span>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">
@@ -89,37 +87,72 @@ export default function ShareModal({ map_id }: ShareMapProps) {
   );
 }
 
+const Close = ({ children }: { children: React.ReactNode }) => {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  return isDesktop ? (
+    <DialogClose asChild>{children}</DialogClose>
+  ) : (
+    <DrawerClose asChild>{children}</DrawerClose>
+  );
+};
+
 function ShareMapForm({ map_id }: ShareMapProps) {
   const [searchValue, setSearchValue] = useState("");
   const { data: users } = useQuery({
     queryKey: ["search", searchValue],
     queryFn: async () => {
-      // if (searchValue === "") return undefined;
-      // const res = await fetch(`/api/users/search?q=${searchValue}`);
-      // const val = await res.json();
-      // return val as SearchUserReturn[] | undefined;
+      if (searchValue === "") return undefined;
+      const res = await apiClient.users.search.$get({
+        query: { q: searchValue },
+      });
+      console.log("va;ue", res);
+      if (res.status == 200) {
+        const val = await res.json();
+        return val?.users ?? null;
+      }
+
+      return null;
     },
   });
-  const [selectedUser, setSelectedUser] = useState<string | undefined>(
-    undefined
-  );
+  const [selectedUsers, setSelectedUsers] = useState<
+    TShareMapUserSchema[] | null
+  >(null);
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<NewMapUser>({
-    defaultValues: {
-      permission: "editor",
-      map_id: map_id,
-    },
-  });
+  const handleChange = (user: TShareMapUserSchema) => {
+    setSelectedUsers((prev) => {
+      if (!prev) return [user];
 
-  const onSubmit: SubmitHandler<NewMapUser> = async (data) => {
-    const share = fetch(`/api/map/${map_id}/share`, {
-      method: "POST",
-      body: JSON.stringify({ ...data, user_id: selectedUser }),
+      const existingUserIndex = prev.findIndex(
+        (u) => u.user_id === user.user_id
+      );
+
+      if (existingUserIndex !== -1) {
+        const updatedUsers = [...prev];
+        updatedUsers[existingUserIndex] = user;
+        return updatedUsers;
+      }
+
+      return [...prev, user];
+    });
+  };
+
+  const removeUser = (userId: string) => {
+    setSelectedUsers((prev) =>
+      prev ? prev.filter((u) => u.user_id !== userId) : null
+    );
+  };
+
+  const onSubmit = async () => {
+    console.log("usesr", selectedUsers);
+    if (!selectedUsers || selectedUsers.length == 0) return;
+
+    const share = apiClient.map[":mapId"].share.$post({
+      param: { mapId: map_id },
+      json: {
+        users: selectedUsers,
+        mapId: map_id,
+      },
     });
 
     toast.promise(share, {
@@ -133,75 +166,109 @@ function ShareMapForm({ map_id }: ShareMapProps) {
   };
 
   return (
-    <form
-      className={cn("grid items-start gap-4")}
-      method="post"
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="q">Find user</Label>
-        <Input
-          aria-label="Search for user by email"
-          id="search"
-          name="search"
-          placeholder="Search by email"
-          type="search"
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-        />
+    <form onSubmit={onSubmit}>
+      <div>
+        <div className="flex items-center justify-center gap-2 px-3">
+          <SearchIcon className="mr-2 h-5 w-5 shrink-0" />
 
-        <div className="flex-col gap-2">
-          {/* {users &&
-            users !== undefined &&
-            users.map((user) => {
-              const selected = selectedUser === user.id;
+          {/* <Command.Input
+            className="flex h-10 w-full rounded-md bg-white py-2 text-base placeholder:text-slate-500 focus:outline-none dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
+            placeholder="Search users"
+            id="search"
+            value={searchValue ?? ""}
+            onValueChange={(val) => setSearchValue(val)}
+          /> */}
+          <Input
+            aria-label="Search for user by email"
+            id="search"
+            name="search"
+            placeholder="Search by email"
+            type="search"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
 
-              return (
-                <Button
-                  key={user.id}
-                  onClick={() => setSelectedUser(user.id)}
-                  variant={"outline"}
-                  className={cn(
-                    "inline-flex w-full items-center justify-start gap-2 text-left",
-                    selected ? "bg-gray-500" : ""
-                  )}
-                  type="button"
-                >
-                  {user.picture && (
-                    <Image
-                      width={32}
-                      height={32}
-                      alt={user.email ?? user.id}
-                      src={user.picture}
-                      className="h-8 w-8 rounded-full"
-                    />
-                  )}
-                  {user.email}
-                </Button>
-              );
-            })} */}
+          {searchValue && (
+            <button
+              aria-label="clear search results"
+              onClick={() => setSearchValue("")}
+            >
+              <X className="h-5 w-5" />
+            </button>
+          )}
         </div>
       </div>
 
-      <Label htmlFor="permission">Access Level</Label>
-      <Select {...register("permission")} defaultValue="editor">
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Access Level" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="viewer">Viewer</SelectItem>
-          <SelectItem value="editor">Editor</SelectItem>
-          <SelectItem value="admin">Admin</SelectItem>
-        </SelectContent>
-      </Select>
+      <ScrollArea className="h-36 w-full flex-col gap-2">
+        {users &&
+          users.map((user, index) => {
+            const userSelected = selectedUsers?.find(
+              (u) => u.user_id === user.userId
+            );
 
-      <DialogClose asChild>
-        <DrawerClose asChild>
-          <Button aria-label="Share map" type="submit">
-            Share
-          </Button>
-        </DrawerClose>
-      </DialogClose>
+            return (
+              <Button
+                key={user.userId}
+                onClick={() => {
+                  const userSelected = selectedUsers?.find(
+                    (u) => u.user_id === user.userId
+                  );
+                  if (userSelected) {
+                    removeUser(user.userId);
+                  } else {
+                    handleChange({
+                      user_id: user.userId,
+                      permission: "editor",
+                    });
+                  }
+                }}
+                className={cn("group h-fit w-full justify-between gap-2", {
+                  "scale-105": userSelected,
+                })}
+                type="button"
+                variant="ghost"
+              >
+                {userSelected ? <CircleCheck /> : <Circle />}
+                {/* {user.picture && (
+                      <Image
+                        width={32}
+                        height={32}
+                        alt={user.email ?? user.id}
+                        src={user.picture}
+                        className="h-8 w-8 rounded-full"
+                      />
+                    )} */}
+                {user.email}
+
+                <Select
+                  defaultValue="editor"
+                  value={userSelected ? userSelected.permission : "editor"}
+                  onValueChange={(e) => {
+                    handleChange({
+                      user_id: user.userId,
+                      permission: (e as PermissionEnum) ?? "editor",
+                    });
+                  }}
+                >
+                  <SelectTrigger className="w-24">
+                    <SelectValue placeholder="Access Level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="viewer">Viewer</SelectItem>
+                    <SelectItem value="editor">Editor</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Button>
+            );
+          })}
+      </ScrollArea>
+
+      <Close>
+        <Button aria-label="Share map" type="submit" onClick={() => onSubmit()}>
+          Share
+        </Button>
+      </Close>
     </form>
   );
 }

@@ -1,6 +1,5 @@
 // import ConfirmDeleteModal from "@/components/shared/modals/comfirm_delete_modal";
-import { createCollection } from "@/actions/map/collection/create-collection";
-import Icon, { otherIconsList } from "@buzztrip/components/icon";
+import { createCollectionAction } from "@/actions/map/collection/create-collection";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +25,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { apiClient } from "@/server/api.client";
+import Icon, { otherIconsList } from "@buzztrip/components/icon";
 import { Collection } from "@buzztrip/db/types";
+import { useAuth } from "@clerk/nextjs";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Edit, Plus } from "lucide-react";
 import * as React from "react";
@@ -106,16 +108,14 @@ export default function CollectionModal({
 }
 
 const Close = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <DialogClose asChild>
-      <DrawerClose asChild>{children}</DrawerClose>
-    </DialogClose>
-  );
-};
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  return isDesktop ? <DialogClose asChild>{children}</DialogClose> : <DrawerClose asChild>{children}</DrawerClose>;
+}
 
 function CollectionForm({ mode, collection }: CollectionModalProps) {
   const { setCollections, map } = useMapStore((store) => store);
-  const allItems = useMapStore((store) => store);
+  const { userId } = useAuth();
 
   const {
     register,
@@ -127,7 +127,7 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
     defaultValues: {
       title: collection?.title || "",
       description: collection?.description || "",
-      icon: collection?.icon || "MapPin",
+      icon: collection?.icon || "Folder",
       color: collection?.color || "#fff",
     },
   });
@@ -135,17 +135,21 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
   const onSubmit: SubmitHandler<Collection> = async (data: Collection) => {
     try {
       if (mode === "create") {
-        const create = createCollection({
-          ...data,
-          color: "#fff",
-          map_id: map!.map_id,
+        const create = apiClient.map[":mapId"].collection.create.$post({
+          param: { mapId: map!.map_id },
+          json: {
+            ...data,
+            created_by: userId!,
+            map_id: map!.map_id,
+          },
         });
 
         toast.promise(create, {
           loading: "Creating collection...",
-          success: (data) => {
-            if (data?.data) {
-              setCollections(data.data);
+          success: async (res) => {
+            if (res.status == 200) {
+              const data = await res.json();
+              setCollections([data]);
             }
             return "Collection created successfully!";
           },

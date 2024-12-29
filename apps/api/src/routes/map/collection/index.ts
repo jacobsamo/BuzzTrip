@@ -1,15 +1,18 @@
-import { Bindings } from "@/common/bindings";
+import { Bindings } from "../../../common/bindings";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import {
   createCollectionHandler,
   editCollectionHandler,
 } from "./collection.handlers";
-import { createCollection, editCollection } from "./collection.routes";
+import {
+  createCollectionRoute,
+  editCollectionRoute,
+} from "./collection.routes";
 
 const app = new OpenAPIHono<{ Bindings: Bindings }>();
 
 const routes = app
-  .openapi(createCollection, createCollectionHandler)
-  .openapi(editCollection, editCollectionHandler);
+  .openapi(createCollectionRoute, createCollectionHandler)
+  .openapi(editCollectionRoute, editCollectionHandler);
 
 export default routes;

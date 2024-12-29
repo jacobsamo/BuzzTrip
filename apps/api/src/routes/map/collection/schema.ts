@@ -22,12 +22,6 @@ export const CollectionReturnSchema = z
   })
   .openapi("CollectionReturnSchema");
 
-export const CreateCollectionSchema = collectionsEditSchema
-  .omit({
-    created_by: true,
-  })
-  .openapi("CreateCollectionSchema");
-
 // Editing of a collection
 export const EditCollectionSchema = collectionsEditSchema.openapi(
   "EditCollectionSchema"

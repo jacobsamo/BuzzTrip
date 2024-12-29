@@ -13,9 +13,9 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": ".",
     "declaration": false,
     "declarationMap": false,
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
@@ -27,6 +27,13 @@
     },
     "types": ["google.maps"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "env.mjs", "next.config.mjs"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "env.mjs",
+    "next.config.mjs"
+  ],
   "exclude": ["node_modules"]
 }

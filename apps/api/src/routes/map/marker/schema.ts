@@ -19,20 +19,6 @@ export const MarkerParamsSchema = MapParamsSchema.extend({
     }),
 });
 
-export const CreateMarkerSchema = z
-  .object({
-    marker: combinedMarkersSchema,
-    collectionIds: z.string().array().nullish(),
-  })
-  .openapi("CreateMarkerSchema");
-
-export const CreateMarkersReturnSchema = z
-  .object({
-    markers: combinedMarkersSchema.array(),
-    collectionLinks: collection_linksSchema.array().nullable(),
-  })
-  .openapi("CreateMarkersReturnSchema");
-
 // Edit a marker
 export const EditMarkerSchema = z
   .object({
@@ -40,6 +26,7 @@ export const EditMarkerSchema = z
     marker: combinedMarkersSchema,
     collectionIds_to_add: z.string().array().optional(),
     collectionIds_to_remove: z.string().array().optional(),
+    userId: z.string(),
   })
   .openapi("EditMarkerSchema");
 
