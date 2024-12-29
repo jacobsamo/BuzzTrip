@@ -25,7 +25,6 @@
   ],
   "trustedDependencies": [
     "@clerk/shared",
-    "@sentry/cli",
     "browser-tabs-lock",
     "core-js",
     "esbuild",
