@@ -1,6 +1,6 @@
-import { withSentryConfig } from "@sentry/nextjs";
+// import { withSentryConfig } from "@sentry/nextjs";
 import "./env.mjs";
-import { env } from "./env.mjs";
+// import { env } from "./env.mjs";
 import nextMdx from "@next/mdx";
 import remarkGfm from "remark-gfm";
 
@@ -48,7 +48,6 @@ const nextConfig = {
       "lucide-react",
       "@phosphor-icons/react",
       "posthog-js",
-      "@sentry/nextjs",
     ],
     instrumentationHook: true,
   },
@@ -63,14 +62,16 @@ const withMDX = nextMdx({
   },
 });
 
-export default withSentryConfig(withMDX(nextConfig), {
-  org: env.SENTRY_ORG,
-  project: env.SENTRY_PROJECT,
-  authToken: env.SENTRY_AUTH_TOKEN,
-  telemetry: false,
-  disableLogger: true,
-  hideSourceMaps: true,
-  sourcemaps: {
-    disable: true,
-  },
-});
+// export default withSentryConfig(withMDX(nextConfig), {
+//   org: env.SENTRY_ORG,
+//   project: env.SENTRY_PROJECT,
+//   authToken: env.SENTRY_AUTH_TOKEN,
+//   telemetry: false,
+//   disableLogger: true,
+//   hideSourceMaps: true,
+//   sourcemaps: {
+//     disable: true,
+//   },
+// });
+
+export default withMDX(nextConfig);
