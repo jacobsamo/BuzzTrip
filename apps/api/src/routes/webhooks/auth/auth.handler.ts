@@ -62,6 +62,10 @@ export const clerkWebhookHandler: AppRouteHandler<
 
     return c.json({ message: "Received" }, 200);
   } catch (error) {
+    console.error("Failed to process clerk webhook request", {
+      payload: c.req.text(),
+      error: c.error,
+    });
     return c.json(
       {
         code: "failed_to_object",

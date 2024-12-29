@@ -22,23 +22,24 @@ const app = new OpenAPIHono<{ Bindings: Bindings }>({
   },
 });
 
-app.use(securityMiddleware);
-app.use(loggingMiddleware);
-app.use("*", requestId());
-
-// all routes that don't need security
-app.route("/", authRoutes);
-
 app.use("*", (c, next) => {
+  if (c.req.header("Origin") == c.env.FRONT_END_URL) {
+    return cors({
+      origin: c.env.FRONT_END_URL, // Front end url for cors
+      allowMethods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
+      allowHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+    })(c, next);
+  }
   return cors({
-    origin: c.env.FRONT_END_URL, // Front end url for cors
-    allowMethods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
-    allowHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+    origin: "*", // Allow all origins
+    allowMethods: ["GET", "POST"],
   })(c, next);
 });
 
 app.use(authMiddleware);
-
+app.use(securityMiddleware);
+app.use(loggingMiddleware);
+app.use("*", requestId());
 app.get("/health", (c) => {
   return c.json({ status: "ok" });
 });
@@ -50,6 +51,8 @@ app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
 
 const map = [mapRoutes, markerRoutes, collectionRoutes];
 const user = [userRoutes];
+
+app.route("/", authRoutes);
 
 const routes = app
   .route("/", userRoutes)
