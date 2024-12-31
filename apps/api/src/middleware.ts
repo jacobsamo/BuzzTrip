@@ -34,13 +34,16 @@ const loggingMiddleware: MiddlewareHandler = async (c, next) => {
     await next();
 
     if (c.res.status !== 200) {
-      console.log("req", {
-        req: c.req,
-        res: c.res,
-        method: c.req.method,
-        json: c.req.json(),
-        err: c.error,
-      });
+      console.log(
+        `Failed request: ${c.req.method} ${c.req.url}, ${c.get("requestId")}`,
+        {
+          req: c.req,
+          res: c.res,
+          method: c.req.method,
+          json: c.req.json(),
+          err: c.error,
+        }
+      );
     }
   } catch (err) {
     console.error("Error in request handling:", err);

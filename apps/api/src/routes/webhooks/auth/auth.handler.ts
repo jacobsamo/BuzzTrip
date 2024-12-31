@@ -11,31 +11,65 @@ export const clerkWebhookHandler: AppRouteHandler<
   typeof clerkWebhookRoute
 > = async (c) => {
   try {
-    const payloadString = await c.req.text();
+    const payload = await c.req.text();
 
-    const svixHeaders = {
-      "svix-id": c.header("svix-id")!,
-      "svix-timestamp": c.header("svix-timestamp")!,
-      "svix-signature": c.header("svix-signature")!,
-    };
+    const svix_id = c.req.header("svix-id");
+    const svix_timestamp = c.req.header("svix-timestamp");
+    const svix_signature = c.req.header("svix-signature");
+
+    if (
+      svix_id == undefined ||
+      svix_timestamp == undefined ||
+      svix_signature == undefined
+    ) {
+      console.error("No svix headers found");
+      return c.json(
+        {
+          code: "failed_webhook",
+          message:
+            "Failed to process webhook request because headers are missing",
+          requestId: c.get("requestId"),
+        },
+        400
+      );
+    }
+
     const wh = new Webhook(c.env.CLERK_WEBHOOK_SECRET);
-    const payload = wh.verify(payloadString, svixHeaders) as WebhookEvent;
+
+    let event: WebhookEvent | null = null;
+
+    try {
+      event = wh.verify(payload, {
+        "svix-id": svix_id,
+        "svix-timestamp": svix_timestamp,
+        "svix-signature": svix_signature,
+      }) as WebhookEvent;
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error("Error verifying webhook:", err);
+        throw Error("Failed to verify webhook", err);
+      }
+    }
 
     const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
-    switch (payload.type) {
+    if (!event) {
+      throw Error("No event found");
+    }
+
+    switch (event.type) {
       case "user.created":
-        const email = payload.data.primary_email_address_id
-          ? payload.data.email_addresses.find(
-              (eml) => eml.id === payload.data.primary_email_address_id
+        const email = event.data.primary_email_address_id
+          ? event.data.email_addresses.find(
+              (eml) => eml.id === event.data.primary_email_address_id
             )
-          : payload.data.email_addresses[0];
+          : event.data.email_addresses[0];
 
         const user: NewUser = {
-          user_id: payload.data.id,
-          first_name: payload.data.first_name,
-          last_name: payload.data.last_name,
-          username: payload.data.username,
+          user_id: event.data.id,
+          first_name: event.data.first_name,
+          last_name: event.data.last_name,
+          username: event.data.username,
           email: email?.email_address!,
         };
 
@@ -43,34 +77,35 @@ export const clerkWebhookHandler: AppRouteHandler<
 
         break;
       case "user.deleted":
-        console.log("User deleted: ", payload.data.id);
-        if (!payload.data.id) break;
+        if (!event.data.id) break;
 
-        await db.delete(users).where(eq(users.user_id, payload.data.id));
+        await db.delete(users).where(eq(users.user_id, event.data.id));
 
         break;
       case "user.updated":
         const updatedUser: Omit<NewUser, "user_id" | "email"> = {
-          first_name: payload.data.first_name,
-          last_name: payload.data.last_name,
-          username: payload.data.username,
+          first_name: event.data.first_name,
+          last_name: event.data.last_name,
+          username: event.data.username,
         };
 
         await db.update(users).set(updatedUser);
+
         break;
     }
 
     return c.json({ message: "Received" }, 200);
   } catch (error) {
-    console.error("Failed to process clerk webhook request", {
-      payload: c.req.text(),
+    console.error("Failed to process", {
+      payload: await c.req.text(),
       error: c.error,
     });
     return c.json(
       {
-        code: "failed_to_object",
+        code: "failed_webhook",
         message: "Failed to process clerk webhook request",
         requestId: c.get("requestId"),
+        error: error,
       },
       400
     );
