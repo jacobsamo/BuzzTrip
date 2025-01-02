@@ -1,4 +1,3 @@
-import { clerkMiddleware } from "@hono/clerk-auth";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { requestId } from "hono/request-id";
 import { Bindings } from "./common/bindings";
@@ -11,6 +10,8 @@ import mapRoutes from "./routes/map";
 import userRoutes from "./routes/user";
 import markerRoutes from "./routes/map/marker";
 import collectionRoutes from "./routes/map/collection";
+import { cors } from "hono/cors";
+import authRoutes from "./routes/webhooks/auth";
 
 const app = new OpenAPIHono<{ Bindings: Bindings }>({
   defaultHook: (result, c) => {
@@ -21,17 +22,24 @@ const app = new OpenAPIHono<{ Bindings: Bindings }>({
   },
 });
 
-app.use("*", requestId());
-app.use(authMiddleware);
-app.use(securityMiddleware);
-app.use(loggingMiddleware);
-app.use("*", async (c, next) => {
-  return clerkMiddleware({
-    publishableKey: c.env.CLERK_PUBLISHABLE_KEY,
-    secretKey: c.env.CLERK_SECRET_KEY,
+app.use("*", (c, next) => {
+  if (c.req.header("Origin") == c.env.FRONT_END_URL) {
+    return cors({
+      origin: c.env.FRONT_END_URL, // Front end url for cors
+      allowMethods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
+      allowHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+    })(c, next);
+  }
+  return cors({
+    origin: "*", // Allow all origins
+    allowMethods: ["GET", "POST"],
   })(c, next);
 });
 
+app.use(authMiddleware);
+app.use(securityMiddleware);
+app.use(loggingMiddleware);
+app.use("*", requestId());
 app.get("/health", (c) => {
   return c.json({ status: "ok" });
 });
@@ -44,11 +52,13 @@ app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
 const map = [mapRoutes, markerRoutes, collectionRoutes];
 const user = [userRoutes];
 
-map.forEach((route) => app.route("/", route));
-type UserRouteTypes = typeof userRoutes;
+app.route("/", authRoutes);
 
-user.forEach((route) => app.route("/", route));
-type MapRouteTypes = typeof mapRoutes;
+const routes = app
+  .route("/", userRoutes)
+  .route("/", mapRoutes)
+  .route("/", markerRoutes)
+  .route("/", collectionRoutes);
 
-export type AppType = MapRouteTypes & UserRouteTypes;
+export type AppType = typeof routes;
 export default app;

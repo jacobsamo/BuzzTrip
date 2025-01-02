@@ -17,6 +17,7 @@ import MarkerPin from "../../../mapping/google-maps/marker_pin";
 import OpenMarkerButton from "../../../mapping/google-maps/open-marker";
 import { useMap } from "@vis.gl/react-google-maps";
 import { useMapStore } from "@/components/providers/map-state-provider";
+import DisplayMarker from "./display-marker";
 // import { useMap } from "react-map-gl";
 
 interface DisplayCollectionProps {
@@ -66,20 +67,7 @@ const DisplayCollection = ({ collection, markers }: DisplayCollectionProps) => {
             <SidebarMenuSub className="space-y-2">
               {markers.map((marker) => (
                 <SidebarMenuSubItem key={marker.marker_id}>
-                  <SidebarMenuSubButton
-                    onClick={() => onMarkerClick(marker)}
-                    className="flex flex-row items-center justify-between py-1 gap-0"
-                  >
-                    <MarkerPin marker={marker} size={16} />
-                    <span className="wrap text-center text-sm">
-                      {marker.title}
-                    </span>
-                    <SidebarMenuAction
-                      onClick={() => setMarkerOpen(true, marker, "edit")}
-                    >
-                      <Pencil />
-                    </SidebarMenuAction>
-                  </SidebarMenuSubButton>
+                  <DisplayMarker marker={marker} />
                 </SidebarMenuSubItem>
               ))}
             </SidebarMenuSub>

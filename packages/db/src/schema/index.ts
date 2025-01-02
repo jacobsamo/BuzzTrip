@@ -98,7 +98,10 @@ export const locations = sqliteTable("locations", {
   lng: real("lng").notNull(),
   bounds: text("bounds", { mode: "json" }).notNull().$type<Bounds | null>(),
   address: text("address"),
-  gm_place_id: text("gm_place_id"),
+  gm_place_id: text("gm_place_id"), // google maps place id
+  // mb_place_id: text("mb_place_id"), // mapbox place id
+  // fq_place_id: text("fq_place_id"), // foursquare place id
+  // plus_code: text("plus_code"),
   icon: text("icon").$type<IconType>().notNull(),
   photos: text("photos", { mode: "json" }).$type<string[] | null>(),
   reviews: text("reviews", { mode: "json" }).$type<Review[] | null>(),
@@ -106,6 +109,7 @@ export const locations = sqliteTable("locations", {
   avg_price: integer("avg_price"),
   types: text("types", { mode: "json" }).$type<string[] | null>(),
   website: text("website"),
+  // menu: text("menu"),
   phone: text("phone"),
   opening_times: text("opening_times", { mode: "json" }).$type<
     string[] | null

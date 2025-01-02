@@ -1,37 +1,25 @@
-import { AppRouteHandler } from "@/common/types";
 import { createDb } from "@buzztrip/db";
+import { createCollection } from "@buzztrip/db/mutations";
 import { collections } from "@buzztrip/db/schema";
-import { getAuth } from "@hono/clerk-auth";
 import { eq } from "drizzle-orm";
-import { createCollection, editCollection } from "./collection.routes";
+import { AppRouteHandler } from "../../../common/types";
+import {
+  createCollectionRoute,
+  editCollectionRoute,
+} from "./collection.routes";
 
 export const createCollectionHandler: AppRouteHandler<
-  typeof createCollection
+  typeof createCollectionRoute
 > = async (c) => {
   const { mapId } = c.req.valid("param");
   const newCollection = c.req.valid("json");
   const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
-  const auth = getAuth(c);
 
-  if (!auth || !auth.userId) {
-    return c.json(
-      {
-        code: "unauthorized",
-        message: "Unauthorized",
-        requestId: c.get("requestId"),
-      },
-      401
-    );
-  }
-
-  const [collection] = await db
-    .insert(collections)
-    .values({
-      ...newCollection,
-      map_id: mapId,
-      created_by: auth.userId,
-    })
-    .returning();
+  const collection = await createCollection(db, {
+    userId: newCollection.created_by,
+    mapId: mapId,
+    input: newCollection,
+  });
 
   if (!collection) {
     return c.json(
@@ -48,23 +36,11 @@ export const createCollectionHandler: AppRouteHandler<
 };
 
 export const editCollectionHandler: AppRouteHandler<
-  typeof editCollection
+  typeof editCollectionRoute
 > = async (c) => {
   const { mapId, collectionId } = c.req.valid("param");
   const editCollection = c.req.valid("json");
   const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
-  const auth = getAuth(c);
-
-  if (!auth || !auth.userId) {
-    return c.json(
-      {
-        code: "unauthorized",
-        message: "Unauthorized",
-        requestId: c.get("requestId"),
-      },
-      401
-    );
-  }
 
   const [updatedCollection] = await db
     .update(collections)

@@ -1,14 +1,12 @@
-import { Bindings } from "@/common/bindings";
-import { ErrorSchema } from "@/common/schema";
-import { createDb } from "@buzztrip/db";
-import { getUserMaps } from "@buzztrip/db/queries";
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
-import { MapsParamsSchema, MapsSchema } from "./schema";
-import { getUserMapsRoute } from "./user.routes";
-import { getUserMapsHandler } from "./user.handler";
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { Bindings } from "../../common/bindings";
+import { getUserMapsHandler, searchUserHandler } from "./user.handler";
+import { getUserMapsRoute, searchUserRoute } from "./user.routes";
 
 const app = new OpenAPIHono<{ Bindings: Bindings }>();
 
-const routes = app.openapi(getUserMapsRoute, getUserMapsHandler);
+const routes = app
+  .openapi(getUserMapsRoute, getUserMapsHandler)
+  .openapi(searchUserRoute, searchUserHandler);
 
 export default routes;

@@ -1,12 +1,18 @@
-import { AppRouteHandler } from "@/common/types";
 import { createDb } from "@buzztrip/db";
+import { createMap, shareMap } from "@buzztrip/db/mutations/maps";
 import { getAllMapData } from "@buzztrip/db/queries";
-import { map_users, maps } from "@buzztrip/db/schema";
+import { maps } from "@buzztrip/db/schema";
 import { eq } from "drizzle-orm";
-import { v4 as uuidv4 } from "uuid";
-import { createMap, editMap, getMap, getMapDataRoute } from "./map.routes";
+import { AppRouteHandler } from "../../common/types";
+import {
+  createMapRoute,
+  editMapRoute,
+  getMapDataRoute,
+  getMapRoute,
+  shareMapRoute,
+} from "./map.routes";
 
-export const getMapHandler: AppRouteHandler<typeof getMap> = async (c) => {
+export const getMapHandler: AppRouteHandler<typeof getMapRoute> = async (c) => {
   const { mapId } = c.req.valid("param");
   const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
@@ -34,11 +40,20 @@ export const getMapDataHandler: AppRouteHandler<
   const { mapId } = c.req.valid("param");
   const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
-  const [foundCollections, collectionLinks, foundMarkers, sharedMap, map] =
+  const [foundCollections, collectionLinks, foundMarkers, sharedMap, [map]] =
     await getAllMapData(db, mapId);
 
+  if (!map) {
+    return c.json({
+      code: "data_not_found",
+      message: "Map not found",
+      requestId: c.get("requestId"),
+    }, 400);
+  }
+
+
   return c.json(
-    {
+    { 
       markers: foundMarkers.map((marker) => ({
         ...marker,
         lat: marker.lat as number,
@@ -48,51 +63,24 @@ export const getMapDataHandler: AppRouteHandler<
       collections: foundCollections,
       collection_links: collectionLinks,
       mapUsers: sharedMap,
-      map: map[0]!,
+      map: map,
     },
     200
   );
 };
 
-export const createMapHandler: AppRouteHandler<typeof createMap> = async (
+export const createMapHandler: AppRouteHandler<typeof createMapRoute> = async (
   c
 ) => {
   const req = c.req.valid("json");
   try {
     const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
-
-    const createMap = await db.transaction(async (trx) => {
-      const mapId = uuidv4();
-      const [map] = await trx
-        .insert(maps)
-        .values({
-          title: req.title,
-          description: req.description,
-          owner_id: req.owner_id,
-          map_id: mapId,
-        })
-        .returning();
-
-      const [mapUser] = await trx
-        .insert(map_users)
-        .values({
-          map_id: mapId,
-          user_id: req.owner_id,
-          permission: "owner",
-        })
-        .returning();
-
-      return {
-        map,
-        mapUser,
-      };
+    const data = await createMap(db, {
+      userId: req.userId,
+      input: req,
     });
 
-    if (!!createMap.map || !!createMap.mapUser) {
-      throw new Error("Error creating map");
-    }
-
-    return c.json(createMap, 200);
+    return c.json(data, 200);
   } catch (error) {
     return c.json(
       {
@@ -105,15 +93,18 @@ export const createMapHandler: AppRouteHandler<typeof createMap> = async (
   }
 };
 
-export const editMapHandler: AppRouteHandler<typeof editMap> = async (c) => {
+export const editMapHandler: AppRouteHandler<typeof editMapRoute> = async (
+  c
+) => {
   const { mapId } = c.req.valid("param");
   const editMap = c.req.valid("json");
   const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
-  const updatedMap = await db
+  const [updatedMap] = await db
     .update(maps)
     .set(editMap)
-    .where(eq(maps.map_id, mapId));
+    .where(eq(maps.map_id, mapId))
+    .returning();
 
   if (!updatedMap) {
     return c.json(
@@ -127,4 +118,19 @@ export const editMapHandler: AppRouteHandler<typeof editMap> = async (c) => {
   }
 
   return c.json(updatedMap, 200);
+};
+
+export const shareMapHandler: AppRouteHandler<typeof shareMapRoute> = async (
+  c
+) => {
+  const { mapId } = c.req.valid("param");
+  const mapUsers = c.req.valid("json");
+  const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+
+  const newMapUsers = await shareMap(db, {
+    mapId: mapId,
+    users: mapUsers.users,
+  });
+
+  return c.json(newMapUsers, 200);
 };

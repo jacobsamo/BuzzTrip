@@ -1,16 +1,11 @@
-import React from "react";
 import Providers from "@/components/providers";
 import "@/lib/styles/globals.css";
+import { constructMetadata } from "@/lib/utils/metadata";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import React from "react";
 
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "BuzzTrip",
-  description: "Plan the trip you've always dreamed of",
-};
+export const metadata: Metadata = constructMetadata();
 
 export const viewport: Viewport = {
   maximumScale: 1,
@@ -28,7 +23,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={inter.className}>
+        <body>
           <Providers>{children}</Providers>
         </body>
       </html>

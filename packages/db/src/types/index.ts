@@ -1,3 +1,4 @@
+import * as z from "zod";
 import {
   collection_links,
   collections,
@@ -5,14 +6,14 @@ import {
   map_users,
   maps,
   markers,
-  routes,
   route_stops,
+  routes,
   users,
 } from "../schema";
-import * as z from "zod";
 import {
   boundsSchema,
   combinedMarkersSchema,
+  permissionEnumSchema,
   reviewsSchema,
   userMapsSchema,
 } from "../zod-schemas";
@@ -51,6 +52,8 @@ export type Bounds = z.infer<typeof boundsSchema>;
 export type Review = z.infer<typeof reviewsSchema>;
 
 export type UserMap = z.infer<typeof userMapsSchema>;
+
+export type PermissionEnum = z.infer<typeof permissionEnumSchema>;
 
 // alternative schema types
 export type CombinedMarker = z.infer<typeof combinedMarkersSchema>;
