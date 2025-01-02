@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { sql, SQL } from "drizzle-orm";
 import { relations } from "drizzle-orm/relations";
 import {
   integer,
@@ -20,8 +20,13 @@ export const users = sqliteTable("users", {
   user_id: text("user_id").primaryKey().notNull(),
   first_name: text("first_name"),
   last_name: text("last_name"),
-  username: text("username").unique(),
+  full_name: text("full_name").generatedAlwaysAs(
+    (): SQL => sql`${users.first_name} ${users.last_name}`
+  ),
   email: text("email").notNull().unique(),
+  profile_picture: text("profile_picture"),
+  username: text("username"),
+  bio: text("bio"),
   created_at: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
   updated_at: text("updated_at").default(sql`(CURRENT_TIMESTAMP)`),
 });

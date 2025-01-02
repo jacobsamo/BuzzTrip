@@ -71,6 +71,7 @@ export const clerkWebhookHandler: AppRouteHandler<
           last_name: event.data.last_name,
           username: event.data.username,
           email: email?.email_address!,
+          profile_picture: event.data.image_url,
         };
 
         await db.insert(users).values(user);
@@ -87,9 +88,13 @@ export const clerkWebhookHandler: AppRouteHandler<
           first_name: event.data.first_name,
           last_name: event.data.last_name,
           username: event.data.username,
+          profile_picture: event.data.image_url,
         };
 
-        await db.update(users).set(updatedUser);
+        await db
+          .update(users)
+          .set(updatedUser)
+          .where(eq(users.user_id, event.data.id));
 
         break;
     }
@@ -100,6 +105,7 @@ export const clerkWebhookHandler: AppRouteHandler<
       payload: await c.req.text(),
       error: c.error,
     });
+
     return c.json(
       {
         code: "failed_webhook",

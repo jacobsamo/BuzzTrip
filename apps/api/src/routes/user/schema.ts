@@ -29,6 +29,7 @@ export const SearchUserReturnSchema = z.object({
       firstName: z.string().nullable(),
       lastName: z.string().nullable(),
       email: z.string(),
+      profile_picture: z.string().nullable(),
     })
     .array()
     .nullable(),
