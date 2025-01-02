@@ -36,6 +36,7 @@ export const searchUserHandler: AppRouteHandler<
           username: user.username,
           firstName: user.first_name,
           lastName: user.last_name,
+          profile_picture: user.profile_picture,
         };
       }),
     },
