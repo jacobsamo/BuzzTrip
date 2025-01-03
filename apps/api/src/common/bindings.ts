@@ -4,6 +4,7 @@ export interface Bindings {
   TURSO_AUTH_TOKEN: string;
   API_SECRET_KEY: string;
   FRONT_END_URL: string;
+  SENTRY_DSN: string;
 }
 
 export interface AppBindings {

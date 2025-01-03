@@ -5,10 +5,12 @@ main = "src/index.ts"
 minify = true
 workers_dev = false
 
-
 [dev]
 port = 8181
 
+[env.development]
+name = "dev-api"
+route = { pattern = "dev-api.buzztrip.co/*", zone_name = "buzztrip.co" }
 
 
 [env.production]
@@ -24,7 +26,7 @@ route = { pattern = "api.buzztrip.co/*", zone_name = "buzztrip.co" }
 # id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 # [[r2_buckets]]
-# binding = "MY_BUCKET"
+# binding = "BUZZTRIP_BUCKET"
 # bucket_name = "my-bucket"
 
 # [[d1_databases]]

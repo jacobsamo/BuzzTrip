@@ -29,26 +29,6 @@ const authMiddleware = (c: Context, next: Next) => {
 
 const securityMiddleware = secureHeaders();
 
-const loggingMiddleware: MiddlewareHandler = async (c, next) => {
-  try {
-    await next();
+export * from "./logger";
 
-    if (c.res.status !== 200) {
-      console.log(
-        `Failed request: ${c.req.method} ${c.req.url}, ${c.get("requestId")}`,
-        {
-          req: c.req,
-          res: c.res,
-          method: c.req.method,
-          json: c.req.json(),
-          err: c.error,
-        }
-      );
-    }
-  } catch (err) {
-    console.error("Error in request handling:", err);
-    throw err; // Re-throw error for further handling
-  }
-};
-
-export { authMiddleware, loggingMiddleware, securityMiddleware };
+export { authMiddleware, securityMiddleware };
