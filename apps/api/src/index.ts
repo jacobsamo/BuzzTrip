@@ -38,13 +38,13 @@ app.use("*", (c, next) => {
 
 app.use(authMiddleware);
 app.use(securityMiddleware);
-app.use(loggingMiddleware);
 app.use((c, next) =>
   sentry({ dsn: c.env.SENTRY_DSN, tracesSampleRate: 1.0, environment: "api" })(
     c,
     next
   )
 );
+app.use(loggingMiddleware);
 app.use("*", requestId());
 
 app.onError((e, c) => {

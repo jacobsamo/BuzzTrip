@@ -34,6 +34,26 @@ const loggingMiddleware: MiddlewareHandler = async (c, next) => {
     await next();
 
     if (c.res.status !== 200) {
+      c.get("sentry").captureMessage(
+        `Failed request: ${c.req.method} ${c.req.url}, ${c.get("requestId")}`,
+        "warning",
+        {
+          data: {
+            request: {
+              method: c.req.method,
+              url: c.req.url,
+              headers: c.req.header,
+              body: c.req.json,
+            },
+            response: {
+              status: c.res.status,
+              headers: c.res.headers,
+              body: c.res.body,
+            },
+            err: c.error,
+          },
+        }
+      );
       console.log(
         `Failed request: ${c.req.method} ${c.req.url}, ${c.get("requestId")}`,
         {
@@ -41,11 +61,11 @@ const loggingMiddleware: MiddlewareHandler = async (c, next) => {
           res: c.res,
           method: c.req.method,
           json: c.req.json(),
-          err: c.error,
         }
       );
     }
   } catch (err) {
+    c.get("sentry").captureException(err);
     console.error("Error in request handling:", err);
     throw err; // Re-throw error for further handling
   }
