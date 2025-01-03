@@ -24,7 +24,19 @@ export const clerkWebhookHandler: AppRouteHandler<
       svix_signature == undefined
     ) {
       console.error("No svix headers found");
-      sentry.captureMessage("No svix headers found");
+      sentry.captureMessage("No svix headers found", "warning", {
+        data: {
+          payload: await c.req.text(),
+          error: c.error,
+          headers: c.req.header(),
+          svixHeaders: {
+            svix_id,
+            svix_timestamp,
+            svix_signature,
+          },
+          requestId: c.get("requestId"),
+        },
+      });
       return c.json(
         {
           code: "failed_webhook",
