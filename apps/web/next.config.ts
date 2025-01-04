@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 import "./env";
 import { env } from "./env";
 import { withSentryConfig } from "@sentry/nextjs";
-import nextMdx from "@next/mdx";
+import createMDX from '@next/mdx'
 import remarkGfm from "remark-gfm";
 
 const nextConfig: NextConfig = {
@@ -52,7 +52,7 @@ const nextConfig: NextConfig = {
   skipTrailingSlashRedirect: true,
 };
 
-const withMDX = nextMdx({
+const withMDX = createMDX({
   extension: /\.mdx?$/,
   options: {
     remarkPlugins: [remarkGfm],

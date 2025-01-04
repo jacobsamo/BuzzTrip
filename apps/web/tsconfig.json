@@ -24,7 +24,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "env": ["env.mjs"]
+      "env": ["env.ts"],
+      "react": ["./node_modules/@types/react"]
     },
     "types": ["google.maps"]
   },

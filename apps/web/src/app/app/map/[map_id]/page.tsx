@@ -9,13 +9,13 @@ import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { map_id: string };
-}) {
+type Params = Promise<{ map_id: string }>;
+
+export async function generateMetadata({ params }: { params: Params }) {
+  const { map_id } = await params;
+
   const map = await db.query.maps.findFirst({
-    where: eq(maps.map_id, params.map_id),
+    where: eq(maps.map_id, map_id),
   });
 
   return constructMetadata({
@@ -24,19 +24,16 @@ export async function generateMetadata({
   });
 }
 
-export default async function MapPage({
-  params,
-}: {
-  params: { map_id: string };
-}) {
+export default async function MapPage({ params }: { params: Params }) {
+  const { map_id } = await params;
   const { userId } = await auth();
 
-  if (!userId || !params.map_id) {
+  if (!userId || !map_id) {
     return notFound();
   }
 
   const [foundCollections, collectionLinks, foundMarkers, sharedMap, [map]] =
-    await getAllMapData(db, params.map_id);
+    await getAllMapData(db, map_id);
 
   if (
     (sharedMap &&
