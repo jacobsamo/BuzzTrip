@@ -33,7 +33,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     h3: ({ children, ...props }) => (
       <h3
         id={getId(children)}
-        className="mt-8 scroll-m-20 text-md font-bold"
+        className="text-md mt-8 scroll-m-20 font-bold"
         {...props}
       >
         {children}
@@ -46,7 +46,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ol: (props) => <ol className="mt-4 list-decimal pl-8" {...props} />,
     a: ({ children, ...props }) => (
       <Link
-        className="underline decoration-yellow decoration-2 underline-offset-[4.5px]"
+        className="decoration-yellow underline decoration-2 underline-offset-[4.5px]"
         {...(props as LinkProps)}
       >
         {children}
