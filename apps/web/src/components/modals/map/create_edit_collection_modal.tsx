@@ -1,5 +1,4 @@
 // import ConfirmDeleteModal from "@/components/shared/modals/comfirm_delete_modal";
-import { createCollectionAction } from "@/actions/map/collection/create-collection";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -122,7 +121,6 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
     handleSubmit,
     watch,
     control,
-    formState: { errors },
   } = useForm<Collection>({
     defaultValues: {
       title: collection?.title || "",
@@ -192,19 +190,19 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
     }
   };
 
-  const handleDelete = () => {
-    // const deleteCollection = fetch(
-    //   `/api/map/${map_id}/collection/${collection?.uid}/delete`,
-    //   {
-    //     method: "DELETE",
-    //   }
-    // );
-    // toast.promise(deleteCollection, {
-    //   loading: "Deleting collection...",
-    //   success: "Collection deleted successfully",
-    //   error: "Failed to delete collection",
-    // });
-  };
+  // const handleDelete = () => {
+  //   const deleteCollection = fetch(
+  //     `/api/map/${map_id}/collection/${collection?.uid}/delete`,
+  //     {
+  //       method: "DELETE",
+  //     }
+  //   );
+  //   toast.promise(deleteCollection, {
+  //     loading: "Deleting collection...",
+  //     success: "Collection deleted successfully",
+  //     error: "Failed to delete collection",
+  //   });
+  // };
 
   return (
     <div>

@@ -19,7 +19,7 @@ export const MapStoreProvider = ({
   children,
   initialState,
 }: MapStoreProviderProps) => {
-  const storeRef = useRef<MapStoreApi>();
+  const storeRef = useRef<MapStoreApi>(undefined);
 
   if (!storeRef.current) {
     storeRef.current = createStore(initialState ?? defaultState);

@@ -1,14 +1,12 @@
+import type { NextConfig } from "next";
+import "./env";
+import { env } from "./env";
 import { withSentryConfig } from "@sentry/nextjs";
-import "./env.mjs";
-import { env } from "./env.mjs";
-import nextMdx from "@next/mdx";
+import createMDX from '@next/mdx'
 import remarkGfm from "remark-gfm";
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
+const nextConfig: NextConfig = {
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
-  crossOrigin: "use-credentials",
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -50,12 +48,11 @@ const nextConfig = {
       "posthog-js",
       "@sentry/nextjs",
     ],
-    instrumentationHook: true,
   },
   skipTrailingSlashRedirect: true,
 };
 
-const withMDX = nextMdx({
+const withMDX = createMDX({
   extension: /\.mdx?$/,
   options: {
     remarkPlugins: [remarkGfm],
