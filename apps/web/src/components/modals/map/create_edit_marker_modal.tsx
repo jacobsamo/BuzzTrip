@@ -177,7 +177,7 @@ function MarkerForm() {
       ) ?? null;
     setInCollections(inCols);
     setValue("collection_ids", inCols);
-  }, [markers, collections, getCollectionsForMarker, setValue, markerOpen]);
+  }, [markers, collections, markerOpen]);
 
   useEffect(() => {
     console.log("Errors: ", errors);
