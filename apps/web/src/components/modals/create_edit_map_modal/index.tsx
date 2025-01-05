@@ -30,8 +30,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { apiClient } from "@/server/api.client";
-import { CreateMapSchema } from "@buzztrip/api/src/routes/map/schema";
 import { Map } from "@buzztrip/db/types";
+import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
 import { useAuth } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "@uidotdev/usehooks";
@@ -40,18 +40,15 @@ import * as React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
+//   mode: "edit";
+//   map: Map;
+//   updateMap: (map: Partial<Map>) => void;
+// };
 
-type EditMap = {
-  mode: "edit";
-  map: Map;
-  updateMap: (map: Partial<Map>) => void;
-};
-
-type CreateMap = {
-  mode: "create";
-  setMap: (map: Map | null) => void;
-};
+// type CreateMap = {
+//   mode: "create";
+//   setMap: (map: Map | null) => void;
+// };
 
 export interface MapModalProps {
   mode?: "create" | "edit";
@@ -156,18 +153,8 @@ function MapForm({
   const {
     register,
     handleSubmit,
-    getValues,
     control,
-    formState: { errors },
   } = form;
-
-  React.useEffect(() => {
-    console.log("Errors: ", {
-      errors,
-      values: getValues(),
-      ui: userId,
-    });
-  }, [errors]);
 
   const onSubmit: SubmitHandler<z.infer<typeof mapsEditSchema>> = async (
     data
