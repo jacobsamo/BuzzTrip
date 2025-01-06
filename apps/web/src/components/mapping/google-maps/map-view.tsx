@@ -8,10 +8,11 @@ import {
   useMapsLibrary,
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
-import { memo, useMemo } from "react";
+import { lazy, memo, useMemo } from "react";
 import DisplayMarkerInfo from "./display-marker-info";
 import { AutocompleteCustomInput, detailsRequestCallback } from "./search";
-import MarkerPin from "./marker_pin";
+
+const MarkerPin = lazy(() => import("./marker_pin"));
 
 const Mapview = () => {
   const map = useMap();

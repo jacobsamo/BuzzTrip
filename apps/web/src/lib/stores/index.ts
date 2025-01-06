@@ -4,19 +4,17 @@ import { defaultState, StoreActions, type StoreState } from "./default-state";
 import type {
   Collection,
   CollectionLink,
-  MapUser,
+  CombinedMarker,
   Map,
-  Marker,
+  MapUser,
   Route,
   RouteStop,
-  CombinedMarker,
-  NewLocation,
 } from "@buzztrip/db/types";
 
 export type Store = StoreState & StoreActions;
 
 export const createStore = (initState: Partial<StoreState>) =>
-  createZustandStore<Store>()((set, get, api) => ({
+  createZustandStore<Store>()((set, get) => ({
     ...defaultState,
     ...initState,
     setCollectionLinks: (collectionLinks: CollectionLink[] | null) => {
@@ -215,13 +213,13 @@ export const createStore = (initState: Partial<StoreState>) =>
     },
 
     // Modals
-    setActiveLocation: (location: CombinedMarker | null) =>
+    setActiveLocation: (place: CombinedMarker | null) =>
       set(() => {
-        if (location) {
+        if (place) {
           return {
-            activeLocation: location,
+            activeLocation: place,
             snap: 0.5,
-            searchValue: location.address,
+            searchValue: place.address,
           };
         }
 

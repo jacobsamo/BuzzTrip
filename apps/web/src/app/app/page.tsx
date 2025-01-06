@@ -1,11 +1,11 @@
 import UserMaps from "@/components/layouts/user-maps";
 import { db } from "@/server/db";
 import { getUserMaps } from "@buzztrip/db/queries";
-import { UserButton, UserProfile } from "@clerk/nextjs";
+import { UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
-import { notFound } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export default async function MapPage() {
   const { userId } = await auth();
