@@ -1,25 +1,16 @@
 "use client";
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { Location } from "@buzztrip/db/types";
-import { useMediaQuery } from "@uidotdev/usehooks";
 import {
   AdvancedMarker,
   Map as GoogleMap,
-  InfoWindow,
   MapMouseEvent,
-  Pin,
-  useAdvancedMarkerRef,
   useMap,
-  useMapsLibrary,
+  useMapsLibrary
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
 import { lazy, memo, useMemo } from "react";
-import MapDrawer from "../../layouts/map-view/components/map-drawer";
-import MapSideBar from "./map-sidebar";
-import { AutocompleteCustomInput, detailsRequestCallback } from "./search";
-import InfoBox from "./info-window";
 import DisplayMarkerInfo from "./display-marker-info";
-import Icon from "@buzztrip/components/icon";
+import { AutocompleteCustomInput, detailsRequestCallback } from "./search";
 
 const MarkerPin = lazy(() => import("./marker_pin"));
 

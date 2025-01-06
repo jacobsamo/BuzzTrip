@@ -2,7 +2,7 @@ import * as z from "zod";
 import {
   collection_links,
   collections,
-  locations,
+  places,
   map_users,
   maps,
   markers,
@@ -29,8 +29,8 @@ export type NewMap = typeof maps.$inferInsert;
 export type Marker = typeof markers.$inferSelect;
 export type NewMarker = typeof markers.$inferInsert;
 
-export type Location = typeof locations.$inferSelect;
-export type NewLocation = typeof locations.$inferInsert;
+export type Place = typeof places.$inferSelect;
+export type NewPlace = typeof places.$inferInsert;
 
 export type Collection = typeof collections.$inferSelect;
 export type NewCollection = typeof collections.$inferInsert;
