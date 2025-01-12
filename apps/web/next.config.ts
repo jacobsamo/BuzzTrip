@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 import "./env";
 import { env } from "./env";
 import { withSentryConfig } from "@sentry/nextjs";
-import createMDX from '@next/mdx'
+import createMDX from "@next/mdx";
 import remarkGfm from "remark-gfm";
 
 const nextConfig: NextConfig = {
@@ -48,8 +48,21 @@ const nextConfig: NextConfig = {
       "posthog-js",
       "@sentry/nextjs",
     ],
+    serverMinification: false,
+    optimizeServerReact: false,
   },
+  productionBrowserSourceMaps: true,
   skipTrailingSlashRedirect: true,
+  webpack: (config) => {
+    return {
+      ...config,
+      optimization: {
+        minimize: false,
+        minimizer: [],
+      },
+    };
+  },
+  reactStrictMode: false
 };
 
 const withMDX = createMDX({
