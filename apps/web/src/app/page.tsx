@@ -1,5 +1,5 @@
 import Navbar from "@/components/navbar";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Layers, MapPin, Palette, Search, Tag, Users } from "lucide-react";
 import Link from "next/link";
 

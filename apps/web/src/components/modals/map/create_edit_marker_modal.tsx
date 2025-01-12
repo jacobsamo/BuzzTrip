@@ -39,13 +39,14 @@ import { useMediaQuery } from "@uidotdev/usehooks";
 import { Circle, CircleCheck } from "lucide-react";
 import Image from "next/image";
 import * as React from "react";
-import { lazy, useEffect } from "react";
+import { useEffect } from "react";
+import dynamic from "next/dynamic";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import IconPickerModal from "../icon-picker-modal";
 
-const Icon = lazy(() => import("@buzztrip/components/icon"));
+const Icon = dynamic(() => import("@buzztrip/components/icon"), { ssr: false });
 
 export default function MarkerModal() {
   const { setMarkerOpen, markerOpen } = useMapStore((store) => store);

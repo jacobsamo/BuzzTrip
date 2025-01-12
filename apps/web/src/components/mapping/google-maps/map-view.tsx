@@ -1,38 +1,23 @@
 "use client";
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { Location } from "@buzztrip/db/types";
-import { useMediaQuery } from "@uidotdev/usehooks";
 import {
   AdvancedMarker,
   Map as GoogleMap,
-  InfoWindow,
   MapMouseEvent,
-  Pin,
-  useAdvancedMarkerRef,
   useMap,
   useMapsLibrary,
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
-import { lazy, memo, useMemo } from "react";
-import MapDrawer from "../../layouts/map-view/components/map-drawer";
-import MapSideBar from "./map-sidebar";
-import { AutocompleteCustomInput, detailsRequestCallback } from "./search";
-import InfoBox from "./info-window";
+import { memo, useMemo } from "react";
 import DisplayMarkerInfo from "./display-marker-info";
-import Icon from "@buzztrip/components/icon";
-
-const MarkerPin = lazy(() => import("./marker_pin"));
+import { AutocompleteCustomInput, detailsRequestCallback } from "./search";
+import MarkerPin from "./marker_pin";
 
 const Mapview = () => {
   const map = useMap();
   const places = useMapsLibrary("places");
-  const {
-    activeLocation,
-    markers,
-    setActiveLocation,
-    searchValue,
-    setSearchValue,
-  } = useMapStore((store) => store);
+  const { activeLocation, markers, setActiveLocation, setSearchValue } =
+    useMapStore((store) => store);
 
   const mapOptions = useMemo(() => {
     return {
