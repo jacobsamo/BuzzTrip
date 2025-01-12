@@ -29,7 +29,7 @@ export const getMarkersView = async (
     .from(markers)
     .leftJoin(locations, eq(locations.location_id, markers.location_id))
     .where(eq(markers.map_id, map_id))
-    .$dynamic();
+    .$dynamic(); // makes this a dynamic query
 
   if (markerId) {
     getMarkers = getMarkers.where(eq(markers.marker_id, markerId));

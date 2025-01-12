@@ -11,7 +11,11 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    Sentry.captureException(error);
+    Sentry.captureException(error, {
+      data: {
+        digest: error.digest,
+      },
+    });
   }, [error]);
 
   return (
