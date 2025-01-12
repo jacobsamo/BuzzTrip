@@ -48,21 +48,8 @@ const nextConfig: NextConfig = {
       "posthog-js",
       "@sentry/nextjs",
     ],
-    serverMinification: false,
-    optimizeServerReact: false,
   },
-  productionBrowserSourceMaps: true,
   skipTrailingSlashRedirect: true,
-  webpack: (config) => {
-    return {
-      ...config,
-      optimization: {
-        minimize: false,
-        minimizer: [],
-      },
-    };
-  },
-  reactStrictMode: false
 };
 
 const withMDX = createMDX({

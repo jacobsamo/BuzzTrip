@@ -15,7 +15,6 @@
     "@buzztrip/db": "workspace:*",
     "@buzztrip/tailwind-config": "workspace:*",
     "@clerk/nextjs": "^6.9.9",
-    "@googlemaps/google-maps-services-js": "^3.4.0",
     "@hookform/resolvers": "^3.10.0",
     "@libsql/client": "^0.14.0",
     "@mapbox/search-js-react": "^1.0.0-beta.24",
@@ -46,7 +45,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.4",
-    "date-fns": "^4.1.0",
     "framer-motion": "^11.17.0",
     "hono": "^4.6.16",
     "lucide-react": "^0.471.0",
@@ -76,6 +74,8 @@
     "@buzztrip/tsconfig": "workspace:*",
     "@eslint/eslintrc": "^3.2.0",
     "@tanstack/eslint-plugin-query": "^5.62.16",
+    "@types/eslint-config-prettier": "~6.11.3",
+    "@types/eslint__eslintrc": "~2.1.2",
     "@types/google.maps": "^3.58.1",
     "@types/mapbox-gl": "^3.4.1",
     "@types/mdx": "^2.0.13",
@@ -90,5 +90,16 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3"
+  },
+  "peerDependencies": {
+    "@types/react": "^19.0.4",
+    "@types/react-dom": "^19.0.2"
+  },
+  "resolutions": {
+    "@types/react": "^19.0.4",
+    "@types/react-dom": "^19.0.2"
+  },
+  "overrides": {
+    "@types/react": "^19.0.4"
   }
 }
