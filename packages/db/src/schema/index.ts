@@ -160,7 +160,7 @@ export const collection_links = sqliteTable("collection_links", {
   user_id: text("user_id").references(() => users.user_id),
 });
 
-export const routeTravelType = [
+export const routeTravelTypeEnum = [
   "driving",
   "walking",
   "transit",
@@ -179,7 +179,7 @@ export const routes = sqliteTable("routes", {
   name: text("name").notNull(),
   description: text("description"),
   travel_type: text("travel_type", {
-    enum: routeTravelType,
+    enum: routeTravelTypeEnum,
   })
     .default("driving")
     .notNull(),

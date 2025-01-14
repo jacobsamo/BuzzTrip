@@ -15,6 +15,7 @@ import {
   combinedMarkersSchema,
   permissionEnumSchema,
   reviewsSchema,
+  travelTypeEnumSchema,
   userMapsSchema,
 } from "../zod-schemas";
 
@@ -54,6 +55,8 @@ export type Review = z.infer<typeof reviewsSchema>;
 export type UserMap = z.infer<typeof userMapsSchema>;
 
 export type PermissionEnum = z.infer<typeof permissionEnumSchema>;
+
+export type TravelTypeEnum = z.infer<typeof travelTypeEnumSchema>;
 
 // alternative schema types
 export type CombinedMarker = z.infer<typeof combinedMarkersSchema>;
