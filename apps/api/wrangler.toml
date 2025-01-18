@@ -8,14 +8,18 @@ workers_dev = false
 [dev]
 port = 8181
 
-[env.development]
-name = "dev-api"
-route = { pattern = "dev-api.buzztrip.co/*", zone_name = "buzztrip.co" }
+
+[observability]
+enabled = true
+
+# [env.development]
+# name = "dev-api"
+# route = { pattern = "dev-api.buzztrip.co/*", zone_name = "buzztrip.co" }
 
 
-[env.production]
-name = "api"
-route = { pattern = "api.buzztrip.co/*", zone_name = "buzztrip.co" }
+# [env.production]
+# name = "api"
+# route = { pattern = "api.buzztrip.co/*", zone_name = "buzztrip.co" }
 
 
 # [vars]
@@ -36,6 +40,3 @@ route = { pattern = "api.buzztrip.co/*", zone_name = "buzztrip.co" }
 
 # [ai]
 # binding = "AI"
-
-[observability]
-enabled = true

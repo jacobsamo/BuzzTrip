@@ -1,3 +1,4 @@
+import ReactComponentName from "react-scan/react-component-name/webpack";
 import type { NextConfig } from "next";
 import "./env";
 import { env } from "./env";
@@ -50,6 +51,11 @@ const nextConfig: NextConfig = {
     ],
   },
   skipTrailingSlashRedirect: true,
+  webpack: (config) => {
+    if (process.env.NODE_ENV === "production")
+      config.plugins.push(ReactComponentName({}));
+    return config;
+  },
 };
 
 const withMDX = createMDX({
