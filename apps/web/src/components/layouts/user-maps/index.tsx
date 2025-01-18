@@ -33,6 +33,8 @@ const UserMaps = ({ usersMaps }: UserMapsProps) => {
                 user_id: map.owner_id,
                 permission: "owner",
                 map_user_id: map.owner_id,
+                created_at: map.created_at,
+                updated_at: map.updated_at,
               };
               setMaps((prev) => (prev ? [...prev, newMap] : [newMap]));
             }
@@ -43,37 +45,63 @@ const UserMaps = ({ usersMaps }: UserMapsProps) => {
 
       <div className="flex flex-wrap gap-2">
         {maps &&
-          maps.map((map, index) => (
-            <MapCard
-              key={map.map_id + index}
-              map={{
-                map_id: map.map_id!,
-                title: map.title!,
-                description: map.description,
-                image: map.image,
-                owner_id: map.owner_id!,
-              }}
-              updateMap={(m) => {
-                const newMap: UserMap = {
-                  title: m.title ?? map.title,
-                  description: m.description ?? map.description,
-                  map_id: map.map_id,
-                  owner_id: map.owner_id,
-                  image: m.image ?? map.image,
-                  user_id: map.owner_id,
-                  permission: "owner",
-                  map_user_id: map.owner_id,
-                };
-                // update the map with the same mapId
-                setMaps(
-                  (prev) =>
-                    prev?.map((m) =>
-                      m.map_id === map.map_id ? newMap : m
-                    ) ?? [newMap]
+          maps
+            .filter((map, index, self) => {
+              const seenIds = new Set(
+                self.slice(0, index).map((m) => m.map_id)
+              );
+              return !seenIds.has(map.map_id);
+            })
+            .sort((a, b) => {
+              if (a.created_at && b.created_at) {
+                return (
+                  new Date(a.created_at).getTime() -
+                  new Date(b.created_at).getTime()
                 );
-              }}
-            />
-          ))}
+              }
+              if (a.created_at && !b.created_at) {
+                return -1;
+              }
+              if (b.created_at && !a.created_at) {
+                return 1;
+              }
+              return 0;
+            })
+            .map((map, index) => (
+              <MapCard
+                key={map.map_id + index}
+                map={{
+                  map_id: map.map_id!,
+                  title: map.title!,
+                  description: map.description,
+                  image: map.image,
+                  owner_id: map.owner_id!,
+                  created_at: map.created_at,
+                  updated_at: map.updated_at,
+                }}
+                updateMap={(m) => {
+                  const newMap: UserMap = {
+                    title: m.title ?? map.title,
+                    description: m.description ?? map.description,
+                    map_id: map.map_id,
+                    owner_id: map.owner_id,
+                    image: m.image ?? map.image,
+                    user_id: map.owner_id,
+                    permission: "owner",
+                    map_user_id: map.owner_id,
+                    created_at: map.created_at,
+                    updated_at: map.updated_at,
+                  };
+                  // update the map with the same mapId
+                  setMaps(
+                    (prev) =>
+                      prev?.map((m) =>
+                        m.map_id === map.map_id ? newMap : m
+                      ) ?? [newMap]
+                  );
+                }}
+              />
+            ))}
       </div>
     </>
   );

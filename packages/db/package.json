@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "clean:all": "rm -rf node_modules/",
-    "db:studio:dev": "drizzle-kit studio",
+    "db:studio": "drizzle-kit studio",
     "db:studio:prd": "cross-env NODE_ENV=production drizzle-kit studio",
     "db:migrate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
