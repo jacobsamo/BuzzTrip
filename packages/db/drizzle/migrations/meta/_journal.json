@@ -12,8 +12,15 @@
     {
       "idx": 1,
       "version": "6",
-      "when": 1735811152326,
-      "tag": "0001_clean_nemesis",
+      "when": 1736149006064,
+      "tag": "0001_condemned_terror",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1736149218906,
+      "tag": "0002_ambitious_expediter",
       "breakpoints": true
     },
     {

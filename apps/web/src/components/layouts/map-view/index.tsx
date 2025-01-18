@@ -11,7 +11,7 @@ export function Map_page() {
   return (
     <SidebarProvider
       style={{
-        // @ts-ignore
+        // @ts-expect-error - TS(2339): Property 'style' does not exist on type 'IntrinsicAttributes & SidebarProviderProps & { children: ReactNode; }'.
         "--sidebar-width": "20rem",
         "--sidebar-width-mobile": "20rem",
       }}

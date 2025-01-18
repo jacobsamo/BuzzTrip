@@ -1,5 +1,6 @@
 "use client";
 import { useMapStore } from "@/components/providers/map-state-provider";
+import { getGoogleMapsTravelMode } from "@/lib/utils/index";
 import {
   AdvancedMarker,
   Map as GoogleMap,
@@ -8,16 +9,33 @@ import {
   useMapsLibrary,
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
-import { memo, useMemo } from "react";
+import { lazy, memo, useEffect, useMemo, useState } from "react";
 import DisplayMarkerInfo from "./display-marker-info";
 import { AutocompleteCustomInput, detailsRequestCallback } from "./search";
-import MarkerPin from "./marker_pin";
+
+const MarkerPin = lazy(() => import("./marker_pin"));
 
 const Mapview = () => {
   const map = useMap();
   const places = useMapsLibrary("places");
-  const { activeLocation, markers, setActiveLocation, setSearchValue } =
-    useMapStore((store) => store);
+  const {
+    activeLocation,
+    markers,
+    setActiveLocation,
+    setSearchValue,
+    routes,
+    routeStops,
+  } = useMapStore((store) => store);
+
+  // Handle directions for routes
+  const routesLibrary = useMapsLibrary("routes");
+  const [directionsService, setDirectionsService] =
+    useState<google.maps.DirectionsService>();
+  const [directionsRenderer, setDirectionsRenderer] =
+    useState<google.maps.DirectionsRenderer>();
+  const [googleRoutes, setGoogleRoutes] = useState<
+    google.maps.DirectionsRoute[]
+  >([]);
 
   const mapOptions = useMemo(() => {
     return {
@@ -28,6 +46,49 @@ const Mapview = () => {
       zoom: 4,
     };
   }, []);
+
+  useEffect(() => {
+    if (!routesLibrary || !map || !routeStops || !routes) return;
+    setDirectionsService(new routesLibrary.DirectionsService());
+    setDirectionsRenderer(new routesLibrary.DirectionsRenderer({ map }));
+  }, [routesLibrary, map]);
+
+  useEffect(() => {
+    if (!directionsService || !directionsRenderer || !routeStops || !routes)
+      return;
+
+    routes.forEach((route) => {
+      const stops = routeStops
+        .filter((stop) => stop.route_id === route.route_id)
+        .sort((a, b) => a.stop_order - b.stop_order);
+      const start = stops[0];
+      const end = stops[stops.length - 1];
+      const mid = stops.slice(1, stops.length - 1);
+
+      if (!stops || !start || !end) return;
+
+      directionsService
+        .route({
+          origin: { lat: start.lat, lng: start.lng },
+          destination: { lat: end.lat, lng: end.lng },
+          waypoints: mid.map((stop) => ({
+            location: { lat: stop.lat, lng: stop.lng },
+            stopover: true,
+          })),
+          travelMode: getGoogleMapsTravelMode(route.travel_type),
+          provideRouteAlternatives: false,
+        })
+        .then((response) => {
+          directionsRenderer.setDirections(response);
+          setGoogleRoutes(response.routes);
+        });
+    });
+
+    return () => {
+      directionsRenderer.setMap(null);
+      setGoogleRoutes([]);
+    };
+  }, [directionsService, directionsRenderer, routes, routeStops]);
 
   async function handleMapClick(e: MapMouseEvent) {
     if (!places || !map) return;
