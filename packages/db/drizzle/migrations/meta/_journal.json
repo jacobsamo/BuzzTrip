@@ -29,6 +29,13 @@
       "when": 1737162185312,
       "tag": "0002_friendly_steel_serpent",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1737162185312,
+      "tag": "0002_friendly_steel_serpent",
+      "breakpoints": true
     }
   ]
 }
