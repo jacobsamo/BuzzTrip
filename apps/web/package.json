@@ -60,6 +60,7 @@
     "react-hotkeys-hook": "^4.6.1",
     "react-map-gl": "^7.1.8",
     "react-resizable-panels": "^2.1.7",
+    "react-scan": "^0.0.54",
     "remark-gfm": "^4.0.0",
     "sonner": "^1.7.1",
     "svix": "^1.45.1",
