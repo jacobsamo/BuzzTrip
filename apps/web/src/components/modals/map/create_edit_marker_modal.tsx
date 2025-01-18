@@ -230,7 +230,7 @@ function MarkerForm() {
                 setMarkers([
                   {
                     ...data.marker,
-                    location_id: data.marker.location_id ?? undefined,
+                    place_id: data.marker.place_id ?? undefined,
                   },
                 ]);
               }

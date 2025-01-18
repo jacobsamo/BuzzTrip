@@ -1,19 +1,12 @@
-import { getMarkersView } from "@buzztrip/db/queries";
-import { collection_links, locations, markers } from "@buzztrip/db/schema";
+import { collections } from "@buzztrip/db/schema";
 import type { IconType } from "@buzztrip/db/types";
-import { NewCollectionLink, NewLocation } from "@buzztrip/db/types";
-import { and, eq } from "drizzle-orm";
-import { v4 as uuid } from "uuid";
+import { NewCollection } from "@buzztrip/db/types";
+import { collectionsEditSchema } from "@buzztrip/db/zod-schemas";
 import { z } from "zod";
 import { Database } from "..";
 import {
-  collection_linksSchema,
-  collectionsSchema,
-  combinedMarkersSchema,
+  collectionsSchema
 } from "../zod-schemas";
-import { collections } from "@buzztrip/db/schema";
-import { NewCollection } from "@buzztrip/db/types";
-import { collectionsEditSchema } from "@buzztrip/db/zod-schemas";
 
 export const CreateCollectionSchema = collectionsEditSchema;
 

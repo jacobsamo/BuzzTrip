@@ -2,7 +2,7 @@ import * as z from "zod";
 import {
   collection_links,
   collections,
-  locations,
+  places,
   map_users,
   maps,
   markers,
@@ -15,6 +15,7 @@ import {
   combinedMarkersSchema,
   permissionEnumSchema,
   reviewsSchema,
+  travelTypeEnumSchema,
   userMapsSchema,
 } from "../zod-schemas";
 
@@ -29,8 +30,8 @@ export type NewMap = typeof maps.$inferInsert;
 export type Marker = typeof markers.$inferSelect;
 export type NewMarker = typeof markers.$inferInsert;
 
-export type Location = typeof locations.$inferSelect;
-export type NewLocation = typeof locations.$inferInsert;
+export type Place = typeof places.$inferSelect;
+export type NewPlace = typeof places.$inferInsert;
 
 export type Collection = typeof collections.$inferSelect;
 export type NewCollection = typeof collections.$inferInsert;
@@ -54,6 +55,8 @@ export type Review = z.infer<typeof reviewsSchema>;
 export type UserMap = z.infer<typeof userMapsSchema>;
 
 export type PermissionEnum = z.infer<typeof permissionEnumSchema>;
+
+export type TravelTypeEnum = z.infer<typeof travelTypeEnumSchema>;
 
 // alternative schema types
 export type CombinedMarker = z.infer<typeof combinedMarkersSchema>;
