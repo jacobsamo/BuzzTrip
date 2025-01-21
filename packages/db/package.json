@@ -6,7 +6,7 @@
     "clean:all": "rm -rf node_modules/",
     "db:studio": "drizzle-kit studio",
     "db:studio:prd": "cross-env NODE_ENV=production drizzle-kit studio",
-    "db:migrate": "drizzle-kit generate",
+    "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:setup": "touch buzztrip-local.db && bun db:migrate"
   },
