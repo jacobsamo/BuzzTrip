@@ -100,7 +100,7 @@ export default function MapModal({
           <Plus /> {mode == "create" ? "Create" : "Edit"} Map
         </Button>
       </DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent className="p-2">
         <DrawerHeader className="text-left">
           <DrawerTitle>{mode == "create" ? "Create" : "Edit"} Map</DrawerTitle>
           <DrawerDescription>Start your travel plans here</DrawerDescription>
@@ -150,11 +150,7 @@ function MapForm({
     shouldUnregister: true,
   });
 
-  const {
-    register,
-    handleSubmit,
-    control,
-  } = form;
+  const { register, handleSubmit, control } = form;
 
   const onSubmit: SubmitHandler<z.infer<typeof mapsEditSchema>> = async (
     data

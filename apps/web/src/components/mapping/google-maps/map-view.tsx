@@ -18,6 +18,7 @@ const MarkerPin = lazy(() => import("./marker_pin"));
 const Mapview = () => {
   const map = useMap();
   const places = useMapsLibrary("places");
+  const geocoder = useMapsLibrary("geocoding");
   const {
     activeLocation,
     markers,
@@ -91,10 +92,12 @@ const Mapview = () => {
   }, [directionsService, directionsRenderer, routes, routeStops]);
 
   async function handleMapClick(e: MapMouseEvent) {
-    if (!places || !map) return;
+    if (!places || !map || !geocoder) return;
     e.domEvent?.stopPropagation();
     e.stop();
+    console.log("Clicked on area", e);
     const placesService = new places.PlacesService(map);
+    const geoCoder = new geocoder.Geocoder();
 
     if (e.detail.placeId) {
       const requestOptions: google.maps.places.PlaceDetailsRequest = {
@@ -125,6 +128,34 @@ const Mapview = () => {
             res.placeDetails?.name ?? res.placeDetails?.formatted_address ?? ""
           );
         }
+      });
+    } else if (e.detail.latLng && geocoder) {
+      const requestOptions: google.maps.places.PlaceSearchRequest = {
+        location: e.detail.latLng,
+        radius: 1000,
+      };
+      placesService.nearbySearch(requestOptions, (data) => {
+        console.log("search-data: ", data);
+        if (!data || !data[0]) return;
+        const res = detailsRequestCallback(map!, data[0]);
+        if (res) {
+          setActiveLocation(res.location);
+          setSearchValue(
+            res.placeDetails?.name ?? res.placeDetails?.formatted_address ?? ""
+          );
+        }
+      });
+
+      const geoCodeRequest: google.maps.GeocoderRequest = {
+        location: e.detail.latLng,
+        bounds: e.map.getBounds(),
+        componentRestrictions: {
+          
+        }
+      };
+      geoCoder.geocode(geoCodeRequest, (results, status) => {
+        console.log("geo-results: ", results);
+        console.log("geo-status: ", status);
       });
     }
 
