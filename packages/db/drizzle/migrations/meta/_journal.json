@@ -15,6 +15,13 @@
       "when": 1735811152326,
       "tag": "0001_clean_nemesis",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1737162185312,
+      "tag": "0002_friendly_steel_serpent",
+      "breakpoints": true
     }
   ]
 }

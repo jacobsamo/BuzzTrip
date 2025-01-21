@@ -1,6 +1,7 @@
 import { map_users, maps } from "@buzztrip/db/schema";
 import { NewMap, NewMapUser } from "@buzztrip/db/types";
 import {
+  map_usersEditSchema,
   map_usersSchema,
   mapsEditSchema,
   mapsSchema,
@@ -117,7 +118,7 @@ export const deleteMap = async (
   return { mapId: deletedMap.deletedId };
 };
 
-export const ShareMapUserSchema = map_usersSchema.omit({
+export const ShareMapUserSchema = map_usersEditSchema.omit({
   map_id: true,
   map_user_id: true,
 });

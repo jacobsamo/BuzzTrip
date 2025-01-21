@@ -27,8 +27,12 @@ export const users = sqliteTable("users", {
   profile_picture: text("profile_picture"),
   username: text("username"),
   bio: text("bio"),
-  created_at: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
-  updated_at: text("updated_at").default(sql`(CURRENT_TIMESTAMP)`),
+  created_at: text("created_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .notNull(),
+  updated_at: text("updated_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .notNull(),
 });
 
 export const maps = sqliteTable("maps", {
@@ -41,6 +45,12 @@ export const maps = sqliteTable("maps", {
   image: text("image"),
   owner_id: text("owner_id")
     .references(() => users.user_id)
+    .notNull(),
+  created_at: text("created_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .notNull(),
+  updated_at: text("updated_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
 });
 
@@ -67,6 +77,12 @@ export const map_users = sqliteTable("map_users", {
   })
     .default("editor")
     .notNull(),
+  // created_at: text("created_at")
+  //   .default(sql`(CURRENT_TIMESTAMP)`)
+  //   .notNull(),
+  // updated_at: text("updated_at")
+  //   .default(sql`(CURRENT_TIMESTAMP)`)
+  //   .notNull(),
 });
 
 export const markers = sqliteTable("markers", {
@@ -81,7 +97,6 @@ export const markers = sqliteTable("markers", {
   created_by: text("created_by")
     .notNull()
     .references(() => users.user_id),
-  created_at: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
   icon: text("icon").$type<IconType>().notNull(),
   color: text("color"),
   location_id: text("location_id")
@@ -89,6 +104,12 @@ export const markers = sqliteTable("markers", {
     .notNull(),
   map_id: text("map_id")
     .references(() => maps.map_id, onUpdateOptions)
+    .notNull(),
+  created_at: text("created_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .notNull(),
+  updated_at: text("updated_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
 });
 
@@ -119,8 +140,12 @@ export const locations = sqliteTable("locations", {
   opening_times: text("opening_times", { mode: "json" }).$type<
     string[] | null
   >(),
-  created_at: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
-  updated_at: text("updated_at").default(sql`(CURRENT_TIMESTAMP)`),
+  created_at: text("created_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .notNull(),
+  updated_at: text("updated_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .notNull(),
 });
 
 export const collections = sqliteTable("collections", {
@@ -136,9 +161,14 @@ export const collections = sqliteTable("collections", {
   created_by: text("created_by")
     .notNull()
     .references(() => users.user_id),
-  created_at: text("created_at").default(sql`(CURRENT_TIMESTAMP)`),
   icon: text("icon").$type<IconType>().notNull(),
   color: text("color"),
+  created_at: text("created_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .notNull(),
+  updated_at: text("updated_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .notNull(),
 });
 
 export const collection_links = sqliteTable("collection_links", {
@@ -156,6 +186,9 @@ export const collection_links = sqliteTable("collection_links", {
     .references(() => maps.map_id, onUpdateOptions)
     .notNull(),
   user_id: text("user_id").references(() => users.user_id),
+  created_at: text("created_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .notNull(),
 });
 
 export const routes = sqliteTable("routes", {
@@ -170,6 +203,9 @@ export const routes = sqliteTable("routes", {
   name: text("name").notNull(),
   description: text("description"),
   user_id: text("user_id").references(() => users.user_id),
+  created_at: text("created_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .notNull(),
 });
 
 export const route_stops = sqliteTable("route_stops", {
@@ -186,6 +222,9 @@ export const route_stops = sqliteTable("route_stops", {
     .notNull(),
   marker_id: text("marker_id").references(() => markers.marker_id),
   stop_order: integer("stop_order").notNull(),
+  created_at: text("created_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .notNull(),
 });
 
 export const collectionLinksRelations = relations(

@@ -1,4 +1,3 @@
-// import Map from "@/components/layouts/map/map-view";
 import { Map_page } from "@/components/layouts/map-view";
 import { MapStoreProvider } from "@/components/providers/map-state-provider";
 import { constructMetadata } from "@/lib/utils/metadata";
