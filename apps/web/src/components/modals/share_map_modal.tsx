@@ -202,7 +202,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
 
       <ScrollArea className="h-36 w-full flex-col gap-2">
         {users &&
-          users.map((user, index) => {
+          users.map((user) => {
             const userSelected = selectedUsers?.find(
               (u) => u.user_id === user.userId
             );

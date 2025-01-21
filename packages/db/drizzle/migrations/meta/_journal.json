@@ -22,6 +22,13 @@
       "when": 1736149218906,
       "tag": "0002_ambitious_expediter",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1737162185312,
+      "tag": "0002_friendly_steel_serpent",
+      "breakpoints": true
     }
   ]
 }
