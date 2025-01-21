@@ -3,7 +3,7 @@ import * as z from "zod";
 import {
   collection_links,
   collections,
-  locations,
+  places,
   map_users,
   maps,
   markers,
@@ -11,6 +11,7 @@ import {
   route_stops,
   routes,
   users,
+  routeTravelTypeEnum,
 } from "../schema";
 import { iconsList } from "../types";
 
@@ -68,13 +69,15 @@ export const map_usersEditSchema = createInsertSchema(map_users);
 
 export const permissionEnumSchema = z.enum(permissionEnum);
 
+export const travelTypeEnumSchema = z.enum(routeTravelTypeEnum);
+
 export const routesSchema = createSelectSchema(routes);
 export const routesEditSchema = createInsertSchema(routes);
 
 export const route_stopsSchema = createSelectSchema(route_stops);
 export const route_stopsEditSchema = createInsertSchema(route_stops);
 
-export const locationsSchema = createSelectSchema(locations).extend({
+export const placesSchema = createSelectSchema(places).extend({
   icon: iconSchema,
   bounds: boundsSchema,
   photos: z.array(z.string()).nullish(),
@@ -82,7 +85,8 @@ export const locationsSchema = createSelectSchema(locations).extend({
   reviews: z.array(reviewsSchema).nullish(),
   opening_times: z.array(z.string()).nullish(),
 });
-export const locationsEditSchema = createInsertSchema(locations).extend({
+
+export const placesEditSchema = createInsertSchema(places).extend({
   icon: iconSchema,
   bounds: boundsSchema,
   photos: z.array(z.string()).nullish(),
@@ -93,10 +97,10 @@ export const locationsEditSchema = createInsertSchema(locations).extend({
 
 // alternative schemas
 
-export const combinedMarkersSchema = locationsEditSchema.extend({
+export const combinedMarkersSchema = placesEditSchema.extend({
   ...markersEditSchema.shape,
   created_by: z.string().optional(),
-  location_id: z.string().optional(),
+  place_id: z.string().optional(),
   bounds: boundsSchema.nullable(),
 });
 

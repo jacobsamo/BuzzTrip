@@ -1,10 +1,10 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { CombinedMarker } from "@buzztrip/db/types";
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
-import { SearchIcon, X } from "lucide-react";
+import { Route, SearchIcon, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-// import { Command, CommandItem, CommandList, CommandEmpty } from "@/components/ui/command";
 import { Command } from "cmdk";
+import { Button } from "@/components/ui/button";
 
 interface DetailsRequestCallbackReturn {
   placeDetails: google.maps.places.PlaceResult;
@@ -25,7 +25,7 @@ export const detailsRequestCallback = (
     return null;
   }
 
-  let bounds = new google.maps.LatLngBounds();
+  const bounds = new google.maps.LatLngBounds();
 
   if (placeDetails.geometry.viewport) {
     bounds.union(placeDetails.geometry.viewport);
@@ -50,6 +50,7 @@ export const detailsRequestCallback = (
       ? placeDetails.name
       : `${placeDetails.geometry.location.lat()}, ${placeDetails.geometry.location.lng()}`,
     description: placeDetails?.html_attributions?.[0] ?? null,
+    plus_code: placeDetails.plus_code?.global_code ?? null,
     address: placeDetails.formatted_address ?? null,
     photos: placeDetails?.photos?.map((photo) => photo.getUrl({})) ?? null,
     reviews:
@@ -195,7 +196,7 @@ export const AutocompleteCustomInput = () => {
   );
 
   return (
-    <div className="fixed left-0 right-0 md:mx-0 mx-auto top-4 z-10 w-[95%] md:left-[calc(var(--sidebar-width)_+_2rem)] md:right-4 md:max-w-[30rem]">
+    <div className="fixed left-0 right-0 top-4 z-10 mx-auto w-[95%] md:left-[calc(var(--sidebar-width)_+_2rem)] md:right-4 md:mx-0 md:max-w-[30rem]">
       <div className="dark:bg-grey flex resize items-center justify-center rounded-xl bg-white p-1 pr-5 dark:text-white">
         <Command
           loop
@@ -248,6 +249,9 @@ export const AutocompleteCustomInput = () => {
           </Command.List>
         </Command>
       </div>
+      {/* <Button variant={"outline"}>
+        <Route />
+      </Button> */}
     </div>
   );
 };
