@@ -36,6 +36,13 @@
       "when": 1737162185312,
       "tag": "0002_friendly_steel_serpent",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1737451141118,
+      "tag": "0003_perpetual_stature",
+      "breakpoints": true
     }
   ]
 }
