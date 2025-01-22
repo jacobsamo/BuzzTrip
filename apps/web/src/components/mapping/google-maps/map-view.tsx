@@ -37,6 +37,15 @@ const Mapview = () => {
   const [googleRoutes, setGoogleRoutes] = useState<
     google.maps.DirectionsRoute[]
   >([]);
+  // https://developers.google.com/maps/documentation/javascript/reference/places-autocomplete-service#AutocompleteSessionToken
+  const [sessionToken, setSessionToken] =
+    useState<google.maps.places.AutocompleteSessionToken>();
+
+  // https://developers.google.com/maps/documentation/javascript/reference/places-autocomplete-service
+  const [autocompleteService, setAutocompleteService] =
+    useState<google.maps.places.AutocompleteService | null>(null);
+  const [placesService, setPlacesService] =
+    useState<google.maps.places.PlacesService | null>(null);
 
   const mapOptions = useMemo(() => {
     return {
@@ -49,7 +58,11 @@ const Mapview = () => {
   }, []);
 
   useEffect(() => {
-    if (!routesLibrary || !map || !routeStops || !routes) return;
+    if (!map || !places) return;
+    setAutocompleteService(new places.AutocompleteService());
+    setPlacesService(new places.PlacesService(map));
+    setSessionToken(new places.AutocompleteSessionToken());
+    if (!routesLibrary || !routeStops || !routes) return;
     setDirectionsService(new routesLibrary.DirectionsService());
     setDirectionsRenderer(new routesLibrary.DirectionsRenderer({ map }));
   }, [routesLibrary, map]);
@@ -92,12 +105,33 @@ const Mapview = () => {
   }, [directionsService, directionsRenderer, routes, routeStops]);
 
   async function handleMapClick(e: MapMouseEvent) {
-    if (!places || !map || !geocoder) return;
+    if (!places || !map || !geocoder || !autocompleteService) return;
     e.domEvent?.stopPropagation();
     e.stop();
     console.log("Clicked on area", e);
     const placesService = new places.PlacesService(map);
     const geoCoder = new geocoder.Geocoder();
+
+    const autoCompleteRequest: google.maps.places.AutocompletionRequest = {
+      fields: [
+        "geometry",
+        "name",
+        "formatted_address",
+        "place_id",
+        "photos",
+        "rating",
+        "price_level",
+        "types",
+        "website",
+        "formatted_phone_number",
+        "opening_hours",
+        "reviews",
+      ],
+      types: ["locality", "administrative_area_level_2", "political"],
+      locationBias: map.getBounds(),
+
+      sessionToken,
+    };
 
     if (e.detail.placeId) {
       const requestOptions: google.maps.places.PlaceDetailsRequest = {
@@ -118,6 +152,8 @@ const Mapview = () => {
           "opening_hours",
           "reviews",
         ],
+
+        sessionToken,
       };
 
       placesService.getDetails(requestOptions, (data) => {
@@ -132,7 +168,8 @@ const Mapview = () => {
     } else if (e.detail.latLng && geocoder) {
       const requestOptions: google.maps.places.PlaceSearchRequest = {
         location: e.detail.latLng,
-        radius: 1000,
+        radius: 300,
+        // type: "locality|administrative_area_level_2|political",
       };
       placesService.nearbySearch(requestOptions, (data) => {
         console.log("search-data: ", data);
@@ -149,14 +186,21 @@ const Mapview = () => {
       const geoCodeRequest: google.maps.GeocoderRequest = {
         location: e.detail.latLng,
         bounds: e.map.getBounds(),
-        componentRestrictions: {
-          
-        }
+        componentRestrictions: {},
       };
       geoCoder.geocode(geoCodeRequest, (results, status) => {
         console.log("geo-results: ", results);
         console.log("geo-status: ", status);
       });
+
+      if (!autocompleteService) {
+        console.log("AutoCompleteService not available");
+        return;
+      }
+      const response =
+        await autocompleteService.getPlacePredictions(autoCompleteRequest);
+
+      console.log("AutoCompleteResponse: ", response);
     }
 
     if (e.detail.latLng) {
