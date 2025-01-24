@@ -1,10 +1,9 @@
-import React from "react";
+import { auth } from "@clerk/nextjs/server";
 import * as Sentry from "@sentry/nextjs";
-import { useAuth } from "@clerk/nextjs";
 import { headers } from "next/headers";
 
 export default async function NotFound() {
-  const { userId } = useAuth();
+  const { userId } = await auth();
   const headersList = await headers();
   const path = headersList.get("referer");
 

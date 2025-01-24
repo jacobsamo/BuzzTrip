@@ -18,7 +18,6 @@ const MarkerPin = lazy(() => import("./marker_pin"));
 const Mapview = () => {
   const map = useMap();
   const places = useMapsLibrary("places");
-  const geocoder = useMapsLibrary("geocoding");
   const {
     activeLocation,
     markers,
@@ -37,15 +36,6 @@ const Mapview = () => {
   const [googleRoutes, setGoogleRoutes] = useState<
     google.maps.DirectionsRoute[]
   >([]);
-  // https://developers.google.com/maps/documentation/javascript/reference/places-autocomplete-service#AutocompleteSessionToken
-  const [sessionToken, setSessionToken] =
-    useState<google.maps.places.AutocompleteSessionToken>();
-
-  // https://developers.google.com/maps/documentation/javascript/reference/places-autocomplete-service
-  const [autocompleteService, setAutocompleteService] =
-    useState<google.maps.places.AutocompleteService | null>(null);
-  const [placesService, setPlacesService] =
-    useState<google.maps.places.PlacesService | null>(null);
 
   const mapOptions = useMemo(() => {
     return {
@@ -58,11 +48,7 @@ const Mapview = () => {
   }, []);
 
   useEffect(() => {
-    if (!map || !places) return;
-    setAutocompleteService(new places.AutocompleteService());
-    setPlacesService(new places.PlacesService(map));
-    setSessionToken(new places.AutocompleteSessionToken());
-    if (!routesLibrary || !routeStops || !routes) return;
+    if (!routesLibrary || !routeStops || !routes || !map) return;
     setDirectionsService(new routesLibrary.DirectionsService());
     setDirectionsRenderer(new routesLibrary.DirectionsRenderer({ map }));
   }, [routesLibrary, map]);
@@ -104,40 +90,62 @@ const Mapview = () => {
     };
   }, [directionsService, directionsRenderer, routes, routeStops]);
 
-  async function handleMapClick(e: MapMouseEvent) {
-    if (!places || !map || !geocoder || !autocompleteService) return;
+  const handleClick = async (e: any) => {
+    if (!places || !map) return;
     e.domEvent?.stopPropagation();
     e.stop();
-    console.log("Clicked on area", e);
+    console.log("Clicked on area:", e);
     const placesService = new places.PlacesService(map);
-    const geoCoder = new geocoder.Geocoder();
+    const latLng = e.detail.latLng;
+    let placeId = e.detail.placeId;
 
-    const autoCompleteRequest: google.maps.places.AutocompletionRequest = {
-      fields: [
-        "geometry",
-        "name",
-        "formatted_address",
-        "place_id",
-        "photos",
-        "rating",
-        "price_level",
-        "types",
-        "website",
-        "formatted_phone_number",
-        "opening_hours",
-        "reviews",
-      ],
-      types: ["locality", "administrative_area_level_2", "political"],
-      locationBias: map.getBounds(),
+    if (!placeId) {
+      const zoom = map.getZoom();
+      const radius = () => {
+        if (!zoom) return 300;
+        if (zoom < 6) return 1000;
+        if (zoom < 8) return 100;
+        if (zoom > 10) return 100;
 
-      sessionToken,
-    };
+        return 300;
+      };
 
-    if (e.detail.placeId) {
+      try {
+        placeId = await new Promise<string | undefined>((resolve, reject) => {
+          placesService.nearbySearch(
+            {
+              location: latLng,
+              radius: radius(),
+              bounds: map.getBounds(),
+            },
+            (data, status) => {
+              if (
+                status !== google.maps.places.PlacesServiceStatus.OK ||
+                !data ||
+                data.length === 0
+              ) {
+                reject(new Error("Nearby search failed"));
+                return;
+              }
+              resolve(data[0]?.place_id);
+            }
+          );
+        });
+      } catch (error) {
+        console.error("Error during nearby search:", error);
+        return; // Exit early if search fails
+      }
+    }
+
+    if (!placeId) {
+      console.error("No placeId found after search");
+      return;
+    }
+
+    // Handle Place Details Lookup
+    try {
       const requestOptions: google.maps.places.PlaceDetailsRequest = {
-        placeId:
-          e.detail.placeId ||
-          `${e.detail.latLng?.lat}, ${e.detail.latLng?.lng}`,
+        placeId: placeId,
         fields: [
           "geometry",
           "name",
@@ -152,11 +160,13 @@ const Mapview = () => {
           "opening_hours",
           "reviews",
         ],
-
-        sessionToken,
       };
 
-      placesService.getDetails(requestOptions, (data) => {
+      placesService.getDetails(requestOptions, (data, status) => {
+        if (status !== google.maps.places.PlacesServiceStatus.OK || !data) {
+          console.error("Error fetching place details:", status);
+          return;
+        }
         const res = detailsRequestCallback(map!, data);
         if (res) {
           setActiveLocation(res.location);
@@ -165,47 +175,10 @@ const Mapview = () => {
           );
         }
       });
-    } else if (e.detail.latLng && geocoder) {
-      const requestOptions: google.maps.places.PlaceSearchRequest = {
-        location: e.detail.latLng,
-        radius: 300,
-        // type: "locality|administrative_area_level_2|political",
-      };
-      placesService.nearbySearch(requestOptions, (data) => {
-        console.log("search-data: ", data);
-        if (!data || !data[0]) return;
-        const res = detailsRequestCallback(map!, data[0]);
-        if (res) {
-          setActiveLocation(res.location);
-          setSearchValue(
-            res.placeDetails?.name ?? res.placeDetails?.formatted_address ?? ""
-          );
-        }
-      });
-
-      const geoCodeRequest: google.maps.GeocoderRequest = {
-        location: e.detail.latLng,
-        bounds: e.map.getBounds(),
-        componentRestrictions: {},
-      };
-      geoCoder.geocode(geoCodeRequest, (results, status) => {
-        console.log("geo-results: ", results);
-        console.log("geo-status: ", status);
-      });
-
-      if (!autocompleteService) {
-        console.log("AutoCompleteService not available");
-        return;
-      }
-      const response =
-        await autocompleteService.getPlacePredictions(autoCompleteRequest);
-
-      console.log("AutoCompleteResponse: ", response);
+    } catch (error) {
+      console.error("Error fetching place details:", error);
     }
-
-    if (e.detail.latLng) {
-    }
-  }
+  };
 
   return (
     <div className="absolute inset-0 h-screen w-full flex-1">
@@ -215,7 +188,7 @@ const Mapview = () => {
         defaultZoom={mapOptions.zoom}
         mapId={env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID}
         disableDefaultUI={true}
-        onClick={(e) => handleMapClick(e)}
+        onClick={(e) => handleClick(e)}
         gestureHandling="greedy"
         reuseMaps
       >
