@@ -1,9 +1,6 @@
 import React from 'react'
 import { useMap } from 'react-map-gl'
 import { Geocoder, SearchBox } from '@mapbox/search-js-react'
-import { Client as GoogleMapsClient } from '@googlemaps/google-maps-services-js';
-import {} from 'mapbox-gl'
-import { env } from 'env'
 import { useMapStore } from '@/components/providers/map-state-provider'
 
 /**

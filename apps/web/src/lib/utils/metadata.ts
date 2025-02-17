@@ -66,8 +66,8 @@ export function constructMetadata({
     },
     icons: {
       icon: "/favicon.ico",
-      shortcut: "/logos/icon_x128.png",
-      apple: "/logos/icon_x128.png",
+      shortcut: "/logos/logo_x128.png",
+      apple: "/logos/logo_x128.png",
     },
     metadataBase: new URL(url),
     ...(noIndex && {

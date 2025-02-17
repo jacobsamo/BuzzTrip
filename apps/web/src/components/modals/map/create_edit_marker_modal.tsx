@@ -1,5 +1,3 @@
-import { createMarkerAction } from "@/actions/map/marker/create-marker";
-import { updateMarkerAction } from "@/actions/map/marker/edit-marker";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -30,24 +28,25 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { apiClient } from "@/server/api.client";
 import { popularIconsList } from "@buzztrip/components/icon";
 import type { IconType } from "@buzztrip/db/types";
 import { CombinedMarker } from "@buzztrip/db/types";
 import { combinedMarkersSchema } from "@buzztrip/db/zod-schemas";
+import { useAuth } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Circle, CircleCheck } from "lucide-react";
 import Image from "next/image";
 import * as React from "react";
-import { lazy, useEffect } from "react";
+import { useEffect } from "react";
+import dynamic from "next/dynamic";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import IconPickerModal from "../icon-picker-modal";
-import { apiClient } from "@/server/api.client";
-import { useAuth } from "@clerk/nextjs";
 
-const Icon = lazy(() => import("@buzztrip/components/icon"));
+const Icon = dynamic(() => import("@buzztrip/components/icon"), { ssr: false });
 
 export default function MarkerModal() {
   const { setMarkerOpen, markerOpen } = useMapStore((store) => store);
@@ -179,7 +178,7 @@ function MarkerForm() {
       ) ?? null;
     setInCollections(inCols);
     setValue("collection_ids", inCols);
-  }, [markers, collections, getCollectionsForMarker, setValue, markerOpen]);
+  }, [markers, collections, markerOpen]);
 
   useEffect(() => {
     console.log("Errors: ", errors);
@@ -231,7 +230,7 @@ function MarkerForm() {
                 setMarkers([
                   {
                     ...data.marker,
-                    location_id: data.marker.location_id ?? undefined,
+                    place_id: data.marker.place_id ?? undefined,
                   },
                 ]);
               }

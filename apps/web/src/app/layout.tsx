@@ -1,3 +1,4 @@
+import { Monitoring } from "react-scan/monitoring/next";
 import Providers from "@/components/providers";
 import "@/lib/styles/globals.css";
 import { constructMetadata } from "@/lib/utils/metadata";
@@ -24,6 +25,12 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body>
+          <Monitoring
+            apiKey="_N7F5vj5e4CAmWIMbP3ymcuvBkK-zCIa" // Safe to expose publically
+            url="https://monitoring.react-scan.com/api/v1/ingest"
+            commit={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}
+            branch={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF}
+          />
           <Providers>{children}</Providers>
         </body>
       </html>

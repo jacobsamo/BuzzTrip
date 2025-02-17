@@ -1,11 +1,8 @@
+import MarkerPin from "@/components/mapping/google-maps/marker_pin";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { BookmarkCheck } from "lucide-react";
 import Image from "next/image";
-import { lazy } from "react";
 import OpenMarkerButton from "../../../mapping/google-maps/open-marker";
-import MarkerPin from "@/components/mapping/google-maps/marker_pin";
-
-const Icon = lazy(() => import("@buzztrip/components/icon"));
 
 const ActiveLocation = () => {
   const { markers, activeLocation } = useMapStore((store) => store);

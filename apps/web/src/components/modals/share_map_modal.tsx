@@ -38,6 +38,7 @@ import * as React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ScrollArea } from "../ui/scroll-area";
+import Image from "next/image";
 
 export interface ShareMapProps {
   map_id: string;
@@ -229,16 +230,19 @@ function ShareMapForm({ map_id }: ShareMapProps) {
                 variant="ghost"
               >
                 {userSelected ? <CircleCheck /> : <Circle />}
-                {/* {user.picture && (
-                      <Image
-                        width={32}
-                        height={32}
-                        alt={user.email ?? user.id}
-                        src={user.picture}
-                        className="h-8 w-8 rounded-full"
-                      />
-                    )} */}
-                {user.email}
+                <span className="flex items-center gap-2">
+                  {user.profile_picture && (
+                    <Image
+                      width={32}
+                      height={32}
+                      alt={user.email ?? user.userId}
+                      src={user.profile_picture}
+                      className="h-8 w-8 rounded-full"
+                      unoptimized
+                    />
+                  )}
+                  {user.email}
+                </span>
 
                 <Select
                   defaultValue="editor"

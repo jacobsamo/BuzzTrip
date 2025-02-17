@@ -10,6 +10,7 @@ import { clerkWebhookRoute } from "./auth.routes";
 export const clerkWebhookHandler: AppRouteHandler<
   typeof clerkWebhookRoute
 > = async (c) => {
+  const sentry = c.get("sentry");
   try {
     const payload = await c.req.text();
 
@@ -23,6 +24,19 @@ export const clerkWebhookHandler: AppRouteHandler<
       svix_signature == undefined
     ) {
       console.error("No svix headers found");
+      sentry.captureMessage("No svix headers found", "warning", {
+        data: {
+          payload: await c.req.text(),
+          error: c.error,
+          headers: c.req.header(),
+          svixHeaders: {
+            svix_id,
+            svix_timestamp,
+            svix_signature,
+          },
+          requestId: c.get("requestId"),
+        },
+      });
       return c.json(
         {
           code: "failed_webhook",
@@ -49,6 +63,7 @@ export const clerkWebhookHandler: AppRouteHandler<
         console.error("Error verifying webhook:", err);
         throw Error("Failed to verify webhook", err);
       }
+      throw Error("Failed to verify webhook");
     }
 
     const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
@@ -71,6 +86,7 @@ export const clerkWebhookHandler: AppRouteHandler<
           last_name: event.data.last_name,
           username: event.data.username,
           email: email?.email_address!,
+          profile_picture: event.data.image_url,
         };
 
         await db.insert(users).values(user);
@@ -87,19 +103,26 @@ export const clerkWebhookHandler: AppRouteHandler<
           first_name: event.data.first_name,
           last_name: event.data.last_name,
           username: event.data.username,
+          profile_picture: event.data.image_url,
         };
 
-        await db.update(users).set(updatedUser);
+        await db
+          .update(users)
+          .set(updatedUser)
+          .where(eq(users.user_id, event.data.id));
 
         break;
     }
 
     return c.json({ message: "Received" }, 200);
   } catch (error) {
-    console.error("Failed to process", {
-      payload: await c.req.text(),
-      error: c.error,
+    sentry.captureException(error, {
+      data: {
+        payload: await c.req.text(),
+        error: c.error,
+      },
     });
+
     return c.json(
       {
         code: "failed_webhook",

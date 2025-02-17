@@ -1,7 +1,7 @@
 import { getMarkersView } from "@buzztrip/db/queries";
-import { collection_links, locations, markers } from "@buzztrip/db/schema";
+import { collection_links, places, markers } from "@buzztrip/db/schema";
 import type { CollectionLink, IconType } from "@buzztrip/db/types";
-import { NewCollectionLink, NewLocation } from "@buzztrip/db/types";
+import { NewCollectionLink, NewPlace } from "@buzztrip/db/types";
 import { and, eq } from "drizzle-orm";
 import { v4 as uuid } from "uuid";
 import { z } from "zod";
@@ -28,7 +28,7 @@ export type CreateMarkerParams = {
 };
 
 /**
- * Creates a marker and links it to a location, along with adding it to any collections passed from the id
+ * Creates a marker and links it to a place, along with adding it to any collections passed from the id
  * @param db - Database client
  * @param mapId - the map id
  * @param userId - the user id of the user creating the marker
@@ -40,43 +40,40 @@ export const createMarker = async (
   { userId, mapId, input }: CreateMarkerParams
 ): Promise<z.infer<typeof CreateMarkersReturnSchema>> => {
   const id = uuid();
-  // Wrap in a transaction as we don't want to create a marker without a location
+  // Wrap in a transaction as we don't want to create a marker without a place
   await db.transaction(async (tx) => {
-    let locationId = uuid();
-    const [location] = await tx
+    let placeId = uuid();
+    const [place] = await tx
       .select()
-      .from(locations)
+      .from(places)
       .where(
-        and(
-          eq(locations.lat, input.marker.lat),
-          eq(locations.lng, input.marker.lng)
-        )
+        and(eq(places.lat, input.marker.lat), eq(places.lng, input.marker.lng))
       );
 
-    // if location exists set the location id
-    if (location) {
-      locationId = location.location_id;
+    // if place exists set the place id
+    if (place) {
+      placeId = place.place_id;
     } else {
-      // otherwise create a new location
-      const newLocation: NewLocation = {
+      // otherwise create a new place
+      const newPlace: NewPlace = {
         ...input.marker,
-        location_id: locationId,
+        place_id: placeId,
         icon: input.marker.icon as IconType,
       };
 
       const [lo] = await tx
-        .insert(locations)
-        .values(newLocation)
-        .returning({ locationId: locations.location_id });
+        .insert(places)
+        .values(newPlace)
+        .returning({ placeId: places.place_id });
 
       if (!lo) {
         tx.rollback();
-        throw Error("Failed to create location", {
+        throw Error("Failed to create place", {
           cause: lo,
         });
       }
 
-      locationId = lo.locationId;
+      placeId = lo.placeId;
     }
 
     await tx.insert(markers).values({
@@ -85,7 +82,7 @@ export const createMarker = async (
       map_id: mapId,
       icon: input.marker.icon as IconType,
       created_by: userId,
-      location_id: locationId,
+      place_id: placeId,
     });
   });
 

@@ -9,7 +9,7 @@ interface UserMapsProps {
   usersMaps: UserMap[] | null;
 }
 
-const UserMaps = ({ userId, usersMaps }: UserMapsProps) => {
+const UserMaps = ({ usersMaps }: UserMapsProps) => {
   const [maps, setMaps] = useState<UserMap[] | null>(usersMaps);
 
   return (
@@ -43,9 +43,9 @@ const UserMaps = ({ userId, usersMaps }: UserMapsProps) => {
 
       <div className="flex flex-wrap gap-2">
         {maps &&
-          maps.map((map) => (
+          maps.map((map, index) => (
             <MapCard
-              key={map.map_id}
+              key={map.map_id + index}
               map={{
                 map_id: map.map_id!,
                 title: map.title!,
@@ -54,7 +54,6 @@ const UserMaps = ({ userId, usersMaps }: UserMapsProps) => {
                 owner_id: map.owner_id!,
               }}
               updateMap={(m) => {
-                console.log("passed", m)
                 const newMap: UserMap = {
                   title: m.title ?? map.title,
                   description: m.description ?? map.description,

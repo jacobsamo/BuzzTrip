@@ -1,6 +1,6 @@
 import {
   markers,
-  locations,
+  places,
   maps,
   map_users,
   collections,
@@ -21,15 +21,15 @@ export const getMarkersView = async (
   let getMarkers = db
     .select({
       ...getTableColumns(markers),
-      ...getTableColumns(locations),
-      lat: locations.lat,
-      lng: locations.lng,
-      location_id: locations.location_id,
+      ...getTableColumns(places),
+      lat: places.lat,
+      lng: places.lng,
+      place_id: places.place_id,
     })
     .from(markers)
-    .leftJoin(locations, eq(locations.location_id, markers.location_id))
+    .leftJoin(places, eq(places.place_id, markers.place_id))
     .where(eq(markers.map_id, map_id))
-    .$dynamic();
+    .$dynamic(); // makes this a dynamic query
 
   if (markerId) {
     getMarkers = getMarkers.where(eq(markers.marker_id, markerId));
