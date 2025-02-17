@@ -24,7 +24,6 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import CollectionModal from "@/components/modals/map/create_edit_collection_modal";
 import DisplayCollection from "./display-collection";
-import { useMap } from "react-map-gl";
 import { CombinedMarker } from "@buzztrip/db/types";
 import DisplayActiveState from "./display-active-state";
 
