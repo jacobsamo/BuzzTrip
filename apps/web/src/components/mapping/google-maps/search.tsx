@@ -3,7 +3,6 @@ import { CombinedMarker } from "@buzztrip/db/types";
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { Route, SearchIcon, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-// import { Command, CommandItem, CommandList, CommandEmpty } from "@/components/ui/command";
 import { Command } from "cmdk";
 import { Button } from "@/components/ui/button";
 
@@ -250,9 +249,9 @@ export const AutocompleteCustomInput = () => {
           </Command.List>
         </Command>
       </div>
-      <Button variant={"outline"}>
+      {/* <Button variant={"outline"}>
         <Route />
-      </Button>
+      </Button> */}
     </div>
   );
 };

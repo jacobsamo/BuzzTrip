@@ -18,7 +18,7 @@ import OpenMarkerButton from "../../../mapping/google-maps/open-marker";
 import { useMap } from "@vis.gl/react-google-maps";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import DisplayMarker from "./display-marker";
-// import { useMap } from "react-map-gl";
+// import { useMap } from "react-map-gl/mapbox";
 
 interface DisplayCollectionProps {
   collection: Collection;
