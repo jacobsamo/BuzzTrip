@@ -8,7 +8,8 @@
     "db:studio:prd": "cross-env NODE_ENV=production drizzle-kit studio",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:setup": "touch buzztrip-local.db && bun db:migrate"
+    "db:setup": "touch buzztrip-local.db && bun db:generate && bun db:push",
+    "db:local-start": "turso dev --db-file buzztrip-local.db"
   },
   "devDependencies": {
     "@buzztrip/tsconfig": "workspace:*",

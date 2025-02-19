@@ -1,4 +1,4 @@
-import { sql, SQL } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm/relations";
 import {
   integer,
