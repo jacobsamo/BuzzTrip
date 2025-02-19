@@ -74,7 +74,6 @@ export default withSentryConfig(withMDX(nextConfig), {
   widenClientFileUpload: true,
   telemetry: false,
   disableLogger: true,
-  hideSourceMaps: true,
   sourcemaps: {
     disable: true,
   },

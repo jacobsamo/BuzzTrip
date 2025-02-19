@@ -48,7 +48,7 @@ const Mapview = () => {
   }, []);
 
   useEffect(() => {
-    if (!routesLibrary || !map || !routeStops || !routes) return;
+    if (!routesLibrary || !routeStops || !routes || !map) return;
     setDirectionsService(new routesLibrary.DirectionsService());
     setDirectionsRenderer(new routesLibrary.DirectionsRenderer({ map }));
   }, [routesLibrary, map]);
@@ -90,17 +90,62 @@ const Mapview = () => {
     };
   }, [directionsService, directionsRenderer, routes, routeStops]);
 
-  async function handleMapClick(e: MapMouseEvent) {
+  const handleClick = async (e: any) => {
     if (!places || !map) return;
     e.domEvent?.stopPropagation();
     e.stop();
+    console.log("Clicked on area:", e);
     const placesService = new places.PlacesService(map);
+    const latLng = e.detail.latLng;
+    let placeId = e.detail.placeId;
 
-    if (e.detail.placeId) {
+    if (!placeId) {
+      const zoom = map.getZoom();
+      const radius = () => {
+        if (!zoom) return 300;
+        if (zoom < 6) return 1000;
+        if (zoom < 8) return 100;
+        if (zoom > 10) return 100;
+
+        return 300;
+      };
+
+      try {
+        placeId = await new Promise<string | undefined>((resolve, reject) => {
+          placesService.nearbySearch(
+            {
+              location: latLng,
+              radius: radius(),
+              bounds: map.getBounds(),
+            },
+            (data, status) => {
+              if (
+                status !== google.maps.places.PlacesServiceStatus.OK ||
+                !data ||
+                data.length === 0
+              ) {
+                reject(new Error("Nearby search failed"));
+                return;
+              }
+              resolve(data[0]?.place_id);
+            }
+          );
+        });
+      } catch (error) {
+        console.error("Error during nearby search:", error);
+        return; // Exit early if search fails
+      }
+    }
+
+    if (!placeId) {
+      console.error("No placeId found after search");
+      return;
+    }
+
+    // Handle Place Details Lookup
+    try {
       const requestOptions: google.maps.places.PlaceDetailsRequest = {
-        placeId:
-          e.detail.placeId ||
-          `${e.detail.latLng?.lat}, ${e.detail.latLng?.lng}`,
+        placeId: placeId,
         fields: [
           "geometry",
           "name",
@@ -117,7 +162,11 @@ const Mapview = () => {
         ],
       };
 
-      placesService.getDetails(requestOptions, (data) => {
+      placesService.getDetails(requestOptions, (data, status) => {
+        if (status !== google.maps.places.PlacesServiceStatus.OK || !data) {
+          console.error("Error fetching place details:", status);
+          return;
+        }
         const res = detailsRequestCallback(map!, data);
         if (res) {
           setActiveLocation(res.location);
@@ -126,11 +175,10 @@ const Mapview = () => {
           );
         }
       });
+    } catch (error) {
+      console.error("Error fetching place details:", error);
     }
-
-    if (e.detail.latLng) {
-    }
-  }
+  };
 
   return (
     <div className="absolute inset-0 h-screen w-full flex-1">
@@ -140,7 +188,7 @@ const Mapview = () => {
         defaultZoom={mapOptions.zoom}
         mapId={env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID}
         disableDefaultUI={true}
-        onClick={(e) => handleMapClick(e)}
+        onClick={(e) => handleClick(e)}
         gestureHandling="greedy"
         reuseMaps
       >

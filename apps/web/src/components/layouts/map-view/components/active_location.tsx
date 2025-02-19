@@ -3,9 +3,12 @@ import { useMapStore } from "@/components/providers/map-state-provider";
 import { BookmarkCheck } from "lucide-react";
 import Image from "next/image";
 import OpenMarkerButton from "../../../mapping/google-maps/open-marker";
+import { Button } from "@/components/ui/button";
 
 const ActiveLocation = () => {
-  const { markers, activeLocation } = useMapStore((store) => store);
+  const { markers, activeLocation, setMarkerOpen } = useMapStore(
+    (store) => store
+  );
 
   if (activeLocation === null) return null;
 
@@ -14,14 +17,20 @@ const ActiveLocation = () => {
       <div className="flex flex-col pl-3">
         <div className="relative flex w-full flex-row justify-between">
           <span className="flex flex-row gap-2">
-            <MarkerPin marker={activeLocation}  />
+            <MarkerPin marker={activeLocation} />
             <h1 className="text-2xl text-gray-900">{activeLocation.title}</h1>
           </span>
           <span>
             {markers?.find(
               (marker) => marker.gm_place_id === activeLocation.gm_place_id
             ) ? (
-              <BookmarkCheck className="h-8 w-8" />
+              <Button
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() => setMarkerOpen(true, activeLocation, "edit")}
+              >
+                <BookmarkCheck className="h-8 w-8" />
+              </Button>
             ) : (
               <OpenMarkerButton marker={activeLocation} mode="create" />
             )}
@@ -31,6 +40,9 @@ const ActiveLocation = () => {
         <p className="text-base text-gray-900">
           {activeLocation.lat}, {activeLocation.lng}
         </p>
+
+        <p>{activeLocation.note}</p>
+
         <div className="flex h-44 w-fit flex-row gap-2 overflow-x-auto overflow-y-hidden">
           {activeLocation.photos &&
             activeLocation.photos.map((photo) => (

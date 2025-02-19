@@ -2,7 +2,7 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { env } from "env";
 import { memo, useMemo } from "react";
-import { Map, MapProvider, Marker } from "react-map-gl";
+import { Map, MapProvider, Marker } from "react-map-gl/mapbox";
 import MarkerPin from "../google-maps/marker_pin";
 import "mapbox-gl/dist/mapbox-gl.css";
 import DisplayMapData from "./display-data";

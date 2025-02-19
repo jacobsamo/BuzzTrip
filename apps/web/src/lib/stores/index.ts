@@ -116,15 +116,15 @@ export const createStore = (initState: Partial<StoreState>) =>
         };
       });
     },
-    setRoute: (route: Route[] | null) => {
-      if (!route) return;
+    setRoute: (routes: Route[] | null) => {
+      if (!routes) return;
 
-      return set(({ route: prevRoute }) => {
-        const prevRouteMap = prevRoute
-          ? new Map(prevRoute.map((route) => [route.route_id, route]))
+      return set(({ routes: prevRoutes }) => {
+        const prevRouteMap = prevRoutes
+          ? new Map(prevRoutes.map((route) => [route.route_id, route]))
           : new Map();
 
-        route.forEach((route) => {
+        routes.forEach((route) => {
           prevRouteMap.set(route.route_id, {
             ...prevRouteMap.get(route.route_id),
             ...route,
@@ -132,7 +132,7 @@ export const createStore = (initState: Partial<StoreState>) =>
         });
         const updatedRoute = Array.from(prevRouteMap.values());
 
-        return { route: updatedRoute };
+        return { routes: updatedRoute };
       });
     },
     setRouteStops: (routeStops: RouteStop[] | null) => {
