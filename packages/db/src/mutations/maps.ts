@@ -1,4 +1,4 @@
-import { map_users, maps } from "@buzztrip/db/schema";
+import { map_users, maps } from "../schemas";
 import { NewMap, NewMapUser } from "@buzztrip/db/types";
 import {
   map_usersEditSchema,

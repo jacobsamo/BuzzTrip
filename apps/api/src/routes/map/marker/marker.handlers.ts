@@ -1,7 +1,7 @@
 import { AppRouteHandler } from "../../../common/types";
 import { createDb } from "@buzztrip/db";
 import { createMarker } from "@buzztrip/db/mutations";
-import { collection_links, markers } from "@buzztrip/db/schema";
+import { collection_links, markers } from "@buzztrip/db/schemas";
 import { NewCollectionLink } from "@buzztrip/db/types";
 import { and, eq } from "drizzle-orm";
 import { createMarkerRoute, editMarkerRoute } from "./marker.routes";

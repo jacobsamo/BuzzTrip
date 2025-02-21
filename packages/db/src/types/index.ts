@@ -9,7 +9,7 @@ import {
   route_stops,
   routes,
   users,
-} from "../schema";
+} from "../schemas";
 import {
   boundsSchema,
   combinedMarkersSchema,

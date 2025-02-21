@@ -1,16 +1,15 @@
+import { eq, getTableColumns, like, or } from "drizzle-orm";
+import { Database } from "..";
 import {
+  collection_links,
+  collections,
+  map_users,
+  maps,
   markers,
   places,
-  maps,
-  map_users,
-  collections,
-  collection_links,
   users,
-} from "../schema";
-import { desc, eq, like, or } from "drizzle-orm";
+} from "../schemas";
 import { CombinedMarker, UserMap } from "../types";
-import { getTableColumns } from "drizzle-orm";
-import { Database } from "..";
 
 // map data items
 export const getMarkersView = async (

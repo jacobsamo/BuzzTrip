@@ -1,4 +1,4 @@
-import * as schema from "./schema";
+import * as schema from "./schemas";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 
@@ -12,17 +12,23 @@ import { drizzle } from "drizzle-orm/libsql";
 //         url: "file:./buzztrip-local.db",
 //       });
 
-
 export const createDb = (url: string, authToken: string) => {
-  return drizzle(createClient({
-    url: url,
-    authToken: authToken,
-  }), {
-    schema: schema,
-    logger: process.env.NODE_ENV === "development",
-  });
-}
+  return drizzle(
+    createClient(
+      process.env.NODE_ENV === "production"
+        ? {
+            url: url,
+            authToken: authToken,
+          }
+        : {
+            url: "http://127.0.0.1:8080",
+          }
+    ),
+    {
+      schema: schema,
+      logger: process.env.NODE_ENV === "development",
+    }
+  );
+};
 
 export type Database = ReturnType<typeof createDb>;
-
-

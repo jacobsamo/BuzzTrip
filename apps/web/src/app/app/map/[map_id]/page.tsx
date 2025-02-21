@@ -3,7 +3,7 @@ import { MapStoreProvider } from "@/components/providers/map-state-provider";
 import { constructMetadata } from "@/lib/utils/metadata";
 import { db } from "@/server/db";
 import { getAllMapData } from "@buzztrip/db/queries";
-import { maps } from "@buzztrip/db/schema";
+import { maps } from "@buzztrip/db/schemas";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";

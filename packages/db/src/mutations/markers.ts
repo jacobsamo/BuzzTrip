@@ -1,5 +1,5 @@
 import { getMarkersView } from "@buzztrip/db/queries";
-import { collection_links, places, markers } from "@buzztrip/db/schema";
+import { collection_links, places, markers } from "../schemas";
 import type { CollectionLink, IconType } from "@buzztrip/db/types";
 import { NewCollectionLink, NewPlace } from "@buzztrip/db/types";
 import { and, eq } from "drizzle-orm";

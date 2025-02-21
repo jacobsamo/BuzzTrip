@@ -1,6 +1,6 @@
 import { createDb } from "@buzztrip/db";
 import { createCollection } from "@buzztrip/db/mutations";
-import { collections } from "@buzztrip/db/schema";
+import { collections } from "@buzztrip/db/schemas";
 import { eq } from "drizzle-orm";
 import { AppRouteHandler } from "../../../common/types";
 import {

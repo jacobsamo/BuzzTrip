@@ -1,7 +1,7 @@
 import { createDb } from "@buzztrip/db";
 import { createMap, shareMap } from "@buzztrip/db/mutations/maps";
 import { getAllMapData } from "@buzztrip/db/queries";
-import { maps } from "@buzztrip/db/schema";
+import { maps } from "@buzztrip/db/schemas";
 import { eq } from "drizzle-orm";
 import { AppRouteHandler } from "../../common/types";
 import {

@@ -1,5 +1,5 @@
 import { createDb } from "@buzztrip/db";
-import { users } from "@buzztrip/db/schema";
+import { users } from "@buzztrip/db/schemas";
 import { NewUser } from "@buzztrip/db/types";
 import { WebhookEvent } from "@clerk/backend";
 import { eq } from "drizzle-orm";

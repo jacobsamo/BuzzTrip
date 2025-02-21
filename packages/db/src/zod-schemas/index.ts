@@ -12,7 +12,7 @@ import {
   routes,
   users,
   routeTravelTypeEnum,
-} from "../schema";
+} from "../schemas";
 import { iconsList } from "../types";
 
 // Custom schemas
