@@ -37,9 +37,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Plus } from "lucide-react";
 import * as React from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import MapStepperForm from "@/components/map-form";
 //   mode: "edit";
 //   map: Map;
 //   updateMap: (map: Partial<Map>) => void;
@@ -71,13 +72,14 @@ export default function MapModal({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button variant="outline">
-            <Plus /> {mode == "create" ? "Create" : "Edit"} Map
+            <Plus className="mr-2 h-4 w-4" />{" "}
+            {mode === "create" ? "Create" : "Edit"} Map
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {mode == "create" ? "Create" : "Edit"} Map
+              {mode === "create" ? "Create" : "Edit"} Map
             </DialogTitle>
             <DialogDescription>Start your travel plans here</DialogDescription>
           </DialogHeader>
@@ -97,12 +99,13 @@ export default function MapModal({
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button variant="outline">
-          <Plus /> {mode == "create" ? "Create" : "Edit"} Map
+          <Plus className="mr-2 h-4 w-4" />{" "}
+          {mode === "create" ? "Create" : "Edit"} Map
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="p-2">
+      <DrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle>{mode == "create" ? "Create" : "Edit"} Map</DrawerTitle>
+          <DrawerTitle>{mode === "create" ? "Create" : "Edit"} Map</DrawerTitle>
           <DrawerDescription>Start your travel plans here</DrawerDescription>
         </DrawerHeader>
         <MapForm
@@ -122,16 +125,6 @@ export default function MapModal({
   );
 }
 
-const Close = ({ children }: { children: React.ReactNode }) => {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-
-  return isDesktop ? (
-    <DialogClose asChild>{children}</DialogClose>
-  ) : (
-    <DrawerClose asChild>{children}</DrawerClose>
-  );
-};
-
 function MapForm({
   mode,
   map,
@@ -147,16 +140,10 @@ function MapForm({
       description: map?.description ?? undefined,
       owner_id: userId!,
     },
-    shouldUnregister: true,
   });
 
-  const { register, handleSubmit, control } = form;
-
-  const onSubmit: SubmitHandler<z.infer<typeof mapsEditSchema>> = async (
-    data
-  ) => {
+  const onSubmit = async (data: z.infer<typeof mapsEditSchema>) => {
     try {
-      console.log("data: ", data);
       if (mode === "create") {
         const create = apiClient.map.create.$post({
           json: {
@@ -168,7 +155,7 @@ function MapForm({
         toast.promise(create, {
           loading: "Creating map...",
           success: async (res) => {
-            if (res.status == 200 && setMap) {
+            if (res.status === 200 && setMap) {
               const d = await res.json();
               setMap(d.map);
               setOpen(false);
@@ -180,7 +167,6 @@ function MapForm({
       }
 
       if (mode === "edit" && map) {
-        console.log("map: ", map);
         const edit = apiClient.map[":mapId"].$put({
           param: { mapId: map.map_id },
           json: {
@@ -195,9 +181,8 @@ function MapForm({
         toast.promise(edit, {
           loading: "Updating map...",
           success: async (res) => {
-            if (res.status == 200 && updateMap) {
+            if (res.status === 200 && updateMap) {
               const d = await res.json();
-              console.log("updated", d);
               updateMap(d);
               setOpen(false);
             }
@@ -212,48 +197,10 @@ function MapForm({
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-        <input type="hidden" {...register("owner_id", { value: userId! })} />
-
-        <FormField
-          control={control}
-          name="title"
-          rules={{ required: true }}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title</FormLabel>
-              <FormControl className="flex">
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl className="flex">
-                <Textarea {...field} value={field?.value ?? undefined} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Close>
-          <Button
-            aria-label="create map"
-            type="submit"
-            onClick={handleSubmit(onSubmit)}
-          >
-            {mode == "create" ? "Create" : "Update"} Map
-          </Button>
-        </Close>
-      </form>
-    </Form>
+    <MapStepperForm
+      form={form}
+      map_id={map?.map_id}
+      onSubmit={form.handleSubmit(onSubmit)}
+    />
   );
 }
