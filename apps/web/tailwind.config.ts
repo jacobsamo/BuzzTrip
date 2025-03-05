@@ -1,11 +1,9 @@
 import type { Config } from "tailwindcss";
-import sharedConfig from "@buzztrip/tailwind-config";
 import * as animate from "tailwindcss-animate";
 
 const config: Config = {
   darkMode: ["class"],
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
-  presets: [sharedConfig],
   theme: {
   	extend: {
   		backgroundImage: {

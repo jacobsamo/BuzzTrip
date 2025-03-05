@@ -10,8 +10,9 @@ import { v4 as uuid } from "uuid";
 import type { IconType } from "../types";
 import { Bounds } from "../types";
 import { users } from "./auth";
-import { onUpdateOptions } from "./helpers";
+import { cascadeActions, cascadeUpdate } from "./helpers";
 import { places } from "./places";
+import { generateId } from "../helpers";
 
 // enums
 export const permissionEnum = [
@@ -32,14 +33,14 @@ export const maps = sqliteTable("maps", {
   map_id: text("map_id")
     .primaryKey()
     .notNull()
-    .$defaultFn(() => uuid()),
+    .$defaultFn(() => generateId("map")),
   title: text("title").notNull(),
   description: text("description"),
   image: text("image"),
   icon: text("icon").$type<IconType>(),
   color: text("color"),
   owner_id: text("owner_id")
-    .references(() => users.user_id)
+    .references(() => users.user_id, cascadeUpdate)
     .notNull(),
   lat: real("lat"),
   lng: real("lng"),
@@ -56,12 +57,12 @@ export const map_users = sqliteTable("map_users", {
   map_user_id: text("map_user_id")
     .primaryKey()
     .notNull()
-    .$default(() => uuid()),
+    .$default(() => generateId("generic")),
   map_id: text("map_id")
-    .references(() => maps.map_id, onUpdateOptions)
+    .references(() => maps.map_id, cascadeActions)
     .notNull(),
   user_id: text("user_id")
-    .references(() => users.user_id)
+    .references(() => users.user_id, cascadeUpdate)
     .notNull(),
   permission: text("permission", {
     enum: permissionEnum,
@@ -80,9 +81,9 @@ export const labels = sqliteTable("labels", {
   label_id: text("label_id")
     .primaryKey()
     .notNull()
-    .$defaultFn(() => uuid()),
+    .$defaultFn(() => generateId("generic")),
   map_id: text("map_id")
-    .references(() => maps.map_id, onUpdateOptions)
+    .references(() => maps.map_id, cascadeActions)
     .notNull(),
   title: text("title").notNull(),
   description: text("description"),
@@ -100,21 +101,21 @@ export const markers = sqliteTable("markers", {
   marker_id: text("marker_id")
     .primaryKey()
     .notNull()
-    .$defaultFn(() => uuid()),
+    .$defaultFn(() => generateId("marker")),
   title: text("title").notNull(),
   note: text("note"),
   lat: real("lat").notNull(),
   lng: real("lng").notNull(),
   created_by: text("created_by")
     .notNull()
-    .references(() => users.user_id),
+    .references(() => users.user_id, cascadeUpdate),
   icon: text("icon").$type<IconType>().notNull(),
   color: text("color"),
   place_id: text("place_id")
-    .references(() => places.place_id)
+    .references(() => places.place_id, cascadeUpdate)
     .notNull(),
   map_id: text("map_id")
-    .references(() => maps.map_id, onUpdateOptions)
+    .references(() => maps.map_id, cascadeActions)
     .notNull(),
   created_at: text("created_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
@@ -128,15 +129,15 @@ export const collections = sqliteTable("collections", {
   collection_id: text("collection_id")
     .primaryKey()
     .notNull()
-    .$defaultFn(() => uuid()),
+    .$defaultFn(() => generateId("collection")),
   map_id: text("map_id")
-    .references(() => maps.map_id, onUpdateOptions)
-    .notNull(),
+    .notNull()
+    .references(() => maps.map_id, cascadeActions),
   title: text("title").notNull(),
   description: text("description"),
   created_by: text("created_by")
     .notNull()
-    .references(() => users.user_id),
+    .references(() => users.user_id, cascadeUpdate),
   icon: text("icon").$type<IconType>().notNull(),
   color: text("color"),
   created_at: text("created_at")
@@ -151,17 +152,20 @@ export const collection_links = sqliteTable("collection_links", {
   link_id: text("link_id")
     .primaryKey()
     .notNull()
-    .$defaultFn(() => uuid()),
+    .$defaultFn(() => generateId("generic")),
   collection_id: text("collection_id").references(
-    () => collections.collection_id
+    () => collections.collection_id,
+    cascadeActions
   ),
   marker_id: text("marker_id")
-    .references(() => markers.marker_id, onUpdateOptions)
+    .references(() => markers.marker_id, cascadeActions)
     .notNull(),
   map_id: text("map_id")
-    .references(() => maps.map_id, onUpdateOptions)
+    .references(() => maps.map_id, cascadeActions)
     .notNull(),
-  user_id: text("user_id").references(() => users.user_id),
+  user_id: text("user_id")
+    .references(() => users.user_id, cascadeUpdate)
+    .notNull(),
   created_at: text("created_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
@@ -171,11 +175,10 @@ export const routes = sqliteTable("routes", {
   route_id: text("route_id")
     .primaryKey()
     .notNull()
-    .$defaultFn(() => uuid()),
-  map_id: text("map_user_id")
+    .$defaultFn(() => generateId("generic")),
+  map_id: text("map_id")
     .notNull()
-    .references(() => maps.map_id, onUpdateOptions)
-    .notNull(),
+    .references(() => maps.map_id, cascadeActions),
   name: text("name").notNull(),
   description: text("description"),
   travel_type: text("travel_type", {
@@ -183,7 +186,9 @@ export const routes = sqliteTable("routes", {
   })
     .default("driving")
     .notNull(),
-  user_id: text("user_id").references(() => users.user_id),
+  user_id: text("user_id")
+    .references(() => users.user_id, cascadeUpdate)
+    .notNull(),
   created_at: text("created_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
@@ -193,15 +198,20 @@ export const route_stops = sqliteTable("route_stops", {
   route_stop_id: text("route_stop_id")
     .primaryKey()
     .notNull()
-    .$defaultFn(() => uuid()),
-  map_id: text("map_user_id")
+    .$defaultFn(() => generateId("generic")),
+  map_id: text("map_id")
     .notNull()
-    .references(() => maps.map_id, onUpdateOptions)
-    .notNull(),
+    .references(() => maps.map_id, cascadeActions),
   route_id: text("route_id")
-    .references(() => routes.route_id, onUpdateOptions)
+    .references(() => routes.route_id, cascadeActions)
     .notNull(),
-  marker_id: text("marker_id").references(() => markers.marker_id),
+  marker_id: text("marker_id").references(
+    () => markers.marker_id,
+    cascadeActions
+  ),
+  user_id: text("user_id")
+    .references(() => users.user_id, cascadeUpdate)
+    .notNull(),
   lat: real("lat").notNull(),
   lng: real("lng").notNull(),
   stop_order: integer("stop_order").notNull(),

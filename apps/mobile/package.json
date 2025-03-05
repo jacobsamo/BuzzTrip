@@ -17,7 +17,6 @@
   "dependencies": {
     "@buzztrip/api": "workspace:*",
     "@buzztrip/db": "workspace:*",
-    "@buzztrip/tailwind-config": "workspace:*",
     "@clerk/clerk-expo": "^2.3.10",
     "@dev-plugins/react-query": "^0.1.0",
     "@expo/metro-runtime": "~4.0.0",

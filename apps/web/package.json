@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@buzztrip/db": "workspace:*",
-    "@buzztrip/tailwind-config": "workspace:*",
     "@clerk/nextjs": "^6.11.3",
     "@hookform/resolvers": "^4.1.0",
     "@libsql/client": "^0.14.0",
