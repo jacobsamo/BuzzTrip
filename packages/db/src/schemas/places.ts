@@ -1,9 +1,8 @@
 import { sql } from "drizzle-orm";
 import { integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { v4 as uuid } from "uuid";
+import { generateId } from "../helpers";
 import type { IconType } from "../types";
 import { Bounds, Review } from "../types";
-import { generateId } from "../helpers";
 
 export const places = sqliteTable("places", {
   place_id: text("place_id")

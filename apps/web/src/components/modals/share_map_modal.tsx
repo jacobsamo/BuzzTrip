@@ -173,7 +173,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
           <SearchIcon className="mr-2 h-5 w-5 shrink-0" />
 
           {/* <Command.Input
-            className="flex h-10 w-full rounded-md bg-white py-2 text-base placeholder:text-slate-500 focus:outline-none dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
+            className="flex h-10 w-full rounded-md bg-white py-2 text-base placeholder:text-slate-500 focus:outline-hidden dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
             placeholder="Search users"
             id="search"
             value={searchValue ?? ""}

@@ -38,7 +38,7 @@ const MainView = () => {
           </>
         )}
         {!activeLocation && collections && (
-          <ScrollArea className="w-full flex-grow">
+          <ScrollArea className="w-full grow">
             <div className="p-4">
               {collections?.map((collection) => {
                 const mark = getMarkersForCollection(collection.collection_id);

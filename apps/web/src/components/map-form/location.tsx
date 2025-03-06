@@ -21,7 +21,7 @@ interface MapLocationFormProps {
 
 const MapLocationForm = ({ form }: MapLocationFormProps) => {
   const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
-  const { setValue, watch } = form;
+  const { setValue } = form;
 
   return (
     <APIProvider
@@ -42,6 +42,10 @@ const MapLocationForm = ({ form }: MapLocationFormProps) => {
               container: "w-full", // Custom width
             }}
             onSelect={(pred, details) => {
+              console.log("Selected", {
+                pred,
+                details,
+              });
               setValue("lat", details?.location.lat ?? null);
               setValue("lng", details?.location.lng ?? null);
               setValue("bounds", details?.bounds ?? null);

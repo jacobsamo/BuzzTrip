@@ -50,7 +50,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     a: (props) => (
       <Link
-        className="decoration-yellow underline decoration-2 underline-offset-[4.5px]"
+        className="underline decoration-primary decoration-2 underline-offset-[4.5px]"
         {...(props as LinkProps)}
       >
         {props.children as ReactNode}
@@ -61,6 +61,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         sizes="(max-width: 768px) 100vw, 50vw"
         className="h-auto w-full rounded-sm"
         {...(props as ImageProps)}
+        alt={props.alt ?? "Image"}
       />
     ),
   };

@@ -1,11 +1,11 @@
 import { getMarkersView } from "@buzztrip/db/queries";
-import { collection_links, places, markers } from "../schemas";
 import type { CollectionLink, IconType } from "@buzztrip/db/types";
 import { NewCollectionLink, NewPlace } from "@buzztrip/db/types";
 import { and, eq } from "drizzle-orm";
-import { v4 as uuid } from "uuid";
 import { z } from "zod";
 import { Database } from "..";
+import { generateId } from "../helpers";
+import { collection_links, markers, places } from "../schemas";
 import { collection_linksSchema, combinedMarkersSchema } from "../zod-schemas";
 
 // =========== Create marker ============
@@ -39,10 +39,10 @@ export const createMarker = async (
   db: Database,
   { userId, mapId, input }: CreateMarkerParams
 ): Promise<z.infer<typeof CreateMarkersReturnSchema>> => {
-  const id = uuid();
+  const id = generateId("marker");
   // Wrap in a transaction as we don't want to create a marker without a place
   await db.transaction(async (tx) => {
-    let placeId = uuid();
+    let placeId = generateId("place");
     const [place] = await tx
       .select()
       .from(places)

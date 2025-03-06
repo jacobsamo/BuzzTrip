@@ -6,13 +6,12 @@ import {
   sqliteTable,
   text,
 } from "drizzle-orm/sqlite-core";
-import { v4 as uuid } from "uuid";
+import { generateId } from "../helpers";
 import type { IconType } from "../types";
 import { Bounds } from "../types";
 import { users } from "./auth";
 import { cascadeActions, cascadeUpdate } from "./helpers";
 import { places } from "./places";
-import { generateId } from "../helpers";
 
 // enums
 export const permissionEnum = [

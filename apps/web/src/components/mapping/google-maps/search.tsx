@@ -206,7 +206,7 @@ export const AutocompleteCustomInput = () => {
             <SearchIcon className="mr-2 h-5 w-5 shrink-0" />
 
             <Command.Input
-              className="flex h-10 w-full rounded-md bg-white py-2 text-base placeholder:text-slate-500 focus:outline-none dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
+              className="flex h-10 w-full rounded-md bg-white py-2 text-base placeholder:text-slate-500 focus:outline-hidden dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
               placeholder="Search locations"
               id="search"
               value={searchValue ?? ""}
@@ -241,7 +241,7 @@ export const AutocompleteCustomInput = () => {
                     onSelect(pred);
                   }}
                   // className="select-all pointer-events-auto cursor-pointer"
-                  className="pointer-events-auto relative cursor-pointer select-all items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-slate-100 aria-selected:text-slate-900 dark:aria-selected:bg-slate-800 dark:aria-selected:text-slate-50"
+                  className="pointer-events-auto relative cursor-pointer select-all items-center rounded-sm px-2 py-1.5 text-sm outline-hidden aria-selected:bg-slate-100 aria-selected:text-slate-900 dark:aria-selected:bg-slate-800 dark:aria-selected:text-slate-50"
                 >
                   {pred.description}
                 </Command.Item>
