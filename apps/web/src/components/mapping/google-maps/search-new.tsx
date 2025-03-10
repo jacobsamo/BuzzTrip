@@ -1,11 +1,20 @@
 "use client";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 import { CombinedMarker } from "@buzztrip/db/types";
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
-import { Command } from "cmdk";
-import { SearchIcon, X } from "lucide-react";
+// import { Command, CommandLoading } from "cmdk";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { CommandLoading } from "cmdk";
+import { X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
 
 interface DetailsRequestCallbackReturn {
   placeDetails: google.maps.places.PlaceResult;
@@ -227,58 +236,53 @@ export const AutocompleteCustomInput = ({
 
   return (
     <div className="rounded-xlp-1 flex resize items-center justify-center pr-5">
-      <Command
-        loop
-        className="flex h-full w-full flex-col overflow-hidden rounded-md"
-      >
-        <div className="flex items-center justify-center gap-2 px-3">
-          <SearchIcon className="mr-2 h-5 w-5 shrink-0" />
+      <Command loop className="h-full w-full">
+        <CommandInput
+          value={value}
+          onValueChange={onInputChange}
+          // className="w-full"
+          placeholder="Search locations"
+          id="search"
+          after={
+            value ? (
+              <button
+                aria-label="clear search results"
+                onClick={() => {
+                  onValueChange("");
+                  setPredictionResults([]);
+                  onSelect && onSelect(null, null);
+                }}
+              >
+                <X className="h-5 w-5" />
+              </button>
+            ) : (
+              <></>
+            )
+          }
+        />
 
-          <Command.Input
-            className="flex h-10 w-full rounded-md py-2 text-base placeholder:text-slate-500 focus:outline-hidden dark:placeholder:text-slate-400"
-            placeholder="Search locations"
-            id="search"
-            value={value ?? ""}
-            onValueChange={onInputChange}
-          />
-
-          {value && (
-            <button
-              aria-label="clear search results"
-              onClick={() => {
-                onValueChange("");
-                setPredictionResults([]);
-                onSelect && onSelect(null, null);
-              }}
-            >
-              <X className="h-5 w-5" />
-            </button>
-          )}
-        </div>
-
-        <Command.List className={cn("relative", classNames?.predictions)}>
-          {predictionResults.length === 0 ? (
-            <Command.Empty>No place found</Command.Empty>
-          ) : (
-            <ScrollArea className={cn("h-[200px]", classNames?.scrollArea)}>
-              <div className="px-1">
-                {!fetchingData &&
-                  predictionResults.map((pred) => (
-                    <Command.Item
-                      key={pred.place_id}
-                      value={pred.description}
-                      onSelect={() => {
-                        onSearchItemSelect(pred);
-                      }}
-                      className="pointer-events-auto relative cursor-pointer select-all items-center rounded-sm px-2 py-1.5 text-sm outline-hidden aria-selected:bg-slate-100 aria-selected:text-slate-900 dark:aria-selected:bg-slate-800 dark:aria-selected:text-slate-50"
-                    >
-                      {pred.description}
-                    </Command.Item>
-                  ))}
-              </div>
-            </ScrollArea>
-          )}
-        </Command.List>
+        <CommandList className={cn("relative", classNames?.predictions)}>
+          <ScrollArea className={cn("h-[200px]", classNames?.scrollArea)}>
+            {fetchingData && <CommandLoading>Loading...</CommandLoading>}
+            <CommandGroup className="px-2">
+              {predictionResults.length != 0 || !fetchingData ? (
+                predictionResults.map((pred) => (
+                  <CommandItem
+                    key={pred.place_id}
+                    value={pred.description}
+                    onSelect={() => {
+                      onSearchItemSelect(pred);
+                    }}
+                  >
+                    {pred.description}
+                  </CommandItem>
+                ))
+              ) : (
+                <CommandEmpty>No place found</CommandEmpty>
+              )}
+            </CommandGroup>
+          </ScrollArea>
+        </CommandList>
       </Command>
     </div>
   );

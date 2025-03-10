@@ -1,36 +1,29 @@
 "use client";
 import { AutocompleteCustomInput } from "@/components/mapping/google-maps/search-new";
-import { Bounds } from "@buzztrip/db/types";
-import { map, mapsEditSchema } from "@buzztrip/db/zod-schemas";
 import {
   AdvancedMarker,
   APIProvider,
   Map as GoogleMap,
-  Pin,
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
-import { SearchIcon } from "lucide-react";
 import { useState } from "react";
-import { UseFormReturn } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import MarkerPin from "../mapping/google-maps/marker_pin";
+import { createMapSchema } from "./helpers";
 
-interface MapLocationFormProps {
-  form: UseFormReturn<z.infer<typeof mapsEditSchema>>;
-}
-
-const MapLocationForm = ({ form }: MapLocationFormProps) => {
+const MapLocationForm = () => {
   const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
-  const { setValue } = form;
+  const { setValue, getValues } =
+    useFormContext<z.infer<typeof createMapSchema>>();
 
   return (
     <APIProvider
       apiKey={env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
       libraries={["places", "marker"]}
     >
-      <div className="space-y-4">
+      <div className="space-y-2">
         <div className="relative">
-          <p>Default location</p>
           <AutocompleteCustomInput
             value={searchValue}
             onValueChange={setSearchValue}
@@ -42,17 +35,17 @@ const MapLocationForm = ({ form }: MapLocationFormProps) => {
               container: "w-full", // Custom width
             }}
             onSelect={(pred, details) => {
-              console.log("Selected", {
-                pred,
-                details,
-              });
-              setValue("lat", details?.location.lat ?? null);
-              setValue("lng", details?.location.lng ?? null);
-              setValue("bounds", details?.bounds ?? null);
+              setSearchValue(
+                details?.placeDetails.name ??
+                  details?.placeDetails?.formatted_address ??
+                  ""
+              );
+              setValue("map.lat", details?.location.lat ?? null);
+              setValue("map.lng", details?.location.lng ?? null);
+              setValue("map.bounds", details?.bounds.toJSON() ?? null);
             }}
           />
         </div>
-
         {/* Map Preview Container */}
         <div className="h-[200px] w-full rounded-md border bg-muted">
           {/* Map component will be added here */}
@@ -64,11 +57,11 @@ const MapLocationForm = ({ form }: MapLocationFormProps) => {
             gestureHandling="greedy"
             reuseMaps
           >
-            {form.getValues("lat") && form.getValues("lng") && (
+            {getValues("map.lat") && getValues("map.lng") && (
               <AdvancedMarker
                 position={{
-                  lat: form.getValues("lat") as number,
-                  lng: form.getValues("lng") as number,
+                  lat: getValues("map.lat") as number,
+                  lng: getValues("map.lng") as number,
                 }}
                 title="Default Location"
               >

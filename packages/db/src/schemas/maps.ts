@@ -8,10 +8,11 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { generateId } from "../helpers";
 import type { IconType } from "../types";
-import { Bounds } from "../types";
+import { bounds } from "../zod-schemas";
 import { users } from "./auth";
 import { cascadeActions, cascadeUpdate } from "./helpers";
 import { places } from "./places";
+import z from "zod";
 
 // enums
 export const permissionEnum = [
@@ -43,7 +44,7 @@ export const maps = sqliteTable("maps", {
     .notNull(),
   lat: real("lat"),
   lng: real("lng"),
-  bounds: blob("bounds", { mode: "json" }).$type<Bounds | null>(),
+  bounds: blob("bounds", { mode: "json" }).$type<z.infer<typeof bounds>>(),
   created_at: text("created_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),

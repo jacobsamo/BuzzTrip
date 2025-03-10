@@ -4,7 +4,6 @@ import { getGoogleMapsTravelMode } from "@/lib/utils/index";
 import {
   AdvancedMarker,
   Map as GoogleMap,
-  MapMouseEvent,
   useMap,
   useMapsLibrary,
 } from "@vis.gl/react-google-maps";
@@ -16,7 +15,7 @@ import { AutocompleteCustomInput, detailsRequestCallback } from "./search";
 const MarkerPin = lazy(() => import("./marker_pin"));
 
 const Mapview = () => {
-  const map = useMap();
+  const googleMap = useMap();
   const places = useMapsLibrary("places");
   const {
     activeLocation,
@@ -25,7 +24,10 @@ const Mapview = () => {
     setSearchValue,
     routes,
     routeStops,
+    map,
   } = useMapStore((store) => store);
+
+  if (!map) return null;
 
   // Handle directions for routes
   const routesLibrary = useMapsLibrary("routes");
@@ -40,18 +42,21 @@ const Mapview = () => {
   const mapOptions = useMemo(() => {
     return {
       center: {
-        lat: -25.2744,
-        lng: 133.7751,
+        lat: map.lat ?? -25.2744,
+        lng: map.lng ?? 133.7751,
       },
+      bounds: map.bounds ?? null,
       zoom: 4,
     };
   }, []);
 
   useEffect(() => {
-    if (!routesLibrary || !routeStops || !routes || !map) return;
+    if (!routesLibrary || !routeStops || !routes || !googleMap) return;
     setDirectionsService(new routesLibrary.DirectionsService());
-    setDirectionsRenderer(new routesLibrary.DirectionsRenderer({ map }));
-  }, [routesLibrary, map]);
+    setDirectionsRenderer(
+      new routesLibrary.DirectionsRenderer({ map: googleMap })
+    );
+  }, [routesLibrary, googleMap]);
 
   useEffect(() => {
     if (!directionsService || !directionsRenderer || !routeStops || !routes)
@@ -91,16 +96,16 @@ const Mapview = () => {
   }, [directionsService, directionsRenderer, routes, routeStops]);
 
   const handleClick = async (e: any) => {
-    if (!places || !map) return;
+    if (!places || !googleMap) return;
     e.domEvent?.stopPropagation();
     e.stop();
     console.log("Clicked on area:", e);
-    const placesService = new places.PlacesService(map);
+    const placesService = new places.PlacesService(googleMap);
     const latLng = e.detail.latLng;
     let placeId = e.detail.placeId;
 
     if (!placeId) {
-      const zoom = map.getZoom();
+      const zoom = googleMap.getZoom();
       const radius = () => {
         if (!zoom) return 300;
         if (zoom < 6) return 1000;
@@ -116,7 +121,7 @@ const Mapview = () => {
             {
               location: latLng,
               radius: radius(),
-              bounds: map.getBounds(),
+              bounds: googleMap.getBounds(),
             },
             (data, status) => {
               if (
@@ -167,7 +172,7 @@ const Mapview = () => {
           console.error("Error fetching place details:", status);
           return;
         }
-        const res = detailsRequestCallback(map!, data);
+        const res = detailsRequestCallback(googleMap!, data);
         if (res) {
           setActiveLocation(res.location);
           setSearchValue(
@@ -186,6 +191,15 @@ const Mapview = () => {
       <GoogleMap
         defaultCenter={mapOptions.center}
         defaultZoom={mapOptions.zoom}
+        defaultBounds={
+          mapOptions.bounds &&
+          "north" in mapOptions.bounds &&
+          "south" in mapOptions.bounds &&
+          "east" in mapOptions.bounds &&
+          "west" in mapOptions.bounds
+            ? mapOptions.bounds
+            : undefined
+        }
         mapId={env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID}
         disableDefaultUI={true}
         onClick={(e) => handleClick(e)}
@@ -210,11 +224,11 @@ const Mapview = () => {
               position={{ lat: marker.lat, lng: marker.lng }}
               title={marker.title}
               onClick={() => {
-                map!.panTo({ lat: marker.lat, lng: marker.lng });
+                googleMap!.panTo({ lat: marker.lat, lng: marker.lng });
                 setActiveLocation(marker);
               }}
             >
-              <MarkerPin marker={marker} size={16} />
+              <MarkerPin color={marker.color} icon={marker.icon} size={16} />
             </AdvancedMarker>
           ))}
       </GoogleMap>

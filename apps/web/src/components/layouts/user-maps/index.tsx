@@ -1,6 +1,6 @@
 "use client";
 import MapCard from "@/components/map-card";
-import MapModal from "@/components/modals/create_edit_map_modal";
+import MapModal from "@/components/modals/create_map_modal";
 import { UserMap } from "@buzztrip/db/types";
 import { useState } from "react";
 

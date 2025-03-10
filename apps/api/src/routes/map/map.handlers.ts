@@ -98,14 +98,17 @@ export const createMapHandler: AppRouteHandler<typeof createMapRoute> = async (
 
     const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
     const data = await createMap(db, {
-      userId: req.userId,
+      userId: req.owner_id,
       input: req,
     });
 
     return c.json(data, 200);
   } catch (error) {
     console.error(error);
-    c.get("sentry").captureException(error);
+    c.get("sentry").captureException(error, {
+      data: c.req.json(),
+    });
+    
     return c.json(
       {
         code: "failed_to_object",

@@ -4,7 +4,7 @@ import {
   Card,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -15,7 +15,7 @@ import {
 import { Map } from "@buzztrip/db/types";
 import { MoreVertical } from "lucide-react";
 import Link from "next/link";
-import MapModal from "./modals/create_edit_map_modal";
+import EditMapModal from "./modals/edit_map_modal";
 import ShareModal from "./modals/share_map_modal";
 
 interface MapCardProps {
@@ -43,7 +43,7 @@ const MapCard = ({ map, updateMap }: MapCardProps) => {
                 <ShareModal map_id={map.map_id} />
               </DropdownMenuItem>
               <DropdownMenuItem onClick={(e) => e.preventDefault()}>
-                <MapModal map={map} mode="edit" updateMap={updateMap} />
+                <EditMapModal map={map} updateMap={updateMap} />
               </DropdownMenuItem>
               {/* <DropdownMenuItem onClick={() => handleEditSharing(map.map_id)}>
                 <Share2 className="mr-2 h-4 w-4" />

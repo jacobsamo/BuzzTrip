@@ -1,4 +1,3 @@
-import React from "react";
 import {
   FormControl,
   FormField,
@@ -8,22 +7,18 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { UseFormReturn } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { z } from "zod";
-import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
+import { createMapSchema } from "./helpers";
 
-interface MapDetailsFormProps {
-  form: UseFormReturn<z.infer<typeof mapsEditSchema>>;
-}
-
-const MapDetailsForm = ({ form }: MapDetailsFormProps) => {
-  const { control } = form;
+const MapDetailsForm = () => {
+  const { control } = useFormContext<z.infer<typeof createMapSchema>>();
 
   return (
     <div className="space-y-4">
       <FormField
         control={control}
-        name="title"
+        name="map.title"
         rules={{ required: true }}
         render={({ field }) => (
           <FormItem>
@@ -37,7 +32,7 @@ const MapDetailsForm = ({ form }: MapDetailsFormProps) => {
       />
       <FormField
         control={control}
-        name="description"
+        name="map.description"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Description</FormLabel>

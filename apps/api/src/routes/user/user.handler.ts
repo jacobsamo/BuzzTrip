@@ -45,11 +45,12 @@ export const searchUserHandler: AppRouteHandler<
       {
         users: users.map((user) => {
           return {
-            userId: user.user_id,
+            user_id: user.user_id,
             email: user.email,
             username: user.username,
-            firstName: user.first_name,
-            lastName: user.last_name,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            full_name: user.full_name,
             profile_picture: user.profile_picture,
           };
         }),

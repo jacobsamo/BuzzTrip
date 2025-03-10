@@ -1,28 +1,25 @@
-import React from "react";
-import { UseFormReturn } from "react-hook-form";
-import { Form } from "@/components/ui/form";
-import { z } from "zod";
-import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
-import MapDetailsForm from "./details";
-import MapShareForm from "./share";
-import { Button } from "../ui/button";
 import {
   Stepper,
-  StepperItem,
-  StepperTrigger,
-  StepperIndicator,
-  StepperTitle,
   StepperDescription,
+  StepperIndicator,
+  StepperItem,
   StepperSeparator,
+  StepperTitle,
+  StepperTrigger,
 } from "@/components/ui/stepper";
 import dynamic from "next/dynamic";
+import React from "react";
+import { useFormContext } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "../ui/button";
+import MapDetailsForm from "./details";
+import { createMapSchema } from "./helpers";
+import MapShareForm from "./share";
 
 const MapLocationForm = dynamic(() => import("./location"), { ssr: false });
 
 interface MapStepperFormProps {
-  form: UseFormReturn<z.infer<typeof mapsEditSchema>>;
-  map_id?: string;
-  onSubmit?: () => void;
+  onSubmit: () => void;
 }
 
 const steps = [
@@ -46,7 +43,10 @@ const steps = [
   },
 ] as const;
 
-const MapStepperForm = ({ form, map_id, onSubmit }: MapStepperFormProps) => {
+const MapStepperForm = ({ onSubmit }: MapStepperFormProps) => {
+  const {
+    formState: { errors },
+  } = useFormContext<z.infer<typeof createMapSchema>>();
   const [currentStep, setCurrentStep] = React.useState(1);
 
   const next = () => {
@@ -76,6 +76,18 @@ const MapStepperForm = ({ form, map_id, onSubmit }: MapStepperFormProps) => {
             step={index + 1}
             completed={currentStep > index + 1}
             className="flex-col! relative flex-1"
+            onError={() => {
+              switch (step.id) {
+                case "name":
+                  return errors.map?.title || errors.map?.description;
+                case "location":
+                  return (
+                    errors.map?.lat || errors.map?.lng || errors.map?.bounds
+                  );
+                default:
+                  return false;
+              }
+            }}
           >
             <StepperTrigger className="flex-col gap-3 rounded">
               <StepperIndicator />
@@ -94,11 +106,7 @@ const MapStepperForm = ({ form, map_id, onSubmit }: MapStepperFormProps) => {
       </Stepper>
 
       {/* Form */}
-      <div className="mt-8">
-        <Form {...form}>
-          <StepComponent form={form} map_id={map_id!} />
-        </Form>
-      </div>
+      <StepComponent />
 
       {/* Navigation */}
       <div className="flex justify-between pt-4">

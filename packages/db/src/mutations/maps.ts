@@ -1,4 +1,3 @@
-import { map_users, maps } from "../schemas";
 import { NewMap, NewMapUser } from "@buzztrip/db/types";
 import {
   map_usersEditSchema,
@@ -9,12 +8,9 @@ import {
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { Database } from "..";
+import { map_users, maps } from "../schemas";
 
-export const CreateMapSchema = z.object({
-  title: z.string(),
-  description: z.string().nullish(),
-  userId: z.string(),
-});
+export const CreateMapSchema = mapsEditSchema;
 
 export const CreateMapReturnSchema = z.object({
   map: mapsSchema,
@@ -31,8 +27,7 @@ export const createMap = async (
   { userId, input }: CreateMapParams
 ): Promise<z.infer<typeof CreateMapReturnSchema>> => {
   const newMap: NewMap = {
-    title: input.title,
-    description: input.description,
+    ...input,
     owner_id: userId,
   };
 
