@@ -10,7 +10,6 @@ import { z } from "@hono/zod-openapi";
 export const MapParamsSchema = z.object({
   mapId: z
     .string()
-    .min(36)
     .openapi({
       param: {
         name: "mapId",

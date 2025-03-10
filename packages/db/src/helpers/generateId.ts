@@ -17,7 +17,7 @@ function generateRandomString(length: number): string {
 }
 
 const prefixes = {
-  generic: "",
+  generic: "id",
   place: "bt",
   map: "map",
   marker: "mar",

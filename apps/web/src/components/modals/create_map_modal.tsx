@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/drawer";
 import { Form } from "@/components/ui/form";
 import { apiClient } from "@/server/api.client";
+import { CreateMapSchema } from "@buzztrip/db/mutations/maps";
 import { Map } from "@buzztrip/db/types";
 import { useAuth } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,7 +31,6 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { createMapSchema } from "../map-form/helpers";
 
 export interface CreateMapModalProps {
   setMap?: (map: Map | null) => void;
@@ -48,7 +48,7 @@ export default function CreateMapModal({ setMap }: CreateMapModalProps) {
             <Plus className="mr-2 h-4 w-4" /> Create Map
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className="h-10/12 justify-start items-start space-y-2">
           <DialogHeader>
             <DialogTitle>Create Map</DialogTitle>
             <DialogDescription>Start your travel plans here</DialogDescription>
@@ -60,7 +60,7 @@ export default function CreateMapModal({ setMap }: CreateMapModalProps) {
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
+    <Drawer open={open} onOpenChange={setOpen} activeSnapPoint={1}>
       <DrawerTrigger asChild>
         <Button variant="outline">
           <Plus className="mr-2 h-4 w-4" /> Create Map
@@ -87,8 +87,8 @@ function MapForm({
   setOpen,
 }: CreateMapModalProps & { setOpen: (open: boolean) => void }) {
   const { userId } = useAuth();
-  const form = useForm<z.infer<typeof createMapSchema>>({
-    resolver: zodResolver(createMapSchema),
+  const form = useForm<z.infer<typeof CreateMapSchema>>({
+    resolver: zodResolver(CreateMapSchema),
     defaultValues: {
       map: {
         owner_id: userId!,
@@ -104,22 +104,25 @@ function MapForm({
     formState: { errors },
   } = form;
 
-  const onSubmit = async (data: z.infer<typeof createMapSchema>) => {
+  const onSubmit = async (data: z.infer<typeof CreateMapSchema>) => {
     try {
       const { map, users } = data;
 
-      // const newUsers =
-      //   users?.map((user) => {
-      //     return {
-      //       user_id: user.user_id,
-      //       permission: user.permission,
-      //     };
-      //   }) ?? null;
+      const newUsers =
+        users?.map((user) => {
+          return {
+            user_id: user.user_id,
+            permission: user.permission,
+          };
+        }) ?? null;
 
       const create = apiClient.map.create.$post({
         json: {
-          ...map,
-          owner_id: userId!,
+          map: {
+            ...map,
+            owner_id: userId!,
+          },
+          users: newUsers,
         },
       });
 

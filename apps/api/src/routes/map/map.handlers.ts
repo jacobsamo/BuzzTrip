@@ -98,7 +98,7 @@ export const createMapHandler: AppRouteHandler<typeof createMapRoute> = async (
 
     const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
     const data = await createMap(db, {
-      userId: req.owner_id,
+      userId: req.map.owner_id,
       input: req,
     });
 

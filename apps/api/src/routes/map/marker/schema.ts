@@ -8,7 +8,6 @@ import { MapParamsSchema } from "../schema";
 export const MarkerParamsSchema = MapParamsSchema.extend({
   markerId: z
     .string()
-    .min(36)
     .openapi({
       param: {
         name: "markerId",

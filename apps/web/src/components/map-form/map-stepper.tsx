@@ -7,13 +7,13 @@ import {
   StepperTitle,
   StepperTrigger,
 } from "@/components/ui/stepper";
+import { CreateMapSchema } from "@buzztrip/db/mutations/maps";
 import dynamic from "next/dynamic";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
 import MapDetailsForm from "./details";
-import { createMapSchema } from "./helpers";
 import MapShareForm from "./share";
 
 const MapLocationForm = dynamic(() => import("./location"), { ssr: false });
@@ -46,7 +46,7 @@ const steps = [
 const MapStepperForm = ({ onSubmit }: MapStepperFormProps) => {
   const {
     formState: { errors },
-  } = useFormContext<z.infer<typeof createMapSchema>>();
+  } = useFormContext<z.infer<typeof CreateMapSchema>>();
   const [currentStep, setCurrentStep] = React.useState(1);
 
   const next = () => {
@@ -68,7 +68,7 @@ const MapStepperForm = ({ onSubmit }: MapStepperFormProps) => {
   const StepComponent = steps[stepIndex]!.component;
 
   return (
-    <div className="space-y-8">
+    <div className="flex flex-col justify-between h-ull w-full space-y-3">
       <Stepper value={currentStep} onValueChange={setCurrentStep}>
         {steps.map((step, index) => (
           <StepperItem
@@ -109,7 +109,7 @@ const MapStepperForm = ({ onSubmit }: MapStepperFormProps) => {
       <StepComponent />
 
       {/* Navigation */}
-      <div className="flex justify-between pt-4">
+      <div className="absolute bottom-2 left-2 right-2 flex justify-between pt-4">
         <Button
           type="button"
           variant="outline"

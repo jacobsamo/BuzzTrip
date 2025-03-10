@@ -5,7 +5,6 @@ import { MapParamsSchema } from "../schema";
 export const CollectionParamsSchema = MapParamsSchema.extend({
   collectionId: z
     .string()
-    .min(36)
     .openapi({
       param: {
         name: "collectionId",

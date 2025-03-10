@@ -10,7 +10,15 @@ import { z } from "zod";
 import { Database } from "..";
 import { map_users, maps } from "../schemas";
 
-export const CreateMapSchema = mapsEditSchema;
+export const ShareMapUserSchema = map_usersEditSchema.omit({
+  map_id: true,
+  map_user_id: true,
+});
+
+export const CreateMapSchema = z.object({
+  users: ShareMapUserSchema.array().nullish(),
+  map: mapsEditSchema,
+});
 
 export const CreateMapReturnSchema = z.object({
   map: mapsSchema,
@@ -26,8 +34,10 @@ export const createMap = async (
   db: Database,
   { userId, input }: CreateMapParams
 ): Promise<z.infer<typeof CreateMapReturnSchema>> => {
+  const { map, users } = input;
+
   const newMap: NewMap = {
-    ...input,
+    ...map,
     owner_id: userId,
   };
 
@@ -45,7 +55,16 @@ export const createMap = async (
     permission: "owner",
   };
 
-  const sharedMap = await db.insert(map_users).values(shared_map).returning();
+  const sharedMap = await shareMap(db, {
+    users: [
+      ...(users ?? []),
+      {
+        user_id: userId,
+        permission: "owner",
+      },
+    ],
+    mapId: createdMap.map_id,
+  });
 
   if (!sharedMap) {
     throw new Error("Error creating new shared map.", {
@@ -55,7 +74,7 @@ export const createMap = async (
 
   return {
     map: createdMap,
-    shared_map: sharedMap,
+    shared_map: sharedMap.users,
   };
 };
 
@@ -112,11 +131,6 @@ export const deleteMap = async (
 
   return { mapId: deletedMap.deletedId };
 };
-
-export const ShareMapUserSchema = map_usersEditSchema.omit({
-  map_id: true,
-  map_user_id: true,
-});
 
 export type TShareMapUserSchema = z.infer<typeof ShareMapUserSchema>;
 

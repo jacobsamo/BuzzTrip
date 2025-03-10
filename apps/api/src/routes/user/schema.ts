@@ -4,7 +4,6 @@ import { z } from "@hono/zod-openapi";
 export const MapsParamsSchema = z.object({
   userId: z
     .string()
-    .min(32)
     .openapi({
       param: {
         name: "userId",
