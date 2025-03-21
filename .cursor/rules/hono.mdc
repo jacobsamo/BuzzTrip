@@ -1,5 +1,5 @@
 ---
-description: 
-globs: 
+description: Best practices for using hono with cloudflare workers
+globs: apps/api/**/*.(ts|tsx)
 alwaysApply: false
 ---

@@ -1,4 +1,5 @@
 "use client";
+import { mapFormSchema } from "@/components/map-form/helpers";
 import MapStepperForm from "@/components/map-form/map-stepper";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +22,6 @@ import {
 } from "@/components/ui/drawer";
 import { Form } from "@/components/ui/form";
 import { apiClient } from "@/server/api.client";
-import { CreateMapSchema } from "@buzztrip/db/mutations/maps";
 import { Map } from "@buzztrip/db/types";
 import { useAuth } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -87,8 +87,8 @@ function MapForm({
   setOpen,
 }: CreateMapModalProps & { setOpen: (open: boolean) => void }) {
   const { userId } = useAuth();
-  const form = useForm<z.infer<typeof CreateMapSchema>>({
-    resolver: zodResolver(CreateMapSchema),
+  const form = useForm<z.infer<typeof mapFormSchema>>({
+    resolver: zodResolver(mapFormSchema),
     defaultValues: {
       map: {
         owner_id: userId!,
@@ -104,7 +104,7 @@ function MapForm({
     formState: { errors },
   } = form;
 
-  const onSubmit = async (data: z.infer<typeof CreateMapSchema>) => {
+  const onSubmit = async (data: z.infer<typeof mapFormSchema>) => {
     try {
       const { map, users } = data;
 

@@ -138,9 +138,9 @@ function ShareMapForm({ map_id }: ShareMapProps) {
     });
   };
 
-  const removeUser = (userId: string) => {
+  const removeUser = (user_id: string) => {
     setSelectedUsers((prev) =>
-      prev ? prev.filter((u) => u.user_id !== userId) : null
+      prev ? prev.filter((u) => u.user_id !== user_id) : null
     );
   };
 
@@ -204,21 +204,21 @@ function ShareMapForm({ map_id }: ShareMapProps) {
         {users &&
           users.map((user) => {
             const userSelected = selectedUsers?.find(
-              (u) => u.user_id === user.userId
+              (u) => u.user_id === user.user_id
             );
 
             return (
               <Button
-                key={user.userId}
+                key={user.user_id}
                 onClick={() => {
                   const userSelected = selectedUsers?.find(
-                    (u) => u.user_id === user.userId
+                    (u) => u.user_id === user.user_id
                   );
                   if (userSelected) {
-                    removeUser(user.userId);
+                    removeUser(user.user_id);
                   } else {
                     handleChange({
-                      user_id: user.userId,
+                      user_id: user.user_id,
                       permission: "editor",
                     });
                   }
@@ -235,7 +235,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
                     <Image
                       width={32}
                       height={32}
-                      alt={user.email ?? user.userId}
+                      alt={user.email ?? user.user_id}
                       src={user.profile_picture}
                       className="h-8 w-8 rounded-full"
                       unoptimized
@@ -249,7 +249,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
                   value={userSelected ? userSelected.permission : "editor"}
                   onValueChange={(e) => {
                     handleChange({
-                      user_id: user.userId,
+                      user_id: user.user_id,
                       permission: (e as PermissionEnum) ?? "editor",
                     });
                   }}

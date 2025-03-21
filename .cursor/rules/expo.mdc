@@ -1,5 +1,5 @@
 ---
-description: 
-globs: 
+description: Best practice for expo
+globs: apps/mobile
 alwaysApply: false
 ---

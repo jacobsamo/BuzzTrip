@@ -16,7 +16,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { apiClient } from "@/server/api.client";
-import { CreateMapSchema } from "@buzztrip/db/mutations/maps";
 import { PermissionEnum } from "@buzztrip/db/types";
 import {
   permissionEnumSchema,
@@ -29,6 +28,8 @@ import Image from "next/image";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
+import { mapFormSchema } from "./helpers";
+
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const userSchema = refinedUserSchema.extend({
@@ -39,7 +40,7 @@ type RefinedUser = z.infer<typeof userSchema>;
 
 const MapShareForm = () => {
   const { getValues, setValue } =
-    useFormContext<z.infer<typeof CreateMapSchema>>();
+    useFormContext<z.infer<typeof mapFormSchema>>();
   const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
   const { data: users, isLoading } = useQuery({
     queryKey: ["search", searchValue === undefined ? "buzztrip" : searchValue],

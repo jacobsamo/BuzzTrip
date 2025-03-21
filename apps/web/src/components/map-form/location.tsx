@@ -1,6 +1,5 @@
 "use client";
 import { AutocompleteCustomInput } from "@/components/mapping/google-maps/search-new";
-import { CreateMapSchema } from "@buzztrip/db/mutations/maps";
 import {
   AdvancedMarker,
   APIProvider,
@@ -11,11 +10,12 @@ import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import MarkerPin from "../mapping/google-maps/marker_pin";
+import { mapFormSchema } from "./helpers";
 
 const MapLocationForm = () => {
   const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
   const { setValue, getValues } =
-    useFormContext<z.infer<typeof CreateMapSchema>>();
+    useFormContext<z.infer<typeof mapFormSchema>>();
 
   return (
     <APIProvider

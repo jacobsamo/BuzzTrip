@@ -12,6 +12,7 @@ import {
   routes,
   users,
   routeTravelTypeEnum,
+  labels,
 } from "../schemas";
 import { iconsList } from "../types";
 
@@ -64,6 +65,13 @@ export const mapsSchema = createSelectSchema(maps).extend({
 export const mapsEditSchema = createInsertSchema(maps).extend({
   icon: iconSchema.nullable(),
   bounds: bounds.nullable(),
+});
+
+export const labelsSchema = createSelectSchema(labels).extend({
+  icon: iconSchema,
+}); 
+export const labelsEditSchema = createInsertSchema(labels).extend({
+  icon: iconSchema,
 });
 
 export const markersSchema = createSelectSchema(markers).extend({

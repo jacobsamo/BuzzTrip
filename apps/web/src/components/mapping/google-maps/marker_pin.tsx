@@ -8,7 +8,6 @@ interface MarkerPinProps extends Omit<IconProps, "name" | "color"> {
   backgroundColor?: string;
   icon?: IconType;
   color?: string | null;
-  name?: string;
 }
 
 const MarkerPin = ({

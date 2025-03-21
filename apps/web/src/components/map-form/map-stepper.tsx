@@ -7,7 +7,6 @@ import {
   StepperTitle,
   StepperTrigger,
 } from "@/components/ui/stepper";
-import { CreateMapSchema } from "@buzztrip/db/mutations/maps";
 import dynamic from "next/dynamic";
 import React from "react";
 import { useFormContext } from "react-hook-form";
@@ -15,6 +14,7 @@ import { z } from "zod";
 import { Button } from "../ui/button";
 import MapDetailsForm from "./details";
 import MapShareForm from "./share";
+import { mapFormSchema } from "./helpers";
 
 const MapLocationForm = dynamic(() => import("./location"), { ssr: false });
 
@@ -46,7 +46,7 @@ const steps = [
 const MapStepperForm = ({ onSubmit }: MapStepperFormProps) => {
   const {
     formState: { errors },
-  } = useFormContext<z.infer<typeof CreateMapSchema>>();
+  } = useFormContext<z.infer<typeof mapFormSchema>>();
   const [currentStep, setCurrentStep] = React.useState(1);
 
   const next = () => {

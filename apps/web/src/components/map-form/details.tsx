@@ -7,12 +7,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CreateMapSchema } from "@buzztrip/db/mutations/maps";
+import { mapFormSchema } from "./helpers";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 
 const MapDetailsForm = () => {
-  const { control } = useFormContext<z.infer<typeof CreateMapSchema>>();
+  const { control } = useFormContext<z.infer<typeof mapFormSchema>>();
 
   return (
     <div className="space-y-4">
