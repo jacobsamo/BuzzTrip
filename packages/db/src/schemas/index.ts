@@ -24,7 +24,7 @@ export const mapsRelations = relations(maps, ({ one, many }) => ({
   map_users: many(map_users),
   user: one(users, {
     fields: [maps.owner_id],
-    references: [users.user_id],
+    references: [users.id],
   }),
   markers: many(markers),
   labels: many(labels),
@@ -41,7 +41,7 @@ export const collectionsRelations = relations(collections, ({ one, many }) => ({
   collection_links: many(collection_links),
   user: one(users, {
     fields: [collections.created_by],
-    references: [users.user_id],
+    references: [users.id],
   }),
   map: one(maps, {
     fields: [collections.map_id],
@@ -61,7 +61,7 @@ export const markersRelations = relations(markers, ({ one, many }) => ({
   }),
   user: one(users, {
     fields: [markers.created_by],
-    references: [users.user_id],
+    references: [users.id],
   }),
   route_stops: many(route_stops),
 }));
@@ -83,7 +83,7 @@ export const collectionLinksRelations = relations(
     }),
     user: one(users, {
       fields: [collection_links.user_id],
-      references: [users.user_id],
+      references: [users.id],
     }),
   })
 );
@@ -98,8 +98,8 @@ export const usersRelations = relations(users, ({ many }) => ({
 
 export const mapUsersRelations = relations(map_users, ({ one }) => ({
   user: one(users, {
-    fields: [map_users.user_id],
-    references: [users.user_id],
+    fields: [map_users.map_user_id],
+    references: [users.id],
   }),
   map: one(maps, {
     fields: [map_users.map_id],
@@ -114,7 +114,7 @@ export const placesRelations = relations(places, ({ many }) => ({
 export const routeRelations = relations(routes, ({ one, many }) => ({
   user: one(users, {
     fields: [routes.user_id],
-    references: [users.user_id],
+    references: [users.id],
   }),
   routeStops: many(route_stops),
 }));

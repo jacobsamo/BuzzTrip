@@ -49,7 +49,7 @@ export const usersSchema = createSelectSchema(users);
 export const usersEditSchema = createInsertSchema(users);
 
 export const refinedUserSchema = usersSchema.pick({
-  user_id: true,
+  id: true,
   email: true,
   username: true,
   first_name: true,

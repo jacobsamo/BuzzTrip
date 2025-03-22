@@ -6,6 +6,7 @@
   "types": "./src/types/index.ts",
   "scripts": {
     "clean:all": "rm -rf node_modules/",
+    "db:auth": "bunx @better-auth/cli generate --config ../api/src/common/auth.ts --output ./src/schemas/auth.ts",
     "db:studio": "drizzle-kit studio",
     "db:studio:prd": "cross-env NODE_ENV=production drizzle-kit studio",
     "db:generate": "drizzle-kit generate",

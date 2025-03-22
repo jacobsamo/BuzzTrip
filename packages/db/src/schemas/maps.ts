@@ -6,13 +6,13 @@ import {
   sqliteTable,
   text,
 } from "drizzle-orm/sqlite-core";
+import z from "zod";
 import { generateId } from "../helpers";
 import type { IconType } from "../types";
 import { bounds } from "../zod-schemas";
 import { users } from "./auth";
 import { cascadeActions, cascadeUpdate } from "./helpers";
 import { places } from "./places";
-import z from "zod";
 
 // enums
 export const permissionEnum = [
@@ -40,7 +40,7 @@ export const maps = sqliteTable("maps", {
   icon: text("icon").$type<IconType>(),
   color: text("color"),
   owner_id: text("owner_id")
-    .references(() => users.user_id, cascadeUpdate)
+    .references(() => users.id, cascadeUpdate)
     .notNull(),
   lat: real("lat"),
   lng: real("lng"),
@@ -54,6 +54,7 @@ export const maps = sqliteTable("maps", {
 });
 
 export const map_users = sqliteTable("map_users", {
+  /**The id for the link table */
   map_user_id: text("map_user_id")
     .primaryKey()
     .notNull()
@@ -61,8 +62,9 @@ export const map_users = sqliteTable("map_users", {
   map_id: text("map_id")
     .references(() => maps.map_id, cascadeActions)
     .notNull(),
+  /**The user id that links the user to the map */
   user_id: text("user_id")
-    .references(() => users.user_id, cascadeUpdate)
+    .references(() => users.id, cascadeUpdate)
     .notNull(),
   permission: text("permission", {
     enum: permissionEnum,
@@ -108,7 +110,7 @@ export const markers = sqliteTable("markers", {
   lng: real("lng").notNull(),
   created_by: text("created_by")
     .notNull()
-    .references(() => users.user_id, cascadeUpdate),
+    .references(() => users.id, cascadeUpdate),
   icon: text("icon").$type<IconType>().notNull(),
   color: text("color"),
   place_id: text("place_id")
@@ -137,7 +139,7 @@ export const collections = sqliteTable("collections", {
   description: text("description"),
   created_by: text("created_by")
     .notNull()
-    .references(() => users.user_id, cascadeUpdate),
+    .references(() => users.id, cascadeUpdate),
   icon: text("icon").$type<IconType>().notNull(),
   color: text("color"),
   created_at: text("created_at")
@@ -164,7 +166,7 @@ export const collection_links = sqliteTable("collection_links", {
     .references(() => maps.map_id, cascadeActions)
     .notNull(),
   user_id: text("user_id")
-    .references(() => users.user_id, cascadeUpdate)
+    .references(() => users.id, cascadeUpdate)
     .notNull(),
   created_at: text("created_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
@@ -187,7 +189,7 @@ export const routes = sqliteTable("routes", {
     .default("driving")
     .notNull(),
   user_id: text("user_id")
-    .references(() => users.user_id, cascadeUpdate)
+    .references(() => users.id, cascadeUpdate)
     .notNull(),
   created_at: text("created_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
@@ -210,7 +212,7 @@ export const route_stops = sqliteTable("route_stops", {
     cascadeActions
   ),
   user_id: text("user_id")
-    .references(() => users.user_id, cascadeUpdate)
+    .references(() => users.id, cascadeUpdate)
     .notNull(),
   lat: real("lat").notNull(),
   lng: real("lng").notNull(),

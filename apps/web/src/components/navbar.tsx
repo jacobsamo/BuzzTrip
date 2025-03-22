@@ -26,14 +26,14 @@ const Navbar = () => {
           Features
         </Link>
         <div>
-          <SignedOut>
+          {/* <SignedOut>
             <SignInButton />
           </SignedOut>
           <SignedIn>
             <Link href={"/app"} className={buttonVariants({ variant: "link" })}>
               Go To app
             </Link>
-          </SignedIn>
+          </SignedIn> */}
         </div>
         {/* <Link
             className="text-sm font-medium underline-offset-4 hover:underline"

@@ -125,7 +125,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
       if (!prev) return [user];
 
       const existingUserIndex = prev.findIndex(
-        (u) => u.user_id === user.user_id
+        (u) => u.id === user.id
       );
 
       if (existingUserIndex !== -1) {
@@ -138,9 +138,9 @@ function ShareMapForm({ map_id }: ShareMapProps) {
     });
   };
 
-  const removeUser = (user_id: string) => {
+  const removeUser = (id: string) => {
     setSelectedUsers((prev) =>
-      prev ? prev.filter((u) => u.user_id !== user_id) : null
+      prev ? prev.filter((u) => u.id !== id) : null
     );
   };
 
@@ -204,21 +204,21 @@ function ShareMapForm({ map_id }: ShareMapProps) {
         {users &&
           users.map((user) => {
             const userSelected = selectedUsers?.find(
-              (u) => u.user_id === user.user_id
+              (u) => u.id === user.id
             );
 
             return (
               <Button
-                key={user.user_id}
+                key={user.id}
                 onClick={() => {
                   const userSelected = selectedUsers?.find(
-                    (u) => u.user_id === user.user_id
+                    (u) => u.id === user.id
                   );
                   if (userSelected) {
-                    removeUser(user.user_id);
+                    removeUser(user.id);
                   } else {
                     handleChange({
-                      user_id: user.user_id,
+                      id: user.id,
                       permission: "editor",
                     });
                   }
@@ -235,7 +235,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
                     <Image
                       width={32}
                       height={32}
-                      alt={user.email ?? user.user_id}
+                      alt={user.email ?? user.id}
                       src={user.profile_picture}
                       className="h-8 w-8 rounded-full"
                       unoptimized
@@ -249,7 +249,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
                   value={userSelected ? userSelected.permission : "editor"}
                   onValueChange={(e) => {
                     handleChange({
-                      user_id: user.user_id,
+                      id: user.id,
                       permission: (e as PermissionEnum) ?? "editor",
                     });
                   }}

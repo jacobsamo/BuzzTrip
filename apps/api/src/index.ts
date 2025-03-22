@@ -1,4 +1,6 @@
+import { sentry } from "@hono/sentry";
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { cors } from "hono/cors";
 import { requestId } from "hono/request-id";
 import { Bindings } from "./common/bindings";
 import {
@@ -6,13 +8,12 @@ import {
   loggingMiddleware,
   securityMiddleware,
 } from "./middleware";
+import { authHandler } from "./routes/auth";
 import mapRoutes from "./routes/map";
-import userRoutes from "./routes/user";
-import markerRoutes from "./routes/map/marker";
 import collectionRoutes from "./routes/map/collection";
-import { cors } from "hono/cors";
+import markerRoutes from "./routes/map/marker";
+import userRoutes from "./routes/user";
 import authRoutes from "./routes/webhooks/auth";
-import { sentry } from "@hono/sentry";
 
 const app = new OpenAPIHono<{ Bindings: Bindings }>({
   defaultHook: (result, c) => {
@@ -26,8 +27,11 @@ app.use("*", (c, next) => {
   if (c.req.header("Origin") == c.env.FRONT_END_URL) {
     return cors({
       origin: c.env.FRONT_END_URL, // Front end url for cors
-      allowMethods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
+      allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow specific methods
       allowHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+      exposeHeaders: ["Content-Length"],
+      maxAge: 600,
+      credentials: true,
     })(c, next);
   }
   return cors({
@@ -62,12 +66,16 @@ app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
 });
 
 app.route("/", authRoutes);
+app.route("/", authHandler);
 
 const routes = app
   .route("/", userRoutes)
   .route("/", mapRoutes)
   .route("/", markerRoutes)
   .route("/", collectionRoutes);
+
+// Export any neccariy items for either build or other apps
+export { createAuth } from "./common/auth";
 
 export type AppType = typeof routes;
 export default app;

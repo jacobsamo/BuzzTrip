@@ -1,10 +1,13 @@
 export interface Bindings {
-  CLERK_WEBHOOK_SECRET: string;
+  AUTH_SECRET: string;
   TURSO_CONNECTION_URL: string;
   TURSO_AUTH_TOKEN: string;
+  API_URL: string;
   API_SECRET_KEY: string;
   FRONT_END_URL: string;
   SENTRY_DSN: string;
+  GOOGLE_CLIENT_SECRET: string;
+  GOOGLE_CLIENT_ID: string;
 }
 
 export interface AppBindings {

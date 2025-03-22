@@ -48,71 +48,73 @@ export const clerkWebhookHandler: AppRouteHandler<
       );
     }
 
-    const wh = new Webhook(c.env.CLERK_WEBHOOK_SECRET);
+    // const wh = new Webhook(c.env.CLERK_WEBHOOK_SECRET);
 
-    let event: WebhookEvent | null = null;
+    // let event: WebhookEvent | null = null;
 
-    try {
-      event = wh.verify(payload, {
-        "svix-id": svix_id,
-        "svix-timestamp": svix_timestamp,
-        "svix-signature": svix_signature,
-      }) as WebhookEvent;
-    } catch (err) {
-      if (err instanceof Error) {
-        console.error("Error verifying webhook:", err);
-        throw Error("Failed to verify webhook", err);
-      }
-      throw Error("Failed to verify webhook");
-    }
+    // try {
+    //   event = wh.verify(payload, {
+    //     "svix-id": svix_id,
+    //     "svix-timestamp": svix_timestamp,
+    //     "svix-signature": svix_signature,
+    //   }) as WebhookEvent;
+    // } catch (err) {
+    //   if (err instanceof Error) {
+    //     console.error("Error verifying webhook:", err);
+    //     throw Error("Failed to verify webhook", err);
+    //   }
+    //   throw Error("Failed to verify webhook");
+    // }
 
-    const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+    // const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
-    if (!event) {
-      throw Error("No event found");
-    }
+    // if (!event) {
+    //   throw Error("No event found");
+    // }
 
-    switch (event.type) {
-      case "user.created":
-        const email = event.data.primary_email_address_id
-          ? event.data.email_addresses.find(
-              (eml) => eml.id === event.data.primary_email_address_id
-            )
-          : event.data.email_addresses[0];
+    // switch (event.type) {
+    //   case "user.created":
+    //     // const email = event.data.primary_email_address_id
+    //     //   ? event.data.email_addresses.find(
+    //     //       (eml) => eml.id === event.data.primary_email_address_id
+    //     //     )
+    //     //   : event.data.email_addresses[0];
 
-        const user: NewUser = {
-          user_id: event.data.id,
-          first_name: event.data.first_name,
-          last_name: event.data.last_name,
-          username: event.data.username,
-          email: email?.email_address!,
-          profile_picture: event.data.image_url,
-        };
+    //     // const user: NewUser = {
+    //     //   id: event.data.id,
+    //     //   first_name: event.data.first_name,
+    //     //   last_name: event.data.last_name,
+    //     //   username: event.data.username,
+    //     //   email: email?.email_address!,
+    //     //   profile_picture: event.data.image_url,
+    //     // };
 
-        await db.insert(users).values(user);
+    //     // await db.insert(users).values(user);
 
-        break;
-      case "user.deleted":
-        if (!event.data.id) break;
+    //     break;
+    //   case "user.deleted":
+    //     if (!event.data.id) break;
 
-        await db.delete(users).where(eq(users.user_id, event.data.id));
+    //     await db.delete(users).where(eq(users.id, event.data.id));
 
-        break;
-      case "user.updated":
-        const updatedUser: Omit<NewUser, "user_id" | "email"> = {
-          first_name: event.data.first_name,
-          last_name: event.data.last_name,
-          username: event.data.username,
-          profile_picture: event.data.image_url,
-        };
+    //     break;
+    //   case "user.updated":
+    //     // const updatedUser: Omit<NewUser, "user_id" | "email"> = {
+    //     //   id: event.data.id,
+    //     //   first_name: event.data.first_name,
+    //     //   last_name: event.data.last_name,
+    //     //   username: event.data.username,
+    //     //   updated_at: event.data.updated_at,
+    //     //   profile_picture: event.data.image_url,
+    //     // };
 
-        await db
-          .update(users)
-          .set(updatedUser)
-          .where(eq(users.user_id, event.data.id));
+    //     // await db
+    //     //   .update(users)
+    //     //   .set(updatedUser)
+    //     //   .where(eq(users.id, event.data.id));
 
-        break;
-    }
+    //     break;
+    // }
 
     return c.json({ message: "Received" }, 200);
   } catch (error) {

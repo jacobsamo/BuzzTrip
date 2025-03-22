@@ -45,7 +45,7 @@ export const searchUserHandler: AppRouteHandler<
       {
         users: users.map((user) => {
           return {
-            user_id: user.user_id,
+            id: user.id,
             email: user.email,
             username: user.username,
             first_name: user.first_name,
