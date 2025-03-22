@@ -6,4 +6,3 @@ alwaysApply: false
 - Use the App Router for better performance and improved data fetching.
 - Implement proper error boundaries to handle runtime errors gracefully.
 - Utilize Next.js built-in optimizations like code splitting and image optimization.
-- Leverage Incremental Static Regeneration (ISR) for dynamic content. 
