@@ -21,9 +21,9 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Form } from "@/components/ui/form";
+import { useSession } from "@/lib/auth-client";
 import { apiClient } from "@/server/api.client";
 import { Map } from "@buzztrip/db/types";
-import { useAuth } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Plus } from "lucide-react";
@@ -86,7 +86,9 @@ function MapForm({
   setMap,
   setOpen,
 }: CreateMapModalProps & { setOpen: (open: boolean) => void }) {
-  const { userId } = useAuth();
+  const { data } = useSession();
+  const userId = data?.session.userId;
+  
   const form = useForm<z.infer<typeof mapFormSchema>>({
     resolver: zodResolver(mapFormSchema),
     defaultValues: {

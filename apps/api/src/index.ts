@@ -13,7 +13,6 @@ import mapRoutes from "./routes/map";
 import collectionRoutes from "./routes/map/collection";
 import markerRoutes from "./routes/map/marker";
 import userRoutes from "./routes/user";
-import authRoutes from "./routes/webhooks/auth";
 
 const app = new OpenAPIHono<{ Bindings: Bindings }>({
   defaultHook: (result, c) => {
@@ -65,7 +64,6 @@ app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
   scheme: "bearer",
 });
 
-app.route("/", authRoutes);
 app.route("/", authHandler);
 
 const routes = app

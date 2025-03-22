@@ -33,7 +33,6 @@ import { popularIconsList } from "@buzztrip/components/icon";
 import type { IconType } from "@buzztrip/db/types";
 import { CombinedMarker } from "@buzztrip/db/types";
 import { combinedMarkersSchema } from "@buzztrip/db/zod-schemas";
-import { useAuth } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Circle, CircleCheck } from "lucide-react";
@@ -44,6 +43,7 @@ import { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useSession } from "@/lib/auth-client";
 import IconPickerModal from "../icon-picker-modal";
 
 const Icon = dynamic(() => import("@buzztrip/components/icon"), { ssr: false });
@@ -136,7 +136,9 @@ function MarkerForm() {
     setMarkerOpen,
     markerOpen,
   } = useMapStore((store) => store);
-  const { userId } = useAuth();
+  const {data} = useSession();
+  const userId = data?.session.userId;
+
   const { mode, marker } = markerOpen;
   const [inCollections, setInCollections] = React.useState<string[] | null>(
     null

@@ -1,24 +1,25 @@
-import { auth } from "@clerk/nextjs/server";
+import { getSession } from "@/server/getSession";
 import * as Sentry from "@sentry/nextjs";
 import { headers } from "next/headers";
 
 export default async function NotFound() {
-  const { userId } = await auth();
+  const { data } = await getSession();
+
   const headersList = await headers();
   const path = headersList.get("referer");
 
   Sentry.addBreadcrumb({
     data: {
       path: path,
-      userId: userId,
+      userId: data?.session.userId,
     },
     category: "request",
   });
   Sentry.captureMessage("User attempted to access a map that does not exist", {
     level: "warning",
-    user: userId
+    user: data?.session.userId
       ? {
-          id: userId,
+          id: data?.session.userId,
         }
       : undefined,
   });

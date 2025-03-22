@@ -2,9 +2,9 @@ import { Map_page } from "@/components/layouts/map-view";
 import { MapStoreProvider } from "@/components/providers/map-state-provider";
 import { constructMetadata } from "@/lib/utils/metadata";
 import { db } from "@/server/db";
+import { getSession } from "@/server/getSession";
 import { getAllMapData } from "@buzztrip/db/queries";
 import { maps } from "@buzztrip/db/schemas";
-import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
@@ -25,9 +25,9 @@ export async function generateMetadata({ params }: { params: Params }) {
 
 export default async function MapPage({ params }: { params: Params }) {
   const { map_id } = await params;
-  const { userId } = await auth();
+  const { data } = await getSession();
 
-  if (!userId || !map_id) {
+  if (!data || !data.session || !map_id) {
     return notFound();
   }
 
@@ -37,7 +37,7 @@ export default async function MapPage({ params }: { params: Params }) {
   if (
     (sharedMap &&
       sharedMap.length > 0 &&
-      !sharedMap.find((sm) => sm.user_id == userId)) ||
+      !sharedMap.find((sm) => sm.user_id == data.session.userId)) ||
     !map
   ) {
     return notFound();

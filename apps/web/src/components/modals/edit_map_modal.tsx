@@ -22,7 +22,6 @@ import { Form } from "@/components/ui/form";
 import { apiClient } from "@/server/api.client";
 import { Map } from "@buzztrip/db/types";
 import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
-import { useAuth } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Plus } from "lucide-react";
@@ -30,6 +29,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useSession } from "@/lib/auth-client";
 
 export interface EditMapModalProps {
   map: Map;
@@ -87,7 +87,8 @@ function MapForm({
   setOpen,
   map,
 }: EditMapModalProps & { setOpen: (open: boolean) => void }) {
-  const { userId } = useAuth();
+  const {data} = useSession();
+  const userId = data?.session.userId;
   const form = useForm<z.infer<typeof mapsEditSchema>>({
     resolver: zodResolver(mapsEditSchema),
     defaultValues: {

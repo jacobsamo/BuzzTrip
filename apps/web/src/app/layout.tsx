@@ -2,7 +2,6 @@ import { Monitoring } from "react-scan/monitoring/next";
 import Providers from "@/components/providers";
 import "@/lib/styles/globals.css";
 import { constructMetadata } from "@/lib/utils/metadata";
-import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata, Viewport } from "next";
 import React from "react";
 
@@ -22,7 +21,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
       <html lang="en">
         <body>
           <Monitoring
@@ -34,6 +32,5 @@ export default function RootLayout({
           <Providers>{children}</Providers>
         </body>
       </html>
-    </ClerkProvider>
   );
 }

@@ -125,7 +125,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
       if (!prev) return [user];
 
       const existingUserIndex = prev.findIndex(
-        (u) => u.id === user.id
+        (u) => u.user_id === user.user_id
       );
 
       if (existingUserIndex !== -1) {
@@ -140,7 +140,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
 
   const removeUser = (id: string) => {
     setSelectedUsers((prev) =>
-      prev ? prev.filter((u) => u.id !== id) : null
+      prev ? prev.filter((u) => u.user_id !== id) : null
     );
   };
 
@@ -204,7 +204,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
         {users &&
           users.map((user) => {
             const userSelected = selectedUsers?.find(
-              (u) => u.id === user.id
+              (u) => u.user_id === user.id
             );
 
             return (
@@ -212,13 +212,13 @@ function ShareMapForm({ map_id }: ShareMapProps) {
                 key={user.id}
                 onClick={() => {
                   const userSelected = selectedUsers?.find(
-                    (u) => u.id === user.id
+                    (u) => u.user_id === user.id
                   );
                   if (userSelected) {
                     removeUser(user.id);
                   } else {
                     handleChange({
-                      id: user.id,
+                      user_id: user.id,
                       permission: "editor",
                     });
                   }
@@ -249,7 +249,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
                   value={userSelected ? userSelected.permission : "editor"}
                   onValueChange={(e) => {
                     handleChange({
-                      id: user.id,
+                      user_id: user.id,
                       permission: (e as PermissionEnum) ?? "editor",
                     });
                   }}

@@ -29,7 +29,6 @@
     "packages/*"
   ],
   "trustedDependencies": [
-    "@clerk/shared",
     "browser-tabs-lock",
     "core-js",
     "esbuild",

@@ -14,7 +14,6 @@
   "dependencies": {
     "@better-fetch/fetch": "^1.1.17",
     "@buzztrip/db": "workspace:*",
-    "@clerk/nextjs": "^6.12.3",
     "@hookform/resolvers": "^4.1.3",
     "@libsql/client": "^0.14.0",
     "@mapbox/search-js-react": "^1.0.0",

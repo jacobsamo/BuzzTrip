@@ -30,7 +30,6 @@ import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import { mapFormSchema } from "./helpers";
 
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const userSchema = refinedUserSchema.extend({
   permission: permissionEnumSchema,
@@ -65,12 +64,15 @@ const MapShareForm = () => {
   const handleChange = (user: RefinedUser) => {
     const currentUsers = getValues("users") || [];
     const existingUserIndex = currentUsers.findIndex(
-      (u) => u.user_id === user.user_id
+      (u) => u.user_id === user.id
     );
 
     if (existingUserIndex !== -1) {
       const updatedUsers = [...currentUsers];
-      updatedUsers[existingUserIndex] = user;
+      updatedUsers[existingUserIndex] = {
+        user_id: user.id,
+        permission: user.permission,
+      };
       setValue("users", updatedUsers, {
         shouldDirty: true,
         shouldTouch: true,
@@ -82,10 +84,20 @@ const MapShareForm = () => {
         return updated;
       });
     } else {
-      setValue("users", [...currentUsers, user], {
-        shouldDirty: true,
-        shouldTouch: true,
-      });
+      setValue(
+        "users",
+        [
+          ...currentUsers,
+          {
+            user_id: user.id,
+            permission: user.permission,
+          },
+        ],
+        {
+          shouldDirty: true,
+          shouldTouch: true,
+        }
+      );
 
       setSelectedUsers((prev) => [...prev, user]);
     }
@@ -98,7 +110,7 @@ const MapShareForm = () => {
       currentUsers.filter((u) => u.user_id !== user_id),
       { shouldDirty: true }
     );
-    setSelectedUsers((prev) => prev.filter((u) => u.user_id !== user_id));
+    setSelectedUsers((prev) => prev.filter((u) => u.id !== user_id));
   };
 
   return (
@@ -133,8 +145,8 @@ const MapShareForm = () => {
               {!users || !isLoading ? (
                 users?.map((user) => (
                   <CommandItem
-                    key={user.user_id}
-                    value={user.user_id}
+                    key={user.id}
+                    value={user.id}
                     onSelect={() => {
                       // onSearchItemSelect(pred);
                       handleChange({
@@ -148,7 +160,7 @@ const MapShareForm = () => {
                       <Image
                         width={32}
                         height={32}
-                        alt={user.email ?? user.user_id}
+                        alt={user.email ?? user.id}
                         src={user.profile_picture}
                         className="h-8 w-8 rounded-full"
                         unoptimized
@@ -168,18 +180,16 @@ const MapShareForm = () => {
       <ScrollArea className="h-36 w-full flex-col gap-2">
         {selectedUsers &&
           selectedUsers.map((user) => {
-            const userSelected = selectedUsers?.find(
-              (u) => u.user_id === user.user_id
-            );
+            const userSelected = selectedUsers?.find((u) => u.id === user.id);
 
             return (
-              <div key={user.user_id} className="flex items-center gap-2">
+              <div key={user.id} className="flex items-center gap-2">
                 <span className="flex items-center gap-2">
                   {user.profile_picture && (
                     <Image
                       width={32}
                       height={32}
-                      alt={user.email ?? user.user_id}
+                      alt={user.email ?? user.id}
                       src={user.profile_picture}
                       className="h-8 w-8 rounded-full"
                       unoptimized
@@ -209,7 +219,7 @@ const MapShareForm = () => {
                 </Select>
 
                 <Button
-                  onClick={() => removeUser(user.user_id)}
+                  onClick={() => removeUser(user.id)}
                   variant="destructive"
                   size="icon"
                 >
