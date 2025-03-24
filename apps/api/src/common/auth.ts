@@ -2,6 +2,7 @@ import { createDb } from "@buzztrip/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { magicLink } from "better-auth/plugins";
+import { generateOTP } from "./generateOTP";
 
 export const createAuth = (
   baseUrl: string,
@@ -77,16 +78,23 @@ export const createAuth = (
     },
     account: {
       modelName: "user_accounts",
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ["google", "microsoft", "apple"],
+      },
     },
 
     plugins: [
       magicLink({
+        generateToken: (email) => {
+          // TODO: enhance this to be more secure e.g add the email into the mix
+          return generateOTP();
+        },
         sendMagicLink: async ({ email, token, url }, request) => {
           console.log("Requesting to login using OTP", {
             email,
             token,
             url,
-            extra: request,
           });
           //TODO: Setup resend to send these emails to users, for now just console.log it
         },
@@ -106,7 +114,23 @@ export const createAuth = (
       },
       // microsoft: {
       //   clientId: microsoftClientId,
-      //   clientSecret: microsoftScretKey
+      //   clientSecret: microsoftScretKey,
+      //   mapProfileToUser: (profile) => {
+      //     return {
+      //       first_name: profile.name.split(" ")[0],
+      //       last_name: profile.name.split(" ")[1],
+      //     };
+      //   },
+      // },
+      // apple: {
+      //   clientId: appleClientId,
+      //   clientSecret: appleSecretKey,
+      //   mapProfileToUser: (profile) => {
+      //     return {
+      //       first_name: profile.name.split(" ")[0],
+      //       last_name: profile.name.split(" ")[1],
+      //     };
+      //   },
       // }
     },
     advanced: {
@@ -122,3 +146,5 @@ export const createAuth = (
     // },
   });
 };
+
+export type Auth = ReturnType<typeof createAuth>;

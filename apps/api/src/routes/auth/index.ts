@@ -1,6 +1,6 @@
 import { Hono } from "hono";
+import {createAuth} from "../../common/auth";
 import { AppBindings } from "../../common/bindings";
-import { createAuth } from "../../common/auth";
 
 // Handler
 const app = new Hono<AppBindings>();

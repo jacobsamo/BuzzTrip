@@ -1,6 +1,7 @@
 ---
 description: Guidelines for writing Trigger.dev tasks
 globs: "**/trigger/**/*.ts, **/trigger/**/*.tsx"
+alwaysApply: false
 ---
 
 # How to write Trigger.dev tasks
@@ -1266,4 +1267,4 @@ When asked about Trigger.dev task implementation, you MUST:
 1. FIRST use code patterns from this guide
 2. NEVER suggest deprecated approaches
 3. VERIFY your response against the patterns shown here
-4. If an answer cannot be found using this guide, look up further information ONLY from the official LLM-friendly version of the [Trigger.dev docs site](https://trigger.dev/docs/llms.txt).
+4. If an answer cannot be found using this guide, look up further information ONLY from the official LLM-friendly version of the [Trigger.dev docs site](mdc:https:/trigger.dev/docs/llms.txt).

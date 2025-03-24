@@ -73,7 +73,7 @@ const routes = app
   .route("/", collectionRoutes);
 
 // Export any neccariy items for either build or other apps
-export { createAuth } from "./common/auth";
+export * from "./common/auth";
 
 export type AppType = typeof routes;
 export default app;
