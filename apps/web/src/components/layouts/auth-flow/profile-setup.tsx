@@ -14,17 +14,19 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authClient, User, useSession } from "@/lib/auth-client";
 import { usersEditSchema } from "@buzztrip/db/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
-import { Icons } from "./icons";
+import { Icons } from "./helpers";
 
 interface ProfileSetupProps {
   email: string;
-  onComplete: (profileData: any) => void;
+  onComplete: (profileData: User) => void;
 }
 
 const schema = usersEditSchema.pick({
@@ -36,12 +38,16 @@ const schema = usersEditSchema.pick({
 });
 
 export function ProfileSetup({ email, onComplete }: ProfileSetupProps) {
+  const { data } = useSession();
+
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      first_name: "",
-      last_name: "",
-      username: "",
+      first_name: data?.user?.first_name ?? "",
+      last_name: data?.user?.last_name ?? "",
+      username: data?.user?.username ?? "",
+      bio: data?.user?.bio ?? "",
+      profile_picture: data?.user?.image ?? "",
     },
   });
 
@@ -66,16 +72,18 @@ export function ProfileSetup({ email, onComplete }: ProfileSetupProps) {
   };
 
   const handleSubmit = (data: z.infer<typeof schema>) => {
-    setIsLoading(true);
+    const updateUserProfile = authClient.updateUser({
+      image: data.profile_picture,
+      name: data.first_name + " " + data.last_name,
+    });
 
-    // Prepare profile data
-    const profileData = data;
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      onComplete(profileData);
-    }, 1500);
+    toast.promise(updateUserProfile, {
+      loading: "Saving profile...",
+      success: (res) => {
+        return "Profile saved successfully!";
+      },
+      error: "Failed to save profile",
+    });
   };
 
   return (
@@ -117,7 +125,7 @@ export function ProfileSetup({ email, onComplete }: ProfileSetupProps) {
               <FormItem className="space-y-2">
                 <FormLabel>First Name</FormLabel>
                 <FormControl>
-                  <Input value={field?.value ?? ""} {...field} />
+                  <Input {...field} value={field.value ?? ""} />
                 </FormControl>
                 <FormDescription />
                 <FormMessage />
@@ -133,7 +141,7 @@ export function ProfileSetup({ email, onComplete }: ProfileSetupProps) {
               <FormItem className="space-y-2">
                 <FormLabel>Last Name</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} value={field.value ?? ""} />
                 </FormControl>
                 <FormDescription />
                 <FormMessage />
@@ -149,7 +157,7 @@ export function ProfileSetup({ email, onComplete }: ProfileSetupProps) {
               <FormItem className="space-y-2">
                 <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} value={field.value ?? ""} />
                 </FormControl>
                 <FormDescription />
                 <FormMessage />

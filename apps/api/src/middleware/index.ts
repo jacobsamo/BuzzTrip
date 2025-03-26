@@ -1,12 +1,13 @@
-import type { Context, MiddlewareHandler, Next } from "hono";
+import type { Context, Next } from "hono";
 import { env } from "hono/adapter";
 import { bearerAuth } from "hono/bearer-auth";
 import { secureHeaders } from "hono/secure-headers";
 
-const PUBLIC_PATHS = ["/", "/health", "/webhook", "/webhook/auth"];
+const PUBLIC_PATHS = [/\/$/, /\/health$/, /\/webhook\/.*/, /\/auth.*/];
 
 const authMiddleware = (c: Context, next: Next) => {
-  if (PUBLIC_PATHS.includes(c.req.path)) {
+  const path = c.req.path;
+  if (PUBLIC_PATHS.some((regex) => regex.test(path))) {
     return next();
   }
 

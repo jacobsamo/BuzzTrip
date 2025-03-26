@@ -1,12 +1,13 @@
 import { Hono } from "hono";
-import {createAuth} from "../../common/auth";
+import { createAuth } from "../../common/auth";
 import { AppBindings } from "../../common/bindings";
 
 // Handler
 const app = new Hono<AppBindings>();
 
-export const authHandler = app.on(["POST", "GET"], "/api/auth/*", (c) => {
+export const authHandler = app.on(["POST", "GET"], "/auth/*", (c) => {
   const auth = createAuth(
+    c.env.API_URL,
     c.env.FRONT_END_URL,
     c.env.AUTH_SECRET,
     c.env.GOOGLE_CLIENT_ID,

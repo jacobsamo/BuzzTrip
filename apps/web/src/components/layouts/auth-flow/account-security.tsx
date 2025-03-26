@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Icons } from "./icons";
+import { Icons } from "./helpers";
 
 interface AccountSecurityProps {
   onComplete: () => void;

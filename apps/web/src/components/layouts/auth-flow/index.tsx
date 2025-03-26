@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,23 +10,34 @@ import {
 } from "@/components/ui/card";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
-import { parseAsBoolean, useQueryState } from "nuqs";
+import { parseAsBoolean, parseAsStringLiteral, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { AccountSecurity } from "./account-security";
 import { LoginOptions } from "./login-options";
 import { MagicLinkSent } from "./magic-link-sent";
 // import { OtpVerification } from "./otp-verification";
+import { authClient, User } from "@/lib/auth-client";
 import Image from "next/image";
-import { Icons } from "./icons";
+import Link from "next/link";
+import { toast } from "sonner";
+import { authSteps, Icons, providers } from "./helpers";
 import { ProfileSetup } from "./profile-setup";
 
-export const AuthForm = () => {
+interface AuthFormProps {
+  mode: "sign-up" | "sign-in";
+}
+
+export const AuthForm = ({ mode }: AuthFormProps) => {
   const router = useRouter();
 
-  const [authStep, setAuthStep] = useQueryState("step", {
-    defaultValue: "login",
-  });
-  const [authMethod, setAuthMethod] = useQueryState("method");
+  const [authStep, setAuthStep] = useQueryState(
+    "step",
+    parseAsStringLiteral(authSteps).withDefault("login")
+  );
+  const [authMethod, setAuthMethod] = useQueryState(
+    "method",
+    parseAsStringLiteral(providers)
+  );
   const [token, setToken] = useQueryState("token");
   const [isNewUser, setIsNewUser] = useQueryState(
     "isNewUser",
@@ -46,21 +57,19 @@ export const AuthForm = () => {
   // Simulate magic link verification
   const verifyMagicLink = async (token: string) => {
     console.log("Verifying magic link token:", token);
-
-    // Simulate API call to verify token
-    setTimeout(() => {
-      // Simulate user data returned from verification
-      const userData = {
-        email: email || "user@example.com",
-        isNewUser: Math.random() > 0.5, // Randomly determine if new user for demo
-        id: "user_" + Math.random().toString(36).substring(2, 9),
-      };
-
-      handleAuthSuccess(userData);
-    }, 1000);
+    if (!token || !email) {
+      toast.error("Invalid token or email");
+      router.push("/auth/sign-in");
+    }
+    // Simulate API call to verify token and get user data
+    const verify = await authClient.magicLink.verify({
+      query: {
+        token: `${email}:${token}`,
+      },
+    });
   };
 
-  const handleAuthSuccess = (userData: any) => {
+  const handleAuthSuccess = (userData: User & { isNewUser: boolean }) => {
     setUserProfile(userData);
 
     if (userData.isNewUser) {
@@ -77,45 +86,6 @@ export const AuthForm = () => {
     setEmail(submittedEmail);
     setAuthMethod("email");
     setAuthStep("email_sent");
-
-    // In a real app, this would call the API to send the email with magic link and OTP
-    console.log("Sending authentication email to:", submittedEmail);
-  };
-
-  const handleOtpVerify = (otp: string) => {
-    console.log("Verifying OTP:", otp);
-
-    // Simulate API call to verify OTP
-    setTimeout(() => {
-      // Simulate user data returned from verification
-      const userData = {
-        email: email,
-        isNewUser: Math.random() > 0.5, // Randomly determine if new user for demo
-        id: "user_" + Math.random().toString(36).substring(2, 9),
-      };
-
-      handleAuthSuccess(userData);
-    }, 1000);
-  };
-
-  // Handle OAuth login
-  const handleOAuthLogin = (provider: string) => {
-    setAuthMethod(provider);
-
-    // In a real app, this would redirect to the OAuth provider
-    console.log(`Initiating OAuth flow with ${provider}`);
-
-    // Simulate successful OAuth login
-    setTimeout(() => {
-      const userData = {
-        email: `user@${provider.toLowerCase()}.com`,
-        isNewUser: Math.random() > 0.5, // Randomly determine if new user for demo
-        id: "user_" + Math.random().toString(36).substring(2, 9),
-        provider,
-      };
-
-      handleAuthSuccess(userData);
-    }, 1500);
   };
 
   // Handle security setup completion
@@ -131,10 +101,6 @@ export const AuthForm = () => {
 
   // Handle profile setup completion
   const handleProfileComplete = (profileData: any) => {
-    console.log("Profile data:", profileData);
-
-    // In a real app, this would save the profile data
-    // Redirect to dashboard
     router.push("/app");
   };
 
@@ -199,24 +165,25 @@ export const AuthForm = () => {
                 {authStep === "login" && (
                   <LoginOptions
                     onEmailSubmit={handleEmailSubmit}
-                    onOAuthLogin={handleOAuthLogin}
+                    onOAuthLogin={(provider) => setAuthMethod(provider)}
                   />
                 )}
 
                 {authStep === "email_sent" && email && (
                   <MagicLinkSent
+                    email={email}
                     onEnterOtp={(data) => {
-                      setAuthStep("security");
-
+                      handleAuthSuccess({
+                        ...data,
+                        isNewUser: !data.first_name || !data.name,
+                      });
                     }}
                     onBack={() => setAuthStep("login")}
                   />
                 )}
 
                 {authStep === "security" && email && (
-                  <AccountSecurity
-                    onComplete={handleSecurityComplete}
-                  />
+                  <AccountSecurity onComplete={handleSecurityComplete} />
                 )}
 
                 {authStep === "profile" && email && (
@@ -231,26 +198,55 @@ export const AuthForm = () => {
 
           {authStep === "login" && (
             <CardFooter className="flex flex-col space-y-4 pt-0">
-              <div className="text-sm text-center text-muted-foreground">
-                <p>
+              {mode === "sign-up" ? (
+                <p className="text-sm text-center text-muted-foreground">
                   Don&apos;t have an account?{" "}
-                  <Button variant="link" className="p-0 h-auto">
+                  <Link
+                    href="/auth/sign-up"
+                    className={buttonVariants({
+                      variant: "link",
+                      className: "p-0",
+                    })}
+                  >
                     Sign up
-                  </Button>
+                  </Link>
                 </p>
-              </div>
-              <div className="text-xs text-center text-muted-foreground">
-                <p>
-                  By continuing, you agree to our{" "}
-                  <Button variant="link" className="p-0 h-auto text-xs">
-                    Terms of Service
-                  </Button>{" "}
-                  and{" "}
-                  <Button variant="link" className="p-0 h-auto text-xs">
-                    Privacy Policy
-                  </Button>
+              ) : (
+                <p className="text-sm text-center text-muted-foreground">
+                  Already have an account?{" "}
+                  <Link
+                    href="/auth/sign-in"
+                    className={buttonVariants({
+                      variant: "link",
+                      className: "p-0",
+                    })}
+                  >
+                    Sign in
+                  </Link>
                 </p>
-              </div>
+              )}
+              <p className="text-xs text-center text-muted-foreground">
+                By continuing, you agree to our{" "}
+                <Link
+                  href="/legal/terms"
+                  className={buttonVariants({
+                    variant: "link",
+                    className: "p-0 h-auto text-xs",
+                  })}
+                >
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link
+                  href="/legal/privacy"
+                  className={buttonVariants({
+                    variant: "link",
+                    className: "p-0 h-auto text-xs",
+                  })}
+                >
+                  Privacy Policy
+                </Link>
+              </p>
             </CardFooter>
           )}
         </Card>

@@ -16,11 +16,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Icons } from "./icons";
+import { Icons, Provider } from "./helpers";
 
 interface LoginOptionsProps {
   onEmailSubmit: (email: string) => void;
-  onOAuthLogin: (provider: string) => void;
+  onOAuthLogin: (provider: Provider | null) => void;
 }
 
 const schema = z.object({ email: z.string().email() });
@@ -40,10 +40,10 @@ export function LoginOptions({
 
   const handleEmailSubmit = async (email: string) => {
     setIsLoading("email");
-    const signin = await authClient.signIn
+    await authClient.signIn
       .magicLink({
         email: email,
-        callbackURL: "/app", //redirect after successful login (optional)
+        callbackURL: `${window.location.origin}/app`, //redirect after successful login (optional)
       })
       .then(() => setIsLoading(null));
     onEmailSubmit(email);
@@ -52,12 +52,12 @@ export function LoginOptions({
   const handleOAuthLogin = (provider: "google" | "microsoft") => {
     setIsLoading(provider);
     onOAuthLogin(provider);
-    return authClient.signIn
-      .social({
-        provider: provider,
-        callbackURL: "/app",
-      })
-      .then(() => setIsLoading(null));
+    return authClient.signIn.social({
+      provider: provider,
+      callbackURL: `${window.location.origin}/app`,
+      newUserCallbackURL: `${window.location.origin}/auth/sign-up?method=${provider}&step=profile`,
+      errorCallbackURL: `${window.location.origin}/auth/sign-up?method=error`,
+    });
   };
 
   return (

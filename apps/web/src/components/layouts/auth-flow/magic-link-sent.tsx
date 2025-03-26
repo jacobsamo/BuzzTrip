@@ -15,25 +15,26 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { authClient } from "@/lib/auth-client";
+import { authClient, User } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Icons } from "./icons";
+import { Icons } from "./helpers";
 
 interface MagicLinkSentProps {
-  onEnterOtp: () => void;
+  email: string;
+  onEnterOtp: (data: User) => void;
   onBack: () => void;
 }
 
-const regex = new RegExp(REGEXP_ONLY_DIGITS + "{6}");
+const regex = new RegExp("^[0-9]+$");
 
 const schema = z.object({
   code: z.string().regex(regex),
 });
 
-export function MagicLinkSent({ onEnterOtp, onBack }: MagicLinkSentProps) {
+export function MagicLinkSent({ email, onEnterOtp, onBack }: MagicLinkSentProps) {
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
   });
@@ -48,7 +49,7 @@ export function MagicLinkSent({ onEnterOtp, onBack }: MagicLinkSentProps) {
   const onSubmit = async (data: z.infer<typeof schema>) => {
     const verify = await authClient.magicLink.verify({
       query: {
-        token: data.code,
+        token: `${email}:${data.code}`,
       },
     });
 
@@ -58,7 +59,7 @@ export function MagicLinkSent({ onEnterOtp, onBack }: MagicLinkSentProps) {
         type: "value",
       });
     } else {
-      onEnterOtp();
+      onEnterOtp(verify.data.user);
     }
   };
 

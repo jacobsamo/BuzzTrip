@@ -28,10 +28,7 @@ const Navbar = () => {
         </Link>
         <div>
           {data?.session ? (
-            <Link
-              href={"/auth/login"}
-              className={buttonVariants({ variant: "link" })}
-            >
+            <Link href={"/auth/sign-up"} className={buttonVariants()}>
               Login
             </Link>
           ) : (

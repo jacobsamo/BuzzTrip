@@ -25,7 +25,7 @@ const app = new OpenAPIHono<{ Bindings: Bindings }>({
 app.use("*", (c, next) => {
   if (c.req.header("Origin") == c.env.FRONT_END_URL) {
     return cors({
-      origin: c.env.FRONT_END_URL, // Front end url for cors
+      origin: [c.env.FRONT_END_URL, c.env.API_URL], // Front end url for cors
       allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow specific methods
       allowHeaders: ["Content-Type", "Authorization"], // Allow specific headers
       exposeHeaders: ["Content-Length"],
@@ -42,16 +42,21 @@ app.use("*", (c, next) => {
 app.use(authMiddleware);
 app.use(securityMiddleware);
 app.use((c, next) =>
-  sentry({ dsn: c.env.SENTRY_DSN, tracesSampleRate: 1.0, environment: "api" })(
-    c,
-    next
-  )
+  sentry({
+    dsn: c.env.SENTRY_DSN,
+    tracesSampleRate: 1.0,
+    environment: "api",
+    enabled: c.env.SENTRY_DSN ? true : false,
+  })(c, next)
 );
 app.use(loggingMiddleware);
 app.use("*", requestId());
 
 app.onError((e, c) => {
-  c.get("sentry").captureException(e);
+  console.error("Error", e);
+  if (!c.get("sentry")) c.text("Internal Server Error", 500);
+
+  c.get("sentry")?.captureException(e);
   return c.text("Internal Server Error", 500);
 });
 

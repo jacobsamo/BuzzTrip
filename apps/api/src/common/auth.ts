@@ -1,15 +1,23 @@
 import { createDb } from "@buzztrip/db";
+import { generateId } from "@buzztrip/db/helpers";
+import * as schemas from "@buzztrip/db/schemas";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { magicLink } from "better-auth/plugins";
 import { generateOTP } from "./generateOTP";
 
 export const createAuth = (
+  /**Our API url */
   baseUrl: string,
+  /**Where the fronted is hosted */
+  frontEndUrl: string,
+  /**Our auth secret to handle hashing */
   authSecret: string,
   googleClientId: string,
   googleClientSecret: string,
+  /**Db connection URL */
   url: string,
+  /** Db auth token */
   authToken: string
 ) => {
   const db = createDb(url, authToken);
@@ -17,9 +25,15 @@ export const createAuth = (
   return betterAuth({
     appName: "BuzzTrip",
     baseURL: baseUrl,
+    basePath: "/auth",
     secret: authSecret,
+    trustedOrigins: [frontEndUrl],
     database: drizzleAdapter(db, {
       provider: "sqlite", // or "mysql", "sqlite"`
+      schema: {
+        ...schemas,
+        user: schemas.users,
+      },
     }),
 
     // Alter user, session, account and verification models & settings
@@ -80,15 +94,15 @@ export const createAuth = (
       modelName: "user_accounts",
       accountLinking: {
         enabled: true,
-        trustedProviders: ["google", "microsoft", "apple"],
+        trustedProviders: ["google", "microsoft", "apple", "email-password"],
       },
     },
 
     plugins: [
       magicLink({
         generateToken: (email) => {
-          // TODO: enhance this to be more secure e.g add the email into the mix
-          return generateOTP();
+          const otp = generateOTP();
+          return `${email}:${otp}`; // Since codes can be used only once, we'll use the email & OTP as the token
         },
         sendMagicLink: async ({ email, token, url }, request) => {
           console.log("Requesting to login using OTP", {
@@ -96,10 +110,16 @@ export const createAuth = (
             token,
             url,
           });
+
           //TODO: Setup resend to send these emails to users, for now just console.log it
         },
+        expiresIn: 60 * 60 * 4, // 4 hours
       }),
     ],
+    // https://www.better-auth.com/docs/authentication/email-password
+    // emailAndPassword: {
+    //   enabled: true,
+    // },
     // https://www.better-auth.com/docs/concepts/oauth
     socialProviders: {
       google: {
@@ -134,16 +154,13 @@ export const createAuth = (
       // }
     },
     advanced: {
-      //TODO: if id's aren't quite what we want than use our own generateId function for db
-      // generateId: false,
+      generateId: (options) => {
+        return generateId("user");
+      },
       crossSubDomainCookies: {
         enabled: true,
       },
     },
-    // https://www.better-auth.com/docs/authentication/email-password
-    // emailAndPassword: {
-    //   enabled: true,
-    // },
   });
 };
 

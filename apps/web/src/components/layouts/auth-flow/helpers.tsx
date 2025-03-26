@@ -78,3 +78,23 @@ export const Icons = {
   user: User,
   x: X,
 };
+
+export const providers = [
+  "google",
+  "microsoft",
+  "apple",
+  "passkey",
+  "email",
+  "password",
+] as const;
+
+export type Provider = (typeof providers)[number];
+
+export const authSteps = [
+  "login",
+  "email_sent",
+  "security",
+  "profile",
+] as const;
+
+export type AuthStep = (typeof authSteps)[number];
