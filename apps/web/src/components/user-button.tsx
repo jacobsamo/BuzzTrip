@@ -16,17 +16,16 @@ export const UserButton = () => {
   if (!data || !data.user) return null;
 
   const handleLogout = () => {
-    authClient.signOut();
-    router.push("/auth/sign-in");
+    authClient.signOut().then(() => {
+      router.push("/auth/sign-in");
+    });
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Image
-          src={
-            data.user.image ?? data.user.profile_picture ?? "/placeholder.svg"
-          }
+          src={data.user.image ?? "/placeholder.svg"}
           alt={data.user.id}
           width={64}
           height={64}

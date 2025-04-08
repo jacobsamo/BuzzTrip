@@ -186,11 +186,8 @@ export const AuthForm = ({ mode }: AuthFormProps) => {
                   <AccountSecurity onComplete={handleSecurityComplete} />
                 )}
 
-                {authStep === "profile" && email && (
-                  <ProfileSetup
-                    email={email}
-                    onComplete={handleProfileComplete}
-                  />
+                {authStep === "profile" && (
+                  <ProfileSetup onComplete={handleProfileComplete} />
                 )}
               </motion.div>
             </AnimatePresence>
@@ -198,13 +195,15 @@ export const AuthForm = ({ mode }: AuthFormProps) => {
 
           {authStep === "login" && (
             <CardFooter className="flex flex-col space-y-4 pt-0">
-              {mode === "sign-up" ? (
+              {mode === "sign-in" ? (
                 <p className="text-sm text-center text-muted-foreground">
                   Don&apos;t have an account?{" "}
                   <Link
                     href="/auth/sign-up"
+                    replace={true}
                     className={buttonVariants({
                       variant: "link",
+                      size: "noPadding",
                       className: "p-0",
                     })}
                   >
@@ -216,9 +215,11 @@ export const AuthForm = ({ mode }: AuthFormProps) => {
                   Already have an account?{" "}
                   <Link
                     href="/auth/sign-in"
+                    replace={true}
                     className={buttonVariants({
                       variant: "link",
-                      className: "p-0",
+                      size: "noPadding",
+                      className: "h-auto text-sm",
                     })}
                   >
                     Sign in
@@ -231,7 +232,8 @@ export const AuthForm = ({ mode }: AuthFormProps) => {
                   href="/legal/terms"
                   className={buttonVariants({
                     variant: "link",
-                    className: "p-0 h-auto text-xs",
+                    size: "noPadding",
+                    className: "h-auto text-xs",
                   })}
                 >
                   Terms of Service
@@ -241,7 +243,8 @@ export const AuthForm = ({ mode }: AuthFormProps) => {
                   href="/legal/privacy"
                   className={buttonVariants({
                     variant: "link",
-                    className: "p-0 h-auto text-xs",
+                    size: "noPadding",
+                    className: "h-auto text-xs",
                   })}
                 >
                   Privacy Policy

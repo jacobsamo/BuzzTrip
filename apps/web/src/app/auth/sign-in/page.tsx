@@ -1,11 +1,6 @@
 "use client";
-
-import AuthForm from "@/components/layouts/auth-flow-old";
+import { AuthForm } from "@/components/layouts/auth-flow";
 
 export default function Page() {
-  return (
-    <div className="flex h-screen items-center justify-center">
-      <AuthForm />
-    </div>
-  );
+  return <AuthForm mode="sign-in" />;
 }

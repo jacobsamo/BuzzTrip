@@ -1,6 +1,8 @@
 import { createDb } from "@buzztrip/db";
 import { generateId } from "@buzztrip/db/helpers";
 import * as schemas from "@buzztrip/db/schemas";
+import MagicLinkVerificationEmail from "@buzztrip/transactional/emails/magic-link";
+import { createResend, sendEmail } from "@buzztrip/transactional/helpers";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { magicLink } from "better-auth/plugins";
@@ -18,7 +20,9 @@ export const createAuth = (
   /**Db connection URL */
   url: string,
   /** Db auth token */
-  authToken: string
+  authToken: string,
+  /** Resend API key */
+  resendApiKey: string
 ) => {
   const db = createDb(url, authToken);
 
@@ -105,15 +109,30 @@ export const createAuth = (
           return `${email}:${otp}`; // Since codes can be used only once, we'll use the email & OTP as the token
         },
         sendMagicLink: async ({ email, token, url }, request) => {
+          // TODO: make it so if in dev we just console.log it
           console.log("Requesting to login using OTP", {
             email,
             token,
             url,
           });
 
-          //TODO: Setup resend to send these emails to users, for now just console.log it
+          try {
+            const resend = createResend(resendApiKey);
+            sendEmail({
+              resend,
+              email: email,
+              subject: "Verify your BuzzTrip account",
+              react: MagicLinkVerificationEmail({
+                email,
+                token,
+                callbackUrl: url,
+              }),
+            });
+          } catch (error) {
+            console.error(error);
+          }
         },
-        expiresIn: 60 * 60 * 4, // 4 hours
+        expiresIn: 60 * 10, // 10 minutes
       }),
     ],
     // https://www.better-auth.com/docs/authentication/email-password
@@ -126,6 +145,7 @@ export const createAuth = (
         clientId: googleClientId,
         clientSecret: googleClientSecret,
         mapProfileToUser: (profile) => {
+          console.log("Google profile:", profile);
           return {
             first_name: profile.given_name,
             last_name: profile.family_name,

@@ -9,11 +9,6 @@ export async function middleware(request: NextRequest) {
     // useSecureCookies: true,
   });
 
-  console.log("Seesion cookie and more", {
-    request,
-    sessionCookie,
-  });
-
   if (!sessionCookie) {
     return NextResponse.redirect(new URL("/auth/sign-up", request.url));
   }

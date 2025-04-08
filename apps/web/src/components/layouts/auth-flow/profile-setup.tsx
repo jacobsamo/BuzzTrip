@@ -2,6 +2,7 @@
 
 import type React from "react";
 
+import ImageUploadModal from "@/components/modals/image-upload-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,14 +19,13 @@ import { authClient, User, useSession } from "@/lib/auth-client";
 import { usersEditSchema } from "@buzztrip/db/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Icons } from "./helpers";
 
 interface ProfileSetupProps {
-  email: string;
   onComplete: (profileData: User) => void;
 }
 
@@ -37,9 +37,9 @@ const schema = usersEditSchema.pick({
   bio: true,
 });
 
-export function ProfileSetup({ email, onComplete }: ProfileSetupProps) {
-  const { data } = useSession();
-
+export function ProfileSetup({ onComplete }: ProfileSetupProps) {
+  const auth = useSession();
+  const { data } = auth;
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -51,9 +51,24 @@ export function ProfileSetup({ email, onComplete }: ProfileSetupProps) {
     },
   });
 
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState(data?.user?.image ?? undefined);
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (data?.user) {
+      console.log("Auth data:", {
+        data,
+        userImage: data.user.image,
+      });
+      form.setValue("first_name", data.user.first_name ?? "");
+      form.setValue("last_name", data.user.last_name ?? "");
+      form.setValue("username", data.user.username ?? "");
+      form.setValue("bio", data.user.bio ?? "");
+      form.setValue("profile_picture", data.user.image ?? "");
+      setAvatarUrl(data.user.image ?? undefined);
+    }
+  }, [auth.isPending]);
 
   const handleAvatarClick = () => {
     if (fileInputRef.current) {
@@ -61,14 +76,10 @@ export function ProfileSetup({ email, onComplete }: ProfileSetupProps) {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // In a real app, you would upload the file to a server
-      // For this demo, we'll create a local object URL
-      const objectUrl = URL.createObjectURL(file);
-      form.setValue("profile_picture", objectUrl);
-    }
+  const handleFileChange = (file: File) => {
+    const objectUrl = URL.createObjectURL(file);
+    form.setValue("profile_picture", objectUrl);
+    setAvatarUrl(objectUrl);
   };
 
   const handleSubmit = (data: z.infer<typeof schema>) => {
@@ -90,29 +101,33 @@ export function ProfileSetup({ email, onComplete }: ProfileSetupProps) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <div className="flex flex-col items-center space-y-4">
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="image/*"
-            className="hidden"
-          />
-
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={handleAvatarClick}
             className="cursor-pointer relative"
           >
-            <Avatar className="h-20 w-20">
-              <AvatarImage src={avatarUrl} />
-              <AvatarFallback className="bg-primary/10">
-                <Icons.user className="h-8 w-8 text-primary" />
-              </AvatarFallback>
-            </Avatar>
-            <div className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1">
-              <Icons.camera className="h-4 w-4" />
-            </div>
+            <ImageUploadModal
+              trigger={
+                <>
+                  <Avatar className="h-20 w-20">
+                    <AvatarImage src={avatarUrl} />
+                    <AvatarFallback className="bg-primary/10">
+                      <Icons.user className="h-8 w-8 text-primary" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1">
+                    <Icons.camera className="h-4 w-4" />
+                  </div>
+                </>
+              }
+              dropZoneProps={{
+                onFileChange(files) {
+                  const file = Array.isArray(files) ? files[0] : files;
+                  if (!files || !file) return;
+                  handleFileChange(file);
+                },
+              }}
+            />
           </motion.div>
         </div>
 
