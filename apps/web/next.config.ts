@@ -1,13 +1,23 @@
-import ReactComponentName from "react-scan/react-component-name/webpack";
+import createMDX from "@next/mdx";
+import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 import "./env";
 import { env } from "./env";
-import { withSentryConfig } from "@sentry/nextjs";
-import createMDX from "@next/mdx";
-import remarkGfm from "remark-gfm";
 
 const nextConfig: NextConfig = {
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
+  // turbopack: {
+  //   resolveExtensions: [
+  //     ".md",
+  //     ".mdx",
+  //     ".tsx",
+  //     ".ts",
+  //     ".jsx",
+  //     ".js",
+  //     ".mjs",
+  //     ".json",
+  //   ],
+  // },
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -46,19 +56,19 @@ const nextConfig: NextConfig = {
       "@sentry/nextjs",
     ],
   },
+
   skipTrailingSlashRedirect: true,
-  webpack: (config) => {
-    if (process.env.NODE_ENV === "production")
-      config.plugins.push(ReactComponentName({}));
-    return config;
-  },
+  // webpack: (config) => {
+  //   if (process.env.NODE_ENV === "production")
+  //     config.plugins.push(ReactComponentName({}));
+  //   return config;
+  // },
 };
 
 const withMDX = createMDX({
-  extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [remarkGfm],
-    rehypePlugins: [],
+    // remarkPlugins: [['remark-gfm', { strict: true, throwOnError: true }]],
+    // rehypePlugins: [],
   },
 });
 

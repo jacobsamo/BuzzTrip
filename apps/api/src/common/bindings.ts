@@ -9,6 +9,11 @@ export interface Bindings {
   GOOGLE_CLIENT_SECRET: string;
   GOOGLE_CLIENT_ID: string;
   RESEND_API_KEY: string;
+  R2_ENDPOINT: string;
+  R2_ACCESS_ID: string;
+  R2_SECRET_ACCESS_KEY: string;
+  R2_BUCKET: string;
+  R2_PUBLIC_URL: string;
 }
 
 export interface AppBindings {

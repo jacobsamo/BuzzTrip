@@ -1,4 +1,4 @@
-import { refinedUserSchema, userMapsSchema } from "@buzztrip/db/zod-schemas";
+import { refinedUserSchema, userMapsSchema, usersSchema } from "@buzztrip/db/zod-schemas";
 import { z } from "@hono/zod-openapi";
 
 export const MapsParamsSchema = z.object({
@@ -25,3 +25,8 @@ export const SearchUsersSchema = z.object({
 export const SearchUserReturnSchema = z.object({
   users: refinedUserSchema.array().nullable(),
 });
+
+
+export const UpdateUserSchema = usersSchema.partial();
+
+export const UpdateUserReturnSchema = usersSchema;

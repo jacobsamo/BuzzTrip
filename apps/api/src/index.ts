@@ -13,6 +13,8 @@ import mapRoutes from "./routes/map";
 import collectionRoutes from "./routes/map/collection";
 import markerRoutes from "./routes/map/marker";
 import userRoutes from "./routes/user";
+// import uploadRoutes from "./routes/upload";
+import fileRoutes from "./routes/files";
 
 const app = new OpenAPIHono<{ Bindings: Bindings }>({
   defaultHook: (result, c) => {
@@ -73,6 +75,8 @@ app.route("/", authHandler);
 
 const routes = app
   .route("/", userRoutes)
+  // .route("/", uploadRoutes)
+  .route("/", fileRoutes)
   .route("/", mapRoutes)
   .route("/", markerRoutes)
   .route("/", collectionRoutes);

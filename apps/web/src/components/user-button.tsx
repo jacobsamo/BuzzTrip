@@ -15,10 +15,15 @@ export const UserButton = () => {
 
   if (!data || !data.user) return null;
 
-  const handleLogout = () => {
-    authClient.signOut().then(() => {
+  const handleLogout = async () => {
+    try {
+      await authClient.signOut();
+      // Force a router refresh before redirecting
+      router.refresh();
       router.push("/auth/sign-in");
-    });
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
 
   return (

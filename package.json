@@ -12,16 +12,16 @@
   },
   "devDependencies": {
     "@buzztrip/tsconfig": "workspace:*",
-    "@types/react": "^19.0.12",
-    "@types/react-dom": "^19.0.4",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
     "drizzle-orm": "^0.38.4",
     "prettier": "^3.5.3",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-tailwindcss": "^0.6.11",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "turbo": "^2.4.4",
-    "typescript": "^5.8.2"
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "turbo": "^2.5.1",
+    "typescript": "^5.8.3"
   },
   "packageManager": "bun@1.2.5",
   "workspaces": [
@@ -39,5 +39,11 @@
   ],
   "resolutions": {
     "drizzle-orm": "^0.38.4"
+  },
+  "dependencies": {
+    "@mdx-js/loader": "^3.1.0",
+    "@mdx-js/react": "^3.1.0",
+    "@next/mdx": "^15.3.1",
+    "@types/mdx": "^2.0.13"
   }
 }

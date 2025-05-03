@@ -1,8 +1,16 @@
-import { AppRouteHandler } from "../../common/types";
 import { createDb } from "@buzztrip/db";
-import { getUserMaps } from "@buzztrip/db/queries";
-import { getUserMapsRoute, searchUserRoute } from "./user.routes";
-import { searchUsers } from "@buzztrip/db/queries";
+import {
+  getUser,
+  getUserMaps,
+  searchUsers,
+  updateUser,
+} from "@buzztrip/db/queries";
+import { AppRouteHandler } from "../../common/types";
+import {
+  getUserMapsRoute,
+  searchUserRoute,
+  updateUserRoute,
+} from "./user.routes";
 
 export const getUserMapsHandler: AppRouteHandler<
   typeof getUserMapsRoute
@@ -64,6 +72,55 @@ export const searchUserHandler: AppRouteHandler<
       {
         code: "failed_request",
         message: "Failed to search user",
+        requestId: c.get("requestId"),
+      },
+      400
+    );
+  }
+};
+
+export const updateUserHandler: AppRouteHandler<
+  typeof updateUserRoute
+> = async (c) => {
+  try {
+    const { userId } = c.req.valid("param");
+    const updateData = await c.req.valid("json");
+    const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+
+    const user = await getUser(db, userId);
+
+    if (!user) {
+      return c.json(
+        {
+          code: "user_not_found",
+          message: "User not found",
+          requestId: c.get("requestId"),
+        },
+        404
+      );
+    }
+
+    const updatedUser = await updateUser(db, userId, updateData);
+
+    if (!updatedUser) {
+      return c.json(
+        {
+          code: "update_failed",
+          message: "Failed to update user",
+          requestId: c.get("requestId"),
+        },
+        400
+      );
+    }
+
+    return c.json(updatedUser, 200);
+  } catch (error) {
+    console.error(error);
+    c.get("sentry").captureException(error);
+    return c.json(
+      {
+        code: "failed_request",
+        message: "Failed to update user",
         requestId: c.get("requestId"),
       },
       400

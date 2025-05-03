@@ -75,7 +75,8 @@ export const AuthForm = ({ mode }: AuthFormProps) => {
     if (userData.isNewUser) {
       setIsNewUser(true);
       // For new users, proceed to account security setup
-      setAuthStep("security");
+      //TODO: setup later once we have security features implmented
+      setAuthStep("profile");
     } else {
       router.push("/app");
     }

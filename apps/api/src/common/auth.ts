@@ -52,7 +52,7 @@ export const createAuth = (
         },
         last_name: {
           type: "string",
-          fieldName: "first_name",
+          fieldName: "last_name",
           required: false,
           input: false,
         },
@@ -174,8 +174,10 @@ export const createAuth = (
       // }
     },
     advanced: {
-      generateId: (options) => {
-        return generateId("user");
+      database: {
+        generateId: (options) => {
+          return generateId("user");
+        },
       },
       crossSubDomainCookies: {
         enabled: true,

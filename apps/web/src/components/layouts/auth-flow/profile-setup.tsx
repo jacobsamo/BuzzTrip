@@ -1,7 +1,4 @@
 "use client";
-
-import type React from "react";
-
 import ImageUploadModal from "@/components/modals/image-upload-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -15,11 +12,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { authClient, User, useSession } from "@/lib/auth-client";
+import { User, useSession } from "@/lib/auth-client";
+import { apiClient } from "@/server/api.client";
 import { usersEditSchema } from "@buzztrip/db/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -39,6 +38,7 @@ const schema = usersEditSchema.pick({
 
 export function ProfileSetup({ onComplete }: ProfileSetupProps) {
   const auth = useSession();
+  const router = useRouter();
   const { data } = auth;
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -51,9 +51,10 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
     },
   });
 
+  const [uploadImageModalOpen, setUploadImageModalOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(data?.user?.image ?? undefined);
+  const [profilePictureFile, setProfilePictureFile] = useState<File | null>();
   const [isLoading, setIsLoading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (data?.user) {
@@ -70,27 +71,66 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
     }
   }, [auth.isPending]);
 
-  const handleAvatarClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
   const handleFileChange = (file: File) => {
     const objectUrl = URL.createObjectURL(file);
-    form.setValue("profile_picture", objectUrl);
+    setProfilePictureFile(file);
     setAvatarUrl(objectUrl);
   };
 
-  const handleSubmit = (data: z.infer<typeof schema>) => {
-    const updateUserProfile = authClient.updateUser({
-      image: data.profile_picture,
-      name: data.first_name + " " + data.last_name,
+  const handleSubmit = async (formData: z.infer<typeof schema>) => {
+    let profilePicture = formData.profile_picture;
+
+    if (profilePictureFile) {
+      try {
+        // Upload using the new files endpoint
+        const formData = new FormData();
+        formData.append("file", profilePictureFile);
+        formData.append("folder", "profile-pictures");
+        formData.append(
+          "metadata",
+          JSON.stringify({
+            userId: data?.user?.id,
+            uploadType: "profile",
+          })
+        );
+
+        const uploadResponse = await fetch("/api/files/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error("Failed to upload profile picture");
+        }
+
+        const uploadResult = (await uploadResponse.json()) as any;
+        profilePicture = uploadResult.fileUrl;
+      } catch (error) {
+        console.error("Failed to upload profile picture:", error);
+        toast.error("Failed to upload profile picture");
+      }
+    }
+
+    console.log("Profile picture", {
+      profilePicture,
+      user: data,
+    });
+
+    const updateUserProfile = apiClient.users[":userId"].$put({
+      param: {
+        userId: data?.user?.id!,
+      },
+      json: {
+        profile_picture: profilePicture,
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        username: formData.username,
+      },
     });
 
     toast.promise(updateUserProfile, {
       loading: "Saving profile...",
-      success: (res) => {
+      success: async (res) => {
         return "Profile saved successfully!";
       },
       error: "Failed to save profile",
@@ -106,25 +146,34 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
             whileTap={{ scale: 0.95 }}
             className="cursor-pointer relative"
           >
+            <div
+              aria-label="Upload profile picture"
+              role="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setUploadImageModalOpen(true);
+              }}
+            >
+              <Avatar className="h-20 w-20">
+                <AvatarImage src={avatarUrl} />
+                <AvatarFallback className="bg-primary/10">
+                  <Icons.user className="h-8 w-8 text-primary" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1">
+                <Icons.camera className="h-4 w-4" />
+              </div>
+            </div>
+
             <ImageUploadModal
-              trigger={
-                <>
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage src={avatarUrl} />
-                    <AvatarFallback className="bg-primary/10">
-                      <Icons.user className="h-8 w-8 text-primary" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1">
-                    <Icons.camera className="h-4 w-4" />
-                  </div>
-                </>
-              }
+              showTrigger={false}
+              open={uploadImageModalOpen}
+              onClose={() => setUploadImageModalOpen(false)}
               dropZoneProps={{
-                onFileChange(files) {
-                  const file = Array.isArray(files) ? files[0] : files;
-                  if (!files || !file) return;
-                  handleFileChange(file);
+                onFilesAdded: (files) => {
+                  const file = files[0]?.file;
+                  if (file instanceof File) handleFileChange(file);
                 },
               }}
             />

@@ -28,12 +28,12 @@ const Navbar = () => {
         </Link>
         <div>
           {data?.session ? (
-            <Link href={"/auth/sign-up"} className={buttonVariants()}>
-              Login
-            </Link>
-          ) : (
             <Link href={"/app"} className={buttonVariants()}>
               Go To app
+            </Link>
+          ) : (
+            <Link href={"/auth/sign-up"} className={buttonVariants()}>
+              Login
             </Link>
           )}
         </div>
