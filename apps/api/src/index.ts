@@ -2,26 +2,39 @@ import { sentry } from "@hono/sentry";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
 import { requestId } from "hono/request-id";
-import { Bindings } from "./common/bindings";
+import { AppBindings } from "./common/types";
 import {
   authMiddleware,
   loggingMiddleware,
   securityMiddleware,
 } from "./middleware";
 import { authHandler } from "./routes/auth";
-import mapRoutes from "./routes/map";
-import collectionRoutes from "./routes/map/collection";
-import markerRoutes from "./routes/map/marker";
-import userRoutes from "./routes/user";
-// import uploadRoutes from "./routes/upload";
-import fileRoutes from "./routes/files";
+// Maps
+import { createMapRoute } from "./routes/map/create-map-route";
+import { editMapRoute } from "./routes/map/edit-map-route";
+import { getMapDataRoute } from "./routes/map/get-map-data-route";
+import { getMapRoute } from "./routes/map/get-map-route";
+import { shareMapRoute } from "./routes/map/share-map-route";
+// Collections
+import { createCollectionRoute } from "./routes/map/collection/create-collection-route";
+import { editCollectionRoute } from "./routes/map/collection/edit-collection-route";
+// Markers
+import { createMarkerRoute } from "./routes/map/marker/create-marker-route";
+import { editMarkerRoute } from "./routes/map/marker/edit-marker-route";
+//Uploads
+import { uploadFileRoute } from "./routes/upload/upload-file-route";
+// Users
+import { getUserMapsRoute } from "./routes/user/get-user-maps-route";
+import { searchUserRoute } from "./routes/user/search-user-route";
+import { updateUserRoute } from "./routes/user/update-user-route";
 
-const app = new OpenAPIHono<{ Bindings: Bindings }>({
+const app = new OpenAPIHono<AppBindings>({
   defaultHook: (result, c) => {
     if (!result.success) {
       console.error("Failed request", {
-        result, c
-      })
+        result,
+        c,
+      });
       return c.json({ success: false, errors: result.error.errors }, 422);
     }
   },
@@ -58,13 +71,6 @@ app.use((c, next) =>
 app.use(loggingMiddleware);
 app.use("*", requestId());
 
-app.onError((e, c) => {
-  console.error("Error", e);
-  if (!c.get("sentry")) c.text("Internal Server Error", 500);
-
-  c.get("sentry")?.captureException(e);
-  return c.text("Internal Server Error", 500);
-});
 
 app.get("/health", (c) => {
   return c.json({ status: "ok" });
@@ -75,15 +81,28 @@ app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
   scheme: "bearer",
 });
 
+
 app.route("/", authHandler);
 
 const routes = app
-  .route("/", userRoutes)
-  // .route("/", uploadRoutes)
-  .route("/", fileRoutes)
-  .route("/", mapRoutes)
-  .route("/", markerRoutes)
-  .route("/", collectionRoutes);
+  // User routes
+  .route("/", getUserMapsRoute)
+  .route("/", searchUserRoute)
+  .route("/", updateUserRoute)
+  // Upload routes
+  .route("/", uploadFileRoute)
+  // Map routes
+  .route("/", createMapRoute)
+  .route("/", editMapRoute)
+  .route("/", getMapDataRoute)
+  .route("/", getMapRoute)
+  .route("/", shareMapRoute)
+  // Marker Routes
+  .route("/", createMarkerRoute)
+  .route("/", editMarkerRoute)
+  // Collection routes
+  .route("/", createCollectionRoute)
+  .route("/", editCollectionRoute);
 
 // Export any neccariy items for either build or other apps
 export * from "./common/auth";

@@ -1,0 +1,48 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "buzztrip-api",
+  "compatibility_date": "2022-04-05",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "nodejs_compat_populate_process_env",
+  ],
+  "main": "src/index.ts",
+  "minify": true,
+  "workers_dev": true,
+  "observability": {
+    "enabled": true,
+  },
+  "dev": {
+    "port": 8181,
+  },
+  "env": {
+    "development": {
+      "name": "buzztrip-dev-api",
+      "route": {
+        "pattern": "dev-api.buzztrip.co/*",
+        "zone_name": "buzztrip.co",
+      },
+    },
+    "production": {
+      "name": "buzztrip-prod-api",
+      "route": { "pattern": "api.buzztrip.co/*", "zone_name": "buzztrip.co" },
+    },
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "MapsDurableObject",
+        "class_name": "MAPS_DURABLE_OBJECT",
+      },
+    ],
+  },
+  "r2_buckets": [
+    {
+      "binding": "BUZZTRIP_BUCKET",
+      "bucket_name": "buzztrip",
+    },
+  ],
+  "ai": {
+    "binding": "AI",
+  },
+}

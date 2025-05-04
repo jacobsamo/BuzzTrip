@@ -7,7 +7,8 @@
     "dev": "NODE_ENV=development wrangler dev src/index.ts",
     "dev:custom-cert": "--https-cert-path certificates/localhost+3.pem --https-key-path certificates/localhost+3-key.pem --local-protocol=https",
     "deploy": "wrangler deploy --minify src/index.ts",
-    "check:types": "tsc --noEmit"
+    "check:types": "tsc --noEmit",
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.787.0",
@@ -22,8 +23,8 @@
     "hono": "^4.7.1"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250214.0",
+    "@cloudflare/workers-types": "^4.20250504.0",
     "@types/bun": "^1.2.2",
-    "wrangler": "^3.109.1"
+    "wrangler": "^4.14.1"
   }
 }
