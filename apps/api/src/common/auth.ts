@@ -17,6 +17,8 @@ export const createAuth = (
   authSecret: string,
   googleClientId: string,
   googleClientSecret: string,
+  microsoftClientId: string,
+  microsoftSecretKey: string,
   /**Db connection URL */
   url: string,
   /** Db auth token */
@@ -31,13 +33,10 @@ export const createAuth = (
     baseURL: baseUrl,
     basePath: "/auth",
     secret: authSecret,
-    trustedOrigins: [frontEndUrl],
+    trustedOrigins: [frontEndUrl, baseUrl],
     database: drizzleAdapter(db, {
       provider: "sqlite", // or "mysql", "sqlite"`
-      schema: {
-        ...schemas,
-        user: schemas.users,
-      },
+      schema: { ...schemas, user: schemas.users },
     }),
 
     // Alter user, session, account and verification models & settings
@@ -56,13 +55,6 @@ export const createAuth = (
           required: false,
           input: false,
         },
-        //TODO: remove if it works correctly
-        // full_name: {
-        //   type: "string",
-        //   fieldName: "full_name",
-        //   required: false,
-        //   input: false,
-        // },
         username: {
           type: "string",
           fieldName: "username",
@@ -83,25 +75,23 @@ export const createAuth = (
         updatedAt: "updated_at",
       },
     },
-    // https://www.better-auth.com/docs/concepts/session-management#session-caching
     session: {
-      modelName: "user_sessions",
       cookieCache: {
         enabled: true,
-        maxAge: 5 * 60, // 5 minutes
+        maxAge: 5 * 60, // 7 days
       },
+      expiresIn: 60 * 60 * 24 * 7, // 7 days
+      updateAge: 60 * 60 * 24, // 1 day (every 1 day the session expiration is updated)
     },
-    verification: {
-      modelName: "user_verifications",
-    },
+    verification: { modelName: "user_verifications" },
     account: {
       modelName: "user_accounts",
       accountLinking: {
         enabled: true,
+        allowDifferentEmails: true,
         trustedProviders: ["google", "microsoft", "apple", "email-password"],
       },
     },
-
     plugins: [
       magicLink({
         generateToken: (email) => {
@@ -110,11 +100,7 @@ export const createAuth = (
         },
         sendMagicLink: async ({ email, token, url }, request) => {
           // TODO: make it so if in dev we just console.log it
-          console.log("Requesting to login using OTP", {
-            email,
-            token,
-            url,
-          });
+          console.log("Requesting to login using OTP", { email, token, url });
 
           try {
             const resend = createResend(resendApiKey);
@@ -136,9 +122,13 @@ export const createAuth = (
       }),
     ],
     // https://www.better-auth.com/docs/authentication/email-password
-    // emailAndPassword: {
-    //   enabled: true,
-    // },
+    // emailAndPassword: { enabled: false, requireEmailVerification: true,  },
+    // emailVerification: {
+    //   autoSignInAfterVerification: true,
+    //   sendVerificationEmail(data, request) {
+    //     rer
+    //   },
+    // }
     // https://www.better-auth.com/docs/concepts/oauth
     socialProviders: {
       google: {
@@ -152,16 +142,18 @@ export const createAuth = (
           };
         },
       },
-      // microsoft: {
-      //   clientId: microsoftClientId,
-      //   clientSecret: microsoftScretKey,
-      //   mapProfileToUser: (profile) => {
-      //     return {
-      //       first_name: profile.name.split(" ")[0],
-      //       last_name: profile.name.split(" ")[1],
-      //     };
-      //   },
-      // },
+      microsoft: {
+        clientId: microsoftClientId,
+        clientSecret: microsoftSecretKey,
+        tenantId: "common",
+        requireSelectAccount: true,
+        mapProfileToUser: (profile) => {
+          return {
+            first_name: profile.name.split(" ")[0],
+            last_name: profile.name.split(" ")[1],
+          };
+        },
+      },
       // apple: {
       //   clientId: appleClientId,
       //   clientSecret: appleSecretKey,
@@ -179,8 +171,11 @@ export const createAuth = (
           return generateId("user");
         },
       },
-      crossSubDomainCookies: {
-        enabled: true,
+      crossSubDomainCookies: { enabled: true },
+    },
+    onAPIError: {
+      onError(error, ctx) {
+        console.error("An error occured during auth", { error, ctx });
       },
     },
   });

@@ -161,7 +161,7 @@ export const AuthForm = ({ mode }: AuthFormProps) => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
-                className="min-h-[200px]"
+                // className="min-h-[200px]"
               >
                 {authStep === "login" && (
                   <LoginOptions

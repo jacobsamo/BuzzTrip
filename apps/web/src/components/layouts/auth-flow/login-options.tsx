@@ -1,16 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
@@ -33,9 +23,7 @@ export function LoginOptions({
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      email: "",
-    },
+    defaultValues: { email: "" },
   });
 
   const handleEmailSubmit = async (email: string) => {
@@ -78,7 +66,7 @@ export function LoginOptions({
           Continue with Google
         </Button>
 
-        {/* <Button
+        <Button
           variant="outline"
           className="w-full h-11 text-base font-medium"
           onClick={() => handleOAuthLogin("microsoft")}
@@ -90,7 +78,7 @@ export function LoginOptions({
             <Icons.microsoft className="mr-2 h-5 w-5" />
           )}
           Continue with Microsoft
-        </Button> */}
+        </Button>
         {/* 
         <Button
           variant="outline"
@@ -108,7 +96,7 @@ export function LoginOptions({
       </div>
 
       {/* Divider */}
-      <div className="relative">
+      {/* <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
@@ -117,10 +105,10 @@ export function LoginOptions({
             Or continue with
           </span>
         </div>
-      </div>
+      </div> */}
 
       {/* Email Form */}
-      <Form {...form}>
+      {/* <Form {...form}>
         <form
           onSubmit={form.handleSubmit((data: z.infer<typeof schema>) =>
             handleEmailSubmit(data.email)
@@ -157,8 +145,8 @@ export function LoginOptions({
               "Continue with Email"
             )}
           </Button>
-        </form>
-      </Form>
+        </form> */}
+      {/* </Form> */}
     </div>
   );
 }

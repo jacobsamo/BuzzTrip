@@ -19,6 +19,9 @@ import fileRoutes from "./routes/files";
 const app = new OpenAPIHono<{ Bindings: Bindings }>({
   defaultHook: (result, c) => {
     if (!result.success) {
+      console.error("Failed request", {
+        result, c
+      })
       return c.json({ success: false, errors: result.error.errors }, 422);
     }
   },
@@ -35,6 +38,7 @@ app.use("*", (c, next) => {
       credentials: true,
     })(c, next);
   }
+
   return cors({
     origin: "*", // Allow all origins
     allowMethods: ["GET", "POST"],

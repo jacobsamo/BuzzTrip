@@ -8,6 +8,8 @@ export interface Bindings {
   SENTRY_DSN: string;
   GOOGLE_CLIENT_SECRET: string;
   GOOGLE_CLIENT_ID: string;
+  MICROSOFT_CLIENT_ID: string;
+  MICROSOFT_CLIENT_SECRET: string;
   RESEND_API_KEY: string;
   R2_ENDPOINT: string;
   R2_ACCESS_ID: string;

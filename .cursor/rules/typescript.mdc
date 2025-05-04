@@ -1,5 +1,5 @@
 ---
 description: 
-globs: 
+globs: *.tsx,*.ts,*.d.ts
 alwaysApply: false
 ---

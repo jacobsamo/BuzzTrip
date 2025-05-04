@@ -2,92 +2,109 @@ import type { MiddlewareHandler } from "hono";
 import { getPath } from "hono/utils/url";
 
 export const loggingMiddleware: MiddlewareHandler = async (c, next) => {
+  const { method } = c.req;
+  const path = getPath(c.req.raw);
+  const requestId = c.get("requestId");
+  const start = Date.now();
+
+  // Read request body safely (clone if needed)
+  let requestBody: unknown = undefined;
   try {
-    const { method } = c.req;
-    const path = getPath(c.req.raw);
+    // Only parse if content-type is JSON
+    if (c.req.header("content-type")?.includes("application/json")) {
+      requestBody = await c.req.json();
+    }
+  } catch (e) {
+    requestBody = "<unreadable>";
+  }
 
-    console.info("Incoming request", {
-      requestId: c.get("requestId"),
-      request: {
-        method,
-        path,
-      },
-    });
+  // Log incoming request with as much context as possible
+  console.info("[Request]", {
+    requestId,
+    method,
+    path,
+    headers: c.req.header(),
+    body: requestBody,
+    honoContext: {
+      params: c.req.param(),
+      query: c.req.query(),
+      url: c.req.url,
+      path: c.req.path,
+      routePath: c.req.routePath,
+      matchedRoutes: c.req.matchedRoutes,
+      env: c.env,
+    },
+  });
 
-    const start = Date.now();
-
+  try {
     await next();
-
     const { status } = c.res;
+    let responseBody: unknown = undefined;
+    try {
+      // Only parse if content-type is JSON
+      if (c.res.headers.get("content-type")?.includes("application/json")) {
+        responseBody = await c.res.json();
+      }
+    } catch (e) {
+      responseBody = "<unreadable>";
+    }
+
+    const logData = {
+      requestId,
+      method,
+      path,
+      status,
+      duration: time(start),
+      request: { headers: c.req.header(), body: requestBody },
+      response: {
+        headers: Object.fromEntries(c.res.headers.entries()),
+        body: responseBody,
+      },
+      honoContext: {
+        params: c.req.param(),
+        query: c.req.query(),
+        url: c.req.url,
+        path: c.req.path,
+        routePath: c.req.routePath,
+        matchedRoutes: c.req.matchedRoutes,
+        env: c.env,
+      },
+    };
 
     if (status !== 200) {
-      const extraData = {
-        request: {
-          method: method,
-          url: path,
-          headers: c.req.header(),
-          body: c.req.json(),
-        },
-        response: {
-          status: c.res.status,
-          headers: c.res.headers,
-          body: c.res.body,
-        },
-        method: method,
-        json: c.req.json(),
-        path: path,
-        start: start,
-        time: time(start),
-        err: c.error,
-      };
-
-      c.get("sentry").captureMessage(
-        `Failed request: ${method} ${path}, ${c.get("requestId")}`,
-        "warning",
-        {
-          data: extraData,
-        }
-      );
-      console.warn(
-        `Failed request: ${method} ${path}, ${c.get("requestId")}`,
-        extraData
-      );
+      c
+        .get("sentry")
+        ?.captureMessage(
+          `[Non-200] ${method} ${path} (${status}) [${requestId}]`,
+          "warning",
+          { data: logData }
+        );
+      console.warn("[Non-200 Response]", logData);
     } else {
-      console.info("Request completed", {
-        requestId: c.get("requestId"),
-        request: {
-          method,
-          path,
-        },
-        response: {
-          status,
-          ok: String(c.res.ok),
-          time: time(start),
-        },
-      });
+      console.info("[Response]", logData);
     }
-  } catch (err) {
-    c.get("sentry").captureException(err, {
-      data: {
-        request: {
-          method: c.req.method,
-          url: c.req.path,
-          headers: c.req.header(),
-          body: c.req.json(),
-        },
-        response: {
-          status: c.res.status,
-          headers: c.res.headers,
-          body: c.res.body,
-        },
-        method: c.req.method,
-        json: c.req.json(),
+  } catch (err: any) {
+    // Log error with stack trace and context
+    const errorLog = {
+      requestId,
+      method,
+      path,
+      error: err?.message,
+      stack: err?.stack,
+      request: { headers: c.req.header(), body: requestBody },
+      honoContext: {
+        params: c.req.param(),
+        query: c.req.query(),
+        url: c.req.url,
         path: c.req.path,
-        err: c.error,
+        routePath: c.req.routePath,
+        matchedRoutes: c.req.matchedRoutes,
+        env: c.env,
       },
-    });
-    console.error("Error in request handling:", err);
-    throw err; // Re-throw error for further handling
+    };
+    c.get("sentry")?.captureException(err, { data: errorLog });
+    console.error("[Request Error]", errorLog);
+    throw err;
   }
 };
 
@@ -102,7 +119,6 @@ function humanize(times: string[]): string {
 
 function time(start: number): string {
   const delta = Date.now() - start;
-
   return humanize([
     delta < 1000 ? delta + "ms" : Math.round(delta / 1000) + "s",
   ]);
