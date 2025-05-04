@@ -71,7 +71,6 @@ app.use((c, next) =>
 app.use(loggingMiddleware);
 app.use("*", requestId());
 
-
 app.get("/health", (c) => {
   return c.json({ status: "ok" });
 });
@@ -81,6 +80,17 @@ app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
   scheme: "bearer",
 });
 
+app.doc("/openapi", {
+  openapi: "3.1.0",
+  info: {
+    version: "1.0.0",
+    title: "BuzzTrip API",
+  },
+});
+app.getOpenAPI31Document({
+  openapi: "3.1.0",
+  info: { title: "BuzzTrip API", version: "1" },
+}); // schema object
 
 app.route("/", authHandler);
 

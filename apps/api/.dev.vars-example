@@ -1,9 +1,0 @@
-AUTH_SECRET=<secret>
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-TURSO_CONNECTION_URL= <not needed in development>
-TURSO_AUTH_TOKEN= <not needed in development>
-API_URL=http://localhost:8181
-API_SECRET_KEY=<secret>
-FRONT_END_URL=http://localhost:5173
-SENTRY_DSN=<sentry-dsn>
