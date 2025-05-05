@@ -24,21 +24,14 @@ import { editMarkerRoute } from "./routes/map/marker/edit-marker-route";
 //Uploads
 import { uploadFileRoute } from "./routes/upload/upload-file-route";
 // Users
+import { connectRealtimeMapRoute } from "./routes/map/connect-realtime-map";
 import { getUserMapsRoute } from "./routes/user/get-user-maps-route";
 import { searchUserRoute } from "./routes/user/search-user-route";
 import { updateUserRoute } from "./routes/user/update-user-route";
 
-const app = new OpenAPIHono<AppBindings>({
-  defaultHook: (result, c) => {
-    if (!result.success) {
-      console.error("Failed request", {
-        result,
-        c,
-      });
-      return c.json({ success: false, errors: result.error.errors }, 422);
-    }
-  },
-});
+export { MapsDurableObject } from "./durable-objects/maps-do";
+
+const app = new OpenAPIHono<AppBindings>();
 
 app.use("*", (c, next) => {
   if (c.req.header("Origin") == c.env.FRONT_END_URL) {
@@ -71,10 +64,6 @@ app.use((c, next) =>
 app.use(loggingMiddleware);
 app.use("*", requestId());
 
-app.get("/health", (c) => {
-  return c.json({ status: "ok" });
-});
-
 app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
   type: "http",
   scheme: "bearer",
@@ -92,6 +81,13 @@ app.getOpenAPI31Document({
   info: { title: "BuzzTrip API", version: "1" },
 }); // schema object
 
+// Routes
+
+app.get("/health", (c) => {
+  return c.json({ status: "ok" });
+});
+
+app.route("/", connectRealtimeMapRoute);
 app.route("/", authHandler);
 
 const routes = app

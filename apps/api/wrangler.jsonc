@@ -1,7 +1,7 @@
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "buzztrip-api",
-  "compatibility_date": "2022-04-05",
+  "compatibility_date": "2025-04-02",
   "compatibility_flags": [
     "nodejs_compat",
     "nodejs_compat_populate_process_env",
@@ -25,14 +25,25 @@
     },
     "production": {
       "name": "buzztrip-prod-api",
-      "route": { "pattern": "api.buzztrip.co/*", "zone_name": "buzztrip.co" },
+      "route": {
+        "pattern": "api.buzztrip.co/*",
+        "zone_name": "buzztrip.co"
+      },
     },
   },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": [
+        "MapsDurableObject"
+      ],
+    },
+  ],
   "durable_objects": {
     "bindings": [
       {
-        "name": "MapsDurableObject",
-        "class_name": "MAPS_DURABLE_OBJECT",
+        "class_name": "MapsDurableObject",
+        "name": "MAPS_DURABLE_OBJECT",
       },
     ],
   },

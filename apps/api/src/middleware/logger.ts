@@ -8,15 +8,21 @@ export const loggingMiddleware: MiddlewareHandler = async (c, next) => {
   const start = Date.now();
 
   // Read request body safely (clone if needed)
-  let requestBody: unknown = undefined;
+  let requestBodyText: string | undefined;
+
   try {
-    // Only parse if content-type is JSON
     if (c.req.header("content-type")?.includes("application/json")) {
-      requestBody = await c.req.json();
+      requestBodyText = await c.req.text(); // Only read once
+      c.set("parsedJsonBody", JSON.parse(requestBodyText)); // store parsed value
     }
   } catch (e) {
-    requestBody = "<unreadable>";
+    requestBodyText = "<unreadable>";
   }
+
+  // Use this in logging
+  const requestBody = requestBodyText && requestBodyText !== "<unreadable>"
+    ? JSON.parse(requestBodyText)
+    : requestBodyText;
 
   // Log incoming request with as much context as possible
   console.info("[Request]", {
@@ -39,15 +45,21 @@ export const loggingMiddleware: MiddlewareHandler = async (c, next) => {
   try {
     await next();
     const { status } = c.res;
-    let responseBody: unknown = undefined;
+    let responseBodyText: string | undefined;
+
     try {
-      // Only parse if content-type is JSON
-      if (c.res.headers.get("content-type")?.includes("application/json")) {
-        responseBody = await c.res.json();
+      if (c.req.header("content-type")?.includes("application/json")) {
+        responseBodyText = await c.req.text(); // Only read once
+        c.set("parsedJsonBody", JSON.parse(responseBodyText)); // store parsed value
       }
     } catch (e) {
-      responseBody = "<unreadable>";
+      responseBodyText = "<unreadable>";
     }
+
+    // Use this in logging
+    const responseBody = responseBodyText && responseBodyText !== "<unreadable>"
+      ? JSON.parse(responseBodyText)
+      : responseBodyText;
 
     const logData = {
       requestId,
