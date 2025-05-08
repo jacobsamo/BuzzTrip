@@ -49,7 +49,6 @@ export const getUserMapsRoute = appRoute.openapi(
     try {
       const { userId } = c.req.valid("param");
       const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
-
       const usersMaps = await getUserMaps(db, userId);
 
       return c.json(usersMaps, 200);

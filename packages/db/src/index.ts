@@ -1,5 +1,5 @@
-import * as schema from "./schemas";
 import { drizzle } from "drizzle-orm/libsql";
+import * as schema from "./schemas";
 
 export const createDb = (url: string, authToken: string) => {
   return drizzle({

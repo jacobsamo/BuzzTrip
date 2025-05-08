@@ -1,25 +1,18 @@
-import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
   id: text("user_id").primaryKey().notNull(),
-  first_name: text("first_name"),
-  last_name: text("last_name"),
-  full_name: text("full_name").generatedAlwaysAs(
-    sql`first_name || ' ' || last_name`,
-    {
-      mode: "stored",
-    }
-  ),
+  name: text("full_name").notNull(),
   email: text("email").notNull().unique(),
-  emailVerified: integer("email_verified", { mode: "boolean" })
-    .default(false)
-    .notNull(),
-  profile_picture: text("profile_picture"),
-  username: text("username"),
-  bio: text("bio"),
+  emailVerified: integer("email_verified", { mode: "boolean" }).notNull(),
+  image: text("profile_picture"),
   created_at: integer("created_at", { mode: "timestamp" }).notNull(),
   updated_at: integer("updated_at", { mode: "timestamp" }).notNull(),
+  twoFactorEnabled: integer("two_factor_enabled", { mode: "boolean" }),
+  first_name: text("first_name"),
+  last_name: text("last_name"),
+  username: text("username"),
+  bio: text("bio"),
 });
 
 export const user_sessions = sqliteTable("user_sessions", {
@@ -32,7 +25,7 @@ export const user_sessions = sqliteTable("user_sessions", {
   userAgent: text("user_agent"),
   userId: text("user_id")
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: "cascade" }),
 });
 
 export const user_accounts = sqliteTable("user_accounts", {
@@ -41,7 +34,7 @@ export const user_accounts = sqliteTable("user_accounts", {
   providerId: text("provider_id").notNull(),
   userId: text("user_id")
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: "cascade" }),
   accessToken: text("access_token"),
   refreshToken: text("refresh_token"),
   idToken: text("id_token"),
@@ -64,4 +57,28 @@ export const user_verifications = sqliteTable("user_verifications", {
   expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
   createdAt: integer("created_at", { mode: "timestamp" }),
   updatedAt: integer("updated_at", { mode: "timestamp" }),
+});
+
+export const passkey = sqliteTable("passkey", {
+  id: text("id").primaryKey(),
+  name: text("name"),
+  publicKey: text("public_key").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  credentialID: text("credential_i_d").notNull(),
+  counter: integer("counter").notNull(),
+  deviceType: text("device_type").notNull(),
+  backedUp: integer("backed_up", { mode: "boolean" }).notNull(),
+  transports: text("transports"),
+  createdAt: integer("created_at", { mode: "timestamp" }),
+});
+
+export const twoFactor = sqliteTable("two_factor", {
+  id: text("id").primaryKey(),
+  secret: text("secret").notNull(),
+  backupCodes: text("backup_codes").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
 });

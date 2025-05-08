@@ -2,22 +2,163 @@ import { generateId } from "@buzztrip/db/helpers";
 import * as schemas from "@buzztrip/db/schemas";
 import MagicLinkVerificationEmail from "@buzztrip/transactional/emails/magic-link";
 import { createResend, sendEmail } from "@buzztrip/transactional/helpers";
+import { polar } from "@polar-sh/better-auth";
+import { Polar } from "@polar-sh/sdk";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { magicLink } from "better-auth/plugins";
+import { magicLink, twoFactor } from "better-auth/plugins";
+import { passkey } from "better-auth/plugins/passkey";
 import { db } from "./db";
 import { generateOTP } from "./generateOTP";
 
+const client = new Polar({
+  accessToken: process.env.POLAR_ACCESS_TOKEN,
+  // Use 'sandbox' if you're using the Polar Sandbox environment
+  // Remember that access tokens, products, etc. are completely separated between environments.
+  // Access tokens obtained in Production are for instance not usable in the Sandbox environment.
+  server: process.env.ENVIRONMENT === "production" ? "production" : "sandbox",
+  serverURL: process.env.API_URL!,
+});
+
 export const auth = betterAuth({
   appName: "BuzzTrip",
-  baseURL: process.env.API_URL,
+  baseURL: process.env.API_URL!,
   basePath: "/auth",
-  secret: process.env.AUTH_SECRET,
-  trustedOrigins: [process.env.FRONT_END_URL, process.env.API_URL],
+  secret: process.env.AUTH_SECRET!,
+  trustedOrigins: [process.env.FRONT_END_URL!, process.env.API_URL!],
   database: drizzleAdapter(db, {
     provider: "sqlite", // or "mysql", "sqlite"`
     schema: { ...schemas, user: schemas.users },
   }),
+
+  // https://www.better-auth.com/docs/authentication/email-password
+  // emailAndPassword: { enabled: false, requireEmailVerification: true,  },
+  // emailVerification: {
+  //   autoSignInAfterVerification: true,
+  //   sendVerificationEmail(data, request) {
+  //     rer
+  //   },
+  // }
+  // https://www.better-auth.com/docs/concepts/oauth
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      mapProfileToUser: (profile) => {
+        return {
+          first_name: profile.given_name,
+          last_name: profile.family_name,
+        };
+      },
+    },
+    microsoft: {
+      clientId: process.env.MICROSOFT_CLIENT_ID!,
+      clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
+      tenantId: "common",
+      requireSelectAccount: true,
+      mapProfileToUser: (profile) => {
+        return {
+          first_name: profile.name.split(" ")[0],
+          last_name: profile.name.split(" ")[1],
+        };
+      },
+    },
+    // apple: {
+    //   clientId: appleClientId,
+    //   clientSecret: appleSecretKey,
+    //   mapProfileToUser: (profile) => {
+    //     return {
+    //       first_name: profile.name.split(" ")[0],
+    //       last_name: profile.name.split(" ")[1],
+    //     };
+    //   },
+    // }
+  },
+  advanced: {
+    database: {
+      generateId: (options) => {
+        return generateId("user");
+      },
+    },
+    crossSubDomainCookies: { enabled: true },
+  },
+  plugins: [
+    polar({
+      client,
+      // Enable automatic Polar Customer creation on signup
+      createCustomerOnSignUp: true,
+      // Enable customer portal
+      enableCustomerPortal: true, // Deployed under /portal for authenticated users
+      // Configure checkout
+      checkout: {
+        enabled: true,
+        products: [
+          {
+            productId: "22cfed61-1e76-4368-a013-5a78c76dac3c", // ID of Product from Polar Dashboard
+            slug: "free", // Custom slug for easy reference in Checkout URL, e.g. /checkout/pro
+          },
+          {
+            productId: "244c7d4f-6b5f-46dc-a8ce-300677396b63",
+            slug: "pro",
+          },
+          {
+            productId: "9c802964-4988-4227-9c7e-c434c7701798",
+            slug: "team",
+          },
+        ],
+        successUrl: "/success?checkout_id={CHECKOUT_ID}",
+      },
+      // Incoming Webhooks handler will be installed at /polar/webhooks
+      // webhooks: {
+      //     secret: process.env.POLAR_WEBHOOK_SECRET,
+      //     onPayload: ...,
+      // }
+    }),
+    magicLink({
+      generateToken: (email) => {
+        const otp = generateOTP();
+        return `${email}:${otp}`; // Since codes can be used only once, we'll use the email & OTP as the token
+      },
+      sendMagicLink: async ({ email, token, url }, request) => {
+        if (process.env.ENVIRONMENT === "development") {
+          console.log("Requesting to login using OTP", { email, token, url });
+          return;
+        }
+
+        try {
+          const resend = createResend(process.env.RESEND_API_KEY!);
+          sendEmail({
+            resend,
+            email: email,
+            subject: "Verify your BuzzTrip account",
+            react: MagicLinkVerificationEmail({
+              email,
+              token,
+              callbackUrl: url,
+            }),
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      },
+      expiresIn: 60 * 10, // 10 minutes
+    }),
+    passkey({
+      rpID: "buzztrip",
+      rpName: "BuzzTrip",
+      origin: "https://buzztrip.co",
+    }),
+    twoFactor({
+      issuer: "buzztrip",
+    }),
+  ],
+
+  onAPIError: {
+    onError(error, ctx) {
+      console.error("An error occured during auth", { error, ctx });
+    },
+    throw: true,
+  },
 
   // Alter user, session, account and verification models & settings
   user: {
@@ -49,13 +190,14 @@ export const auth = betterAuth({
       },
     },
     fields: {
-      name: "full_name",
-      image: "profile_picture",
+      // name: "full_name",
+      // image: "profile_picture",
       createdAt: "created_at",
       updatedAt: "updated_at",
     },
   },
   session: {
+    modelName: "user_sessions",
     cookieCache: {
       enabled: true,
       maxAge: 5 * 60, // 7 days
@@ -71,93 +213,6 @@ export const auth = betterAuth({
       allowDifferentEmails: true,
       trustedProviders: ["google", "microsoft", "apple", "email-password"],
     },
-  },
-  plugins: [
-    magicLink({
-      generateToken: (email) => {
-        const otp = generateOTP();
-        return `${email}:${otp}`; // Since codes can be used only once, we'll use the email & OTP as the token
-      },
-      sendMagicLink: async ({ email, token, url }, request) => {
-        // TODO: make it so if in dev we just console.log it
-        console.log("Requesting to login using OTP", { email, token, url });
-
-        try {
-          const resend = createResend(process.env.RESEND_API_KEY);
-          sendEmail({
-            resend,
-            email: email,
-            subject: "Verify your BuzzTrip account",
-            react: MagicLinkVerificationEmail({
-              email,
-              token,
-              callbackUrl: url,
-            }),
-          });
-        } catch (error) {
-          console.error(error);
-        }
-      },
-      expiresIn: 60 * 10, // 10 minutes
-    }),
-  ],
-  // https://www.better-auth.com/docs/authentication/email-password
-  // emailAndPassword: { enabled: false, requireEmailVerification: true,  },
-  // emailVerification: {
-  //   autoSignInAfterVerification: true,
-  //   sendVerificationEmail(data, request) {
-  //     rer
-  //   },
-  // }
-  // https://www.better-auth.com/docs/concepts/oauth
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      mapProfileToUser: (profile) => {
-        console.log("Google profile:", profile);
-        return {
-          first_name: profile.given_name,
-          last_name: profile.family_name,
-        };
-      },
-    },
-    microsoft: {
-      clientId: process.env.MICROSOFT_CLIENT_ID,
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
-      tenantId: "common",
-      requireSelectAccount: true,
-      mapProfileToUser: (profile) => {
-        return {
-          first_name: profile.name.split(" ")[0],
-          last_name: profile.name.split(" ")[1],
-        };
-      },
-    },
-    // apple: {
-    //   clientId: appleClientId,
-    //   clientSecret: appleSecretKey,
-    //   mapProfileToUser: (profile) => {
-    //     return {
-    //       first_name: profile.name.split(" ")[0],
-    //       last_name: profile.name.split(" ")[1],
-    //     };
-    //   },
-    // }
-  },
-  advanced: {
-    database: {
-      generateId: (options) => {
-        return generateId("user");
-      },
-    },
-    crossSubDomainCookies: { enabled: true },
-  },
-  onAPIError: {
-    onError(error, ctx) {
-      console.error("An error occured during auth", { error, ctx });
-    },
-    throw: true,
   },
 });
 

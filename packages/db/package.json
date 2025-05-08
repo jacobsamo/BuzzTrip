@@ -6,7 +6,8 @@
   "types": "./src/types/index.ts",
   "scripts": {
     "clean:all": "rm -rf node_modules/",
-    "db:auth": "bunx @better-auth/cli generate --config ../api/src/common/auth.ts --output ./src/schemas/auth.ts",
+    "db:auth:generate": "bunx @better-auth/cli@latest generate --config ../../apps/api/src/common/auth.ts --output ./src/schemas/auth.ts",
+    "db:auth:migrate": "bunx @better-auth/cli@latest generate --config ../../apps/api/src/common/auth.ts",
     "db:studio": "drizzle-kit studio",
     "db:studio:prd": "cross-env NODE_ENV=production drizzle-kit studio",
     "db:generate": "drizzle-kit generate",
@@ -16,7 +17,7 @@
   },
   "devDependencies": {
     "@buzztrip/tsconfig": "workspace:*",
-    "@types/node": "^22.15.3",
+    "@types/node": "^22.15.15",
     "cross-env": "^7.0.3",
     "dotenv": "^16.5.0",
     "drizzle-kit": "^0.31.1",
@@ -25,7 +26,7 @@
   "dependencies": {
     "@libsql/client": "^0.15.4",
     "drizzle-zod": "^0.7.1",
-    "zod": "^3.24.3"
+    "zod": "^3.24.4"
   },
   "exports": {
     ".": "./src/index.ts",

@@ -86,16 +86,18 @@ app.get("/health", (c) => {
   return c.json({ status: "ok" }, 200);
 });
 
+// routes note needed in type inference
+const noTypeInferenceRoutes = [authHandler, connectRealtimeMapRoute];
+
+// routes for type inference
 const routes = [
   // User routes
-  authHandler,
   getUserMapsRoute,
   searchUserRoute,
   updateUserRoute,
   // Upload routes
   uploadFileRoute,
   // Map routes
-  connectRealtimeMapRoute,
   createMapRoute,
   editMapRoute,
   getMapDataRoute,
@@ -111,6 +113,7 @@ const routes = [
 
 // initialize routes
 routes.forEach((route) => app.route("/", route));
+noTypeInferenceRoutes.forEach((route) => app.route("/", route));
 
 // Export any neccariy items for either build or other apps
 export * from "./common/auth";
