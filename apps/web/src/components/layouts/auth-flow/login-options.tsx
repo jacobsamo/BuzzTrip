@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Icons, Provider } from "./helpers";
+import { toast } from "sonner";
 
 interface LoginOptionsProps {
   onEmailSubmit: (email: string) => void;
@@ -45,6 +46,11 @@ export function LoginOptions({
       callbackURL: `${window.location.origin}/app`,
       newUserCallbackURL: `${window.location.origin}/auth/sign-up?method=${provider}&step=profile`,
       errorCallbackURL: `${window.location.origin}/auth/sign-up?method=error`,
+    }).then((res) => {
+      if (res.error) {
+        toast.error("Something went wrong");
+        setIsLoading(null);
+      }
     });
   };
 

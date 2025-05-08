@@ -82,36 +82,38 @@ app.getOpenAPI31Document({
 }); // schema object
 
 // Routes
-
 app.get("/health", (c) => {
-  return c.json({ status: "ok" });
+  return c.json({ status: "ok" }, 200);
 });
 
-app.route("/", connectRealtimeMapRoute);
-app.route("/", authHandler);
-
-const routes = app
+const routes = [
   // User routes
-  .route("/", getUserMapsRoute)
-  .route("/", searchUserRoute)
-  .route("/", updateUserRoute)
+  authHandler,
+  getUserMapsRoute,
+  searchUserRoute,
+  updateUserRoute,
   // Upload routes
-  .route("/", uploadFileRoute)
+  uploadFileRoute,
   // Map routes
-  .route("/", createMapRoute)
-  .route("/", editMapRoute)
-  .route("/", getMapDataRoute)
-  .route("/", getMapRoute)
-  .route("/", shareMapRoute)
+  connectRealtimeMapRoute,
+  createMapRoute,
+  editMapRoute,
+  getMapDataRoute,
+  getMapRoute,
+  shareMapRoute,
   // Marker Routes
-  .route("/", createMarkerRoute)
-  .route("/", editMarkerRoute)
+  createMarkerRoute,
+  editMarkerRoute,
   // Collection routes
-  .route("/", createCollectionRoute)
-  .route("/", editCollectionRoute);
+  createCollectionRoute,
+  editCollectionRoute,
+] as const;
+
+// initialize routes
+routes.forEach((route) => app.route("/", route));
 
 // Export any neccariy items for either build or other apps
 export * from "./common/auth";
 
-export type AppType = typeof routes;
+export type AppType = (typeof routes)[number];
 export default app;
