@@ -3,16 +3,16 @@ import * as z from "zod";
 import {
   collection_links,
   collections,
-  places,
+  labels,
   map_users,
   maps,
   markers,
   permissionEnum,
+  places,
   route_stops,
   routes,
-  users,
   routeTravelTypeEnum,
-  labels,
+  users,
 } from "../schemas";
 import { iconsList } from "../types";
 
@@ -42,7 +42,7 @@ export const boundsSchema = z.union([bounds, latlng]);
 
 export const mapBoundsSchema = bounds.extend({
   offset: z.number().optional(),
-})
+});
 
 // Table generated schemas with drizzle-zod
 export const usersSchema = createSelectSchema(users);
@@ -54,9 +54,9 @@ export const refinedUserSchema = usersSchema.pick({
   username: true,
   first_name: true,
   last_name: true,
-  full_name: true,
-  profile_picture: true,
-})
+  name: true,
+  image: true,
+});
 
 export const mapsSchema = createSelectSchema(maps).extend({
   icon: iconSchema.nullable(),
@@ -69,7 +69,7 @@ export const mapsEditSchema = createInsertSchema(maps).extend({
 
 export const labelsSchema = createSelectSchema(labels).extend({
   icon: iconSchema,
-}); 
+});
 export const labelsEditSchema = createInsertSchema(labels).extend({
   icon: iconSchema,
 });

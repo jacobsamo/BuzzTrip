@@ -17,10 +17,14 @@ export const UserButton = () => {
 
   const handleLogout = async () => {
     try {
-      await authClient.signOut();
-      // Force a router refresh before redirecting
-      router.refresh();
-      router.push("/auth/sign-in");
+      // https://www.better-auth.com/docs/authentication/email-password#sign-out
+      await authClient.signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            router.push("/auth/sign-in"); // redirect to login page
+          },
+        },
+      });
     } catch (error) {
       console.error("Error during logout:", error);
     }

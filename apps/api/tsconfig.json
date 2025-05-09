@@ -1,17 +1,21 @@
 {
   "compilerOptions": {
-    "moduleResolution": "Bundler",
-    "baseUrl": ".",
-    "strict": true,
-    "types": ["@cloudflare/workers-types", "bun-types"],
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
-    "lib": ["ESNext"],
-    "target": "ESNext",
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
     "module": "ESNext",
-    "moduleDetection": "force",
+    "target": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ESNext"],
+    "baseUrl": ".",
     "allowJs": true,
     "skipLibCheck": true,
+    "strict": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
     "noFallthroughCasesInSwitch": true
-  }
+  },
+  "include": ["./**/*.ts"]
 }

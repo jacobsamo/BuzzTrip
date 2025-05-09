@@ -2,92 +2,111 @@ import type { MiddlewareHandler } from "hono";
 import { getPath } from "hono/utils/url";
 
 export const loggingMiddleware: MiddlewareHandler = async (c, next) => {
+  const { method } = c.req;
+  const path = getPath(c.req.raw);
+  const requestId = c.get("requestId");
+  const start = Date.now();
+  // Read request body safely (clone if needed)
+  let requestBodyText: string | undefined;
   try {
-    const { method } = c.req;
-    const path = getPath(c.req.raw);
-
-    console.info("Incoming request", {
-      requestId: c.get("requestId"),
-      request: {
-        method,
-        path,
-      },
-    });
-
-    const start = Date.now();
-
-    await next();
-
-    const { status } = c.res;
-
-    if (status !== 200) {
-      const extraData = {
-        request: {
-          method: method,
-          url: path,
-          headers: c.req.header(),
-          body: c.req.json(),
-        },
-        response: {
-          status: c.res.status,
-          headers: c.res.headers,
-          body: c.res.body,
-        },
-        method: method,
-        json: c.req.json(),
-        path: path,
-        start: start,
-        time: time(start),
-        err: c.error,
-      };
-
-      c.get("sentry").captureMessage(
-        `Failed request: ${method} ${path}, ${c.get("requestId")}`,
-        "warning",
-        {
-          data: extraData,
-        }
-      );
-      console.warn(
-        `Failed request: ${method} ${path}, ${c.get("requestId")}`,
-        extraData
-      );
-    } else {
-      console.info("Request completed", {
-        requestId: c.get("requestId"),
-        request: {
-          method,
-          path,
-        },
-        response: {
-          status,
-          ok: String(c.res.ok),
-          time: time(start),
-        },
-      });
+    if (c.req.header("content-type")?.includes("application/json")) {
+      requestBodyText = await c.req.text(); // Only read once
+      c.set("parsedJsonBody", JSON.parse(requestBodyText)); // store parsed value
     }
-  } catch (err) {
-    c.get("sentry").captureException(err, {
-      data: {
-        request: {
-          method: c.req.method,
-          url: c.req.path,
-          headers: c.req.header(),
-          body: c.req.json(),
-        },
-        response: {
-          status: c.res.status,
-          headers: c.res.headers,
-          body: c.res.body,
-        },
-        method: c.req.method,
-        json: c.req.json(),
-        path: c.req.path,
-        err: c.error,
+  } catch (e) {
+    requestBodyText = "<unreadable>";
+  }
+  // Use this in logging
+  const requestBody =
+    requestBodyText && requestBodyText !== "<unreadable>"
+      ? JSON.parse(requestBodyText)
+      : requestBodyText;
+  // Log incoming request with as much context as possible
+  console.info("[Request]", {
+    requestId,
+    method,
+    path,
+    headers: c.req.header(),
+    body: requestBody,
+    honoContext: {
+      params: c.req.param(),
+      query: c.req.query(),
+      url: c.req.url,
+      path: c.req.path,
+      routePath: c.req.routePath,
+      matchedRoutes: c.req.matchedRoutes,
+    },
+  });
+  try {
+    await next();
+    const { status } = c.res;
+    let responseBodyText: string | undefined;
+    try {
+      if (c.req.header("content-type")?.includes("application/json")) {
+        responseBodyText = await c.req.text(); // Only read once
+        c.set("parsedJsonBody", JSON.parse(responseBodyText)); // store parsed value
+      }
+    } catch (e) {
+      responseBodyText = "<unreadable>";
+    }
+    // Use this in logging
+    const responseBody =
+      responseBodyText && responseBodyText !== "<unreadable>"
+        ? JSON.parse(responseBodyText)
+        : responseBodyText;
+    const logData = {
+      requestId,
+      method,
+      path,
+      status,
+      duration: time(start),
+      request: { headers: c.req.header(), body: requestBody },
+      response: {
+        headers: Object.fromEntries(c.res.headers.entries()),
+        body: responseBody,
       },
-    });
-    console.error("Error in request handling:", err);
-    throw err; // Re-throw error for further handling
+      honoContext: {
+        params: c.req.param(),
+        query: c.req.query(),
+        url: c.req.url,
+        path: c.req.path,
+        routePath: c.req.routePath,
+        matchedRoutes: c.req.matchedRoutes,
+      },
+    };
+    if (status !== 200) {
+      c
+        .get("sentry")
+        ?.captureMessage(
+          `[Non-200] ${method} ${path} (${status}) [${requestId}]`,
+          "warning",
+          { data: logData }
+        );
+      console.warn("[Non-200 Response]", logData);
+    } else {
+      console.info("[Response]", logData);
+    }
+  } catch (err: any) {
+    // Log error with stack trace and context
+    const errorLog = {
+      requestId,
+      method,
+      path,
+      error: err?.message,
+      stack: err?.stack,
+      request: { headers: c.req.header(), body: requestBody },
+      honoContext: {
+        params: c.req.param(),
+        query: c.req.query(),
+        url: c.req.url,
+        path: c.req.path,
+        routePath: c.req.routePath,
+        matchedRoutes: c.req.matchedRoutes,
+      },
+    };
+    c.get("sentry")?.captureException(err, { data: errorLog });
+    console.error("[Request Error]", errorLog);
+    throw err;
   }
 };
 
@@ -102,7 +121,6 @@ function humanize(times: string[]): string {
 
 function time(start: number): string {
   const delta = Date.now() - start;
-
   return humanize([
     delta < 1000 ? delta + "ms" : Math.round(delta / 1000) + "s",
   ]);

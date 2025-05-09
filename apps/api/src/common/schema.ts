@@ -1,3 +1,4 @@
+import { mapsSchema } from "@buzztrip/db/zod-schemas";
 import { z } from "@hono/zod-openapi";
 
 export const ErrorSchema = z.object({
@@ -18,3 +19,19 @@ export const HeadersSchema = z.object({
     example: "Bearer SECRET",
   }),
 });
+
+
+export const MapParamsSchema = z.object({
+  mapId: z
+    .string()
+    .openapi({
+      param: {
+        name: "mapId",
+        in: "path",
+        required: true,
+      },
+      example: "1f36c536-c8cf-4174-8ed4-3150c08212b5",
+    }),
+});
+
+export const MapSchema = mapsSchema.openapi("MapsSchema");

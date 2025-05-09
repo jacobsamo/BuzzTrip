@@ -94,7 +94,7 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
           })
         );
 
-        const uploadResponse = await fetch("/api/files/upload", {
+        const uploadResponse = await fetch("/api/upload", {
           method: "POST",
           body: formData,
         });
