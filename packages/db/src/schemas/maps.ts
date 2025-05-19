@@ -5,6 +5,7 @@ import {
   real,
   sqliteTable,
   text,
+  index
 } from "drizzle-orm/sqlite-core";
 import z from "zod";
 import { generateId } from "../helpers";
@@ -77,7 +78,9 @@ export const map_users = sqliteTable("map_users", {
   // updated_at: text("updated_at")
   //   .default(sql`(CURRENT_TIMESTAMP)`)
   //   .notNull(),
-});
+}, (table) => [
+  index("map_id_idx").on(table.map_id),
+]);
 
 export const labels = sqliteTable("labels", {
   label_id: text("label_id")
@@ -97,7 +100,9 @@ export const labels = sqliteTable("labels", {
   updated_at: text("updated_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
-});
+}, (table) => [
+  index("map_id_idx").on(table.map_id),
+]);
 
 export const markers = sqliteTable("markers", {
   marker_id: text("marker_id")
@@ -125,7 +130,9 @@ export const markers = sqliteTable("markers", {
   updated_at: text("updated_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
-});
+}, (table) => [
+  index("map_id_idx").on(table.map_id),
+]);
 
 export const collections = sqliteTable("collections", {
   collection_id: text("collection_id")
@@ -148,7 +155,9 @@ export const collections = sqliteTable("collections", {
   updated_at: text("updated_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
-});
+}, (table) => [
+  index("map_id_idx").on(table.map_id),
+]);
 
 export const collection_links = sqliteTable("collection_links", {
   link_id: text("link_id")
@@ -171,7 +180,10 @@ export const collection_links = sqliteTable("collection_links", {
   created_at: text("created_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
-});
+}, (table) => [
+  index("map_id_idx").on(table.map_id),
+  index("marker_id_idx").on(table.marker_id),
+]);
 
 export const routes = sqliteTable("routes", {
   route_id: text("route_id")
@@ -194,7 +206,9 @@ export const routes = sqliteTable("routes", {
   created_at: text("created_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
-});
+}, (table) => [
+  index("map_id_idx").on(table.map_id),
+]);
 
 export const route_stops = sqliteTable("route_stops", {
   route_stop_id: text("route_stop_id")
@@ -220,4 +234,6 @@ export const route_stops = sqliteTable("route_stops", {
   created_at: text("created_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
-});
+}, (table) => [
+  index("map_id_idx").on(table.map_id),
+]);

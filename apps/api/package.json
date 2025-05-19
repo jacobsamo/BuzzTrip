@@ -2,13 +2,19 @@
   "name": "@buzztrip/api",
   "version": "0.0.0",
   "main": "src/index.ts",
+  "types": "dist/types.d.ts",
+  "exports": {
+    "./auth": "./dist/auth.js",
+    "./types": "./dist/types.js"
+  },
   "scripts": {
     "clean:all": "rm -rf node_modules/",
     "dev": "wrangler types && wrangler dev src/index.ts",
     "dev:custom-cert": "--https-cert-path certificates/localhost+3.pem --https-key-path certificates/localhost+3-key.pem --local-protocol=https",
     "deploy": "wrangler types && wrangler deploy --minify src/index.ts",
     "check:types": "tsc --noEmit",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "build:types": "tsc --build"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.787.0",

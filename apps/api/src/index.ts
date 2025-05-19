@@ -1,37 +1,16 @@
 import { sentry } from "@hono/sentry";
-import { OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
 import { requestId } from "hono/request-id";
-import { AppBindings } from "./common/types";
+import { app } from "./common/types";
 import {
   authMiddleware,
   loggingMiddleware,
   securityMiddleware,
 } from "./middleware";
+import { routes } from "./routes";
 import { authHandler } from "./routes/auth";
-// Maps
-import { createMapRoute } from "./routes/map/create-map-route";
-import { editMapRoute } from "./routes/map/edit-map-route";
-import { getMapDataRoute } from "./routes/map/get-map-data-route";
-import { getMapRoute } from "./routes/map/get-map-route";
-import { shareMapRoute } from "./routes/map/share-map-route";
-// Collections
-import { createCollectionRoute } from "./routes/map/collection/create-collection-route";
-import { editCollectionRoute } from "./routes/map/collection/edit-collection-route";
-// Markers
-import { createMarkerRoute } from "./routes/map/marker/create-marker-route";
-import { editMarkerRoute } from "./routes/map/marker/edit-marker-route";
-//Uploads
-import { uploadFileRoute } from "./routes/upload/upload-file-route";
-// Users
 import { connectRealtimeMapRoute } from "./routes/map/connect-realtime-map";
-import { getUserMapsRoute } from "./routes/user/get-user-maps-route";
-import { searchUserRoute } from "./routes/user/search-user-route";
-import { updateUserRoute } from "./routes/user/update-user-route";
-
 export { MapsDurableObject } from "./durable-objects/maps-do";
-
-const app = new OpenAPIHono<AppBindings>();
 
 app.use("*", (c, next) => {
   if (c.req.header("Origin") == c.env.FRONT_END_URL) {
@@ -90,33 +69,9 @@ app.get("/health", (c) => {
 const noTypeInferenceRoutes = [authHandler, connectRealtimeMapRoute];
 
 // routes for type inference
-const routes = [
-  // User routes
-  getUserMapsRoute,
-  searchUserRoute,
-  updateUserRoute,
-  // Upload routes
-  uploadFileRoute,
-  // Map routes
-  createMapRoute,
-  editMapRoute,
-  getMapDataRoute,
-  getMapRoute,
-  shareMapRoute,
-  // Marker Routes
-  createMarkerRoute,
-  editMarkerRoute,
-  // Collection routes
-  createCollectionRoute,
-  editCollectionRoute,
-] as const;
 
 // initialize routes
 routes.forEach((route) => app.route("/", route));
 noTypeInferenceRoutes.forEach((route) => app.route("/", route));
 
-// Export any neccariy items for either build or other apps
-export * from "./common/auth";
-
-export type AppType = (typeof routes)[number];
 export default app;

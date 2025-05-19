@@ -3,7 +3,7 @@ import { createMap, CreateMapSchema } from "@buzztrip/db/mutations";
 import { map_usersSchema, mapsSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
 import { ErrorSchema } from "../../common/schema";
-import { appRoute } from "../../common/types";
+import { app } from "../../common/types";
 
 const CreateMapReturnSchema = z
   .object({
@@ -12,7 +12,7 @@ const CreateMapReturnSchema = z
   })
   .openapi("CreateMapReturnSchema");
 
-export const createMapRoute = appRoute.openapi(
+export const createMapRoute = app.openapi(
   createRoute({
     method: "post",
     path: "/map/create",

@@ -3,7 +3,7 @@ import { maps } from "@buzztrip/db/schemas";
 import { createRoute, z } from "@hono/zod-openapi";
 import { eq } from "drizzle-orm";
 import { ErrorSchema, MapParamsSchema, MapSchema } from "../../common/schema";
-import { appRoute } from "../../common/types";
+import { app } from "../../common/types";
 
 const EditMapSchema = z
   .object({
@@ -26,7 +26,7 @@ const EditMapSchema = z
   })
   .openapi("EditMapSchema");
 
-export const editMapRoute = appRoute.openapi(
+export const editMapRoute = app.openapi(
   createRoute({
     method: "put",
     path: "/map/{mapId}",

@@ -3,13 +3,13 @@ import { getUser, updateUser } from "@buzztrip/db/queries";
 import { usersSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
 import { ErrorSchema } from "../../common/schema";
-import { appRoute } from "../../common/types";
+import { app } from "../../common/types";
 
 const UpdateUserSchema = usersSchema.partial();
 
 const UpdateUserReturnSchema = usersSchema;
 
-export const updateUserRoute = appRoute.openapi(
+export const updateUserRoute = app.openapi(
   createRoute({
     method: "put",
     path: "/users/{userId}",

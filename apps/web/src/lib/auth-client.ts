@@ -1,25 +1,39 @@
-import type { Auth } from "@buzztrip/api";
 import {
   inferAdditionalFields,
   magicLinkClient,
   passkeyClient,
   twoFactorClient,
 } from "better-auth/client/plugins";
-import { createAuthClient } from "better-auth/react"; // make sure to import from better-auth/react
+import { createAuthClient } from "better-auth/react";
 import { env } from "env";
 
 export const authClient = createAuthClient({
-  baseURL: env.NEXT_PUBLIC_API_URL, // base url of our API - where the server auth handler is mounted
-  basePath: "/auth", // base path that the auth handler is mounted on - API
+  baseURL: env.NEXT_PUBLIC_API_URL,
+  basePath: "/auth",
   fetchOptions: {
     auth: {
       type: "Bearer",
-      token: env.NEXT_PUBLIC_API_SECRET_KEY, // our auth secret to access the API
+      token: env.NEXT_PUBLIC_API_SECRET_KEY,
     },
     credentials: "include",
   },
   plugins: [
-    inferAdditionalFields<Auth>(),
+    inferAdditionalFields({
+      user: {
+        first_name: {
+          type: "string",
+        },
+        last_name: {
+          type: "string",
+        },
+        username: {
+          type: "string",
+        },
+        bio: {
+          type: "string",
+        },
+      },
+    }),
     magicLinkClient(),
     twoFactorClient(),
     passkeyClient(),

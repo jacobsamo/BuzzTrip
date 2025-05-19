@@ -176,7 +176,7 @@ export const AuthForm = ({ mode }: AuthFormProps) => {
                     onEnterOtp={(data) => {
                       handleAuthSuccess({
                         ...data,
-                        isNewUser: !data.first_name || !data.name,
+                        isNewUser: !data.name,
                       });
                     }}
                     onBack={() => setAuthStep("login")}

@@ -22,7 +22,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
             />
             {children}
           </QueryClientProvider>
-        </NuqsAdapter>
+        </NuqsAdapter>  
       </PostHogProvider>
     </>
   );

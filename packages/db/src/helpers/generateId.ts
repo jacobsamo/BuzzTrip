@@ -2,14 +2,14 @@
 const ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 function generateRandomString(length: number): string {
-  let result = '';
+  let result = "";
   const len = ALPHABET.length;
   const arr = new Uint8Array(length);
-  
+
   // In modern environments (including Cloudflare Workers and Next.js),
   // crypto is always available on globalThis
   globalThis.crypto.getRandomValues(arr);
-  
+
   for (let i = 0; i < length; i++) {
     result += ALPHABET.charAt(arr[i]! % len);
   }

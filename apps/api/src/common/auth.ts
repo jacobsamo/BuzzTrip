@@ -1,7 +1,5 @@
 import { generateId } from "@buzztrip/db/helpers";
 import * as schemas from "@buzztrip/db/schemas";
-import MagicLinkVerificationEmail from "@buzztrip/transactional/emails/magic-link";
-import { createResend, sendEmail } from "@buzztrip/transactional/helpers";
 import { polar } from "@polar-sh/better-auth";
 import { Polar } from "@polar-sh/sdk";
 import { betterAuth } from "better-auth";
@@ -20,6 +18,8 @@ const client = new Polar({
   serverURL: process.env.API_URL!,
 });
 
+// TODO try and figure this out
+// doesn't affect builds tho so leaving it for now
 export const auth = betterAuth({
   appName: "BuzzTrip",
   baseURL: process.env.API_URL!,
@@ -55,7 +55,6 @@ export const auth = betterAuth({
       clientId: process.env.MICROSOFT_CLIENT_ID!,
       clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
       tenantId: "common",
-      requireSelectAccount: true,
       mapProfileToUser: (profile) => {
         return {
           first_name: profile.name.split(" ")[0],
@@ -120,26 +119,27 @@ export const auth = betterAuth({
         return `${email}:${otp}`; // Since codes can be used only once, we'll use the email & OTP as the token
       },
       sendMagicLink: async ({ email, token, url }, request) => {
-        if (process.env.ENVIRONMENT === "development") {
-          console.log("Requesting to login using OTP", { email, token, url });
-          return;
-        }
+        // TODO: reimplement this
+        console.log("Requesting to login using OTP", { email, token, url });
+        // if (process.env.ENVIRONMENT === "development") {
+        //   return;
+        // }
 
-        try {
-          const resend = createResend(process.env.RESEND_API_KEY!);
-          sendEmail({
-            resend,
-            email: email,
-            subject: "Verify your BuzzTrip account",
-            react: MagicLinkVerificationEmail({
-              email,
-              token,
-              callbackUrl: url,
-            }),
-          });
-        } catch (error) {
-          console.error(error);
-        }
+        // try {
+        //   const resend = createResend(process.env.RESEND_API_KEY!);
+        //   sendEmail({
+        //     resend,
+        //     email: email,
+        //     subject: "Verify your BuzzTrip account",
+        //     react: MagicLinkVerificationEmail({
+        //       email,
+        //       token,
+        //       callbackUrl: url,
+        //     }),
+        //   });
+        // } catch (error) {
+        //   console.error(error);
+        // }
       },
       expiresIn: 60 * 10, // 10 minutes
     }),
@@ -216,4 +216,7 @@ export const auth = betterAuth({
   },
 });
 
+// Export the inferred types
 export type Auth = typeof auth;
+export type Session = typeof auth.$Infer.Session;
+export type User = typeof auth.$Infer.Session.user;

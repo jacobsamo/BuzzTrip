@@ -16,6 +16,7 @@ export const UserButton = () => {
   if (!data || !data.user) return null;
 
   const handleLogout = async () => {
+    router.prefetch("/auth/sign-in"); // make rerouting faster
     try {
       // https://www.better-auth.com/docs/authentication/email-password#sign-out
       await authClient.signOut({
@@ -36,13 +37,13 @@ export const UserButton = () => {
         <Image
           src={data.user.image ?? "/placeholder.svg"}
           alt={data.user.id}
-          width={64}
-          height={64}
-          className="size-16 rounded-full"
+          width={40}
+          height={40}
+          className="size-10 rounded-full"
         />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-56">
-        <DropdownMenuItem>Profile</DropdownMenuItem>
+        {/* <DropdownMenuItem>Profile</DropdownMenuItem> */}
         <DropdownMenuItem onClick={() => handleLogout()}>
           Log out
         </DropdownMenuItem>

@@ -88,7 +88,7 @@ function MapForm({
 }: CreateMapModalProps & { setOpen: (open: boolean) => void }) {
   const { data } = useSession();
   const userId = data?.session.userId;
-  
+
   const form = useForm<z.infer<typeof mapFormSchema>>({
     resolver: zodResolver(mapFormSchema),
     defaultValues: {
@@ -133,7 +133,7 @@ function MapForm({
         success: async (res) => {
           if (res.status === 200 && setMap) {
             const d = await res.json();
-            setMap(d.map);
+            setMap(d.map ?? null);
             setOpen(false);
           }
           return "Map created successfully!";

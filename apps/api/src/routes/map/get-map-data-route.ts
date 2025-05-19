@@ -9,8 +9,7 @@ import {
 } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
 import { ErrorSchema, MapParamsSchema } from "../../common/schema";
-import { appRoute } from "../../common/types";
-
+import { app } from "../../common/types";
 
 const MapDataSchema = z
   .object({
@@ -22,7 +21,7 @@ const MapDataSchema = z
   })
   .openapi("MapDataSchema");
 
-export const getMapDataRoute = appRoute.openapi(
+export const getMapDataRoute = app.openapi(
   createRoute({
     method: "get",
     path: "/map/{mapId}/data",

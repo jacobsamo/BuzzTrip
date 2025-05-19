@@ -156,12 +156,12 @@ const MapShareForm = () => {
                     }}
                     className="flex items-center gap-2"
                   >
-                    {user.profile_picture && (
+                    {user.image && (
                       <Image
                         width={32}
                         height={32}
                         alt={user.email ?? user.id}
-                        src={user.profile_picture}
+                        src={user.image}
                         className="h-8 w-8 rounded-full"
                         unoptimized
                       />
@@ -185,12 +185,12 @@ const MapShareForm = () => {
             return (
               <div key={user.id} className="flex items-center gap-2">
                 <span className="flex items-center gap-2">
-                  {user.profile_picture && (
+                  {user.image && (
                     <Image
                       width={32}
                       height={32}
                       alt={user.email ?? user.id}
-                      src={user.profile_picture}
+                      src={user.image}
                       className="h-8 w-8 rounded-full"
                       unoptimized
                     />

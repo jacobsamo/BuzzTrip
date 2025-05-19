@@ -6,10 +6,10 @@ alwaysApply: false
 # Route File Structure
 All API route files follow a simple pattern, each file
 - imports any schemas, types, etc from common
-- import `appRoute` to defined the route
+- import `app` to defined the route
 - Exports the route using the pattern:
   ```ts
-  export const <routeName> = appRoute.openapi(createRoute(...), handler)
+  export const <routeName> = app.openapi(createRoute(...), handler)
   ```
 - Handler logic is colocated in the same file, not in a separate handler file.
 
@@ -23,14 +23,14 @@ Packages can and will be imported from existing packages either within the monor
 ```ts
 // ... imports for file
 import { createRoute, z } from "@hono/zod-openapi";
-import { appRoute } from "<relative-path-to-conmmon>/common/types";
+import { app } from "<relative-path-to-conmmon>/common/types";
 import { createDb } from "@buzztrip/db"; // only if db actions are needed
 import { ErrorSchema, ...other schemas } from "../../common/schema";
 
 // schemas defined using zod-openapi
 
 // export the route
-export const <routeName> = appRoute.openapi(createRoute(...), handler)
+export const <routeName> = app.openapi(createRoute(...), handler)
 
 ```
 

@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text, index } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
   id: text("user_id").primaryKey().notNull(),
@@ -13,7 +13,9 @@ export const users = sqliteTable("users", {
   last_name: text("last_name"),
   username: text("username"),
   bio: text("bio"),
-});
+}, (table) => [
+  index("email_idx").on(table.email),
+]);
 
 export const user_sessions = sqliteTable("user_sessions", {
   id: text("id").primaryKey(),
@@ -26,7 +28,10 @@ export const user_sessions = sqliteTable("user_sessions", {
   userId: text("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-});
+}, (table) => [
+  index("user_id_idx").on(table.userId),
+  index("token_idx").on(table.token),
+]);
 
 export const user_accounts = sqliteTable("user_accounts", {
   id: text("id").primaryKey(),
@@ -48,7 +53,9 @@ export const user_accounts = sqliteTable("user_accounts", {
   password: text("password"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
-});
+}, (table) => [
+  index("user_id_idx").on(table.userId),
+]);
 
 export const user_verifications = sqliteTable("user_verifications", {
   id: text("id").primaryKey(),
@@ -57,7 +64,9 @@ export const user_verifications = sqliteTable("user_verifications", {
   expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
   createdAt: integer("created_at", { mode: "timestamp" }),
   updatedAt: integer("updated_at", { mode: "timestamp" }),
-});
+}, (table) => [
+  index("identifier_idx").on(table.identifier),
+]);
 
 export const passkey = sqliteTable("passkey", {
   id: text("id").primaryKey(),
@@ -72,7 +81,9 @@ export const passkey = sqliteTable("passkey", {
   backedUp: integer("backed_up", { mode: "boolean" }).notNull(),
   transports: text("transports"),
   createdAt: integer("created_at", { mode: "timestamp" }),
-});
+}, (table) => [
+  index("user_id_idx").on(table.userId),
+]);
 
 export const twoFactor = sqliteTable("two_factor", {
   id: text("id").primaryKey(),
@@ -81,4 +92,6 @@ export const twoFactor = sqliteTable("two_factor", {
   userId: text("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-});
+}, (table) => [
+  index("secret_idx").on(table.secret),
+]);

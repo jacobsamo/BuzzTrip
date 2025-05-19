@@ -59,7 +59,7 @@ export function MagicLinkSent({ email, onEnterOtp, onBack }: MagicLinkSentProps)
         type: "value",
       });
     } else {
-      onEnterOtp(verify.data.user);
+      onEnterOtp(verify.data.user as User);
     }
   };
 

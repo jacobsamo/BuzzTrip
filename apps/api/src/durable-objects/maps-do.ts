@@ -1,3 +1,4 @@
+import { Env } from "@/common/types";
 import { DurableObject } from "cloudflare:workers";
 import { Hono } from "hono";
 

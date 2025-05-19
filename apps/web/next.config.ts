@@ -56,7 +56,15 @@ const nextConfig: NextConfig = {
       "@sentry/nextjs",
     ],
   },
+  webpack: (config, { webpack }) => {
+    config.plugins.push(
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^cloudflare:workers$|^cloudflare:*/,
+      })
+    );
 
+    return config;
+  },
   skipTrailingSlashRedirect: true,
   // webpack: (config) => {
   //   if (process.env.NODE_ENV === "production")

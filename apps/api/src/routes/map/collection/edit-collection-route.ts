@@ -4,7 +4,7 @@ import { collectionsEditSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
 import { eq } from "drizzle-orm";
 import { ErrorSchema, MapParamsSchema } from "../../../common/schema";
-import { appRoute } from "../../../common/types";
+import { app } from "../../../common/types";
 
 export const EditCollectionSchema = collectionsEditSchema.openapi(
   "EditCollectionSchema"
@@ -27,7 +27,7 @@ export const CollectionReturnSchema = z
   })
   .openapi("CollectionReturnSchema");
 
-export const editCollectionRoute = appRoute.openapi(
+export const editCollectionRoute = app.openapi(
   createRoute({
     method: "put",
     path: "/map/{mapId}/collection/{collectionId}",

@@ -3,7 +3,7 @@ import { searchUsers } from "@buzztrip/db/queries";
 import { refinedUserSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
 import { ErrorSchema } from "../../common/schema";
-import { appRoute } from "../../common/types";
+import { app } from "../../common/types";
 
 const SearchUsersSchema = z.object({
   q: z.string(),
@@ -13,7 +13,7 @@ const SearchUserReturnSchema = z.object({
   users: refinedUserSchema.array().nullable(),
 });
 
-export const searchUserRoute = appRoute.openapi(
+export const searchUserRoute = app.openapi(
   createRoute({
     method: "get",
     path: "/users/search",

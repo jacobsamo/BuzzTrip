@@ -8,7 +8,7 @@ import {
 import { createRoute, z } from "@hono/zod-openapi";
 import { and, eq } from "drizzle-orm";
 import { ErrorSchema, MapParamsSchema } from "../../../common/schema";
-import { appRoute } from "../../../common/types";
+import { app } from "../../../common/types";
 
 export const MarkerParamsSchema = MapParamsSchema.extend({
   markerId: z.string().openapi({
@@ -43,7 +43,7 @@ export const EditMarkerReturnSchema = z
   })
   .openapi("EditMarkerReturnSchema");
 
-export const editMarkerRoute = appRoute.openapi(
+export const editMarkerRoute = app.openapi(
   createRoute({
     method: "put",
     path: "/map/{mapId}/marker/{markerId}",

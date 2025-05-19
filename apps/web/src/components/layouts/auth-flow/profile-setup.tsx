@@ -32,7 +32,7 @@ const schema = usersEditSchema.pick({
   first_name: true,
   last_name: true,
   username: true,
-  profile_picture: true,
+  image: true,
   bio: true,
 });
 
@@ -40,14 +40,15 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
   const auth = useSession();
   const router = useRouter();
   const { data } = auth;
+  const user = data?.user as User | null ?? null;
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      first_name: data?.user?.first_name ?? "",
-      last_name: data?.user?.last_name ?? "",
-      username: data?.user?.username ?? "",
-      bio: data?.user?.bio ?? "",
-      profile_picture: data?.user?.image ?? "",
+      first_name:user?.first_name ?? "",
+      last_name:user?.last_name ?? "",
+      username:user?.username ?? "",
+      bio:user?.bio ?? "",
+      image:user?.image ?? "",
     },
   });
 
@@ -66,7 +67,7 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
       form.setValue("last_name", data.user.last_name ?? "");
       form.setValue("username", data.user.username ?? "");
       form.setValue("bio", data.user.bio ?? "");
-      form.setValue("profile_picture", data.user.image ?? "");
+      form.setValue("image", data.user.image ?? "");
       setAvatarUrl(data.user.image ?? undefined);
     }
   }, [auth.isPending]);
@@ -78,7 +79,7 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
   };
 
   const handleSubmit = async (formData: z.infer<typeof schema>) => {
-    let profilePicture = formData.profile_picture;
+    let profilePicture = formData.image;
 
     if (profilePictureFile) {
       try {
@@ -121,7 +122,7 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
         userId: data?.user?.id!,
       },
       json: {
-        profile_picture: profilePicture,
+        image: profilePicture,
         first_name: formData.first_name,
         last_name: formData.last_name,
         username: formData.username,

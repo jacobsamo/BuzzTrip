@@ -1,9 +1,9 @@
 import { createDb } from "@buzztrip/db";
+import { getUserMaps } from "@buzztrip/db/queries";
 import { userMapsSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
 import { ErrorSchema } from "../../common/schema";
-import { appRoute } from "../../common/types";
-import { getUserMaps } from "@buzztrip/db/queries";
+import { app } from "../../common/types";
 
 const MapsParamsSchema = z.object({
   userId: z.string().openapi({
@@ -18,7 +18,7 @@ const MapsParamsSchema = z.object({
 
 const MapsSchema = userMapsSchema.array().openapi("MapsSchema");
 
-export const getUserMapsRoute = appRoute.openapi(
+export const getUserMapsRoute = app.openapi(
   createRoute({
     method: "get",
     path: "/users/{userId}/maps",

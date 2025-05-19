@@ -3,7 +3,7 @@ import { generateId } from "@buzztrip/db/helpers";
 import { createRoute, z } from "@hono/zod-openapi";
 import { fileTypeFromBuffer } from "file-type";
 import { ErrorSchema } from "../../common/schema";
-import { appRoute } from "../../common/types";
+import { app } from "../../common/types";
 
 const FileFormParamsSchema = z.object({
   file: z.instanceof(File).refine((file) => file.size <= 50 * 1024 * 1024, {
@@ -17,7 +17,7 @@ const FileJSONParamsSchema = z.object({
   file: z.union([
     z.instanceof(ArrayBuffer),
     z.instanceof(Uint8Array),
-    z.string().base64(),  
+    z.string().base64(),
   ]),
   fileName: z.string(),
   mimeType: z.string().optional(),
@@ -47,7 +47,7 @@ function base64ToUint8Array(base64: string): Uint8Array {
   return bytes;
 }
 
-export const uploadFileRoute = appRoute.openapi(
+export const uploadFileRoute = app.openapi(
   createRoute({
     method: "post",
     path: "/files/upload",
