@@ -47,7 +47,7 @@ declare namespace NodeJS {
 
 export interface AppBindings {
   Bindings: Env;
-  Variables: RequestIdVariables & SecureHeadersVariables;
+  Variables: RequestIdVariables;
 }
 
 export const app = new OpenAPIHono<AppBindings>();

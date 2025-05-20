@@ -1,16 +1,13 @@
-import { sentry } from "@hono/sentry";
 import { withSentry } from "@sentry/cloudflare";
 import { cors } from "hono/cors";
+import { logger } from "hono/logger";
 import { requestId } from "hono/request-id";
+import { auth } from "./common/auth";
 import { app, Env } from "./common/types";
-import {
-  authMiddleware,
-  loggingMiddleware,
-  securityMiddleware,
-} from "./middleware";
+import { authMiddleware } from "./middleware";
 import { routes } from "./routes";
-import { authHandler } from "./routes/auth";
 import { connectRealtimeMapRoute } from "./routes/map/connect-realtime-map";
+
 export { MapsDurableObject } from "./durable-objects/maps-do";
 
 app.use("*", (c, next) => {
@@ -18,7 +15,7 @@ app.use("*", (c, next) => {
     return cors({
       origin: [c.env.FRONT_END_URL, c.env.API_URL], // Front end url for cors
       allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow specific methods
-      allowHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+      allowHeaders: ["Content-Type", "Authorization"],
       exposeHeaders: ["Content-Length"],
       maxAge: 600,
       credentials: true,
@@ -31,9 +28,11 @@ app.use("*", (c, next) => {
   })(c, next);
 });
 
+app.use(logger());
+
 app.use(authMiddleware);
-app.use(securityMiddleware);
-app.use(loggingMiddleware);
+// app.use(securityMiddleware);
+// app.use(loggingMiddleware);
 app.use("*", requestId());
 
 app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
@@ -58,14 +57,14 @@ app.get("/health", (c) => {
   return c.json({ status: "ok" }, 200);
 });
 
-// routes note needed in type inference
-const noTypeInferenceRoutes = [authHandler, connectRealtimeMapRoute];
+app.on(["POST", "GET"], "/auth/*", (c) => {
+  return auth.handler(c.req.raw);
+});
+
+app.route("/", connectRealtimeMapRoute);
 
 // routes for type inference
-
-// initialize routes
 routes.forEach((route) => app.route("/", route));
-noTypeInferenceRoutes.forEach((route) => app.route("/", route));
 
 export default withSentry<Env>(
   (env) => ({
