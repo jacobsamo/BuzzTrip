@@ -4,6 +4,7 @@ import { userMapsSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
 import { ErrorSchema } from "../../common/schema";
 import { app } from "../../common/types";
+import { captureException } from "@sentry/cloudflare";
 
 const MapsParamsSchema = z.object({
   userId: z.string().openapi({
@@ -54,7 +55,7 @@ export const getUserMapsRoute = app.openapi(
       return c.json(usersMaps, 200);
     } catch (error) {
       console.error(error);
-      c.get("sentry").captureException(error);
+      captureException(error);
       return c.json(
         {
           code: "failed_request",

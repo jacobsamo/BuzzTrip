@@ -1,6 +1,6 @@
 import { generateId } from "@buzztrip/db/helpers";
 import * as schemas from "@buzztrip/db/schemas";
-import { polar } from "@polar-sh/better-auth";
+import { checkout, polar, portal, usage } from "@polar-sh/better-auth";
 import { Polar } from "@polar-sh/sdk";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -15,7 +15,7 @@ const client = new Polar({
   // Remember that access tokens, products, etc. are completely separated between environments.
   // Access tokens obtained in Production are for instance not usable in the Sandbox environment.
   server: process.env.ENVIRONMENT === "production" ? "production" : "sandbox",
-  serverURL: process.env.API_URL!,
+  serverURL: process.env.API_URL,
 });
 
 // TODO try and figure this out
@@ -30,7 +30,6 @@ export const auth = betterAuth({
     provider: "sqlite", // or "mysql", "sqlite"`
     schema: { ...schemas, user: schemas.users },
   }),
-
   // https://www.better-auth.com/docs/authentication/email-password
   // emailAndPassword: { enabled: false, requireEmailVerification: true,  },
   // emailVerification: {
@@ -44,23 +43,24 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      mapProfileToUser: (profile) => {
-        return {
-          first_name: profile.given_name,
-          last_name: profile.family_name,
-        };
-      },
+      // mapProfileToUser: (profile) => {
+      //   return {
+      //     first_name: profile.given_name,
+      //     last_name: profile.family_name,
+      //   };
+      // },
     },
     microsoft: {
       clientId: process.env.MICROSOFT_CLIENT_ID!,
       clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
       tenantId: "common",
-      mapProfileToUser: (profile) => {
-        return {
-          first_name: profile.name.split(" ")[0],
-          last_name: profile.name.split(" ")[1],
-        };
-      },
+      // TODO: fix this so we don't get weird errors
+      // mapProfileToUser: (profile) => {
+      //   return {
+      //     first_name: profile.name.split(" ")[0],
+      //     last_name: profile.name.split(" ")[1],
+      //   };
+      // },
     },
     // apple: {
     //   clientId: appleClientId,
@@ -86,32 +86,28 @@ export const auth = betterAuth({
       client,
       // Enable automatic Polar Customer creation on signup
       createCustomerOnSignUp: true,
-      // Enable customer portal
-      enableCustomerPortal: true, // Deployed under /portal for authenticated users
-      // Configure checkout
-      checkout: {
-        enabled: true,
-        products: [
-          {
-            productId: "22cfed61-1e76-4368-a013-5a78c76dac3c", // ID of Product from Polar Dashboard
-            slug: "free", // Custom slug for easy reference in Checkout URL, e.g. /checkout/pro
-          },
-          {
-            productId: "244c7d4f-6b5f-46dc-a8ce-300677396b63",
-            slug: "pro",
-          },
-          {
-            productId: "9c802964-4988-4227-9c7e-c434c7701798",
-            slug: "team",
-          },
-        ],
-        successUrl: "/success?checkout_id={CHECKOUT_ID}",
-      },
-      // Incoming Webhooks handler will be installed at /polar/webhooks
-      // webhooks: {
-      //     secret: process.env.POLAR_WEBHOOK_SECRET,
-      //     onPayload: ...,
-      // }
+      use: [
+        checkout({
+          authenticatedUsersOnly: true,
+          products: [
+            {
+              productId: "22cfed61-1e76-4368-a013-5a78c76dac3c", // ID of Product from Polar Dashboard
+              slug: "free", // Custom slug for easy reference in Checkout URL, e.g. /checkout/pro
+            },
+            {
+              productId: "244c7d4f-6b5f-46dc-a8ce-300677396b63",
+              slug: "pro",
+            },
+            {
+              productId: "9c802964-4988-4227-9c7e-c434c7701798",
+              slug: "team",
+            },
+          ],
+          successUrl: "/success?checkout_id={CHECKOUT_ID}",
+        }),
+        portal(),
+        usage(),
+      ],
     }),
     magicLink({
       generateToken: (email) => {

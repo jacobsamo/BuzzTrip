@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { motion } from "framer-motion";
+import { motion } from "motion/react"
 import { useState } from "react";
 import { Icons } from "./helpers";
 

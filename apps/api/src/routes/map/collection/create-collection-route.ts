@@ -7,6 +7,7 @@ import {
 import { createRoute } from "@hono/zod-openapi";
 import { ErrorSchema, MapParamsSchema } from "../../../common/schema";
 import { app } from "../../../common/types";
+import { captureException } from "@sentry/cloudflare";
 
 export const createCollectionRoute = app.openapi(
   createRoute({
@@ -72,7 +73,7 @@ export const createCollectionRoute = app.openapi(
       return c.json(collection, 200);
     } catch (error) {
       console.error(error);
-      c.get("sentry").captureException(error);
+      captureException(error);
       return c.json(
         {
           code: "failed_to_object",

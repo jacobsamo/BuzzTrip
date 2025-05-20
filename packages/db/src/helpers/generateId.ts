@@ -8,7 +8,7 @@ function generateRandomString(length: number): string {
 
   // In modern environments (including Cloudflare Workers and Next.js),
   // crypto is always available on globalThis
-  globalThis.crypto.getRandomValues(arr);
+  crypto.getRandomValues(arr);
 
   for (let i = 0; i < length; i++) {
     result += ALPHABET.charAt(arr[i]! % len);

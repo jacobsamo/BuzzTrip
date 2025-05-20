@@ -1,7 +1,8 @@
 import { sentry } from "@hono/sentry";
+import { withSentry } from "@sentry/cloudflare";
 import { cors } from "hono/cors";
 import { requestId } from "hono/request-id";
-import { app } from "./common/types";
+import { app, Env } from "./common/types";
 import {
   authMiddleware,
   loggingMiddleware,
@@ -32,14 +33,6 @@ app.use("*", (c, next) => {
 
 app.use(authMiddleware);
 app.use(securityMiddleware);
-app.use((c, next) =>
-  sentry({
-    dsn: c.env.SENTRY_DSN,
-    tracesSampleRate: 1.0,
-    environment: "api",
-    enabled: c.env.SENTRY_DSN ? true : false,
-  })(c, next)
-);
 app.use(loggingMiddleware);
 app.use("*", requestId());
 
@@ -74,4 +67,13 @@ const noTypeInferenceRoutes = [authHandler, connectRealtimeMapRoute];
 routes.forEach((route) => app.route("/", route));
 noTypeInferenceRoutes.forEach((route) => app.route("/", route));
 
-export default app;
+export default withSentry<Env>(
+  (env) => ({
+    dsn: env.SENTRY_DSN,
+    sendDefaultPii: true,
+    tracesSampleRate: 1.0,
+    environment: `api-${env.ENVIRONMENT}`,
+    enabled: env.SENTRY_DSN ? true : false,
+  }),
+  app
+);

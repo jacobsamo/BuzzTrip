@@ -9,14 +9,14 @@ import { app } from "../../common/types";
 
 export const connectRealtimeMapRoute = app.get(
   "/map/:mapId/connect",
-  async (c, next) => {
+  async (c) => {
     const shouldConnect = false;
     if (!shouldConnect)
       return c.json({ success: false, message: "Not implemented" });
 
-    // Add type assertion to access MAPS_DURABLE_OBJECT
-    const stubId = c.env.MAPS_DURABLE_OBJECT.idFromName("default");
-    const stub = c.env.MAPS_DURABLE_OBJECT.get(stubId);
-    return stub.fetch(c.req.raw);
+    // // Add type assertion to access MAPS_DURABLE_OBJECT
+    // const stubId = c.env.MAPS_DURABLE_OBJECT.idFromName("default");
+    // const stub = c.env.MAPS_DURABLE_OBJECT.get(stubId);
+    // return stub.fetch(c.req.raw);
   }
 );

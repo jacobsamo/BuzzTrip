@@ -1,28 +1,20 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalEnv": [
-    "TURSO_CONNECTION_URL",
-    "TURSO_AUTH_TOKEN"
-  ],
+  "globalEnv": ["TURSO_CONNECTION_URL", "TURSO_AUTH_TOKEN"],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env*"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
-      ]
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["!.next/cache/**", ".next/**", "dist/**"]
+    },
+    "@buzztrip/web#build": {
+      "dependsOn": ["@buzztrip/api#build", "^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["!.next/cache/**", ".next/**", "dist/**"]
     },
     "lint": {
-      "dependsOn": [
-        "^lint"
-      ]
+      "dependsOn": ["^lint"]
     },
     "dev": {
       "cache": false,

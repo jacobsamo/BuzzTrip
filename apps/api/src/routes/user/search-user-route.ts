@@ -4,6 +4,7 @@ import { refinedUserSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
 import { ErrorSchema } from "../../common/schema";
 import { app } from "../../common/types";
+import { captureException } from "@sentry/cloudflare";
 
 const SearchUsersSchema = z.object({
   q: z.string(),
@@ -69,7 +70,7 @@ export const searchUserRoute = app.openapi(
       );
     } catch (error) {
       console.error(error);
-      c.get("sentry").captureException(error);
+      captureException(error);
       return c.json(
         {
           code: "failed_request",

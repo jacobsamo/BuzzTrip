@@ -16,7 +16,7 @@ import { User, useSession } from "@/lib/auth-client";
 import { apiClient } from "@/server/api.client";
 import { usersEditSchema } from "@buzztrip/db/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
+import { motion } from "motion/react"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";

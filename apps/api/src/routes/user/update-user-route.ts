@@ -4,6 +4,7 @@ import { usersSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
 import { ErrorSchema } from "../../common/schema";
 import { app } from "../../common/types";
+import { captureException } from "@sentry/cloudflare";
 
 const UpdateUserSchema = usersSchema.partial();
 
@@ -95,7 +96,7 @@ export const updateUserRoute = app.openapi(
       return c.json(updatedUser, 200);
     } catch (error) {
       console.error(error);
-      c.get("sentry").captureException(error);
+      captureException(error);
       return c.json(
         {
           code: "failed_request",

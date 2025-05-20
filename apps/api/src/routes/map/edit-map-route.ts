@@ -4,6 +4,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { eq } from "drizzle-orm";
 import { ErrorSchema, MapParamsSchema, MapSchema } from "../../common/schema";
 import { app } from "../../common/types";
+import { captureException } from "@sentry/cloudflare";
 
 const EditMapSchema = z
   .object({
@@ -83,7 +84,7 @@ export const editMapRoute = app.openapi(
       return c.json(updatedMap, 200);
     } catch (error) {
       console.error(error);
-      c.get("sentry").captureException(error, {
+      captureException(error, {
         data: c.req.json(),
       });
       return c.json(

@@ -10,6 +10,7 @@ import {
 import { createRoute, z } from "@hono/zod-openapi";
 import { ErrorSchema, MapParamsSchema } from "../../common/schema";
 import { app } from "../../common/types";
+import { captureException } from "@sentry/cloudflare";
 
 const MapDataSchema = z
   .object({
@@ -97,7 +98,7 @@ export const getMapDataRoute = app.openapi(
       );
     } catch (error) {
       console.error(error);
-      c.get("sentry").captureException(error);
+      captureException(error);
       return c.json(
         {
           code: "data_not_found",

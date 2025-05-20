@@ -5,6 +5,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { eq } from "drizzle-orm";
 import { ErrorSchema, MapParamsSchema } from "../../../common/schema";
 import { app } from "../../../common/types";
+import { captureException } from "@sentry/cloudflare";
 
 export const EditCollectionSchema = collectionsEditSchema.openapi(
   "EditCollectionSchema"
@@ -89,7 +90,7 @@ export const editCollectionRoute = app.openapi(
       );
     } catch (error) {
       console.error(error);
-      c.get("sentry").captureException(error);
+      captureException(error);
       return c.json(
         {
           code: "failed_to_object",

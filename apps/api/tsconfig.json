@@ -15,11 +15,11 @@
     "skipLibCheck": true,
     "lib": ["ESNext"],
     "paths": {
-      "@/*": ["./src/*"],
-      "better-auth": ["../../node_modules/better-auth"]
+      "@/*": ["./src/*"]
     },
     "jsx": "react-jsx",
+    "types": ["@cloudflare/workers-types", "@types/bun"]
   },
-  "include": ["src/**/*", "./worker-configuration.d.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts", "dist"]
 }

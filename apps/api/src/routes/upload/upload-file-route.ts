@@ -4,6 +4,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { fileTypeFromBuffer } from "file-type";
 import { ErrorSchema } from "../../common/schema";
 import { app } from "../../common/types";
+import { captureException } from "@sentry/cloudflare";
 
 const FileFormParamsSchema = z.object({
   file: z.instanceof(File).refine((file) => file.size <= 50 * 1024 * 1024, {
@@ -194,7 +195,7 @@ export const uploadFileRoute = app.openapi(
       );
     } catch (err: any) {
       console.error("[File Upload Error]", err);
-      if (c.get("sentry")) c.get("sentry").captureException(err);
+      captureException(err);
 
       return c.json(
         {

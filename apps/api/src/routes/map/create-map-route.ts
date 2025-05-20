@@ -2,6 +2,7 @@ import { createDb } from "@buzztrip/db";
 import { createMap, CreateMapSchema } from "@buzztrip/db/mutations";
 import { map_usersSchema, mapsSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
+import { captureException } from "@sentry/cloudflare";
 import { ErrorSchema } from "../../common/schema";
 import { app } from "../../common/types";
 
@@ -62,7 +63,7 @@ export const createMapRoute = app.openapi(
       return c.json(data, 200);
     } catch (error) {
       console.error(error);
-      c.get("sentry").captureException(error, {
+      captureException(error, {
         data: c.req.json(),
       });
 

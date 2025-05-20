@@ -1,9 +1,5 @@
 import { hc } from "hono/client";
-import type { Auth, Session, User } from "./common/auth";
-import type { AppType as InternalAppType } from "./routes";
-
-export type AppType = InternalAppType;
-export type { Auth, Session, User };
+import { AppType } from "./routes";
 
 const client = hc<AppType>("");
 export type Client = typeof client;

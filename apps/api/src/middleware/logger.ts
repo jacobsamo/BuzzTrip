@@ -71,7 +71,7 @@ export const loggingMiddleware: MiddlewareHandler = async (c, next) => {
   //   };
 
   //   if (status !== 200) {
-  //     c.get("sentry")?.captureMessage(
+  //       captureMessage(
   //       `[Non-200] ${method} ${path} (${status}) [${requestId}]`,
   //       "warning",
   //       { data: logData }
@@ -101,7 +101,7 @@ export const loggingMiddleware: MiddlewareHandler = async (c, next) => {
   //       matchedRoutes: c.req.matchedRoutes,
   //     },
   //   };
-  //   c.get("sentry")?.captureException(err, { data: errorLog });
+  //   captureException(err, { data: errorLog });
   //   console.error("[Request Error]", errorLog);
   //   throw err;
   // }

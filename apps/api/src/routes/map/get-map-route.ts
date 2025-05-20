@@ -2,6 +2,7 @@ import { createDb } from "@buzztrip/db";
 import { createRoute, z } from "@hono/zod-openapi";
 import { ErrorSchema, MapSchema } from "../../common/schema";
 import { app } from "../../common/types";
+import { captureException } from "@sentry/cloudflare";
 
 // --- schema (moved from ./schema.ts) ---
 const MapParamsSchema = z.object({
@@ -53,7 +54,7 @@ export const getMapRoute = app.openapi(
       return c.json(map, 200);
     } catch (error) {
       console.error(error);
-      c.get("sentry").captureException(error);
+      captureException(error);
       return c.json(
         {
           code: "data_not_found",

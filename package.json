@@ -14,7 +14,7 @@
     "@buzztrip/tsconfig": "workspace:*",
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.5",
-    "drizzle-orm": "^0.38.4",
+    "drizzle-orm": "^0.43.1",
     "prettier": "^3.5.3",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-tailwindcss": "^0.6.11",
@@ -38,6 +38,9 @@
     "workerd"
   ],
   "resolutions": {
-    "drizzle-orm": "^0.38.4"
+    "drizzle-orm": "^0.43.1",
+    "better-auth": "^1.2.8",
+    "@polar-sh/better-auth": "^1.0.1",
+    "@polar-sh/sdk": "^0.32.15"
   }
 }
