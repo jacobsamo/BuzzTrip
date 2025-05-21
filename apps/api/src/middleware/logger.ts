@@ -39,7 +39,6 @@ export const loggingMiddleware: MiddlewareHandler = async (c, next) => {
       url: c.req.url,
       path: c.req.path,
       routePath: c.req.routePath,
-      matchedRoutes: c.req.matchedRoutes,
     },
   });
 
@@ -69,7 +68,6 @@ export const loggingMiddleware: MiddlewareHandler = async (c, next) => {
         url: c.req.url,
         path: c.req.path,
         routePath: c.req.routePath,
-        matchedRoutes: c.req.matchedRoutes,
       },
     };
 

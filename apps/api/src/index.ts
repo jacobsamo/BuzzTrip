@@ -4,7 +4,7 @@ import { logger } from "hono/logger";
 import { requestId } from "hono/request-id";
 import { auth } from "./common/auth";
 import { app, Env } from "./common/types";
-import { authMiddleware } from "./middleware";
+import { authMiddleware, loggingMiddleware } from "./middleware";
 import { routes } from "./routes";
 import { connectRealtimeMapRoute } from "./routes/map/connect-realtime-map";
 
@@ -32,7 +32,7 @@ app.use(logger());
 
 app.use(authMiddleware);
 // app.use(securityMiddleware);
-// app.use(loggingMiddleware);
+app.use(loggingMiddleware);
 app.use("*", requestId());
 
 app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {

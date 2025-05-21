@@ -15,7 +15,6 @@ const client = new Polar({
   // Remember that access tokens, products, etc. are completely separated between environments.
   // Access tokens obtained in Production are for instance not usable in the Sandbox environment.
   server: process.env.ENVIRONMENT === "production" ? "production" : "sandbox",
-  serverURL: process.env.API_URL,
 });
 
 // TODO try and figure this out
@@ -53,7 +52,9 @@ export const auth = betterAuth({
     microsoft: {
       clientId: process.env.MICROSOFT_CLIENT_ID!,
       clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
-      tenantId: "common",
+      // tenantId: "common",
+      // requireSelectAccount: true,
+
       // TODO: fix this so we don't get weird errors
       // mapProfileToUser: (profile) => {
       //   return {
@@ -80,6 +81,22 @@ export const auth = betterAuth({
       },
     },
     crossSubDomainCookies: { enabled: true },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          // TODO: alter this back to mapProfileToUser once there is a fix
+          return {
+            data: {
+              ...user,
+              first_name: user.name.split(" ")[0],
+              last_name: user.name.split(" ")[1],
+            },
+          };
+        },
+      },
+    },
   },
   plugins: [
     polar({
@@ -201,7 +218,10 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day (every 1 day the session expiration is updated)
   },
-  verification: { modelName: "user_verifications" },
+  verification: {
+    modelName: "user_verifications",
+    disableCleanup: true, // TODO: change this in the future
+  },
   account: {
     modelName: "user_accounts",
     accountLinking: {

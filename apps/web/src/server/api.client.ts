@@ -5,4 +5,13 @@ export const apiClient = hcWithType(env.NEXT_PUBLIC_API_URL, {
   headers: {
     Authorization: `Bearer ${env.NEXT_PUBLIC_API_SECRET_KEY}`,
   },
+  // fetch: ((input, init) => {
+  //   return fetch(input, {
+  //     ...init,
+  //     credentials: "include",
+  //     headers: {
+  //       Authorization: `Bearer ${env.NEXT_PUBLIC_API_SECRET_KEY}`,
+  //     },
+  //   });
+  // }) satisfies typeof fetch,
 });

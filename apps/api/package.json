@@ -15,21 +15,21 @@
     "build:types": "tsc --build"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.787.0",
+    "@aws-sdk/client-s3": "^3.812.0",
     "@buzztrip/db": "workspace:*",
     "@buzztrip/transactional": "workspace:*",
-    "@hono/swagger-ui": "^0.5.0",
-    "@hono/zod-openapi": "^0.18.4",
-    "@hono/zod-validator": "^0.4.3",
+    "@hono/swagger-ui": "^0.5.1",
+    "@hono/zod-openapi": "^0.19.6",
+    "@hono/zod-validator": "^0.5.0",
     "@polar-sh/better-auth": "^1.0.1",
-    "@sentry/cloudflare": "^9.20.0",
+    "@sentry/cloudflare": "^9.22.0",
     "better-auth": "^1.2.8",
-    "file-type": "^20.4.1",
+    "file-type": "^20.5.0",
     "hono": "^4.7.10"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250520.0",
     "@types/bun": "^1.2.13",
-    "wrangler": "^4.14.1"
+    "wrangler": "^4.16.0"
   }
 }
