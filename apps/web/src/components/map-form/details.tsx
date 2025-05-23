@@ -8,18 +8,18 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
-import { mapFormSchema } from "./helpers";
 
 const MapDetailsForm = () => {
-  const { control } = useFormContext<z.infer<typeof mapFormSchema>>();
+  const { control } = useFormContext<z.infer<typeof mapsEditSchema>>();
 
   return (
     <div className="space-y-6">
       <FormField
         control={control}
-        name="map.title"
+        name="title"
         rules={{ required: true }}
         render={({ field }) => (
           <FormItem>
@@ -34,7 +34,7 @@ const MapDetailsForm = () => {
       />
       <FormField
         control={control}
-        name="map.description"
+        name="description"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Description</FormLabel>

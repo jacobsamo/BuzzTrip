@@ -18,36 +18,22 @@ import {
 import { useSession } from "@/lib/auth-client";
 import { apiClient } from "@/server/api.client";
 import { PermissionEnum } from "@buzztrip/db/types";
-import {
-  permissionEnumSchema,
-  refinedUserSchema,
-} from "@buzztrip/db/zod-schemas";
 import { useQuery } from "@tanstack/react-query";
 import { CommandLoading } from "cmdk";
 import { Check, UserPlus, X } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { useFormContext } from "react-hook-form";
-import { z } from "zod";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Label } from "../ui/label";
-import { mapFormSchema } from "./helpers";
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const userSchema = refinedUserSchema.extend({
-  permission: permissionEnumSchema,
-});
-
-type RefinedUser = z.infer<typeof userSchema>;
+import { useMapFormContext } from "./provider";
 
 const MapShareForm = () => {
-  const form = useFormContext<z.infer<typeof mapFormSchema>>();
+  const { users, addUser, removeUser, updateUser } = useMapFormContext();
   const { data } = useSession();
   const [searchValue, setSearchValue] = useState("");
-  const [selectedUsers, setSelectedUsers] = useState<RefinedUser[]>([]);
   const [commandOpen, setCommandOpen] = useState(false);
 
-  const { data: users, isLoading } = useQuery({
+  const { data: fetchedUsers, isLoading } = useQuery({
     queryKey: ["users", searchValue],
     queryFn: async () => {
       const res = await apiClient.users.search.$get({
@@ -64,54 +50,6 @@ const MapShareForm = () => {
     },
     enabled: searchValue?.length >= 2,
   });
-
-  const addUser = (user: RefinedUser) => {
-    setSelectedUsers((prev) => {
-      const exists = prev.find((u) => u.id === user.id);
-      if (exists) return prev;
-      return [...prev, user];
-    });
-
-    const currentUsers = form.getValues("users") || [];
-    form.setValue(
-      "users",
-      [...currentUsers, { user_id: user.id, permission: user.permission }],
-      {
-        shouldDirty: true,
-        shouldValidate: true,
-      }
-    );
-    setSearchValue("");
-    setCommandOpen(false);
-  };
-
-  const removeUser = (userId: string) => {
-    setSelectedUsers((prev) => prev.filter((u) => u.id !== userId));
-    const currentUsers = form.getValues("users") || [];
-    form.setValue(
-      "users",
-      currentUsers.filter((u) => u.user_id !== userId),
-      { shouldDirty: true, shouldValidate: true }
-    );
-  };
-
-  const updatePermission = (
-    userId: string,
-    permission: RefinedUser["permission"]
-  ) => {
-    setSelectedUsers((prev) =>
-      prev.map((u) => (u.id === userId ? { ...u, permission } : u))
-    );
-
-    const currentUsers = form.getValues("users") || [];
-    form.setValue(
-      "users",
-      currentUsers.map((u) =>
-        u.user_id === userId ? { ...u, permission } : u
-      ),
-      { shouldDirty: true, shouldValidate: true }
-    );
-  };
 
   return (
     <div className="space-y-12">
@@ -149,20 +87,19 @@ const MapShareForm = () => {
               {isLoading && <CommandLoading>Searching users...</CommandLoading>}
               <CommandEmpty>No users found</CommandEmpty>
               <CommandGroup className="px-2">
-                {users !== undefined &&
-                  users.map((user) => (
+                {users &&
+                  users?.map((user) => (
                     <CommandItem
                       key={`${user.name}-${user.email}`}
                       value={`${user.name}-${user.email}`}
-                      onSelect={() =>
-                        addUser({
-                          ...user,
-                          permission: "editor",
-                        })
-                      }
+                      onSelect={() => {
+                        addUser({ ...user, permission: "editor" });
+                        setSearchValue("");
+                        setCommandOpen(false);
+                      }}
                       className="flex items-center justify-between p-2 cursor-pointer"
                       disabled={
-                        selectedUsers.some((u) => u.id === user.id) ||
+                        users?.some((u) => u.id === user.id) ||
                         data?.session?.userId === user.id
                       }
                     >
@@ -183,7 +120,7 @@ const MapShareForm = () => {
                       </div>
 
                       <div className="flex items-center">
-                        {selectedUsers.some((u) => u.id === user.id) ||
+                        {users.some((u) => u.id === user.id) ||
                         data?.session?.userId === user.id ? (
                           <Check className="h-4 w-4 text-green-500" />
                         ) : (
@@ -191,12 +128,11 @@ const MapShareForm = () => {
                             size="sm"
                             variant="ghost"
                             className="h-8 hover:bg-accent cursor-pointer"
-                            onClick={() =>
-                              addUser({
-                                ...user,
-                                permission: "editor",
-                              })
-                            }
+                            onClick={() => {
+                              addUser({ ...user, permission: "editor" });
+                              setSearchValue("");
+                              setCommandOpen(false);
+                            }}
                           >
                             <UserPlus className="h-4 w-4" />
                             <span className="ml-1">Add</span>
@@ -212,11 +148,11 @@ const MapShareForm = () => {
       </Command>
 
       <ScrollArea className="h-36 w-full flex-col gap-2">
-        {selectedUsers.length > 0 && (
+        {users && (
           <div className="space-y-3">
-            <Label>Invited collaborators ({selectedUsers.length})</Label>
+            <Label>Invited collaborators ({users.length})</Label>
             <div className="space-y-2 max-h-40">
-              {selectedUsers.map((user) => (
+              {users.map((user) => (
                 <motion.div
                   key={user.id}
                   initial={{ opacity: 0, x: -20 }}
@@ -242,7 +178,9 @@ const MapShareForm = () => {
                     <Select
                       value={user.permission}
                       onValueChange={(value) =>
-                        updatePermission(user.id, value as PermissionEnum)
+                        updateUser(user.id, {
+                          permission: value as PermissionEnum,
+                        })
                       }
                     >
                       <SelectTrigger className="w-24">

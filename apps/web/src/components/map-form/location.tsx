@@ -7,17 +7,18 @@ import {
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
 import { useState } from "react";
-import { useFormContext } from "react-hook-form";
-import { z } from "zod";
 import MarkerPin from "../mapping/google-maps/marker_pin";
-import { mapFormSchema } from "./helpers";
+import { useMapFormContext } from "./provider";
 
 const MapLocationForm = () => {
+  const {
+    form: { setValue, watch },
+  } = useMapFormContext();
   const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
-  const { setValue, watch } = useFormContext<z.infer<typeof mapFormSchema>>();
 
-  const lat = watch("map.lat");
-  const lng = watch("map.lng");
+  const lat = watch("lat");
+  const lng = watch("lng");
+  const bounds = watch("bounds");
 
   return (
     <APIProvider
@@ -43,15 +44,15 @@ const MapLocationForm = () => {
                   details?.placeDetails?.formatted_address ??
                   ""
               );
-              setValue("map.lat", details?.location.lat ?? null, {
+              setValue("lat", details?.location.lat ?? null, {
                 shouldDirty: true,
                 shouldTouch: true,
               });
-              setValue("map.lng", details?.location.lng ?? null, {
+              setValue("lng", details?.location.lng ?? null, {
                 shouldDirty: true,
                 shouldTouch: true,
               });
-              setValue("map.bounds", details?.bounds.toJSON() ?? null, {
+              setValue("bounds", details?.bounds.toJSON() ?? null, {
                 shouldDirty: true,
                 shouldTouch: true,
               });
@@ -60,30 +61,33 @@ const MapLocationForm = () => {
         </div>
         {/* Map Preview Container */}
 
-        <div className="h-[200px] w-full rounded-md border bg-muted">
-          <GoogleMap
-            mapId={env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID}
-            disableDefaultUI={true}
-            gestureHandling="greedy"
-            reuseMaps
-            defaultCenter={{
-              lat: 12.2891309,
-              lng: 31.6049679,
-            }}
-            defaultZoom={0}
-          >
-            {lat && lng && (
-              <AdvancedMarker
-                position={{
-                  lat: lat,
-                  lng: lng,
-                }}
-                title="Default Location"
-              >
-                <MarkerPin size={18} />
-              </AdvancedMarker>
-            )}
-          </GoogleMap>
+        <div>
+          <p>Map Preview {lat && lng && `of ${lat}, ${lng}`}</p>
+          <div className="h-[200px] w-full rounded-lg border bg-muted">
+            <GoogleMap
+              mapId={env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID}
+              disableDefaultUI={true}
+              gestureHandling="greedy"
+              reuseMaps
+              defaultZoom={3}
+              defaultCenter={{
+                lat: lat ?? 12.2891309,
+                lng: lng ?? 31.6049679,
+              }}
+            >
+              {lat && lng && (
+                <AdvancedMarker
+                  position={{
+                    lat: lat,
+                    lng: lng,
+                  }}
+                  title="Default Location"
+                >
+                  <MarkerPin size={18} />
+                </AdvancedMarker>
+              )}
+            </GoogleMap>
+          </div>
         </div>
       </div>
     </APIProvider>

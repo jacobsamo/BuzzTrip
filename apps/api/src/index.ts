@@ -11,7 +11,9 @@ import { connectRealtimeMapRoute } from "./routes/map/connect-realtime-map";
 import { createMapRoute } from "./routes/map/create-map-route";
 import { editMapRoute } from "./routes/map/edit-map-route";
 import { getMapDataRoute } from "./routes/map/get-map-data-route";
+import { getMapLabels } from "./routes/map/get-map-labels";
 import { getMapRoute } from "./routes/map/get-map-route";
+import { getMapUsers } from "./routes/map/get-map-users";
 import { shareMapRoute } from "./routes/map/share-map-route";
 // Collections
 import { createCollectionRoute } from "./routes/map/collection/create-collection-route";
@@ -114,6 +116,8 @@ const routes = app
   .route("/", getMapDataRoute)
   .route("/", getMapRoute)
   .route("/", shareMapRoute)
+  .route("/", getMapUsers)
+  .route("/", getMapLabels)
   .route("/", createMarkerRoute)
   .route("/", editMarkerRoute)
   .route("/", createCollectionRoute)

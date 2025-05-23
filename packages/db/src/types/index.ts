@@ -15,6 +15,7 @@ import {
   boundsSchema,
   combinedMarkersSchema,
   permissionEnumSchema,
+  refinedUserSchema,
   reviewsSchema,
   travelTypeEnumSchema,
   userMapsSchema,
@@ -24,6 +25,8 @@ export * from "./icons";
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+
+export type RefinedUser = z.infer<typeof refinedUserSchema>;
 
 export type Map = typeof maps.$inferSelect;
 export type NewMap = typeof maps.$inferInsert;

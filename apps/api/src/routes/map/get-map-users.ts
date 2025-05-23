@@ -1,20 +1,26 @@
 import { createDb } from "@buzztrip/db";
+import { map_usersSchema, refinedUserSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute } from "@hono/zod-openapi";
-import { ErrorSchema, MapParamsSchema, MapSchema } from "../../common/schema";
-import { app } from "../../common/types";
 import { captureException } from "@sentry/cloudflare";
+import { ErrorSchema, MapParamsSchema } from "../../common/schema";
+import { app } from "../../common/types";
 
+export const GetMapUsersReturn = map_usersSchema
+  .extend({
+    user: refinedUserSchema,
+  })
+  .array()
+  .nullable();
 
-
-export const getMapRoute = app.openapi(
+export const getMapUsers = app.openapi(
   createRoute({
     method: "get",
-    path: "/map/{mapId}",
+    path: "/map/{mapId}/users",
     summary: "Get a map",
     request: { params: MapParamsSchema },
     responses: {
       200: {
-        content: { "application/json": { schema: MapSchema } },
+        content: { "application/json": { schema: GetMapUsersReturn } },
         description: "Map found",
       },
       400: {
@@ -31,21 +37,24 @@ export const getMapRoute = app.openapi(
     try {
       const { mapId } = c.req.valid("param");
       const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
-      const map = await db.query.maps.findFirst({
+      const mapUsers = await db.query.map_users.findMany({
         where: (maps, { eq }) => eq(maps.map_id, mapId),
+        with: {
+          user: {
+            columns: {
+              id: true,
+              email: true,
+              username: true,
+              first_name: true,
+              last_name: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
       });
 
-      if (!map)
-        return c.json(
-          {
-            code: "data_not_found",
-            message: "Map not found",
-            requestId: c.get("requestId"),
-          },
-          400
-        );
-
-      return c.json(map, 200);
+      return c.json(mapUsers, 200);
     } catch (error) {
       console.error(error);
       captureException(error);

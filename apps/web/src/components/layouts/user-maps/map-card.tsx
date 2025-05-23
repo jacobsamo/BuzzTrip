@@ -1,4 +1,5 @@
 "use client";
+import EditMapModal from "@/components/modals/edit_map_modal";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,9 +16,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Map, UserMap } from "@buzztrip/db/types";
 import { formatDistanceToNow } from "date-fns";
-import { Calendar, MapIcon, MoreHorizontal, User } from "lucide-react";
+import { Calendar,  MapIcon, MoreHorizontal, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface MapCardProps {
   map: UserMap;
@@ -25,6 +27,7 @@ interface MapCardProps {
 }
 
 const MapCard = ({ map, updateMap }: MapCardProps) => {
+  const router = useRouter();
   const mapImage = map.image || "/placeholder.svg?height=200&width=400";
   const mapColor = map.color || "#4f46e5";
 
@@ -70,7 +73,9 @@ const MapCard = ({ map, updateMap }: MapCardProps) => {
                 align="end"
                 onClick={(e) => e.preventDefault()}
               >
-                <DropdownMenuItem>Edit</DropdownMenuItem>{" "}
+                <DropdownMenuItem asChild onClick={(e) => e.preventDefault()}>
+                  <EditMapModal map={map} updateMap={updateMap} />
+                </DropdownMenuItem>{" "}
                 {/* Open edit modal */}
                 <DropdownMenuItem>Share</DropdownMenuItem>{" "}
                 {/* Open edit modal to share */}

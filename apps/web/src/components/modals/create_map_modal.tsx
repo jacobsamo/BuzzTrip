@@ -1,5 +1,4 @@
 "use client";
-import { mapFormSchema } from "@/components/map-form/helpers";
 import MapStepperForm from "@/components/map-form/map-stepper";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,18 +19,20 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Form } from "@/components/ui/form";
 import { useSession } from "@/lib/auth-client";
 import { apiClient } from "@/server/api.client";
 import { Map } from "@buzztrip/db/types";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Plus } from "lucide-react";
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-
+import {
+  MapFormProvider,
+  RefinedUserWithPermission,
+} from "../map-form/provider";
 export interface CreateMapModalProps {
   setMap?: (map: Map | null) => void;
   trigger?: React.ReactNode;
@@ -100,32 +101,14 @@ function MapForm({
 }: CreateMapModalProps & { setOpen: (open: boolean) => void }) {
   const { data } = useSession();
   const userId = data?.session.userId;
+  const [users, setUsers] = useState<RefinedUserWithPermission[] | null>(null);
 
-  const form = useForm<z.infer<typeof mapFormSchema>>({
-    resolver: zodResolver(mapFormSchema),
-    defaultValues: {
-      map: {
-        owner_id: userId!,
-        bounds: null,
-        lat: null,
-        lng: null,
-        icon: "Map",
-      },
-    },
-  });
-
-  const {
-    formState: { errors },
-  } = form;
-
-  const onSubmit = async (data: z.infer<typeof mapFormSchema>) => {
+  const onSubmit = async (data: z.infer<typeof mapsEditSchema>) => {
     try {
-      const { map, users } = data;
-
       const newUsers =
         users?.map((user) => {
           return {
-            user_id: user.user_id,
+            user_id: user.id,
             permission: user.permission,
           };
         }) ?? null;
@@ -133,7 +116,7 @@ function MapForm({
       const create = apiClient.map.create.$post({
         json: {
           map: {
-            ...map,
+            ...data,
             owner_id: userId!,
           },
           users: newUsers,
@@ -152,47 +135,19 @@ function MapForm({
         },
         error: "Failed to create map",
       });
-
-      //     if (!users || users.length == 0) return;
-
-      // const newUsers = users.map((user) => {
-      //   return {
-      //     user_id: user.user_id,
-      //     permission: user.permission,
-      //   };
-      // });
-
-      // const share = apiClient.map[":mapId"].share.$post({
-      //   param: { mapId: map_id },
-      //   json: {
-      //     users: newUsers,
-      //     mapId: map_id,
-      //   },
-      // });
-
-      // toast.promise(share, {
-      //   loading: "sharing map...",
-      //   success: "Shared map successfully",
-      //   error: (err) => {
-      //     console.error(err);
-      //     return "Failed to share map";
-      //   },
-      // });
-      // };
     } catch (error) {
       console.error(error);
     }
   };
 
-  React.useEffect(() => {
-    console.log("errors", errors);
-  }, [errors]);
-
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <MapStepperForm onSubmit={form.handleSubmit(onSubmit)} />
-      </form>
-    </Form>
+    <MapFormProvider formProps={{
+      defaultValues: {
+        icon: "Map",
+        owner_id: userId!,
+      }
+    }} onSubmit={onSubmit} setExternalUsers={setUsers}>
+      <MapStepperForm />
+    </MapFormProvider>
   );
 }

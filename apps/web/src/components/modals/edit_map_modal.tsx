@@ -18,18 +18,18 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Form } from "@/components/ui/form";
+
+import { useSession } from "@/lib/auth-client";
 import { apiClient } from "@/server/api.client";
 import { Map } from "@buzztrip/db/types";
 import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "@uidotdev/usehooks";
-import { Plus } from "lucide-react";
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { use } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { useSession } from "@/lib/auth-client";
+import MapTabForm from "../map-form/map-tab-form";
+import { MapFormProvider } from "../map-form/provider";
 
 export interface EditMapModalProps {
   map: Map;
@@ -43,14 +43,12 @@ export default function EditMapModal({ updateMap, map }: EditMapModalProps) {
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline">
-            <Plus className="mr-2 h-4 w-4" /> Create Map
-          </Button>
+        <DialogTrigger className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50">
+          Edit Map
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className="sm:max-w-8/12 h-8/12">
           <DialogHeader>
-            <DialogTitle>Create Map</DialogTitle>
+            <DialogTitle>Edit Map</DialogTitle>
             <DialogDescription>Start your travel plans here</DialogDescription>
           </DialogHeader>
           <MapForm updateMap={updateMap} setOpen={setOpen} map={map} />
@@ -60,15 +58,13 @@ export default function EditMapModal({ updateMap, map }: EditMapModalProps) {
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button variant="outline">
-          <Plus className="mr-2 h-4 w-4" /> Create Map
-        </Button>
+    <Drawer open={open} onOpenChange={setOpen} activeSnapPoint={0.9}>
+      <DrawerTrigger className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50">
+        Edit Map
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle>Create Map</DrawerTitle>
+          <DrawerTitle>Edit Map</DrawerTitle>
           <DrawerDescription>Start your travel plans here</DrawerDescription>
         </DrawerHeader>
         <MapForm updateMap={updateMap} setOpen={setOpen} map={map} />
@@ -87,14 +83,25 @@ function MapForm({
   setOpen,
   map,
 }: EditMapModalProps & { setOpen: (open: boolean) => void }) {
-  const {data} = useSession();
+  const { data } = useSession();
   const userId = data?.session.userId;
-  const form = useForm<z.infer<typeof mapsEditSchema>>({
-    resolver: zodResolver(mapsEditSchema),
-    defaultValues: {
-      owner_id: userId!,
-    },
+  const getMapUsersPromise = apiClient.map[":mapId"].users.$get({
+    param: { mapId: map.map_id },
   });
+  const getMapLabelsPromise = apiClient.map[":mapId"].labels.$get({
+    param: { mapId: map.map_id },
+  });
+
+  const [mapUsers, mapLabels] = use(
+    Promise.all([
+      getMapUsersPromise.then((res) => {
+        if (res.ok) return res.json();
+      }),
+      getMapLabelsPromise.then((res) => {
+        if (res.ok) return res.json();
+      }),
+    ])
+  );
 
   const onSubmit = async (data: z.infer<typeof mapsEditSchema>) => {
     try {
@@ -127,8 +134,17 @@ function MapForm({
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}></form>
-    </Form>
+    <MapFormProvider
+      onSubmit={onSubmit}
+      initialLabels={mapLabels ?? null}
+      initialUsers={
+        mapUsers?.map((user) => ({
+          ...user.user,
+          permission: user.permission,
+        })) ?? null
+      }
+    >
+      <MapTabForm />
+    </MapFormProvider>
   );
 }

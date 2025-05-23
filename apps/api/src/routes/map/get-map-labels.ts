@@ -1,20 +1,22 @@
 import { createDb } from "@buzztrip/db";
+import { IconType } from "@buzztrip/db/types";
+import { labelsSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute } from "@hono/zod-openapi";
-import { ErrorSchema, MapParamsSchema, MapSchema } from "../../common/schema";
-import { app } from "../../common/types";
 import { captureException } from "@sentry/cloudflare";
+import { ErrorSchema, MapParamsSchema } from "../../common/schema";
+import { app } from "../../common/types";
 
+export const GetMapLabelsReturn = labelsSchema.array().nullable();
 
-
-export const getMapRoute = app.openapi(
+export const getMapLabels = app.openapi(
   createRoute({
     method: "get",
-    path: "/map/{mapId}",
+    path: "/map/{mapId}/labels",
     summary: "Get a map",
     request: { params: MapParamsSchema },
     responses: {
       200: {
-        content: { "application/json": { schema: MapSchema } },
+        content: { "application/json": { schema: GetMapLabelsReturn } },
         description: "Map found",
       },
       400: {
@@ -31,21 +33,15 @@ export const getMapRoute = app.openapi(
     try {
       const { mapId } = c.req.valid("param");
       const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
-      const map = await db.query.maps.findFirst({
+      const res = await db.query.labels.findMany({
         where: (maps, { eq }) => eq(maps.map_id, mapId),
       });
+      const mapLabels = res.map((label) => ({
+        ...label,
+        icon: label.icon as IconType,
+      }));
 
-      if (!map)
-        return c.json(
-          {
-            code: "data_not_found",
-            message: "Map not found",
-            requestId: c.get("requestId"),
-          },
-          400
-        );
-
-      return c.json(map, 200);
+      return c.json(mapLabels, 200);
     } catch (error) {
       console.error(error);
       captureException(error);
