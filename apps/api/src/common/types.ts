@@ -7,7 +7,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import type { RequestIdVariables } from 'hono/request-id'
 import type { SecureHeadersVariables } from 'hono/secure-headers'
 
-export interface Env {
+export interface Bindings {
   AUTH_SECRET: string;
   GOOGLE_CLIENT_SECRET: string;
   GOOGLE_CLIENT_ID: string;
@@ -41,12 +41,12 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 declare namespace NodeJS {
   interface ProcessEnv
     extends StringifyValues<
-      Omit<Env, "MAPS_DURABLE_OBJECT" | "BUZZTRIP_BUCKET" | "AI">
+      Omit<Bindings, "MAPS_DURABLE_OBJECT" | "BUZZTRIP_BUCKET" | "AI">
     > {}
 }
 
 export interface AppBindings {
-  Bindings: Env;
+  Bindings: Bindings;
   Variables: RequestIdVariables;
 }
 

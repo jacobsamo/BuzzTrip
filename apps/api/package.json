@@ -2,7 +2,7 @@
   "name": "@buzztrip/api",
   "version": "0.0.0",
   "exports": {
-    "./client": "./src/client.ts",
+    "./client": "./src/client/index.ts",
     "./auth": "./src/common/auth.ts"
   },
   "scripts": {

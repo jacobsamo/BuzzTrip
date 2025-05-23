@@ -3,12 +3,54 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { requestId } from "hono/request-id";
 import { auth } from "./common/auth";
-import { app, Env } from "./common/types";
+import { AppBindings, Bindings } from "./common/types";
 import { authMiddleware, loggingMiddleware } from "./middleware";
-import { routes } from "./routes";
 import { connectRealtimeMapRoute } from "./routes/map/connect-realtime-map";
 
+// Maps
+import { createMapRoute } from "./routes/map/create-map-route";
+import { editMapRoute } from "./routes/map/edit-map-route";
+import { getMapDataRoute } from "./routes/map/get-map-data-route";
+import { getMapRoute } from "./routes/map/get-map-route";
+import { shareMapRoute } from "./routes/map/share-map-route";
+// Collections
+import { createCollectionRoute } from "./routes/map/collection/create-collection-route";
+import { editCollectionRoute } from "./routes/map/collection/edit-collection-route";
+// Markers
+import { createMarkerRoute } from "./routes/map/marker/create-marker-route";
+import { editMarkerRoute } from "./routes/map/marker/edit-marker-route";
+//Uploads
+import { uploadFileRoute } from "./routes/upload/upload-file-route";
+// Users
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { getUserMapsRoute } from "./routes/user/get-user-maps-route";
+import { searchUserRoute } from "./routes/user/search-user-route";
+import { updateUserRoute } from "./routes/user/update-user-route";
+
 export { MapsDurableObject } from "./durable-objects/maps-do";
+
+/**
+ * DO NOT CHANGE THIS TO BE THE IMPORTED VERSION FROM ./common/types
+ * This will break the app stopping middleware running on the OpenAPI routes
+ */
+const app = new OpenAPIHono<AppBindings>();
+
+app.use("/*", async (c, next) => {
+  try {
+    await next();
+  } catch (error: any) {
+    if (error.message.includes("CORS")) {
+      return c.json(
+        {
+          error: "CORS Error",
+          message: "Origin not allowed",
+        },
+        403
+      );
+    }
+    throw error;
+  }
+});
 
 app.use("*", (c, next) => {
   if (c.req.header("Origin") == c.env.FRONT_END_URL) {
@@ -22,10 +64,7 @@ app.use("*", (c, next) => {
     })(c, next);
   }
 
-  return cors({
-    origin: "*", // Allow all origins
-    allowMethods: ["GET", "POST"],
-  })(c, next);
+  return cors()(c, next);
 });
 
 app.use(logger());
@@ -63,10 +102,22 @@ app.on(["POST", "GET"], "/auth/*", (c) => {
 
 app.route("/", connectRealtimeMapRoute);
 
-// routes for type inference
-routes.forEach((route) => app.route("/", route));
+const routes = app
+  .route("/", getUserMapsRoute)
+  .route("/", searchUserRoute)
+  .route("/", updateUserRoute)
+  .route("/", uploadFileRoute)
+  .route("/", createMapRoute)
+  .route("/", editMapRoute)
+  .route("/", getMapDataRoute)
+  .route("/", getMapRoute)
+  .route("/", shareMapRoute)
+  .route("/", createMarkerRoute)
+  .route("/", editMarkerRoute)
+  .route("/", createCollectionRoute)
+  .route("/", editCollectionRoute);
 
-export default withSentry<Env>(
+export default withSentry<Bindings>(
   (env) => ({
     dsn: env.SENTRY_DSN,
     sendDefaultPii: true,
@@ -76,3 +127,5 @@ export default withSentry<Env>(
   }),
   app
 );
+
+export type AppType = typeof routes;

@@ -34,11 +34,11 @@ import { PermissionEnum } from "@buzztrip/db/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Circle, CircleCheck, SearchIcon, Share2, X } from "lucide-react";
+import Image from "next/image";
 import * as React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ScrollArea } from "../ui/scroll-area";
-import Image from "next/image";
 
 export interface ShareMapProps {
   map_id: string;

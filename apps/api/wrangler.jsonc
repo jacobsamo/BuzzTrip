@@ -5,7 +5,7 @@
   "compatibility_flags": [
     "nodejs_compat",
     "nodejs_compat_populate_process_env",
-    "nodejs_als"
+    "nodejs_als",
   ],
   "main": "src/index.ts",
   "minify": true,
@@ -17,27 +17,25 @@
     "port": 8181,
   },
   "env": {
-    "development": {
-      "name": "buzztrip-dev-api",
-      "route": {
-        "pattern": "dev-api.buzztrip.co/*",
-        "zone_name": "buzztrip.co",
-      },
-    },
+    // "development": {
+    //   "name": "buzztrip-dev-api",
+    //   "route": {
+    //     "pattern": "dev-api.buzztrip.co/*",
+    //     "zone_name": "buzztrip.co",
+    //   },
+    // },
     "production": {
       "name": "buzztrip-prod-api",
       "route": {
         "pattern": "api.buzztrip.co/*",
-        "zone_name": "buzztrip.co"
+        "zone_name": "buzztrip.co",
       },
     },
   },
   "migrations": [
     {
       "tag": "v1",
-      "new_classes": [
-        "MapsDurableObject"
-      ],
+      "new_classes": ["MapsDurableObject"],
     },
   ],
   "durable_objects": {
