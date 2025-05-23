@@ -34,9 +34,13 @@ import { z } from "zod";
 
 export interface CreateMapModalProps {
   setMap?: (map: Map | null) => void;
+  trigger?: React.ReactNode;
 }
 
-export default function CreateMapModal({ setMap }: CreateMapModalProps) {
+export default function CreateMapModal({
+  setMap,
+  trigger,
+}: CreateMapModalProps) {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -44,9 +48,13 @@ export default function CreateMapModal({ setMap }: CreateMapModalProps) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline">
-            <Plus className="mr-2 h-4 w-4" /> Create Map
-          </Button>
+          {trigger ? (
+            trigger
+          ) : (
+            <Button variant="outline">
+              <Plus className="mr-2 h-4 w-4" /> Create Map
+            </Button>
+          )}
         </DialogTrigger>
         <DialogContent className="h-10/12 justify-start items-start space-y-2">
           <DialogHeader>
@@ -62,9 +70,13 @@ export default function CreateMapModal({ setMap }: CreateMapModalProps) {
   return (
     <Drawer open={open} onOpenChange={setOpen} activeSnapPoint={1}>
       <DrawerTrigger asChild>
-        <Button variant="outline">
-          <Plus className="mr-2 h-4 w-4" /> Create Map
-        </Button>
+        {trigger ? (
+          trigger
+        ) : (
+          <Button variant="outline">
+            <Plus className="mr-2 h-4 w-4" /> Create Map
+          </Button>
+        )}
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">
