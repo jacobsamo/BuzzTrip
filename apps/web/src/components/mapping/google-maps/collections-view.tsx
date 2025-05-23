@@ -78,7 +78,7 @@ const CollectionsView = ({ collection, markers }: CollectionsViewProps) => {
               className="flex items-center justify-between py-1"
             >
               <div className="flex items-center">
-                <MarkerPin marker={marker} />
+                <MarkerPin color={marker.color} icon={marker.icon}/>
                 <span>{marker.title}</span>
               </div>
               <OpenMarkerButton marker={marker} mode="edit" />

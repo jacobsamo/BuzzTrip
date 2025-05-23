@@ -2,8 +2,12 @@
   "name": "@buzztrip/db",
   "version": "0.0.0",
   "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/types/index.ts",
   "scripts": {
     "clean:all": "rm -rf node_modules/",
+    "db:auth:generate": "bunx @better-auth/cli@latest generate --config ../../apps/api/src/common/auth.ts --output ./src/schemas/auth.ts",
+    "db:auth:migrate": "bunx @better-auth/cli@latest generate --config ../../apps/api/src/common/auth.ts",
     "db:studio": "drizzle-kit studio",
     "db:studio:prd": "cross-env NODE_ENV=production drizzle-kit studio",
     "db:generate": "drizzle-kit generate",
@@ -13,24 +17,24 @@
   },
   "devDependencies": {
     "@buzztrip/tsconfig": "workspace:*",
-    "@types/node": "^22.13.4",
+    "@types/node": "^22.15.19",
     "cross-env": "^7.0.3",
-    "dotenv": "^16.4.7",
-    "drizzle-kit": "^0.30.4",
-    "typescript": "^5.7.3"
+    "dotenv": "^16.5.0",
+    "drizzle-kit": "^0.31.1",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@libsql/client": "^0.14.0",
-    "drizzle-zod": "^0.7.0",
-    "zod": "^3.24.2"
+    "@libsql/client": "^0.15.6",
+    "drizzle-zod": "^0.7.1",
+    "zod": "^3.25.7"
   },
   "exports": {
     ".": "./src/index.ts",
-    "./schema": "./src/schema/index.ts",
+    "./schemas": "./src/schemas/index.ts",
     "./zod-schemas": "./src/zod-schemas/index.ts",
+    "./helpers": "./src/helpers/index.ts",
     "./types": "./src/types/index.ts",
     "./queries": "./src/queries/index.ts",
-    "./cached-queries": "./src/queries/cached-queries.ts",
     "./mutations": "./src/mutations/index.ts",
     "./mutations/maps": "./src/mutations/maps.ts",
     "./mutations/markers": "./src/mutations/markers.ts",

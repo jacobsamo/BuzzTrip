@@ -1,12 +1,10 @@
-import { collections } from "@buzztrip/db/schema";
+import { collections } from "../schemas";
 import type { IconType } from "@buzztrip/db/types";
 import { NewCollection } from "@buzztrip/db/types";
 import { collectionsEditSchema } from "@buzztrip/db/zod-schemas";
 import { z } from "zod";
 import { Database } from "..";
-import {
-  collectionsSchema
-} from "../zod-schemas";
+import { collectionsSchema } from "../zod-schemas";
 
 export const CreateCollectionSchema = collectionsEditSchema;
 

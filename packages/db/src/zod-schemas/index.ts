@@ -3,16 +3,17 @@ import * as z from "zod";
 import {
   collection_links,
   collections,
-  places,
+  labels,
   map_users,
   maps,
   markers,
   permissionEnum,
+  places,
   route_stops,
   routes,
-  users,
   routeTravelTypeEnum,
-} from "../schema";
+  users,
+} from "../schemas";
 import { iconsList } from "../types";
 
 // Custom schemas
@@ -39,12 +40,39 @@ const iconSchema = z.enum(iconsList);
 
 export const boundsSchema = z.union([bounds, latlng]);
 
+export const mapBoundsSchema = bounds.extend({
+  offset: z.number().optional(),
+});
+
 // Table generated schemas with drizzle-zod
 export const usersSchema = createSelectSchema(users);
 export const usersEditSchema = createInsertSchema(users);
 
-export const mapsSchema = createSelectSchema(maps);
-export const mapsEditSchema = createInsertSchema(maps);
+export const refinedUserSchema = usersSchema.pick({
+  id: true,
+  email: true,
+  username: true,
+  first_name: true,
+  last_name: true,
+  name: true,
+  image: true,
+});
+
+export const mapsSchema = createSelectSchema(maps).extend({
+  icon: iconSchema.nullable(),
+  bounds: bounds.nullable(),
+});
+export const mapsEditSchema = createInsertSchema(maps).extend({
+  icon: iconSchema.nullable(),
+  bounds: bounds.nullable(),
+});
+
+export const labelsSchema = createSelectSchema(labels).extend({
+  icon: iconSchema,
+});
+export const labelsEditSchema = createInsertSchema(labels).extend({
+  icon: iconSchema,
+});
 
 export const markersSchema = createSelectSchema(markers).extend({
   icon: iconSchema,

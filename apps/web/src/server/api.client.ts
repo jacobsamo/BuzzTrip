@@ -1,7 +1,14 @@
-import { client } from "@buzztrip/api/src/client";
+import { hcWithType } from "@buzztrip/api/client";
 import { env } from "env";
 
-export const apiClient = client(
-  env.NEXT_PUBLIC_API_URL,
-  env.NEXT_PUBLIC_API_SECRET_KEY
-);
+export const apiClient = hcWithType(env.NEXT_PUBLIC_API_URL, {
+  fetch: ((input, init) => {
+    return fetch(input, {
+      ...init,
+      credentials: "include",
+      headers: {
+        Authorization: `Bearer ${env.NEXT_PUBLIC_API_SECRET_KEY}`,
+      },
+    });
+  }) satisfies typeof fetch,
+});

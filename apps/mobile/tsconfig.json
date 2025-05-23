@@ -15,7 +15,6 @@
     "expo-env.d.ts",
     "tailwind.config.js",
     "nativewind-env.d.ts",
-    "../api"
   ],
   "references": [
     {

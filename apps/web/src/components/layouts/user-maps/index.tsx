@@ -1,6 +1,6 @@
 "use client";
 import MapCard from "@/components/map-card";
-import MapModal from "@/components/modals/create_edit_map_modal";
+import MapModal from "@/components/modals/create_map_modal";
 import { UserMap } from "@buzztrip/db/types";
 import { useState } from "react";
 
@@ -30,6 +30,11 @@ const UserMaps = ({ usersMaps }: UserMapsProps) => {
                 map_id: map.map_id,
                 owner_id: map.owner_id,
                 image: map.image,
+                bounds: map.bounds,
+                icon: map.icon,
+                lat: map.lat,
+                lng: map.lng,
+                color: map.color,
                 user_id: map.owner_id,
                 permission: "owner",
                 map_user_id: map.owner_id,
@@ -75,6 +80,11 @@ const UserMaps = ({ usersMaps }: UserMapsProps) => {
                   title: map.title!,
                   description: map.description,
                   image: map.image,
+                  bounds: map.bounds,
+                  icon: map.icon,
+                  lat: map.lat,
+                  lng: map.lng,
+                  color: map.color,
                   owner_id: map.owner_id!,
                   created_at: map.created_at,
                   updated_at: map.updated_at,
@@ -87,6 +97,11 @@ const UserMaps = ({ usersMaps }: UserMapsProps) => {
                     owner_id: map.owner_id,
                     image: m.image ?? map.image,
                     user_id: map.owner_id,
+                    bounds: m.bounds ?? map.bounds,
+                    icon: m.icon ?? map.icon,
+                    lat: m.lat ?? map.lat,
+                    lng: m.lng ?? map.lng,
+                    color: m.color ?? map.color,
                     permission: "owner",
                     map_user_id: map.owner_id,
                     created_at: map.created_at,

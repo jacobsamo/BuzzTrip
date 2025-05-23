@@ -1,11 +1,12 @@
 "use client";
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { buttonVariants } from "@/components/ui/button";
+import { useSession } from "@/lib/auth-client";
+import Image from "next/image";
+import Link from "next/link";
 
 const Navbar = () => {
+  const { data } = useSession();
+
   return (
     <header className="m-auto flex h-14 items-center px-4 lg:px-6">
       <Link className="flex items-center justify-center" href="/">
@@ -26,14 +27,15 @@ const Navbar = () => {
           Features
         </Link>
         <div>
-          <SignedOut>
-            <SignInButton />
-          </SignedOut>
-          <SignedIn>
-            <Link href={"/app"} className={buttonVariants({ variant: "link" })}>
+          {data?.session ? (
+            <Link href={"/app"} className={buttonVariants()}>
               Go To app
             </Link>
-          </SignedIn>
+          ) : (
+            <Link href={"/auth/sign-up"} className={buttonVariants()}>
+              Login
+            </Link>
+          )}
         </div>
         {/* <Link
             className="text-sm font-medium underline-offset-4 hover:underline"

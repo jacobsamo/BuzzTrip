@@ -1,0 +1,46 @@
+---
+description: Best practices for using hono with cloudflare workers
+globs: apps/api/*.ts
+alwaysApply: false
+---
+# Route File Structure
+All API route files follow a simple pattern, each file
+- imports any schemas, types, etc from common
+- import `app` to defined the route
+- Exports the route using the pattern:
+  ```ts
+  export const <routeName> = app.openapi(createRoute(...), handler)
+  ```
+- Handler logic is colocated in the same file, not in a separate handler file.
+
+## Example
+See [get-user-maps-route.ts](mdc:apps/api/src/routes/user/get-user-maps-route.ts) for a canonical example.
+
+## External / third party packages
+Packages can and will be imported from existing packages either within the monorepo using `@buzztrip/<package-name>` or imported from a third party, if a package is needed it shall be installed using `bun add` 
+
+## File Structure example
+```ts
+// ... imports for file
+import { createRoute, z } from "@hono/zod-openapi";
+import { app } from "<relative-path-to-conmmon>/common/types";
+import { createDb } from "@buzztrip/db"; // only if db actions are needed
+import { ErrorSchema, ...other schemas } from "../../common/schema";
+
+// schemas defined using zod-openapi
+
+// export the route
+export const <routeName> = app.openapi(createRoute(...), handler)
+
+```
+
+this route is then imported into [index.ts](mdc:apps/api/src/index.ts) and added to the route list using `.route("/", <route defintion>)
+```ts
+const routes = app
+  // User routes
+  .route("/", updateUserRoute) // ... other user routes
+  // Upload routes
+  .route("/", uploadFileRoute)
+  // Map routes
+  .route("/", getMapRoute) // ...other map routes
+```

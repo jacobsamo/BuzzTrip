@@ -1,16 +1,15 @@
+import { eq, getTableColumns, like, or } from "drizzle-orm";
+import { Database } from "..";
 import {
+  collection_links,
+  collections,
+  map_users,
+  maps,
   markers,
   places,
-  maps,
-  map_users,
-  collections,
-  collection_links,
   users,
-} from "../schema";
-import { desc, eq, like, or } from "drizzle-orm";
+} from "../schemas";
 import { CombinedMarker, UserMap } from "../types";
-import { getTableColumns } from "drizzle-orm";
-import { Database } from "..";
 
 // map data items
 export const getMarkersView = async (
@@ -94,4 +93,22 @@ export const searchUsers = async (db: Database, query: string) => {
         like(users.last_name, `%${query}%`)
       )
     );
+};
+
+export const getUser = async (db: Database, userId: string) => {
+  const [result] = await db.select().from(users).where(eq(users.id, userId));
+  return result;
+};
+
+export const updateUser = async (
+  db: Database,
+  userId: string,
+  updateData: Partial<typeof users.$inferSelect>
+) => {
+  const [result] = await db
+    .update(users)
+    .set({ ...updateData, updated_at: new Date() })
+    .where(eq(users.id, userId))
+    .returning();
+  return result;
 };

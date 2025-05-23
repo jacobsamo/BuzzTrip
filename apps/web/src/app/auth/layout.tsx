@@ -14,7 +14,7 @@ export default function RootLayout({
         alt="BuzzTrip"
         width={1200}
         height={630}
-        className="absolute top-0 -z-10 h-full w-full object-cover blur"
+        className="absolute top-0 -z-10 h-full w-full object-cover blur-sm"
       />
     </main>
   );

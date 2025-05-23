@@ -8,27 +8,27 @@
     "lint": "turbo lint && bun sherif",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md,mdx}\"",
     "clean:all": "turbo run clean:all",
-    "update": "bun update --latest && cd ./packages/db && bun update --latest && cd ../eslint-config && bun update --latest && cd ../tsconfig && bun update --latest && cd ../tailwind-config && bun update --latest && cd ../../apps/api && cd ../web && bun update --latest && cd ../.."
+    "update": "bun update --latest && cd ./packages/db && bun update --latest && cd ../tsconfig && bun update --latest && cd ../../apps/api && cd ../web && bun update --latest && cd ../.."
   },
   "devDependencies": {
     "@buzztrip/tsconfig": "workspace:*",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "drizzle-orm": "^0.38.4",
-    "prettier": "^3.5.1",
+    "@types/react": "^19.1.4",
+    "@types/react-dom": "^19.1.5",
+    "drizzle-orm": "^0.43.1",
+    "prettier": "^3.5.3",
+    "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-tailwindcss": "^0.6.11",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "turbo": "^2.4.2",
-    "typescript": "^5.7.3"
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "turbo": "^2.5.3",
+    "typescript": "^5.8.3"
   },
-  "packageManager": "bun@1.1.42",
+  "packageManager": "bun@1.2.13",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "trustedDependencies": [
-    "@clerk/shared",
     "browser-tabs-lock",
     "core-js",
     "esbuild",
@@ -38,6 +38,9 @@
     "workerd"
   ],
   "resolutions": {
-    "drizzle-orm": "^0.38.4"
+    "drizzle-orm": "^0.43.1",
+    "better-auth": "^1.2.8",
+    "@polar-sh/better-auth": "^1.0.1",
+    "@polar-sh/sdk": "^0.32.15"
   }
 }

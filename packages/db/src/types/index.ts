@@ -2,14 +2,15 @@ import * as z from "zod";
 import {
   collection_links,
   collections,
-  places,
+  labels,
   map_users,
   maps,
   markers,
+  places,
   route_stops,
   routes,
   users,
-} from "../schema";
+} from "../schemas";
 import {
   boundsSchema,
   combinedMarkersSchema,
@@ -26,6 +27,9 @@ export type NewUser = typeof users.$inferInsert;
 
 export type Map = typeof maps.$inferSelect;
 export type NewMap = typeof maps.$inferInsert;
+
+export type Label = typeof labels.$inferSelect;
+export type NewLabel = typeof labels.$inferInsert;
 
 export type Marker = typeof markers.$inferSelect;
 export type NewMarker = typeof markers.$inferInsert;

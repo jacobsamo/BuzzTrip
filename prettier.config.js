@@ -5,6 +5,5 @@ module.exports = {
   semi: true,
   singleQuote: false,
   printWidth: 80,
-  tailwindConfig: "./apps/web/tailwind.config.ts",
-  plugins: ["prettier-plugin-tailwindcss"],
+  plugins: ["prettier-plugin-tailwindcss", "prettier-plugin-organize-imports"],
 };

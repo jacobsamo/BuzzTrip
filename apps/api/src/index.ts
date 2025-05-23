@@ -1,73 +1,78 @@
-import { OpenAPIHono } from "@hono/zod-openapi";
-import { requestId } from "hono/request-id";
-import { Bindings } from "./common/bindings";
-import {
-  authMiddleware,
-  loggingMiddleware,
-  securityMiddleware,
-} from "./middleware";
-import mapRoutes from "./routes/map";
-import userRoutes from "./routes/user";
-import markerRoutes from "./routes/map/marker";
-import collectionRoutes from "./routes/map/collection";
+import { withSentry } from "@sentry/cloudflare";
 import { cors } from "hono/cors";
-import authRoutes from "./routes/webhooks/auth";
-import { sentry } from "@hono/sentry";
+import { logger } from "hono/logger";
+import { requestId } from "hono/request-id";
+import { auth } from "./common/auth";
+import { app, Env } from "./common/types";
+import { authMiddleware, loggingMiddleware } from "./middleware";
+import { routes } from "./routes";
+import { connectRealtimeMapRoute } from "./routes/map/connect-realtime-map";
 
-const app = new OpenAPIHono<{ Bindings: Bindings }>({
-  defaultHook: (result, c) => {
-    if (!result.success) {
-      return c.json({ success: false, errors: result.error.errors }, 422);
-    }
-  },
-});
+export { MapsDurableObject } from "./durable-objects/maps-do";
 
 app.use("*", (c, next) => {
   if (c.req.header("Origin") == c.env.FRONT_END_URL) {
     return cors({
-      origin: c.env.FRONT_END_URL, // Front end url for cors
-      allowMethods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
-      allowHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+      origin: [c.env.FRONT_END_URL, c.env.API_URL], // Front end url for cors
+      allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow specific methods
+      allowHeaders: ["Content-Type", "Authorization"],
+      exposeHeaders: ["Content-Length"],
+      maxAge: 600,
+      credentials: true,
     })(c, next);
   }
+
   return cors({
     origin: "*", // Allow all origins
     allowMethods: ["GET", "POST"],
   })(c, next);
 });
 
+app.use(logger());
+
 app.use(authMiddleware);
-app.use(securityMiddleware);
-app.use((c, next) =>
-  sentry({ dsn: c.env.SENTRY_DSN, tracesSampleRate: 1.0, environment: "api" })(
-    c,
-    next
-  )
-);
+// app.use(securityMiddleware);
 app.use(loggingMiddleware);
 app.use("*", requestId());
-
-app.onError((e, c) => {
-  c.get("sentry").captureException(e);
-  return c.text("Internal Server Error", 500);
-});
-
-app.get("/health", (c) => {
-  return c.json({ status: "ok" });
-});
 
 app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
   type: "http",
   scheme: "bearer",
 });
 
-app.route("/", authRoutes);
+app.doc("/openapi", {
+  openapi: "3.1.0",
+  info: {
+    version: "1.0.0",
+    title: "BuzzTrip API",
+  },
+});
+app.getOpenAPI31Document({
+  openapi: "3.1.0",
+  info: { title: "BuzzTrip API", version: "1" },
+}); // schema object
 
-const routes = app
-  .route("/", userRoutes)
-  .route("/", mapRoutes)
-  .route("/", markerRoutes)
-  .route("/", collectionRoutes);
+// Routes
+app.get("/health", (c) => {
+  return c.json({ status: "ok" }, 200);
+});
 
-export type AppType = typeof routes;
-export default app;
+app.on(["POST", "GET"], "/auth/*", (c) => {
+  return auth.handler(c.req.raw);
+});
+
+app.route("/", connectRealtimeMapRoute);
+
+// routes for type inference
+routes.forEach((route) => app.route("/", route));
+
+export default withSentry<Env>(
+  (env) => ({
+    dsn: env.SENTRY_DSN,
+    sendDefaultPii: true,
+    tracesSampleRate: 1.0,
+    environment: `api-${env.ENVIRONMENT}`,
+    enabled: env.SENTRY_DSN ? true : false,
+  }),
+  app
+);

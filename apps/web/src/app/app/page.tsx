@@ -1,20 +1,20 @@
 import UserMaps from "@/components/layouts/user-maps";
+import { UserButton } from "@/components/user-button";
 import { db } from "@/server/db";
+import { getSession } from "@/server/getSession";
 import { getUserMaps } from "@buzztrip/db/queries";
-import { UserButton } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export default async function MapPage() {
-  const { userId } = await auth();
+  const { data } = await getSession();
 
-  if (!userId) {
+  if (!data || !data.session) {
     return notFound();
   }
 
-  const usersMaps = await getUserMaps(db, userId);
+  const usersMaps = await getUserMaps(db, data.session.userId);
 
   return (
     <>
@@ -31,7 +31,7 @@ export default async function MapPage() {
         </Link>
         <UserButton />
       </nav>
-      <UserMaps userId={userId} usersMaps={usersMaps} />
+      <UserMaps userId={data.session.userId} usersMaps={usersMaps} />
     </>
   );
 }

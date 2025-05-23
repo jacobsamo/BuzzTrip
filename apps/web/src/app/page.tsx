@@ -10,7 +10,7 @@ export default function LandingPage() {
       <main className="flex-1">
         <section
           id="hero"
-          className="w-full bg-gradient-to-r from-primary/20 via-primary/10 to-background py-12 md:py-24 lg:py-32 xl:py-48"
+          className="w-full bg-linear-to-r from-primary/20 via-primary/10 to-background py-12 md:py-24 lg:py-32 xl:py-48"
         >
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
@@ -40,7 +40,7 @@ export default function LandingPage() {
               </div>
               <div className="flex items-center justify-center">
                 <div className="relative h-[300px] w-[300px] sm:h-[400px] sm:w-[400px] lg:h-[500px] lg:w-[500px]">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 opacity-50 blur-2xl"></div>
+                  <div className="absolute inset-0 rounded-full bg-linear-to-r from-blue-400 to-blue-600 opacity-50 blur-2xl"></div>
                   <div className="absolute inset-4 overflow-hidden rounded-2xl bg-white shadow-2xl">
                     <div className="h-full w-full bg-[url('/assets/app-screenshot.webp')] bg-cover bg-center"></div>
                     <div className="absolute left-4 top-4 rounded-full bg-white p-2 shadow-md">
@@ -281,7 +281,7 @@ export default function LandingPage() {
           </div>
         </section> */}
 
-        <section className="w-full bg-gradient-to-r from-primary/20 via-primary/10 to-background py-12 md:py-24 lg:py-32">
+        <section className="w-full bg-linear-to-r from-primary/20 via-primary/10 to-background py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center space-y-4 rounded-md border p-2 text-center">
               <div className="space-y-2">

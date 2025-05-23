@@ -3,8 +3,8 @@ import { defineConfig } from "drizzle-kit";
 
 
 export default defineConfig({
-  schema: "./src/schema",
-  out: "./migrations",
+  schema: "./src/schemas",
+  out: "./drizzle/migrations",
   dialect: "turso",
   dbCredentials: process.env.NODE_ENV === "production" ? {
     url: process.env.TURSO_CONNECTION_URL!,
