@@ -32,6 +32,8 @@ export { MapsDurableObject } from "./durable-objects/maps-do";
 /**
  * DO NOT CHANGE THIS TO BE THE IMPORTED VERSION FROM ./common/types
  * This will break the app stopping middleware running on the OpenAPI routes
+ * commit: c0723edf3e71f7df0bdfbfea0fd6b06695bd8b66
+ * github: https://github.com/jacobsamo/BuzzTrip/commit/c0723edf3e71f7df0bdfbfea0fd6b06695bd8b66
  */
 const app = new OpenAPIHono<AppBindings>();
 

@@ -14,8 +14,10 @@ import { mapFormSchema } from "./helpers";
 
 const MapLocationForm = () => {
   const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
-  const { setValue, getValues } =
-    useFormContext<z.infer<typeof mapFormSchema>>();
+  const { setValue, watch } = useFormContext<z.infer<typeof mapFormSchema>>();
+
+  const lat = watch("map.lat");
+  const lng = watch("map.lng");
 
   return (
     <APIProvider
@@ -28,6 +30,7 @@ const MapLocationForm = () => {
             value={searchValue}
             onValueChange={setSearchValue}
             locationTypes={["(regions)"]}
+            autoFocus={true}
             // limit={3}
             classNames={{
               scrollArea: "max-h-20", // Custom height
@@ -56,19 +59,24 @@ const MapLocationForm = () => {
           />
         </div>
         {/* Map Preview Container */}
+
         <div className="h-[200px] w-full rounded-md border bg-muted">
-          {/* Map component will be added here */}
           <GoogleMap
             mapId={env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID}
             disableDefaultUI={true}
             gestureHandling="greedy"
             reuseMaps
+            defaultCenter={{
+              lat: 12.2891309,
+              lng: 31.6049679,
+            }}
+            defaultZoom={0}
           >
-            {getValues("map.lat") && getValues("map.lng") && (
+            {lat && lng && (
               <AdvancedMarker
                 position={{
-                  lat: getValues("map.lat") as number,
-                  lng: getValues("map.lng") as number,
+                  lat: lat,
+                  lng: lng,
                 }}
                 title="Default Location"
               >
