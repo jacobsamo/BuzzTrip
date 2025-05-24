@@ -37,24 +37,28 @@ type MapFormContextType = {
   removeUser: (userId: string) => void;
   updateUser: (
     userId: string,
-    user: Partial<RefinedUserWithPermission>
+    user: RefinedUserWithPermission
   ) => void;
   addLabel: (label: NewLabel) => void;
   removeLabel: (labelId: string) => void;
-  updateLabel: (labelId: string, label: Partial<NewLabel>) => void;
+  updateLabel: (labelId: string, label: NewLabel) => void;
 };
 
-type MapFormUserEvents = {
-  "user:added": RefinedUserWithPermission;
-  "user:removed": string;
-  "user:updated": { userId: string; user: Partial<RefinedUserWithPermission> };
-};
+type MapFormUserEvents =
+  | { event: "user:added"; payload: RefinedUserWithPermission }
+  | { event: "user:removed"; payload: string }
+  | {
+      event: "user:updated";
+      payload: { userId: string; user: RefinedUserWithPermission };
+    };
 
-type MapFormLabelEvents = {
-  "label:added": NewLabel;
-  "label:removed": string;
-  "label:updated": { labelId: string; label: Partial<NewLabel> };
-};
+type MapFormLabelEvents =
+  | { event: "label:added"; payload: NewLabel }
+  | { event: "label:removed"; payload: string }
+  | {
+      event: "label:updated";
+      payload: { labelId: string; label: NewLabel };
+    };
 
 const MapFormContext = createContext<MapFormContextType | undefined>(undefined);
 
@@ -69,19 +73,13 @@ type MapFormProviderProps = {
   children: React.ReactNode;
   formProps?: Exclude<UseFormProps<z.infer<typeof mapsEditSchema>>, "resolver">;
   onSubmit: SubmitHandler<z.infer<typeof mapsEditSchema>>;
-  initialMapData?: Partial<NewMap>;
+  initialMapData?: NewMap;
   initialUsers?: RefinedUserWithPermission[] | null;
   initialLabels?: NewLabel[] | null;
   setExternalUsers?: (users: RefinedUserWithPermission[] | null) => void;
   setExternalLabels?: (labels: NewLabel[] | null) => void;
-  onUserChange?: (
-    event: keyof MapFormUserEvents,
-    payload: MapFormUserEvents[keyof MapFormUserEvents]
-  ) => void;
-  onLabelChange?: (
-    event: keyof MapFormLabelEvents,
-    payload: MapFormLabelEvents[keyof MapFormLabelEvents]
-  ) => void;
+  onUserChange?: (e: MapFormUserEvents) => void;
+  onLabelChange?: (e: MapFormLabelEvents) => void;
 };
 
 export const MapFormProvider = ({
@@ -101,7 +99,7 @@ export const MapFormProvider = ({
     resolver: zodResolver(mapsEditSchema),
     defaultValues: formProps?.defaultValues ?? {
       icon: "Map",
-      owner_id: userId!,
+      owner_id: userId || "",
     },
     ...formProps,
   });
@@ -118,13 +116,13 @@ export const MapFormProvider = ({
     if (setExternalUsers) {
       setExternalUsers(users);
     }
-  }, [users]);
+  }, [users, setExternalUsers]);
 
   useEffect(() => {
     if (setExternalLabels) {
       setExternalLabels(labels);
     }
-  }, [labels]);
+  }, [labels, setExternalLabels]);
 
   useEffect(() => {
     console.error("Form Errors", errors);
@@ -139,7 +137,7 @@ export const MapFormProvider = ({
         if (exists) return prev;
         return [...prev, user];
       });
-      onUserChange?.("user:added", user);
+      onUserChange?.({ event: "user:added", payload: user });
     },
     [onUserChange]
   );
@@ -150,19 +148,22 @@ export const MapFormProvider = ({
         if (!prev) return null;
         return prev.filter((u) => u.id !== userId);
       });
-      onUserChange?.("user:removed", userId);
+      onUserChange?.({ event: "user:removed", payload: userId });
     },
     [onUserChange]
   );
 
   const updateUser = useCallback(
-    (userId: string, user: Partial<RefinedUserWithPermission>) => {
+    (userId: string, user: RefinedUserWithPermission) => {
       setUsers((prev) => {
         if (!prev) return null;
         return prev.map((u) => {
           if (u.id === userId) {
             const updated = { ...u, ...user };
-            onUserChange?.("user:updated", { userId, user });
+            onUserChange?.({
+              event: "user:updated",
+              payload: { userId, user },
+            });
             return updated;
           }
           return u;
@@ -179,7 +180,7 @@ export const MapFormProvider = ({
         if (!prev) return [label];
         return [...prev, label];
       });
-      onLabelChange?.("label:added", label);
+      onLabelChange?.({ event: "label:added", payload: label });
     },
     [onLabelChange]
   );
@@ -190,19 +191,22 @@ export const MapFormProvider = ({
         if (!prev) return null;
         return prev.filter((l) => l.label_id !== labelId);
       });
-      onLabelChange?.("label:removed", labelId);
+      onLabelChange?.({ event: "label:removed", payload: labelId });
     },
     [onLabelChange]
   );
 
   const updateLabel = useCallback(
-    (labelId: string, label: Partial<NewLabel>) => {
+    (labelId: string, label: NewLabel) => {
       setLabels((prev) => {
         if (!prev) return null;
         return prev.map((l) => {
           if (l.label_id === labelId) {
             const updated = { ...l, ...label };
-            onLabelChange?.("label:updated", { labelId, label });
+            onLabelChange?.({
+              event: "label:updated",
+              payload: { labelId, label },
+            });
             return updated;
           }
           return l;

@@ -21,7 +21,7 @@ import {
 
 import { useSession } from "@/lib/auth-client";
 import { apiClient } from "@/server/api.client";
-import { Map } from "@buzztrip/db/types";
+import { Map, NewLabel } from "@buzztrip/db/types";
 import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import * as React from "react";
@@ -29,11 +29,14 @@ import { use } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import MapTabForm from "../map-form/map-tab-form";
-import { MapFormProvider } from "../map-form/provider";
+import {
+  MapFormProvider,
+  RefinedUserWithPermission,
+} from "../map-form/provider";
 
 export interface EditMapModalProps {
   map: Map;
-  updateMap?: (map: Partial<Map>) => void;
+  updateMap?: (map: Map) => void;
 }
 
 export default function EditMapModal({ updateMap, map }: EditMapModalProps) {
@@ -92,13 +95,15 @@ function MapForm({
     param: { mapId: map.map_id },
   });
 
-  const [mapUsers, mapLabels] = use(
+const [mapUsers, mapLabels] = use(
     Promise.all([
       getMapUsersPromise.then((res) => {
-        if (res.ok) return res.json();
+       if (res && res.ok) return res.json();
+       return null;
       }),
       getMapLabelsPromise.then((res) => {
-        if (res.ok) return res.json();
+       if (res && res.ok) return res.json();
+       return null;
       }),
     ])
   );
@@ -133,6 +138,94 @@ function MapForm({
     }
   };
 
+  const handleUserCreate = async (user: RefinedUserWithPermission) => {
+    const create = apiClient.map[":mapId"].users.$post({
+      json: {
+        ...user,
+      },
+    });
+
+    toast.promise(create, {
+      loading: "creating user...",
+      success: "User created successfully",
+      error: "Failed to create user",
+    });
+  };
+
+  const handleRemoveUser = async (userId: string) => {
+    const remove = apiClient.map[":mapId"].users[":userId"].$delete({
+      param: { mapId: map.map_id, userId: userId },
+    });
+
+    toast.promise(remove, {
+      loading: "removing user...",
+      success: "User removed successfully",
+      error: "Failed to remove user",
+    });
+  };
+
+  const handleUpdateUser = async (
+    userId: string,
+    user: RefinedUserWithPermission
+  ) => {
+    const update = apiClient.map[":mapId"].users[":userId"].$put({
+      param: { mapId: map.map_id, userId: userId },
+      json: {
+        ...user,
+      },
+    });
+
+    toast.promise(update, {
+      loading: "updating user...",
+      success: "User updated successfully",
+      error: "Failed to update user",
+    });
+  };
+
+  const handleLabelCreate = async (label: NewLabel) => {
+    const create = apiClient.map[":mapId"].labels.$post({
+      json: {
+        ...label,
+      },
+    });
+
+    toast.promise(create, {
+      loading: "creating label...",
+      success: "Label created successfully",
+      error: "Failed to create label",
+    });
+  };
+
+  const handleLabelUpdate = async (
+    labelId: string,
+    label: NewLabel
+  ) => {
+    const update = apiClient.map[":mapId"].labels[":labelId"].$put({
+      param: { mapId: map.map_id, labelId: labelId },
+      json: {
+        ...label
+      },
+    });
+
+    toast.promise(update, {
+      loading: "updating label...",
+      success: "Label updated successfully",
+      error: "Failed to update label",
+    });
+  };
+
+  const handleLabelDelete = async (labelId: string) => {
+    const deleteLabel = apiClient.map[":mapId"].labels[":labelId"].$delete({
+      param: { mapId: map.map_id, labelId: labelId },
+    });
+
+    toast.promise(deleteLabel, {
+      loading: "deleting label...",
+      success: "Label deleted successfully",
+      error: "Failed to delete label",
+    });
+  };
+
   return (
     <MapFormProvider
       onSubmit={onSubmit}
@@ -143,8 +236,35 @@ function MapForm({
           permission: user.permission,
         })) ?? null
       }
+      onUserChange={({event, payload}) => {
+        switch (event) {
+          case "user:added":
+            handleUserCreate(payload);
+            break;
+          case "user:removed":
+            handleRemoveUser(payload);
+            break;
+          case "user:updated":
+            handleUpdateUser(payload.userId, payload.user);
+            break;
+        }
+      }}
+      onLabelChange={({event, payload}) => {
+        switch (event) {
+          case "label:added":
+            handleLabelCreate(payload);
+            break;
+          case "label:removed":
+            handleLabelDelete(payload);
+            break;
+          case "label:updated":
+            handleLabelUpdate(payload.labelId, payload.label);
+            break;
+        }
+      }}
     >
       <MapTabForm />
     </MapFormProvider>
   );
 }
+

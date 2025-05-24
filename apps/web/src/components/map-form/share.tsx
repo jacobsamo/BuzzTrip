@@ -87,8 +87,8 @@ const MapShareForm = () => {
               {isLoading && <CommandLoading>Searching users...</CommandLoading>}
               <CommandEmpty>No users found</CommandEmpty>
               <CommandGroup className="px-2">
-                {users &&
-                  users?.map((user) => (
+                {fetchedUsers &&
+                  fetchedUsers?.map((user) => (
                     <CommandItem
                       key={`${user.name}-${user.email}`}
                       value={`${user.name}-${user.email}`}
@@ -120,7 +120,7 @@ const MapShareForm = () => {
                       </div>
 
                       <div className="flex items-center">
-                        {users.some((u) => u.id === user.id) ||
+                        {(users && users.some((u) => u.id === user.id) )||
                         data?.session?.userId === user.id ? (
                           <Check className="h-4 w-4 text-green-500" />
                         ) : (
@@ -179,6 +179,7 @@ const MapShareForm = () => {
                       value={user.permission}
                       onValueChange={(value) =>
                         updateUser(user.id, {
+                          ...user,
                           permission: value as PermissionEnum,
                         })
                       }

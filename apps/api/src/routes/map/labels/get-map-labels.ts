@@ -3,12 +3,12 @@ import { IconType } from "@buzztrip/db/types";
 import { labelsSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute } from "@hono/zod-openapi";
 import { captureException } from "@sentry/cloudflare";
-import { ErrorSchema, MapParamsSchema } from "../../common/schema";
-import { app } from "../../common/types";
+import { ErrorSchema, MapParamsSchema } from "../../../common/schema";
+import { app } from "../../../common/types";
 
 export const GetMapLabelsReturn = labelsSchema.array().nullable();
 
-export const getMapLabels = app.openapi(
+export const getMapLabelsRoute = app.openapi(
   createRoute({
     method: "get",
     path: "/map/{mapId}/labels",

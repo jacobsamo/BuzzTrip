@@ -11,10 +11,14 @@ import { connectRealtimeMapRoute } from "./routes/map/connect-realtime-map";
 import { createMapRoute } from "./routes/map/create-map-route";
 import { editMapRoute } from "./routes/map/edit-map-route";
 import { getMapDataRoute } from "./routes/map/get-map-data-route";
-import { getMapLabels } from "./routes/map/get-map-labels";
 import { getMapRoute } from "./routes/map/get-map-route";
-import { getMapUsers } from "./routes/map/get-map-users";
-import { shareMapRoute } from "./routes/map/share-map-route";
+import { deleteLabelRoute } from "./routes/map/labels/delete-map-label";
+import { getMapLabelsRoute } from "./routes/map/labels/get-map-labels";
+import { updateLabelRoute } from "./routes/map/labels/update-map-label";
+import { createMapUserRoute } from "./routes/map/map-user/create-map-user-route";
+import { deleteMapUserRoute } from "./routes/map/map-user/delete-map-user";
+import { getMapUserRoute } from "./routes/map/map-user/get-map-users";
+import { updateMapUserRoute } from "./routes/map/map-user/update-map-user";
 // Collections
 import { createCollectionRoute } from "./routes/map/collection/create-collection-route";
 import { editCollectionRoute } from "./routes/map/collection/edit-collection-route";
@@ -115,9 +119,13 @@ const routes = app
   .route("/", editMapRoute)
   .route("/", getMapDataRoute)
   .route("/", getMapRoute)
-  .route("/", shareMapRoute)
-  .route("/", getMapUsers)
-  .route("/", getMapLabels)
+  .route("/", createMapUserRoute)
+  .route("/", getMapUserRoute)
+  .route("/", deleteMapUserRoute)
+  .route("/", updateMapUserRoute)
+  .route("/", getMapLabelsRoute)
+  .route("/", updateLabelRoute)
+  .route("/", deleteLabelRoute)
   .route("/", createMarkerRoute)
   .route("/", editMarkerRoute)
   .route("/", createCollectionRoute)

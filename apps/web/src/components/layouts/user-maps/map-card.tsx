@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Map, UserMap } from "@buzztrip/db/types";
 import { formatDistanceToNow } from "date-fns";
-import { Calendar,  MapIcon, MoreHorizontal, User } from "lucide-react";
+import { Calendar, MapIcon, MoreHorizontal, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

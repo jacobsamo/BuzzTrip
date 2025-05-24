@@ -2,8 +2,8 @@ import { createDb } from "@buzztrip/db";
 import { map_usersSchema, refinedUserSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute } from "@hono/zod-openapi";
 import { captureException } from "@sentry/cloudflare";
-import { ErrorSchema, MapParamsSchema } from "../../common/schema";
-import { app } from "../../common/types";
+import { ErrorSchema, MapParamsSchema } from "../../../common/schema";
+import { app } from "../../../common/types";
 
 export const GetMapUsersReturn = map_usersSchema
   .extend({
@@ -12,7 +12,7 @@ export const GetMapUsersReturn = map_usersSchema
   .array()
   .nullable();
 
-export const getMapUsers = app.openapi(
+export const getMapUserRoute = app.openapi(
   createRoute({
     method: "get",
     path: "/map/{mapId}/users",

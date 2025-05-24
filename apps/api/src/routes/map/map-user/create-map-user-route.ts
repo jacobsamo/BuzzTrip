@@ -5,15 +5,15 @@ import {
   ShareMapSchema,
 } from "@buzztrip/db/mutations";
 import { createRoute } from "@hono/zod-openapi";
-import { ErrorSchema, MapParamsSchema } from "../../common/schema";
-import { app } from "../../common/types";
 import { captureException } from "@sentry/cloudflare";
+import { ErrorSchema, MapParamsSchema } from "../../../common/schema";
+import { app } from "../../../common/types";
 
-export const shareMapRoute = app.openapi(
+export const createMapUserRoute = app.openapi(
   createRoute({
     method: "post",
-    path: "/map/{mapId}/share",
-    summary: "Share a map with other users",
+    path: "/map/{mapId}/users", //TODO: update this route maybe
+    summary: "Create / add a new user to the map",
     request: {
       params: MapParamsSchema,
       body: {
