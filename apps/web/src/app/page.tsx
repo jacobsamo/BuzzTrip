@@ -1,321 +1,665 @@
-import Navbar from "@/components/navbar";
-import { buttonVariants } from "@/components/ui/button";
-import { Layers, MapPin, Palette, Search, Tag, Users } from "lucide-react";
+"use client";
+import GeneralCTA from "@/components/cta";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  ArrowRight,
+  Calendar,
+  Camera,
+  Check,
+  Download,
+  Map,
+  MapPin,
+  Palette,
+  Route,
+  Ruler,
+  Share2,
+  Smartphone,
+  Users,
+} from "lucide-react";
+import { motion } from "motion/react";
+import Image from "next/image";
 import Link from "next/link";
 
-export default function LandingPage() {
+type Feature = {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  delay: number;
+  available?: boolean;
+  timeline?: string;
+};
+
+const availableFeatures: Feature[] = [
+  {
+    icon: <MapPin className="h-6 w-6 text-white" />,
+    title: "Custom Markers & Collections",
+    description:
+      "Create personalized markers and organize them into collections for easy management.",
+    delay: 0.1,
+    available: true,
+  },
+  {
+    icon: <Map className="h-6 w-6 text-white" />,
+    title: "Multiple Maps",
+    description:
+      "Create and manage multiple maps for different projects, trips, or purposes.",
+    delay: 0.2,
+    available: true,
+  },
+  {
+    icon: <Share2 className="h-6 w-6 text-white" />,
+    title: "Easy Sharing",
+    description:
+      "Share your maps with friends, family, or colleagues with simple sharing links.",
+    delay: 0.3,
+    available: true,
+  },
+  {
+    icon: <Smartphone className="h-6 w-6 text-white" />,
+    title: "Responsive Design",
+    description:
+      "Access and edit your maps from any device with our responsive web interface.",
+    delay: 0.4,
+    available: true,
+  },
+];
+
+const upComingFeatures: Feature[] = [
+  {
+    icon: <Route className="h-6 w-6 text-amber-700" />,
+    title: "Paths & Routes",
+    description:
+      "Draw custom paths and routes with built-in measurement tools for distance and area calculations.",
+    delay: 0.1,
+    timeline: "Q2 2025",
+  },
+  {
+    icon: <Ruler className="h-6 w-6 text-amber-700" />,
+    title: "Advanced Measurements",
+    description:
+      "Precise measurement tools for distances, areas, and elevations with multiple unit options.",
+    delay: 0.6,
+    timeline: "Q3 2025",
+  },
+  {
+    icon: <Users className="h-6 w-6 text-amber-700" />,
+    title: "Real-time Collaboration",
+    description:
+      "Work together with your team in real-time. See changes instantly as others edit the map.",
+    delay: 0.2,
+    timeline: "Q4 2025",
+  },
+  {
+    icon: <Download className="h-6 w-6 text-amber-700" />,
+    title: "Import/Export Data",
+    description:
+      "Import and export your map data in popular formats including KML, GeoJSON, and CSV.",
+    delay: 0.3,
+    timeline: "Q4 2025",
+  },
+  {
+    icon: <Palette className="h-6 w-6 text-amber-700" />,
+    title: "Custom Map Styles",
+    description:
+      "Personalize your maps with custom themes, colors, and styling options to match your brand.",
+    delay: 0.4,
+    timeline: "Q1 2026",
+  },
+  {
+    icon: <Smartphone className="h-6 w-6 text-amber-700" />,
+    title: "Mobile Apps",
+    description:
+      "Native iOS and Android apps for seamless mapping on the go with offline capabilities.",
+    delay: 0.5,
+    timeline: "Q2 2026",
+  },
+];
+
+const appHighlights = [
+  {
+    icon: Route,
+    title: "Travel Planning",
+    description:
+      "Plan your perfect trip with custom markers for must-visit locations. Create detailed itineraries and share them with travel companions.",
+    features: [
+      "Custom location marking",
+      "Easy sharing with companions",
+      "Custom collections for trips",
+    ],
+    color: "blue",
+    delay: 0.1,
+  },
+  {
+    icon: Camera,
+    title: "Photo Shoots",
+    description:
+      "Scout locations, plan shooting schedules, and coordinate with your team. Mark the perfect spots and share with clients.",
+    features: [
+      "Location scouting",
+      "Team coordination",
+      // "Client presentations",
+    ],
+    color: "purple",
+    delay: 0.2,
+  },
+  {
+    icon: Calendar,
+    title: "Event Planning",
+    description:
+      "Design event layouts, coordinate vendor locations, and guide attendees. Create interactive maps for seamless event experiences.",
+    // features: ["Venue layouts", "Vendor coordination", "Attendee navigation"],
+    features: ["Custom paths for navigation", "Vendor coordination"],
+    color: "green",
+    delay: 0.3,
+  },
+];
+
+const roadMap = [
+  {
+    quarter: "Q1 2025",
+    status: "completed",
+    title: "Foundation & Core Features",
+    features: [
+      "Custom markers & collections",
+      "Multiple maps support",
+      "Responsive web interface",
+      "Basic sharing capabilities",
+    ],
+  },
+  {
+    quarter: "Q2 2025",
+    status: "in-progress",
+    title: "Paths, Routes & Measurements",
+    features: [
+      "Paths & routes with measurements",
+      "Advanced marker customization",
+      "Improved sharing options",
+    ],
+  },
+  {
+    quarter: "Q3 2025",
+    status: "planned",
+    title: "Collaboration & Sharing",
+    features: [
+      "Real-time collaborative editing",
+      "Advanced sharing permissions",
+      "Email notifications for collaborators",
+      "Comments and annotations",
+    ],
+  },
+  {
+    quarter: "Q4 2025",
+    status: "planned",
+    title: "Data & Customization",
+    features: [
+      "Import/Export (KML, GeoJSON, CSV)",
+      "Custom map styles & themes",
+      "Advanced measurement tools",
+      "API access",
+    ],
+  },
+];
+
+export default function BuzzTripLanding() {
   return (
-    <>
-      <Navbar />
-      <main className="flex-1">
-        <section
-          id="hero"
-          className="w-full bg-linear-to-r from-primary/20 via-primary/10 to-background py-12 md:py-24 lg:py-32 xl:py-48"
-        >
-          <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-              <div className="flex flex-col justify-center space-y-4">
-                <div className="space-y-2">
-                  <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                    Create Custom Maps with Ease
-                  </h1>
-                  <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    BuzzTrip lets you design personalized maps with custom
-                    markers, collections, and more. Perfect for travel planning,
-                    business locations, or any mapping needs.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
+    <div className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <section className="py-20 lg:py-32 bg-gradient-to-br from-primary/5 to-primary/10 overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ x: -100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-center lg:text-left"
+            >
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <Badge className="mb-6 bg-primary/10 text-primary border-primary/20">
+                  Next-Generation Mapping Platform
+                </Badge>
+              </motion.div>
+
+              <motion.h1
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight"
+              >
+                Create Custom Maps
+                <br />
+                <span className="text-primary">
+                  Anywhere, Anytime, with Anyone
+                </span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+                className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed"
+              >
+                The powerful mapping platform that brings Google Maps and Google
+                My Maps together. Create, customize, and share beautiful maps
+                across all your devices.
+              </motion.p>
+
+              <motion.div
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 1 }}
+                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
                   <Link
                     href="/auth/sign-up"
-                    className={buttonVariants({ size: "lg" })}
+                    className={buttonVariants({
+                      variant: "outline",
+                      size: "lg",
+                      className:
+                        "bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg shadow-lg",
+                    })}
                   >
-                    Get Started
+                    Start Creating Maps
+                    <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
-                  {/*   
-                  <Button size="lg" variant="outline">
-                    Learn More
-                  </Button> */}
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-primary text-primary hover:bg-primary hover:text-white px-8 py-4 text-lg"
+                  >
+                    View Demo
+                  </Button>
+                </motion.div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 1.2 }}
+                className="mt-8 flex items-center justify-center lg:justify-start space-x-6 text-sm text-gray-600"
+              >
+                <div className="flex items-center">
+                  <Check className="h-4 w-4 text-primary mr-2" />
+                  Free to start
+                </div>
+                <div className="flex items-center">
+                  <Check className="h-4 w-4 text-primary mr-2" />
+                  No credit card required
+                </div>
+                <div className="flex items-center">
+                  <Check className="h-4 w-4 text-primary mr-2" />
+                  Works on all devices
+                </div>
+              </motion.div>
+            </motion.div>
+
+            <motion.div
+              initial={{ x: 100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="relative"
+            >
+              <div className="relative">
+                <div className="bg-white rounded-2xl shadow-2xl p-4 max-w-md mx-auto lg:max-w-none">
+                  <Image
+                    src="/assets/desktop-app-screenshot.webp"
+                    alt="BuzzTrip Desktop Interface"
+                    width={600}
+                    height={400}
+                    className="w-full rounded-xl"
+                  />
                 </div>
               </div>
-              <div className="flex items-center justify-center">
-                <div className="relative h-[300px] w-[300px] sm:h-[400px] sm:w-[400px] lg:h-[500px] lg:w-[500px]">
-                  <div className="absolute inset-0 rounded-full bg-linear-to-r from-blue-400 to-blue-600 opacity-50 blur-2xl"></div>
-                  <div className="absolute inset-4 overflow-hidden rounded-2xl bg-white shadow-2xl">
-                    <div className="h-full w-full bg-[url('/assets/app-screenshot.webp')] bg-cover bg-center"></div>
-                    <div className="absolute left-4 top-4 rounded-full bg-white p-2 shadow-md">
-                      <MapPin className="h-6 w-6 text-primary" />
-                    </div>
-                    <div className="absolute bottom-4 right-4 rounded-full bg-white p-2 shadow-md">
-                      <Layers className="h-6 w-6 text-primary" />
-                    </div>
+
+              {/* Floating mobile preview */}
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 1.2 }}
+                className="absolute -bottom-16 -right-4 lg:-right-12"
+              >
+                <div className="bg-gray-900 rounded-3xl shadow-xl p-1 w-32 lg:w-40 relative">
+                  <div className="bg-black rounded-3xl p-1">
+                    <Image
+                      src="/assets/mobile-app-screenshot.webp"
+                      alt="BuzzTrip Mobile Interface"
+                      width={160}
+                      height={300}
+                      className="w-full rounded-2xl"
+                    />
                   </div>
+                  {/* Phone notch */}
+                  <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-gray-700 rounded-full"></div>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section
-          id="features"
-          className="w-full bg-secondary p-8 py-12 md:py-24 lg:py-32"
-        >
-          <h2 className="mb-12 text-center text-3xl font-bold tracking-tighter sm:text-5xl">
-            Key Features
-          </h2>
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-12">
-            <div className="flex flex-col items-center space-y-4 rounded-md border p-2 text-center">
-              <div className="rounded-full bg-primary/10 p-4">
-                <MapPin className="h-10 w-10 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold">Custom Markers</h3>
-              <p className="text-muted-foreground">
-                Create unique markers with custom icons, colors, and tags.
-              </p>
-            </div>
-            <div className="flex flex-col items-center space-y-4 rounded-md border p-2 text-center">
-              <div className="rounded-full bg-primary/10 p-4">
-                <Layers className="h-10 w-10 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold">Collections</h3>
-              <p className="text-muted-foreground">
-                Organize your markers into collections for easy management.
-              </p>
-            </div>
-            <div className="flex flex-col items-center space-y-4 rounded-md border p-2 text-center">
-              <div className="rounded-full bg-primary/10 p-4">
-                <Tag className="h-10 w-10 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold">Tagging System</h3>
-              <p className="text-muted-foreground">
-                Add tags to markers and collections for quick filtering.
-              </p>
-            </div>
-            <div className="flex flex-col items-center space-y-4 rounded-md border p-2 text-center">
-              <div className="rounded-full bg-primary/10 p-4">
-                <Palette className="h-10 w-10 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold">Customization</h3>
-              <p className="text-muted-foreground">
-                Personalize your maps with custom colors and icons.
-              </p>
-            </div>
-            <div className="flex flex-col items-center space-y-4 rounded-md border p-2 text-center">
-              <div className="rounded-full bg-primary/10 p-4">
-                <Search className="h-10 w-10 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold">Advanced Search</h3>
-              <p className="text-muted-foreground">
-                Easily find locations and your custom markers.
-              </p>
-            </div>
-            <div className="flex flex-col items-center space-y-4 rounded-md border p-2 text-center">
-              <div className="rounded-full bg-primary/10 p-4">
-                <Users className="h-10 w-10 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold">Collaboration</h3>
-              <p className="text-muted-foreground">
-                Share and collaborate on maps with team members or friends.
-              </p>
-            </div>
-          </div>
-        </section>
-        {/* 
-        <section id="testimonials" className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
-            <h2 className="mb-12 text-center text-3xl font-bold tracking-tighter sm:text-5xl">
-              What Our Users Say
+      {/* Current Features Section */}
+      <section id="features" className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+              Available Now
             </h2>
-            <div className="grid gap-6 lg:grid-cols-3 lg:gap-12">
-              <div className="flex flex-col items-center space-y-4 rounded-md border p-2 text-center">
-                <img
-                  alt="User"
-                  className="rounded-full"
-                  height="100"
-                  src="/placeholder.svg?height=100&width=100"
-                  style={{
-                    aspectRatio: "100/100",
-                    objectFit: "cover",
-                  }}
-                  width="100"
-                />
-                <div className="space-y-2">
-                  <h3 className="text-xl font-bold">Sarah L.</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Travel Blogger
-                  </p>
-                  <p className="text-muted-foreground">
-                    "BuzzTrip has revolutionized how I plan and document my
-                    travels. The custom collections feature is a game-changer!"
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col items-center space-y-4 rounded-md border p-2 text-center">
-                <img
-                  alt="User"
-                  className="rounded-full"
-                  height="100"
-                  src="/placeholder.svg?height=100&width=100"
-                  style={{
-                    aspectRatio: "100/100",
-                    objectFit: "cover",
-                  }}
-                  width="100"
-                />
-                <div className="space-y-2">
-                  <h3 className="text-xl font-bold">Michael R.</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Small Business Owner
-                  </p>
-                  <p className="text-muted-foreground">
-                    "I use BuzzTrip to track all our business locations and
-                    deliveries. It's intuitive and has saved us so much time."
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col items-center space-y-4 rounded-md border p-2 text-center">
-                <img
-                  alt="User"
-                  className="rounded-full"
-                  height="100"
-                  src="/placeholder.svg?height=100&width=100"
-                  style={{
-                    aspectRatio: "100/100",
-                    objectFit: "cover",
-                  }}
-                  width="100"
-                />
-                <div className="space-y-2">
-                  <h3 className="text-xl font-bold">Emily T.</h3>
-                  <p className="text-sm text-muted-foreground">Event Planner</p>
-                  <p className="text-muted-foreground">
-                    "The collaboration features in BuzzTrip make it easy to work
-                    with clients and plan events efficiently."
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Start creating beautiful, custom maps today with these powerful
+              features
+            </p>
+          </motion.div>
 
-        <section
-          id="pricing"
-          className="w-full bg-secondary py-12 md:py-24 lg:py-32"
-        >
-          <div className="container px-4 md:px-6">
-            <h2 className="mb-12 text-center text-3xl font-bold tracking-tighter sm:text-5xl">
-              Simple Pricing
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {availableFeatures.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ y: 30, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, delay: feature.delay }}
+                viewport={{ once: true }}
+                whileHover={{ y: -2 }}
+              >
+                <Card className="border-2 border-primary/20 bg-primary/5 hover:border-primary/40 transition-all duration-300 hover:shadow-lg h-full">
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <motion.div
+                        className="bg-primary w-12 h-12 rounded-xl flex items-center justify-center"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 10,
+                        }}
+                      >
+                        {feature.icon}
+                      </motion.div>
+                      <Badge className="bg-green-100 text-green-700 border-green-200 text-xs">
+                        Available
+                      </Badge>
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed text-sm">
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Upcoming Features Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+              Coming Soon
             </h2>
-            <div className="grid gap-6 lg:grid-cols-3 lg:gap-12">
-              <div className="flex flex-col rounded-lg bg-background p-6 shadow-lg">
-                <h3 className="mb-4 text-center text-2xl font-bold">Basic</h3>
-                <p className="mb-4 text-center text-4xl font-bold">$0</p>
-                <ul className="mb-6 space-y-2">
-                  <li className="flex items-center">
-                    <MapPin className="mr-2 h-5 w-5 text-primary" />
-                    Up to 50 custom markers
-                  </li>
-                  <li className="flex items-center">
-                    <Layers className="mr-2 h-5 w-5 text-primary" />5
-                    collections
-                  </li>
-                  <li className="flex items-center">
-                    <Users className="mr-2 h-5 w-5 text-primary" />
-                    Basic collaboration
-                  </li>
-                </ul>
-                <Button className="mt-auto">Get Started</Button>
-              </div>
-              <div className="flex flex-col rounded-lg bg-primary p-6 text-primary-foreground shadow-lg">
-                <h3 className="mb-4 text-center text-2xl font-bold">Pro</h3>
-                <p className="mb-4 text-center text-4xl font-bold">$9.99</p>
-                <ul className="mb-6 space-y-2">
-                  <li className="flex items-center">
-                    <MapPin className="mr-2 h-5 w-5" />
-                    Unlimited custom markers
-                  </li>
-                  <li className="flex items-center">
-                    <Layers className="mr-2 h-5 w-5" />
-                    Unlimited collections
-                  </li>
-                  <li className="flex items-center">
-                    <Users className="mr-2 h-5 w-5" />
-                    Advanced collaboration
-                  </li>
-                  <li className="flex items-center">
-                    <Palette className="mr-2 h-5 w-5" />
-                    Custom branding
-                  </li>
-                </ul>
-                <Button className="mt-auto bg-background text-primary hover:bg-secondary">
-                  Upgrade to Pro
-                </Button>
-              </div>
-              <div className="flex flex-col rounded-lg bg-background p-6 shadow-lg">
-                <h3 className="mb-4 text-center text-2xl font-bold">
-                  Enterprise
-                </h3>
-                <p className="mb-4 text-center text-4xl font-bold">Custom</p>
-                <ul className="mb-6 space-y-2">
-                  <li className="flex items-center">
-                    <MapPin className="mr-2 h-5 w-5 text-primary" />
-                    Unlimited everything
-                  </li>
-                  <li className="flex items-center">
-                    <Layers className="mr-2 h-5 w-5 text-primary" />
-                    Priority support
-                  </li>
-                  <li className="flex items-center">
-                    <Users className="mr-2 h-5 w-5 text-primary" />
-                    Dedicated account manager
-                  </li>
-                  <li className="flex items-center">
-                    <Palette className="mr-2 h-5 w-5 text-primary" />
-                    Custom integrations
-                  </li>
-                </ul>
-                <Button className="mt-auto">Contact Sales</Button>
-              </div>
-            </div>
-          </div>
-        </section> */}
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Exciting new features in development to make BuzzTrip even more
+              powerful
+            </p>
+          </motion.div>
 
-        <section className="w-full bg-linear-to-r from-primary/20 via-primary/10 to-background py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center space-y-4 rounded-md border p-2 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  Start Mapping Today
-                </h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl">
-                  Join users who are already creating amazing custom maps with
-                  BuzzTrip.
-                </p>
-              </div>
-              <div className="w-full max-w-sm space-y-2">
-                <Link href="/auth/sign-up" className={buttonVariants()}>
-                  Sign Up
-                </Link>
-              </div>
-            </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {upComingFeatures.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ y: 30, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, delay: feature.delay }}
+                viewport={{ once: true }}
+                whileHover={{ y: -2 }}
+              >
+                <Card className="border-2 border-gray-200 hover:border-amber-300 transition-all duration-300 hover:shadow-lg h-full">
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <motion.div
+                        className="bg-amber-100 w-12 h-12 rounded-xl flex items-center justify-center"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 10,
+                        }}
+                      >
+                        {feature.icon}
+                      </motion.div>
+                      <Badge
+                        variant="outline"
+                        className="bg-amber-50 text-amber-700 border-amber-200 text-xs"
+                      >
+                        {feature.timeline}
+                      </Badge>
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed text-sm">
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
 
-      <footer className="flex w-full shrink-0 flex-col items-center gap-2 border-t px-4 py-6 sm:flex-row md:px-6">
-        <p className="text-xs text-muted-foreground">
-          © 2023-2024 BuzzTrip. All rights reserved.
-        </p>
-        {/* <nav className="flex gap-4 sm:ml-auto sm:gap-6">
-          <Link className="text-xs underline-offset-4 hover:underline" href="#">
-            Terms of Service
-          </Link>
-          <Link className="text-xs underline-offset-4 hover:underline" href="#">
-            Privacy
-          </Link>
-        </nav> */}
-      </footer>
-    </>
+      {/* Use Cases Section */}
+      <section id="use-cases" className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+              Perfect for Every Adventure
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              From travel planning to event coordination, BuzzTrip adapts to
+              your unique mapping needs
+            </p>
+          </motion.div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            {appHighlights.map((useCase, index) => (
+              <motion.div
+                key={index}
+                initial={{ y: 30, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.6, delay: useCase.delay }}
+                viewport={{ once: true }}
+                whileHover={{ y: -3 }}
+              >
+                <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 h-full">
+                  <CardContent className="p-8">
+                    <motion.div
+                      className={`bg-${useCase.color}-100 w-16 h-16 rounded-2xl flex items-center justify-center mb-6`}
+                      whileHover={{ scale: 1.05 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 10,
+                      }}
+                    >
+                      <useCase.icon
+                        className={`h-8 w-8 text-${useCase.color}-600`}
+                      />
+                    </motion.div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                      {useCase.title}
+                    </h3>
+                    <p className="text-gray-600 mb-6 leading-relaxed">
+                      {useCase.description}
+                    </p>
+                    <ul className="space-y-2">
+                      {useCase.features.map((feature, featureIndex) => (
+                        <motion.li
+                          key={featureIndex}
+                          initial={{ x: -10, opacity: 0 }}
+                          whileInView={{ x: 0, opacity: 1 }}
+                          transition={{
+                            duration: 0.4,
+                            delay: useCase.delay + featureIndex * 0.1,
+                          }}
+                          viewport={{ once: true }}
+                          className="flex items-center text-gray-600"
+                        >
+                          <Check className="h-4 w-4 text-primary mr-2" />
+                          {feature}
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+      {/* Roadmap Section */}
+      <section
+        id="roadmap"
+        className="py-20 bg-gradient-to-br from-gray-50 to-primary/5"
+      >
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+              Development Roadmap
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              See what's coming next and be part of BuzzTrip's journey to
+              becoming the ultimate mapping platform
+            </p>
+          </motion.div>
+
+          <div className="max-w-4xl mx-auto">
+            <div className="space-y-8">
+              {roadMap.map((phase, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ x: -50, opacity: 0 }}
+                  whileInView={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="flex items-start space-x-6"
+                >
+                  <div className="flex flex-col items-center">
+                    <div
+                      className={`w-4 h-4 rounded-full ${
+                        phase.status === "completed"
+                          ? "bg-primary"
+                          : phase.status === "in-progress"
+                            ? "bg-amber-500"
+                            : "bg-gray-300"
+                      }`}
+                    />
+                    {index < 3 && (
+                      <div className="w-0.5 h-16 bg-gray-200 mt-2" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <h3 className="text-xl font-bold text-gray-900">
+                        {phase.quarter}
+                      </h3>
+                      <Badge
+                        className={
+                          phase.status === "completed"
+                            ? "bg-primary text-white"
+                            : phase.status === "in-progress"
+                              ? "bg-amber-100 text-amber-700"
+                              : "bg-gray-100 text-gray-700"
+                        }
+                      >
+                        {phase.status === "completed"
+                          ? "Completed"
+                          : phase.status === "in-progress"
+                            ? "In Progress"
+                            : "Planned"}
+                      </Badge>
+                    </div>
+                    <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                      {phase.title}
+                    </h4>
+                    <ul className="grid md:grid-cols-2 gap-2">
+                      {phase.features.map((feature, featureIndex) => (
+                        <li
+                          key={featureIndex}
+                          className="flex items-center text-gray-600 text-sm"
+                        >
+                          <Check className="h-3 w-3 text-primary mr-2 flex-shrink-0" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+            <Link
+              href="/roadmap"
+              className={buttonVariants({
+                variant: "outline",
+                size: "lg",
+                className:
+                  "mt-8 inline-flex items-center justify-center bg-white text-primary hover:bg-gray-100 px-6 py-3 text-lg font-semibold shadow-md",
+              })}
+            >
+              View the full roadmap
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+              <GeneralCTA />
+      <div className="bg-purple-100" />
+      <div className="text-purple-600" />
+      <div className="bg-green-100" />
+      <div className="text-green-600" />
+      <div className="bg-blue-100" />
+      <div className="text-blue-600" />
+    </div>
   );
 }

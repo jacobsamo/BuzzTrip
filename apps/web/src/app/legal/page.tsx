@@ -1,5 +1,4 @@
 import Link from "next/link";
-import React from "react";
 
 const formatDate = (date: string) => {
   const dateObj = new Date(date);
@@ -25,7 +24,7 @@ export default async function LegalPage() {
         >
           <h2>Privacy Policy</h2>
           <p className="text-sm font-light">
-            Last Updated: {formatDate("2024-12-08")}
+            Last Updated: {formatDate("2025-12-08")}
           </p>
         </Link>
         <Link
@@ -34,7 +33,7 @@ export default async function LegalPage() {
         >
           <h2>Terms of Service</h2>
           <p className="text-sm font-light">
-            Last Updated: {formatDate("2024-12-08")}
+            Last Updated: {formatDate("2025-12-08")}
           </p>
         </Link>
       </div>

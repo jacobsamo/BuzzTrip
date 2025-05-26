@@ -29,7 +29,7 @@ interface MapCardProps {
 const MapCard = ({ map, updateMap }: MapCardProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const mapImage = map.image || "/placeholder.svg?height=200&width=400";
-  const mapColor = map.color || "#4f46e5";
+  const mapColor = map.color || "#2C7772";
 
   return (
     <>
