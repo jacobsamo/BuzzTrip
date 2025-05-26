@@ -104,6 +104,10 @@ function MapForm({
   const [users, setUsers] = useState<RefinedUserWithPermission[] | null>(null);
 
   const onSubmit = async (data: z.infer<typeof mapsEditSchema>) => {
+    if (!userId) {
+      toast.error("Please sign in to create a map");
+      return;
+    }
     try {
       const newUsers =
         users?.map((user) => {
@@ -141,12 +145,16 @@ function MapForm({
   };
 
   return (
-    <MapFormProvider formProps={{
-      defaultValues: {
-        icon: "Map",
-        owner_id: userId!,
-      }
-    }} onSubmit={onSubmit} setExternalUsers={setUsers}>
+    <MapFormProvider
+      formProps={{
+        defaultValues: {
+          icon: "Map",
+          owner_id: userId!,
+        },
+      }}
+      onSubmit={onSubmit}
+      setExternalUsers={setUsers}
+    >
       <MapStepperForm />
     </MapFormProvider>
   );

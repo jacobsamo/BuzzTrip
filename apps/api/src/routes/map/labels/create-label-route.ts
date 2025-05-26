@@ -1,16 +1,14 @@
 import { createDb } from "@buzztrip/db";
 import { labels } from "@buzztrip/db/schemas";
 import { labelsEditSchema, labelsSchema } from "@buzztrip/db/zod-schemas";
-import { createRoute, z } from "@hono/zod-openapi";
+import { createRoute } from "@hono/zod-openapi";
 import { captureException } from "@sentry/cloudflare";
 import { ErrorSchema, MapParamsSchema } from "../../../common/schema";
 import { app } from "../../../common/types";
 
-export const CreateLabelSchema = labelsEditSchema.array();
+export const CreateLabelSchema = labelsEditSchema;
 
-export const CreateLabelReturnSchema = z.object({
-  labels: labelsSchema.array(),
-});
+export const CreateLabelReturnSchema = labelsSchema;
 
 export const createLabelRoute = app.openapi(
   createRoute({
@@ -30,7 +28,7 @@ export const createLabelRoute = app.openapi(
             schema: CreateLabelReturnSchema,
           },
         },
-        description: "Edit a collection",
+        description: "Create labels for a map",
       },
       400: {
         content: {
@@ -61,24 +59,19 @@ export const createLabelRoute = app.openapi(
   async (c) => {
     try {
       const { mapId } = c.req.valid("param");
-      const newLabels = c.req.valid("json");
+      const newLabel = c.req.valid("json");
       const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
-      const createdLabels = await db
+      const [createdLabel] = await db
         .insert(labels)
-        .values(newLabels.map((label) => ({ ...label, map_id: mapId })))
+        .values({ ...newLabel, map_id: mapId })
         .returning();
 
-      if (!createdLabels) {
+      if (!createdLabel) {
         throw Error("Failed to create label");
       }
 
-      return c.json(
-        {
-          labels: createdLabels,
-        },
-        200
-      );
+      return c.json(createdLabel, 200);
     } catch (error) {
       console.error(error);
       captureException(error);

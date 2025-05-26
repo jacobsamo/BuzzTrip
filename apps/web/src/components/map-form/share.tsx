@@ -16,13 +16,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useSession } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
 import { apiClient } from "@/server/api.client";
 import { PermissionEnum } from "@buzztrip/db/types";
 import { useQuery } from "@tanstack/react-query";
 import { CommandLoading } from "cmdk";
 import { Check, UserPlus, X } from "lucide-react";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Label } from "../ui/label";
 import { useMapFormContext } from "./provider";
@@ -50,6 +51,10 @@ const MapShareForm = () => {
     },
     enabled: searchValue?.length >= 2,
   });
+
+  useEffect(() => {
+    console.log("users", users);
+  }, []);
 
   return (
     <div className="space-y-12">
@@ -120,7 +125,7 @@ const MapShareForm = () => {
                       </div>
 
                       <div className="flex items-center">
-                        {(users && users.some((u) => u.id === user.id) )||
+                        {(users && users.some((u) => u.id === user.id)) ||
                         data?.session?.userId === user.id ? (
                           <Check className="h-4 w-4 text-green-500" />
                         ) : (
@@ -157,7 +162,14 @@ const MapShareForm = () => {
                   key={user.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="flex items-center justify-between p-3 border rounded-lg bg-gray-50"
+                  className={cn(
+                    "flex items-center justify-between p-3 border rounded-lg bg-gray-50",
+                    {
+                      // if the user is the owner of the map, we don't want to allow them to remove themselves
+                      "opacity-50 cursor-not-allowed pointer-events-none":
+                        user.id === data?.session?.userId,
+                    }
+                  )}
                 >
                   <div className="flex items-center space-x-3">
                     <Avatar className="w-8 h-8">
@@ -183,6 +195,7 @@ const MapShareForm = () => {
                           permission: value as PermissionEnum,
                         })
                       }
+                      disabled={user.id === data?.session?.userId}
                     >
                       <SelectTrigger className="w-24">
                         <SelectValue />
@@ -191,12 +204,14 @@ const MapShareForm = () => {
                         <SelectItem value="commenter">Commenter</SelectItem>
                         <SelectItem value="viewer">Viewer</SelectItem>
                         <SelectItem value="editor">Editor</SelectItem>
+                        <SelectItem value="owner">Owner</SelectItem>
                       </SelectContent>
                     </Select>
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => removeUser(user.id)}
+                      disabled={user.id === data?.session?.userId}
                     >
                       Remove
                     </Button>

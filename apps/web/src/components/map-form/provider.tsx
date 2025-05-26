@@ -1,6 +1,7 @@
 import { Form } from "@/components/ui/form";
 import { useSession } from "@/lib/auth-client";
-import { NewLabel, NewMap } from "@buzztrip/db/types";
+import { formatDateForSql, generateId } from "@buzztrip/db/helpers";
+import { Label, NewLabel, NewMap } from "@buzztrip/db/types";
 import {
   mapsEditSchema,
   permissionEnumSchema,
@@ -32,13 +33,10 @@ type MapFormContextType = {
   form: UseFormReturn<z.infer<typeof mapsEditSchema>>;
   onSubmit: () => void;
   users: RefinedUserWithPermission[] | null;
-  labels: NewLabel[] | null;
+  labels: Label[] | null;
   addUser: (user: RefinedUserWithPermission) => void;
   removeUser: (userId: string) => void;
-  updateUser: (
-    userId: string,
-    user: RefinedUserWithPermission
-  ) => void;
+  updateUser: (userId: string, user: RefinedUserWithPermission) => void;
   addLabel: (label: NewLabel) => void;
   removeLabel: (labelId: string) => void;
   updateLabel: (labelId: string, label: NewLabel) => void;
@@ -75,7 +73,7 @@ type MapFormProviderProps = {
   onSubmit: SubmitHandler<z.infer<typeof mapsEditSchema>>;
   initialMapData?: NewMap;
   initialUsers?: RefinedUserWithPermission[] | null;
-  initialLabels?: NewLabel[] | null;
+  initialLabels?: Label[] | null;
   setExternalUsers?: (users: RefinedUserWithPermission[] | null) => void;
   setExternalLabels?: (labels: NewLabel[] | null) => void;
   onUserChange?: (e: MapFormUserEvents) => void;
@@ -110,7 +108,15 @@ export const MapFormProvider = ({
   const [users, setUsers] = useState<RefinedUserWithPermission[] | null>(
     initialUsers
   );
-  const [labels, setLabels] = useState<NewLabel[] | null>(initialLabels);
+  const [labels, setLabels] = useState<Label[] | null>(initialLabels);
+
+  useEffect(() => {
+    setUsers(initialUsers);
+  }, [initialUsers]);
+
+  useEffect(() => {
+    setLabels(initialLabels);
+  }, [initialLabels]);
 
   useEffect(() => {
     if (setExternalUsers) {
@@ -176,9 +182,21 @@ export const MapFormProvider = ({
   // === NewLabel handlers ===
   const addLabel = useCallback(
     (label: NewLabel) => {
+      const newLabel: Label = {
+        ...label,
+        label_id: generateId("generic"),
+        map_id: label.map_id!,
+        title: label.title ?? "",
+        color: label?.color ?? null,
+        icon: label?.icon ?? null,
+        description: label?.description ?? null,
+        created_at: label?.created_at ?? formatDateForSql(new Date()),
+        updated_at: label?.updated_at ?? formatDateForSql(new Date()),
+      };
+
       setLabels((prev) => {
-        if (!prev) return [label];
-        return [...prev, label];
+        if (!prev) return [newLabel];
+        return [...prev, newLabel];
       });
       onLabelChange?.({ event: "label:added", payload: label });
     },

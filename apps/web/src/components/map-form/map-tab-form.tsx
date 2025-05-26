@@ -44,7 +44,7 @@ interface MapTabFormProps {
 
 const MapTabForm = ({ defaultTab }: MapTabFormProps) => {
   const { form, onSubmit } = useMapFormContext();
-  const [currentTab, setCurrentTab] = useState(defaultTab);
+  const [currentTab, setCurrentTab] = useState(defaultTab || "details");
   const { dirtyFields, isDirty, isSubmitting, isValid, errors } =
     form.formState;
 
@@ -95,8 +95,8 @@ const MapTabForm = ({ defaultTab }: MapTabFormProps) => {
       <Button
         type="button"
         onClick={form.handleSubmit(onSubmit)}
-        disabled={isSubmitting || !isDirty || !isValid}
-        className="min-w-[120px] absolute bottom-2 right-2 "
+        disabled={isSubmitting || !isDirty}
+        className="min-w-[120px] mt-6 ml-auto"
       >
         {isSubmitting ? (
           <Loader2 className="size-4 animate-spin" />

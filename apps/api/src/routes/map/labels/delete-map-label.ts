@@ -16,7 +16,7 @@ export const deleteLabelRoute = app.openapi(
     responses: {
       200: {
         content: { "application/json": { schema: SuccessfulDeleteSchema } },
-        description: "Map found",
+        description: "Label deleted successfully",
       },
       400: {
         content: { "application/json": { schema: ErrorSchema } },
@@ -43,7 +43,7 @@ export const deleteLabelRoute = app.openapi(
       return c.json(
         {
           code: "success",
-          message: "User removed successfully",
+          message: "Label deleted successfully",
           deletedId: deleteLabel.deletedId,
           requestId: c.get("requestId"),
         },

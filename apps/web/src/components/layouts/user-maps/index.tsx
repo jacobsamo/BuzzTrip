@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { UserMap } from "@buzztrip/db/types";
+import { Map, UserMap } from "@buzztrip/db/types";
 import { MapIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
@@ -58,6 +58,53 @@ const UserMaps = ({ usersMaps }: UserMapsProps) => {
       : null;
   }, [filteredMaps, sortOption]);
 
+  const handleMapCreated = (map: Map | null) => {
+    if (map) {
+      const newMap: UserMap = {
+        title: map.title,
+        description: map.description,
+        map_id: map.map_id,
+        owner_id: map.owner_id,
+        image: map.image,
+        bounds: map.bounds,
+        icon: map.icon,
+        location_name: map.location_name,
+        visibility: map.visibility,
+        lat: map.lat,
+        lng: map.lng,
+        color: map.color,
+        user_id: map.owner_id,
+        permission: "owner",
+        map_user_id: map.owner_id,
+        created_at: map.created_at,
+        updated_at: map.updated_at,
+      };
+      setMaps((prev) => (prev ? [...prev, newMap] : [newMap]));
+    }
+  };
+
+  const handleMapUpdated = (map: Partial<Map>) => {
+    console.log("handleMapUpdated", map);
+    if (!maps) return;
+
+    const foundMap = maps.find((m) => m.map_id === map.map_id);
+    console.log("foundMap", foundMap);
+    if (foundMap) {
+      const newMap: UserMap = {
+        ...foundMap,
+        ...map,
+      };
+      console.log("newMap", newMap);
+      setMaps((prev) => {
+        if (!prev) return [newMap];
+
+        return prev.map((m) =>
+          m.map_id === map.map_id ? { ...m, ...map } : m
+        );
+      });
+    }
+  };
+
   if (!sortedMaps || sortedMaps.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px] border rounded-lg p-8">
@@ -74,29 +121,7 @@ const UserMaps = ({ usersMaps }: UserMapsProps) => {
               Create Your First Map
             </Button>
           }
-          setMap={(map) => {
-            if (map) {
-              const newMap: UserMap = {
-                title: map.title,
-                description: map.description,
-                map_id: map.map_id,
-                owner_id: map.owner_id,
-                image: map.image,
-                bounds: map.bounds,
-                icon: map.icon,
-                lat: map.lat,
-                lng: map.lng,
-                color: map.color,
-                user_id: map.owner_id,
-                permission: "owner",
-                map_user_id: map.owner_id,
-                created_at: map.created_at,
-                updated_at: map.updated_at,
-              };
-              setMaps((prev) => (prev ? [...prev, newMap] : [newMap]));
-            }
-            return;
-          }}
+          setMap={handleMapCreated}
         />
       </div>
     );
@@ -105,31 +130,7 @@ const UserMaps = ({ usersMaps }: UserMapsProps) => {
   return (
     <div className="space-y-6">
       <div className="inline-flex w-full items-center justify-end">
-        <MapModal
-          setMap={(map) => {
-            if (map) {
-              const newMap: UserMap = {
-                title: map.title,
-                description: map.description,
-                map_id: map.map_id,
-                owner_id: map.owner_id,
-                image: map.image,
-                bounds: map.bounds,
-                icon: map.icon,
-                lat: map.lat,
-                lng: map.lng,
-                color: map.color,
-                user_id: map.owner_id,
-                permission: "owner",
-                map_user_id: map.owner_id,
-                created_at: map.created_at,
-                updated_at: map.updated_at,
-              };
-              setMaps((prev) => (prev ? [...prev, newMap] : [newMap]));
-            }
-            return;
-          }}
-        />
+        <MapModal setMap={handleMapCreated} />
       </div>
       <div className="space-y-6">
         <div className="flex flex-wrap gap-2 justify-end items-center">
@@ -166,7 +167,7 @@ const UserMaps = ({ usersMaps }: UserMapsProps) => {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <MapCard map={map} />
+                <MapCard map={map} updateMap={handleMapUpdated} />
               </motion.div>
             ))}
           </div>

@@ -69,7 +69,7 @@ export const mapsEditSchema = createInsertSchema(maps).extend({
 
 export const labelsSchema = createSelectSchema(labels)
   .extend({
-    icon: iconSchema,
+    icon: iconSchema.nullable(),
   })
   .refine((data) => !(data.icon === null && data.color === null), {
     message: "Either icon or color must be provided.",
@@ -78,7 +78,7 @@ export const labelsSchema = createSelectSchema(labels)
 
 export const labelsEditSchema = createInsertSchema(labels)
   .extend({
-    icon: iconSchema,
+    icon: iconSchema.nullable(),
   })
   .refine((data) => !(data.icon === null && data.color === null), {
     message: "Either icon or color must be provided.",

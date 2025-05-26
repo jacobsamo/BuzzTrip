@@ -18,14 +18,13 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-
 import { useSession } from "@/lib/auth-client";
 import { apiClient } from "@/server/api.client";
-import { Map, NewLabel } from "@buzztrip/db/types";
+import { Label, Map, NewLabel } from "@buzztrip/db/types";
 import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import * as React from "react";
-import { use } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import MapTabForm from "../map-form/map-tab-form";
@@ -37,18 +36,39 @@ import {
 export interface EditMapModalProps {
   map: Map;
   updateMap?: (map: Map) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export default function EditMapModal({ updateMap, map }: EditMapModalProps) {
-  const [open, setOpen] = React.useState(false);
+export default function EditMapModal({
+  updateMap,
+  map,
+  open: controlledOpen,
+  onOpenChange,
+}: EditMapModalProps) {
+  const isControlled = controlledOpen !== undefined;
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(false);
+  const open = isControlled ? controlledOpen : uncontrolledOpen;
+  const setOpen = isControlled
+    ? (onOpenChange ?? (() => {}))
+    : setUncontrolledOpen;
   const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  const Trigger = () =>
+    isControlled ? null : isDesktop ? (
+      <DialogTrigger className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50">
+        Edit Map
+      </DialogTrigger>
+    ) : (
+      <DrawerTrigger className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50">
+        Edit Map
+      </DrawerTrigger>
+    );
 
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50">
-          Edit Map
-        </DialogTrigger>
+        <Trigger />
         <DialogContent className="sm:max-w-8/12 h-8/12">
           <DialogHeader>
             <DialogTitle>Edit Map</DialogTitle>
@@ -62,9 +82,7 @@ export default function EditMapModal({ updateMap, map }: EditMapModalProps) {
 
   return (
     <Drawer open={open} onOpenChange={setOpen} activeSnapPoint={0.9}>
-      <DrawerTrigger className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50">
-        Edit Map
-      </DrawerTrigger>
+      <Trigger />
       <DrawerContent>
         <DrawerHeader className="text-left">
           <DrawerTitle>Edit Map</DrawerTitle>
@@ -88,25 +106,55 @@ function MapForm({
 }: EditMapModalProps & { setOpen: (open: boolean) => void }) {
   const { data } = useSession();
   const userId = data?.session.userId;
-  const getMapUsersPromise = apiClient.map[":mapId"].users.$get({
-    param: { mapId: map.map_id },
-  });
-  const getMapLabelsPromise = apiClient.map[":mapId"].labels.$get({
-    param: { mapId: map.map_id },
-  });
-
-const [mapUsers, mapLabels] = use(
-    Promise.all([
-      getMapUsersPromise.then((res) => {
-       if (res && res.ok) return res.json();
-       return null;
-      }),
-      getMapLabelsPromise.then((res) => {
-       if (res && res.ok) return res.json();
-       return null;
-      }),
-    ])
+  const [mapUsers, setMapUsers] = useState<RefinedUserWithPermission[] | null>(
+    null
   );
+  const [mapLabels, setMapLabels] = useState<Label[] | null>(null);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const fetchData = async () => {
+      try {
+        const [mu, ml] = await Promise.all([
+          apiClient.map[":mapId"].users
+            .$get({
+              param: { mapId: map.map_id },
+            })
+            .then((res) => {
+              if (res && res.ok) return res.json();
+              return null;
+            }),
+          apiClient.map[":mapId"].labels
+            .$get({
+              param: { mapId: map.map_id },
+            })
+            .then((res) => {
+              if (res && res.ok) return res.json();
+              return null;
+            }),
+        ]);
+
+        if (!isCancelled) {
+          setMapUsers(
+            mu?.map((user) => ({
+              ...user.user,
+              permission: user.permission,
+            })) ?? null
+          );
+          setMapLabels(ml);
+        }
+      } catch (error) {
+        console.error("Failed to fetch map data:", error);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [map.map_id]); // Add only necessary dependencies
 
   const onSubmit = async (data: z.infer<typeof mapsEditSchema>) => {
     try {
@@ -140,8 +188,10 @@ const [mapUsers, mapLabels] = use(
 
   const handleUserCreate = async (user: RefinedUserWithPermission) => {
     const create = apiClient.map[":mapId"].users.$post({
+      param: { mapId: map.map_id },
       json: {
-        ...user,
+        mapId: map.map_id,
+        users: [{ ...user, user_id: user.id }],
       },
     });
 
@@ -171,7 +221,9 @@ const [mapUsers, mapLabels] = use(
     const update = apiClient.map[":mapId"].users[":userId"].$put({
       param: { mapId: map.map_id, userId: userId },
       json: {
-        ...user,
+        map_id: map.map_id,
+        user_id: userId,
+        permission: user.permission,
       },
     });
 
@@ -184,9 +236,8 @@ const [mapUsers, mapLabels] = use(
 
   const handleLabelCreate = async (label: NewLabel) => {
     const create = apiClient.map[":mapId"].labels.$post({
-      json: {
-        ...label,
-      },
+      param: { mapId: map.map_id },
+      json: label,
     });
 
     toast.promise(create, {
@@ -196,14 +247,11 @@ const [mapUsers, mapLabels] = use(
     });
   };
 
-  const handleLabelUpdate = async (
-    labelId: string,
-    label: NewLabel
-  ) => {
+  const handleLabelUpdate = async (labelId: string, label: NewLabel) => {
     const update = apiClient.map[":mapId"].labels[":labelId"].$put({
       param: { mapId: map.map_id, labelId: labelId },
       json: {
-        ...label
+        ...label,
       },
     });
 
@@ -229,14 +277,14 @@ const [mapUsers, mapLabels] = use(
   return (
     <MapFormProvider
       onSubmit={onSubmit}
-      initialLabels={mapLabels ?? null}
-      initialUsers={
-        mapUsers?.map((user) => ({
-          ...user.user,
-          permission: user.permission,
-        })) ?? null
-      }
-      onUserChange={({event, payload}) => {
+      initialLabels={mapLabels}
+      initialUsers={mapUsers}
+      formProps={{
+        defaultValues: {
+          ...map,
+        },
+      }}
+      onUserChange={({ event, payload }) => {
         switch (event) {
           case "user:added":
             handleUserCreate(payload);
@@ -249,7 +297,7 @@ const [mapUsers, mapLabels] = use(
             break;
         }
       }}
-      onLabelChange={({event, payload}) => {
+      onLabelChange={({ event, payload }) => {
         switch (event) {
           case "label:added":
             handleLabelCreate(payload);
@@ -267,4 +315,3 @@ const [mapUsers, mapLabels] = use(
     </MapFormProvider>
   );
 }
-

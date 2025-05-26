@@ -3,7 +3,7 @@ import { map_users } from "@buzztrip/db/schemas";
 import { map_usersEditSchema, map_usersSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
 import { captureException } from "@sentry/cloudflare";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { ErrorSchema } from "../../../common/schema";
 import { app } from "../../../common/types";
 import { MapUserParamsSchema } from "./schema";
@@ -64,7 +64,7 @@ export const updateMapUserRoute = app.openapi(
       const [updatedMapUser] = await db
         .update(map_users)
         .set(newLabel)
-        .where(eq(map_users.user_id, userId))
+        .where(and(eq(map_users.map_id, mapId), eq(map_users.user_id, userId)))
         .returning();
 
       if (!updatedMapUser) {

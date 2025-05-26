@@ -16,7 +16,7 @@ export const getMapUserRoute = app.openapi(
   createRoute({
     method: "get",
     path: "/map/{mapId}/users",
-    summary: "Get a map",
+    summary: "Get map users",
     request: { params: MapParamsSchema },
     responses: {
       200: {
@@ -60,11 +60,11 @@ export const getMapUserRoute = app.openapi(
       captureException(error);
       return c.json(
         {
-          code: "data_not_found",
-          message: "Map not found",
+          code: "internal_error",
+          message: "Failed to retrieve map users",
           requestId: c.get("requestId"),
         },
-        400
+        500
       );
     }
   }

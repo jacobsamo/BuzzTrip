@@ -3,7 +3,7 @@ import { labels } from "@buzztrip/db/schemas";
 import { labelsEditSchema, labelsSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
 import { captureException } from "@sentry/cloudflare";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { ErrorSchema } from "../../../common/schema";
 import { app } from "../../../common/types";
 import { LabelParamsSchema } from "./schema";
@@ -62,10 +62,19 @@ export const updateLabelRoute = app.openapi(
       const newLabel = c.req.valid("json");
       const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
+      // TODO: Add authorization check here
+      // Verify user owns the map or has permission to edit
+      // Example: await verifyMapAccess(userId, mapId, db);
+
+      console.log("newLabel", {
+        newLabel,
+        mapId,
+        labelId,
+      });
       const [updatedLabel] = await db
         .update(labels)
         .set(newLabel)
-        .where(eq(labels.label_id, labelId))
+        .where(and(eq(labels.label_id, labelId), eq(labels.map_id, mapId)))
         .returning();
 
       if (!updatedLabel) {

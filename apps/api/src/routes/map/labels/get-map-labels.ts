@@ -12,7 +12,7 @@ export const getMapLabelsRoute = app.openapi(
   createRoute({
     method: "get",
     path: "/map/{mapId}/labels",
-    summary: "Get a map",
+    summary: "Get map labels",
     request: { params: MapParamsSchema },
     responses: {
       200: {
@@ -33,13 +33,10 @@ export const getMapLabelsRoute = app.openapi(
     try {
       const { mapId } = c.req.valid("param");
       const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
-      const res = await db.query.labels.findMany({
+      const mapLabels = await db.query.labels.findMany({
         where: (maps, { eq }) => eq(maps.map_id, mapId),
       });
-      const mapLabels = res.map((label) => ({
-        ...label,
-        icon: label.icon as IconType,
-      }));
+
 
       return c.json(mapLabels, 200);
     } catch (error) {

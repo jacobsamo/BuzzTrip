@@ -56,6 +56,16 @@ const MapLocationForm = () => {
                 shouldDirty: true,
                 shouldTouch: true,
               });
+              setValue(
+                "location_name",
+                details?.placeDetails.name ??
+                  details?.placeDetails?.formatted_address ??
+                  null,
+                {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                }
+              );
             }}
           />
         </div>
