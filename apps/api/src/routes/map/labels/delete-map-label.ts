@@ -40,6 +40,17 @@ export const deleteLabelRoute = app.openapi(
           deletedId: labels.label_id,
         });
 
+      if (!deleteLabel) {
+        return c.json(
+          {
+            code: "data_not_found",
+            message: "Label not found",
+            requestId: c.get("requestId"),
+          },
+          400
+        );
+      }
+
       return c.json(
         {
           code: "success",

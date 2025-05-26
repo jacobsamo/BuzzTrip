@@ -64,7 +64,7 @@ export const getMapUserRoute = app.openapi(
           message: "Failed to retrieve map users",
           requestId: c.get("requestId"),
         },
-        500
+        400
       );
     }
   }

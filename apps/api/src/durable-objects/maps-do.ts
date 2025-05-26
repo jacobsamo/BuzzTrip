@@ -1,4 +1,4 @@
-import { Env } from "@/common/types";
+import { Bindings } from "../common/types";
 import { DurableObject } from "cloudflare:workers";
 import { Hono } from "hono";
 
@@ -13,7 +13,7 @@ enum EventTypes {
   SESSION_ID = "SESSION_ID",
 }
 
-export class MapsDurableObject extends DurableObject<Env> {
+export class MapsDurableObject extends DurableObject<Bindings> {
   // Hono application instance for serving routes
   private app: Hono = new Hono();
   // Connection between the connected client (e.g. browser) and the current durable object (this)
@@ -21,11 +21,11 @@ export class MapsDurableObject extends DurableObject<Env> {
   // Store the user locations if the map is has been setup to share user locations
   private userLocations = new Map<string, UserLocation>(); // future
 
-  constructor(ctx: DurableObjectState, env: Env) {
+  constructor(ctx: DurableObjectState, env: Bindings) {
     super(ctx, env);
   }
 
-  async webSocketMessage(ws: WebSocket, message: any) {
+  override async webSocketMessage(ws: WebSocket, message: any) {
     try {
       const data = JSON.parse(typeof message === "string" ? message : "{}");
       const { type, lat, lng } = data;
@@ -63,7 +63,7 @@ export class MapsDurableObject extends DurableObject<Env> {
     }
   }
 
-  async webSocketClose(
+  override async webSocketClose(
     ws: WebSocket,
     code: number,
     reason: string,
@@ -97,12 +97,16 @@ export class MapsDurableObject extends DurableObject<Env> {
     ws.close(code, "Durable Object is closing WebSocket");
   }
 
-  async fetch(request: Request): Promise<Response> {
+  override async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === "/ws") {
       const webSocketPair = new WebSocketPair();
       const [client, server] = Object.values(webSocketPair);
+
+      if (!server)   return new Response(null, {
+        status: 400,
+      });
 
       const connectionId = crypto.randomUUID();
       this.connections.set(connectionId, server);

@@ -48,6 +48,17 @@ export const deleteMapUserRoute = app.openapi(
           deletedId: map_users.map_user_id,
         });
 
+      if (!deletedMapUser) {
+        return c.json(
+          {
+            code: "data_not_found",
+            message: "User not found",
+            requestId: c.get("requestId"),
+          },
+          400
+        );
+      }
+
       return c.json(
         {
           code: "success",
