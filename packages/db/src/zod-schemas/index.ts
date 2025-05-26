@@ -67,12 +67,23 @@ export const mapsEditSchema = createInsertSchema(maps).extend({
   bounds: bounds.nullable(),
 });
 
-export const labelsSchema = createSelectSchema(labels).extend({
-  icon: iconSchema,
-});
-export const labelsEditSchema = createInsertSchema(labels).extend({
-  icon: iconSchema,
-});
+export const labelsSchema = createSelectSchema(labels)
+  .extend({
+    icon: iconSchema.nullable(),
+  })
+  .refine((data) => !(data.icon === null && data.color === null), {
+    message: "Either icon or color must be provided.",
+    path: ["icon"],
+  });
+
+export const labelsEditSchema = createInsertSchema(labels)
+  .extend({
+    icon: iconSchema.nullable(),
+  })
+  .refine((data) => !(data.icon === null && data.color === null), {
+    message: "Either icon or color must be provided.",
+    path: ["icon"],
+  });
 
 export const markersSchema = createSelectSchema(markers).extend({
   icon: iconSchema,

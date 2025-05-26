@@ -10,6 +10,7 @@ import { and, eq } from "drizzle-orm";
 import { ErrorSchema, MapParamsSchema } from "../../../common/schema";
 import { app } from "../../../common/types";
 import { captureException } from "@sentry/cloudflare";
+import { formatDateForSql } from "@buzztrip/db/helpers";
 
 export const MarkerParamsSchema = MapParamsSchema.extend({
   markerId: z.string().openapi({
@@ -134,7 +135,10 @@ export const editMarkerRoute = app.openapi(
 
       await db
         .update(markers)
-        .set(editMarker.marker)
+        .set({
+          ...editMarker.marker,
+          updated_at: formatDateForSql(new Date()),
+        })
         .where(eq(markers.marker_id, markerId));
 
       return c.json(

@@ -14,13 +14,9 @@ import { z } from "zod";
 import { Button } from "../ui/button";
 import MapDetailsForm from "./details";
 import MapShareForm from "./share";
-import { mapFormSchema } from "./helpers";
+import { useMapFormContext } from "./provider";
 
 const MapLocationForm = dynamic(() => import("./location"), { ssr: false });
-
-interface MapStepperFormProps {
-  onSubmit: () => void;
-}
 
 const steps = [
   {
@@ -43,10 +39,12 @@ const steps = [
   },
 ] as const;
 
-const MapStepperForm = ({ onSubmit }: MapStepperFormProps) => {
+const MapStepperForm = () => {
   const {
-    formState: { errors },
-  } = useFormContext<z.infer<typeof mapFormSchema>>();
+    form,
+    onSubmit
+  } = useMapFormContext();
+  const {formState: { errors }} = form;
   const [currentStep, setCurrentStep] = React.useState(1);
 
   const next = () => {
@@ -79,10 +77,10 @@ const MapStepperForm = ({ onSubmit }: MapStepperFormProps) => {
             onError={() => {
               switch (step.id) {
                 case "name":
-                  return errors.map?.title || errors.map?.description;
+                  return errors?.title || errors?.description;
                 case "location":
                   return (
-                    errors.map?.lat || errors.map?.lng || errors.map?.bounds
+                    errors?.lat || errors?.lng || errors?.bounds
                   );
                 default:
                   return false;

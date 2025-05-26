@@ -2,7 +2,6 @@ import * as z from "zod";
 import {
   collection_links,
   collections,
-  labels,
   map_users,
   maps,
   markers,
@@ -14,7 +13,10 @@ import {
 import {
   boundsSchema,
   combinedMarkersSchema,
+  labelsEditSchema,
+  labelsSchema,
   permissionEnumSchema,
+  refinedUserSchema,
   reviewsSchema,
   travelTypeEnumSchema,
   userMapsSchema,
@@ -25,11 +27,13 @@ export * from "./icons";
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
+export type RefinedUser = z.infer<typeof refinedUserSchema>;
+
 export type Map = typeof maps.$inferSelect;
 export type NewMap = typeof maps.$inferInsert;
 
-export type Label = typeof labels.$inferSelect;
-export type NewLabel = typeof labels.$inferInsert;
+export type Label = z.infer<typeof labelsSchema>;
+export type NewLabel = z.infer<typeof labelsEditSchema>;
 
 export type Marker = typeof markers.$inferSelect;
 export type NewMarker = typeof markers.$inferInsert;

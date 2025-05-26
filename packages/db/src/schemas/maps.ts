@@ -30,6 +30,12 @@ export const routeTravelTypeEnum = [
   "bicycling",
 ] as const;
 
+const visibilityOptions = [
+  "private", //Only the owner + shared people can access
+  "public", //Publicly viewable + indexed/searchable
+  "unlisted", //Viewable with link, but not discoverable
+] as const;
+
 export const maps = sqliteTable("maps", {
   map_id: text("map_id")
     .primaryKey()
@@ -43,9 +49,15 @@ export const maps = sqliteTable("maps", {
   owner_id: text("owner_id")
     .references(() => users.id, cascadeUpdate)
     .notNull(),
+  location_name: text("location_name"), // the location where the map is saved too e.g Brisbane, Australia, etc
   lat: real("lat"),
   lng: real("lng"),
   bounds: blob("bounds", { mode: "json" }).$type<z.infer<typeof bounds>>(),
+  visibility: text("visibility", {
+    enum: visibilityOptions,
+  })
+    .default("private")
+    .notNull(),
   created_at: text("created_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),

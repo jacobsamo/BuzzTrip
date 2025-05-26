@@ -98,7 +98,7 @@ export const usersRelations = relations(users, ({ many }) => ({
 
 export const mapUsersRelations = relations(map_users, ({ one }) => ({
   user: one(users, {
-    fields: [map_users.map_user_id],
+    fields: [map_users.user_id],
     references: [users.id],
   }),
   map: one(maps, {

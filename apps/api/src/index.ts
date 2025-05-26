@@ -12,7 +12,14 @@ import { createMapRoute } from "./routes/map/create-map-route";
 import { editMapRoute } from "./routes/map/edit-map-route";
 import { getMapDataRoute } from "./routes/map/get-map-data-route";
 import { getMapRoute } from "./routes/map/get-map-route";
-import { shareMapRoute } from "./routes/map/share-map-route";
+import { createLabelRoute } from "./routes/map/labels/create-label-route";
+import { deleteLabelRoute } from "./routes/map/labels/delete-map-label";
+import { getMapLabelsRoute } from "./routes/map/labels/get-map-labels";
+import { updateLabelRoute } from "./routes/map/labels/update-map-label";
+import { createMapUserRoute } from "./routes/map/map-user/create-map-user-route";
+import { deleteMapUserRoute } from "./routes/map/map-user/delete-map-user";
+import { getMapUserRoute } from "./routes/map/map-user/get-map-users";
+import { updateMapUserRoute } from "./routes/map/map-user/update-map-user";
 // Collections
 import { createCollectionRoute } from "./routes/map/collection/create-collection-route";
 import { editCollectionRoute } from "./routes/map/collection/edit-collection-route";
@@ -32,6 +39,8 @@ export { MapsDurableObject } from "./durable-objects/maps-do";
 /**
  * DO NOT CHANGE THIS TO BE THE IMPORTED VERSION FROM ./common/types
  * This will break the app stopping middleware running on the OpenAPI routes
+ * commit: c0723edf3e71f7df0bdfbfea0fd6b06695bd8b66
+ * github: https://github.com/jacobsamo/BuzzTrip/commit/c0723edf3e71f7df0bdfbfea0fd6b06695bd8b66
  */
 const app = new OpenAPIHono<AppBindings>();
 
@@ -74,22 +83,22 @@ app.use(authMiddleware);
 app.use(loggingMiddleware);
 app.use("*", requestId());
 
-app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
-  type: "http",
-  scheme: "bearer",
-});
+// app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
+//   type: "http",
+//   scheme: "bearer",
+// });
 
-app.doc("/openapi", {
-  openapi: "3.1.0",
-  info: {
-    version: "1.0.0",
-    title: "BuzzTrip API",
-  },
-});
-app.getOpenAPI31Document({
-  openapi: "3.1.0",
-  info: { title: "BuzzTrip API", version: "1" },
-}); // schema object
+// app.doc("/openapi", {
+//   openapi: "3.1.0",
+//   info: {
+//     version: "1.0.0",
+//     title: "BuzzTrip API",
+//   },
+// });
+// app.getOpenAPI31Document({
+//   openapi: "3.1.0",
+//   info: { title: "BuzzTrip API", version: "1" },
+// }); // schema object
 
 // Routes
 app.get("/health", (c) => {
@@ -111,7 +120,14 @@ const routes = app
   .route("/", editMapRoute)
   .route("/", getMapDataRoute)
   .route("/", getMapRoute)
-  .route("/", shareMapRoute)
+  .route("/", createMapUserRoute)
+  .route("/", getMapUserRoute)
+  .route("/", deleteMapUserRoute)
+  .route("/", updateMapUserRoute)
+  .route("/", createLabelRoute)
+  .route("/", getMapLabelsRoute)
+  .route("/", updateLabelRoute)
+  .route("/", deleteLabelRoute)
   .route("/", createMarkerRoute)
   .route("/", editMarkerRoute)
   .route("/", createCollectionRoute)

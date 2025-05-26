@@ -8,6 +8,13 @@
       "when": 1747960480961,
       "tag": "0000_even_squirrel_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1748221609403,
+      "tag": "0001_complete_lady_vermin",
+      "breakpoints": true
     }
   ]
 }

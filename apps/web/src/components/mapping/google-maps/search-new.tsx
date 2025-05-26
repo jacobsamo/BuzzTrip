@@ -111,6 +111,7 @@ export type AutocompleteCustomInputProps = {
    * @link
    */
   locationTypes?: string[] | undefined;
+  autoFocus?: boolean;
   classNames?: {
     predictions?: string;
     scrollArea?: string;
@@ -124,6 +125,7 @@ export const AutocompleteCustomInput = ({
   value,
   onValueChange,
   classNames,
+  autoFocus = false,
 }: AutocompleteCustomInputProps) => {
   const map = useMap();
   const places = useMapsLibrary("places");
@@ -180,7 +182,7 @@ export const AutocompleteCustomInput = ({
       setFetchingData(false);
     },
 
-    [autocompleteService, sessionToken]
+    [autocompleteService, sessionToken, value]
   );
 
   const onInputChange = useCallback(
@@ -240,6 +242,7 @@ export const AutocompleteCustomInput = ({
         <CommandInput
           value={value}
           onValueChange={onInputChange}
+          autoFocus={autoFocus}
           // className="w-full"
           placeholder="Search locations"
           id="search"

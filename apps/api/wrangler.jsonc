@@ -17,13 +17,13 @@
     "port": 8181,
   },
   "env": {
-    // "development": {
-    //   "name": "buzztrip-dev-api",
-    //   "route": {
-    //     "pattern": "dev-api.buzztrip.co/*",
-    //     "zone_name": "buzztrip.co",
-    //   },
-    // },
+    "development": {
+      "name": "buzztrip-dev-api",
+      "route": {
+        "pattern": "dev-api.buzztrip.co/*",
+        "zone_name": "buzztrip.co",
+      },
+    },
     "production": {
       "name": "buzztrip-prod-api",
       "route": {

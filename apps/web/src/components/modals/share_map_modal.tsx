@@ -148,7 +148,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
     console.log("usesr", selectedUsers);
     if (!selectedUsers || selectedUsers.length == 0) return;
 
-    const share = apiClient.map[":mapId"].share.$post({
+    const share = apiClient.map[":mapId"].users.$post({
       param: { mapId: map_id },
       json: {
         users: selectedUsers,

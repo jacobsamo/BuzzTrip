@@ -1,16 +1,10 @@
 import { createDb } from "@buzztrip/db";
-import { createRoute, z } from "@hono/zod-openapi";
-import { ErrorSchema, MapSchema } from "../../common/schema";
+import { createRoute } from "@hono/zod-openapi";
+import { ErrorSchema, MapParamsSchema, MapSchema } from "../../common/schema";
 import { app } from "../../common/types";
 import { captureException } from "@sentry/cloudflare";
 
-// --- schema (moved from ./schema.ts) ---
-const MapParamsSchema = z.object({
-  mapId: z.string().openapi({
-    param: { name: "mapId", in: "path", required: true },
-    example: "1f36c536-c8cf-4174-8ed4-3150c08212b5",
-  }),
-});
+
 
 export const getMapRoute = app.openapi(
   createRoute({

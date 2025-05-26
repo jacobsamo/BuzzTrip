@@ -1,31 +1,14 @@
+import { formatDateForSql } from "@buzztrip/db/helpers";
 import { createDb } from "@buzztrip/db";
 import { maps } from "@buzztrip/db/schemas";
-import { createRoute, z } from "@hono/zod-openapi";
+import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
+import { createRoute } from "@hono/zod-openapi";
+import { captureException } from "@sentry/cloudflare";
 import { eq } from "drizzle-orm";
 import { ErrorSchema, MapParamsSchema, MapSchema } from "../../common/schema";
 import { app } from "../../common/types";
-import { captureException } from "@sentry/cloudflare";
 
-const EditMapSchema = z
-  .object({
-    map_id: z.string().openapi({
-      param: { name: "mapId", in: "path", required: true },
-      example: "1f36c536-c8cf-4174-8ed4-3150c08212b5",
-    }),
-    title: z.string().optional().openapi({ example: "My Map" }),
-    description: z
-      .string()
-      .nullish()
-      .openapi({ example: "An awesome trip across Australia" }),
-    owner_id: z
-      .string()
-      .openapi({ example: "user_2lmIzCk7BhX5a5MwvgITlFjkoLH" }),
-    image: z
-      .string()
-      .optional()
-      .openapi({ example: "https://example.com/image.png" }),
-  })
-  .openapi("EditMapSchema");
+const EditMapSchema = mapsEditSchema.openapi("EditMapSchema");
 
 export const editMapRoute = app.openapi(
   createRoute({
@@ -73,7 +56,10 @@ export const editMapRoute = app.openapi(
 
       const [updatedMap] = await db
         .update(maps)
-        .set(editMap)
+        .set({
+          ...editMap,
+          updated_at: formatDateForSql(new Date()),
+        })
         .where(eq(maps.map_id, mapId))
         .returning();
 
