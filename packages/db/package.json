@@ -34,6 +34,7 @@
     "./zod-schemas": "./src/zod-schemas/index.ts",
     "./helpers": "./src/helpers/index.ts",
     "./types": "./src/types/index.ts",
+    "./types/icon": "./src/types/icons.ts",
     "./queries": "./src/queries/index.ts",
     "./mutations": "./src/mutations/index.ts",
     "./mutations/maps": "./src/mutations/maps.ts",

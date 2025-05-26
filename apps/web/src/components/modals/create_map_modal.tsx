@@ -69,7 +69,12 @@ export default function CreateMapModal({
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen} activeSnapPoint={1}>
+    <Drawer
+      open={open}
+      onOpenChange={setOpen}
+      activeSnapPoint={0.9}
+      snapPoints={[0.5, 0.75, 0.9]}
+    >
       <DrawerTrigger asChild>
         {trigger ? (
           trigger

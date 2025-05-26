@@ -3,14 +3,20 @@ import { Button } from "@/components/ui/button";
 import { generateId } from "@buzztrip/db/helpers";
 import { Plus } from "lucide-react";
 import { Label } from "../ui/label";
+import { ScrollArea } from "../ui/scroll-area";
 import LabelForm from "./label-form";
 import { useMapFormContext } from "./provider";
 
 const MapLabelsForm = () => {
-  const { form: {watch}, labels, addLabel, removeLabel } = useMapFormContext();
+  const {
+    form: { watch },
+    labels,
+    addLabel,
+    removeLabel,
+  } = useMapFormContext();
   const mapId = watch("map_id");
 
-  if (!mapId) return null
+  if (!mapId) return null;
 
   return (
     <>
@@ -34,19 +40,24 @@ const MapLabelsForm = () => {
           Add Label
         </Button>
       </div>
-      {labels &&
-        labels.map((label, index) => (
-          <LabelForm key={label.label_id} label={{
-            label_id: label.label_id!,
-            description: label?.description ?? null,
-            map_id: label.map_id!,
-            title: label.title!,
-            color: label?.color ?? null,
-            icon: label?.icon ?? null,
-            created_at: label?.created_at,
-            updated_at: label?.updated_at,
-          }} />
-        ))}
+      <ScrollArea className="h-[250px] w-full">
+        {labels &&
+          labels.map((label, index) => (
+            <LabelForm
+              key={label.label_id}
+              label={{
+                label_id: label.label_id!,
+                description: label?.description ?? null,
+                map_id: label.map_id!,
+                title: label.title!,
+                color: label?.color ?? null,
+                icon: label?.icon ?? null,
+                created_at: label?.created_at,
+                updated_at: label?.updated_at,
+              }}
+            />
+          ))}
+      </ScrollArea>
     </>
   );
 };

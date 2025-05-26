@@ -13,6 +13,8 @@ import React, {
   use,
   useCallback,
   useEffect,
+  useMemo,
+  useRef,
   useState,
 } from "react";
 import {
@@ -93,6 +95,30 @@ export const MapFormProvider = ({
 }: MapFormProviderProps) => {
   const { data } = useSession();
   const userId = data?.session.userId;
+
+  // Use refs to store callback functions to prevent unnecessary re-renders
+  const onUserChangeRef = useRef(onUserChange);
+  const onLabelChangeRef = useRef(onLabelChange);
+  const setExternalUsersRef = useRef(setExternalUsers);
+  const setExternalLabelsRef = useRef(setExternalLabels);
+
+  // Update refs when callbacks change
+  useEffect(() => {
+    onUserChangeRef.current = onUserChange;
+  }, [onUserChange]);
+
+  useEffect(() => {
+    onLabelChangeRef.current = onLabelChange;
+  }, [onLabelChange]);
+
+  useEffect(() => {
+    setExternalUsersRef.current = setExternalUsers;
+  }, [setExternalUsers]);
+
+  useEffect(() => {
+    setExternalLabelsRef.current = setExternalLabels;
+  }, [setExternalLabels]);
+
   const form = useForm<z.infer<typeof mapsEditSchema>>({
     resolver: zodResolver(mapsEditSchema),
     defaultValues: formProps?.defaultValues ?? {
@@ -101,6 +127,7 @@ export const MapFormProvider = ({
     },
     ...formProps,
   });
+
   const {
     formState: { errors },
   } = form;
@@ -110,54 +137,68 @@ export const MapFormProvider = ({
   );
   const [labels, setLabels] = useState<Label[] | null>(initialLabels);
 
+  // Only update state when initialUsers actually changes (deep comparison)
+  const initialUsersStringified = useMemo(
+    () => JSON.stringify(initialUsers),
+    [initialUsers]
+  );
+
   useEffect(() => {
     setUsers(initialUsers);
-  }, [initialUsers]);
+  }, [initialUsersStringified]);
+
+  // Only update state when initialLabels actually changes (deep comparison)
+  const initialLabelsStringified = useMemo(
+    () => JSON.stringify(initialLabels),
+    [initialLabels]
+  );
 
   useEffect(() => {
     setLabels(initialLabels);
-  }, [initialLabels]);
+  }, [initialLabelsStringified]);
 
+  // Notify external components of state changes using refs to prevent re-renders
   useEffect(() => {
-    if (setExternalUsers) {
-      setExternalUsers(users);
+    if (setExternalUsersRef.current) {
+      setExternalUsersRef.current(users);
     }
-  }, [users, setExternalUsers]);
+  }, [users]);
 
   useEffect(() => {
-    if (setExternalLabels) {
-      setExternalLabels(labels);
+    if (setExternalLabelsRef.current) {
+      setExternalLabelsRef.current(labels);
     }
-  }, [labels, setExternalLabels]);
+  }, [labels]);
 
+  // Only log errors in development
   useEffect(() => {
-    console.error("Form Errors", errors);
+    if (
+      process.env.NODE_ENV === "development" &&
+      Object.keys(errors).length > 0
+    ) {
+      console.error("Form Errors", errors);
+    }
   }, [errors]);
 
-  // === RefinedUserWithPermission handlers ===
-  const addUser = useCallback(
-    (user: RefinedUserWithPermission) => {
-      setUsers((prev) => {
-        if (!prev) return [user];
-        const exists = prev.find((u) => u.id === user.id);
-        if (exists) return prev;
-        return [...prev, user];
-      });
-      onUserChange?.({ event: "user:added", payload: user });
-    },
-    [onUserChange]
-  );
+  // Memoized user handlers to prevent unnecessary re-renders
+  const addUser = useCallback((user: RefinedUserWithPermission) => {
+    setUsers((prev) => {
+      if (!prev) return [user];
+      const exists = prev.find((u) => u.id === user.id);
+      if (exists) return prev;
+      return [...prev, user];
+    });
+    onUserChangeRef.current?.({ event: "user:added", payload: user });
+  }, []);
 
-  const removeUser = useCallback(
-    (userId: string) => {
-      setUsers((prev) => {
-        if (!prev) return null;
-        return prev.filter((u) => u.id !== userId);
-      });
-      onUserChange?.({ event: "user:removed", payload: userId });
-    },
-    [onUserChange]
-  );
+  const removeUser = useCallback((userId: string) => {
+    setUsers((prev) => {
+      if (!prev) return null;
+      const filtered = prev.filter((u) => u.id !== userId);
+      return filtered.length === 0 ? null : filtered;
+    });
+    onUserChangeRef.current?.({ event: "user:removed", payload: userId });
+  }, []);
 
   const updateUser = useCallback(
     (userId: string, user: RefinedUserWithPermission) => {
@@ -166,91 +207,104 @@ export const MapFormProvider = ({
         return prev.map((u) => {
           if (u.id === userId) {
             const updated = { ...u, ...user };
-            onUserChange?.({
-              event: "user:updated",
-              payload: { userId, user },
-            });
             return updated;
           }
           return u;
         });
       });
-    },
-    [onUserChange]
-  );
-
-  // === NewLabel handlers ===
-  const addLabel = useCallback(
-    (label: NewLabel) => {
-      const newLabel: Label = {
-        ...label,
-        label_id: generateId("generic"),
-        map_id: label.map_id!,
-        title: label.title ?? "",
-        color: label?.color ?? null,
-        icon: label?.icon ?? null,
-        description: label?.description ?? null,
-        created_at: label?.created_at ?? formatDateForSql(new Date()),
-        updated_at: label?.updated_at ?? formatDateForSql(new Date()),
-      };
-
-      setLabels((prev) => {
-        if (!prev) return [newLabel];
-        return [...prev, newLabel];
-      });
-      onLabelChange?.({ event: "label:added", payload: label });
-    },
-    [onLabelChange]
-  );
-
-  const removeLabel = useCallback(
-    (labelId: string) => {
-      setLabels((prev) => {
-        if (!prev) return null;
-        return prev.filter((l) => l.label_id !== labelId);
-      });
-      onLabelChange?.({ event: "label:removed", payload: labelId });
-    },
-    [onLabelChange]
-  );
-
-  const updateLabel = useCallback(
-    (labelId: string, label: NewLabel) => {
-      setLabels((prev) => {
-        if (!prev) return null;
-        return prev.map((l) => {
-          if (l.label_id === labelId) {
-            const updated = { ...l, ...label };
-            onLabelChange?.({
-              event: "label:updated",
-              payload: { labelId, label },
-            });
-            return updated;
-          }
-          return l;
-        });
+      onUserChangeRef.current?.({
+        event: "user:updated",
+        payload: { userId, user },
       });
     },
-    [onLabelChange]
+    []
+  );
+
+  // Memoized label handlers to prevent unnecessary re-renders
+  const addLabel = useCallback((label: NewLabel) => {
+    const newLabel: Label = {
+      ...label,
+      label_id: label.label_id || generateId("generic"),
+      map_id: label.map_id!,
+      title: label.title ?? "",
+      color: label?.color ?? null,
+      icon: label?.icon ?? null,
+      description: label?.description ?? null,
+      created_at: label?.created_at ?? formatDateForSql(new Date()),
+      updated_at: label?.updated_at ?? formatDateForSql(new Date()),
+    };
+
+    setLabels((prev) => {
+      if (!prev) return [newLabel];
+      return [...prev, newLabel];
+    });
+    onLabelChangeRef.current?.({ event: "label:added", payload: label });
+  }, []);
+
+  const removeLabel = useCallback((labelId: string) => {
+    setLabels((prev) => {
+      if (!prev) return null;
+      const filtered = prev.filter((l) => l.label_id !== labelId);
+      return filtered.length === 0 ? null : filtered;
+    });
+    onLabelChangeRef.current?.({ event: "label:removed", payload: labelId });
+  }, []);
+
+  const updateLabel = useCallback((labelId: string, label: NewLabel) => {
+    setLabels((prev) => {
+      if (!prev) return null;
+      return prev.map((l) => {
+        if (l.label_id === labelId) {
+          const updated = { ...l, ...label };
+          return updated;
+        }
+        return l;
+      });
+    });
+    onLabelChangeRef.current?.({
+      event: "label:updated",
+      payload: { labelId, label },
+    });
+  }, []);
+
+  // Memoize the handleSubmit function to prevent re-creation
+  const handleSubmit = useMemo(
+    () => form.handleSubmit(onSubmit),
+    [form, onSubmit]
+  );
+
+  // Memoize the context value to prevent unnecessary re-renders
+  const contextValue = useMemo(
+    () => ({
+      form,
+      onSubmit: handleSubmit,
+      users,
+      labels,
+      addUser,
+      removeUser,
+      updateUser,
+      addLabel,
+      removeLabel,
+      updateLabel,
+    }),
+    [
+      form,
+      handleSubmit,
+      users,
+      labels,
+      addUser,
+      removeUser,
+      updateUser,
+      addLabel,
+      removeLabel,
+      updateLabel,
+    ]
   );
 
   return (
-    <MapFormContext.Provider
-      value={{
-        form,
-        onSubmit: form.handleSubmit(onSubmit),
-        users,
-        labels,
-        addUser,
-        removeUser,
-        updateUser,
-        addLabel,
-        removeLabel,
-        updateLabel,
-      }}
-    >
+    <MapFormContext.Provider value={contextValue}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>{children}</form>
+        <form onSubmit={handleSubmit} className="size-full relative">{children}</form>
       </Form>
     </MapFormContext.Provider>
   );

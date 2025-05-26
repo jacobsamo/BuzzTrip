@@ -6,7 +6,7 @@ import {
   Map as GoogleMap,
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import MarkerPin from "../mapping/google-maps/marker_pin";
 import { useMapFormContext } from "./provider";
 
@@ -19,6 +19,66 @@ const MapLocationForm = () => {
   const lat = watch("lat");
   const lng = watch("lng");
   const bounds = watch("bounds");
+
+  // Memoize the map center to prevent unnecessary re-renders
+  const mapCenter = useMemo(
+    () => ({
+      lat: lat ?? 12.2891309,
+      lng: lng ?? 31.6049679,
+    }),
+    [lat, lng]
+  );
+
+  // Memoize the marker position
+  const markerPosition = useMemo(
+    () => (lat && lng ? { lat, lng } : null),
+    [lat, lng]
+  );
+
+  // Memoized selection handler
+  const handleLocationSelect = useCallback(
+    (pred: any, details: any) => {
+      const locationName =
+        details?.placeDetails.name ??
+        details?.placeDetails?.formatted_address ??
+        "";
+
+      setSearchValue(locationName);
+
+      // Batch setValue calls to minimize re-renders
+      const updates = [
+        { name: "lat", value: details?.location.lat ?? null },
+        { name: "lng", value: details?.location.lng ?? null },
+        { name: "bounds", value: details?.bounds.toJSON() ?? null },
+        { name: "location_name", value: locationName || null },
+      ] as const;
+
+      updates.forEach(({ name, value }) => {
+        setValue(name, value, {
+          shouldDirty: true,
+          shouldTouch: true,
+        });
+      });
+    },
+    [setValue]
+  );
+
+  // Memoize the autocomplete props
+  const autocompleteProps = useMemo(
+    () => ({
+      value: searchValue,
+      onValueChange: setSearchValue,
+      locationTypes: ["(regions)"] as const,
+      autoFocus: true,
+      classNames: {
+        scrollArea: "max-h-20",
+        predictions: "max-h-20",
+        container: "w-full",
+      },
+      onSelect: handleLocationSelect,
+    }),
+    [searchValue, handleLocationSelect]
+  );
 
   return (
     <APIProvider
@@ -69,10 +129,13 @@ const MapLocationForm = () => {
             }}
           />
         </div>
-        {/* Map Preview Container */}
 
+        {/* Map Preview Container */}
         <div>
-          <p>Map Preview {lat && lng && `of ${lat}, ${lng}`}</p>
+          <p>
+            Map Preview
+            {lat && lng && ` of ${lat.toFixed(4)}, ${lng.toFixed(4)}`}
+          </p>
           <div className="h-[200px] w-full rounded-lg border bg-muted">
             <GoogleMap
               mapId={env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID}
@@ -80,17 +143,11 @@ const MapLocationForm = () => {
               gestureHandling="greedy"
               reuseMaps
               defaultZoom={3}
-              defaultCenter={{
-                lat: lat ?? 12.2891309,
-                lng: lng ?? 31.6049679,
-              }}
+              defaultCenter={mapCenter}
             >
-              {lat && lng && (
+              {markerPosition && (
                 <AdvancedMarker
-                  position={{
-                    lat: lat,
-                    lng: lng,
-                  }}
+                  position={markerPosition}
                   title="Default Location"
                 >
                   <MarkerPin size={18} />

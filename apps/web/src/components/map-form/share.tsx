@@ -180,13 +180,13 @@ const MapShareForm = () => {
                       <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium text-sm">{user.name}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="font-medium text-xs sm:text-sm">{user.name}</p>
+                      <p className="text-xs sm:text-xs text-muted-foreground">
                         {user.email}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <Select
                       value={user.permission}
                       onValueChange={(value) =>

@@ -54,7 +54,7 @@ const MapTabForm = ({ defaultTab }: MapTabFormProps) => {
       onValueChange={(value) => setCurrentTab(value as Tab)}
       className="flex-1 flex flex-col"
     >
-      <TabsList className="grid w-full grid-cols-4 mb-6">
+      <TabsList className="w-full">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
@@ -71,24 +71,22 @@ const MapTabForm = ({ defaultTab }: MapTabFormProps) => {
         })}
       </TabsList>
 
-      <div className="flex-1 min-h-0">
-        {tabs.map((tab) => {
-          const Component = tab.component;
-          return (
-            <TabsContent key={tab.id} value={tab.id} className="h-full mt-0">
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="h-full"
-              >
-                <Component />
-              </motion.div>
-            </TabsContent>
-          );
-        })}
-      </div>
+      {tabs.map((tab) => {
+        const Component = tab.component;
+        return (
+          <TabsContent key={tab.id} value={tab.id} className="h-full">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="flex-1 overflow-y-auto"
+            >
+              <Component />
+            </motion.div>
+          </TabsContent>
+        );
+      })}
 
       {/* Save Button */}
 
