@@ -36,12 +36,13 @@ function InputOTPGroup({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-interface InputOTPSlotProps extends React.ComponentProps<"div"> {
+function InputOTPSlot({
+  index,
+  className,
+  ...props
+}: React.ComponentProps<"div"> & {
   index: number;
-  caretClassName?: string | undefined;
-}
-
-function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
+}) {
   const inputOTPContext = React.useContext(OTPInputContext);
   const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {};
 
@@ -58,12 +59,7 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
       {char}
       {hasFakeCaret && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div
-            className={cn(
-              "animate-caret-blink bg-foreground h-4 w-px duration-1000",
-              props.caretClassName
-            )}
-          />
+          <div className="animate-caret-blink bg-foreground h-4 w-px duration-1000" />
         </div>
       )}
     </div>

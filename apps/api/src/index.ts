@@ -12,6 +12,7 @@ import { createMapRoute } from "./routes/map/create-map-route";
 import { editMapRoute } from "./routes/map/edit-map-route";
 import { getMapDataRoute } from "./routes/map/get-map-data-route";
 import { getMapRoute } from "./routes/map/get-map-route";
+import { createLabelRoute } from "./routes/map/labels/create-label-route";
 import { deleteLabelRoute } from "./routes/map/labels/delete-map-label";
 import { getMapLabelsRoute } from "./routes/map/labels/get-map-labels";
 import { updateLabelRoute } from "./routes/map/labels/update-map-label";
@@ -82,22 +83,22 @@ app.use(authMiddleware);
 app.use(loggingMiddleware);
 app.use("*", requestId());
 
-app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
-  type: "http",
-  scheme: "bearer",
-});
+// app.openAPIRegistry.registerComponent("securitySchemes", "Bearer", {
+//   type: "http",
+//   scheme: "bearer",
+// });
 
-app.doc("/openapi", {
-  openapi: "3.1.0",
-  info: {
-    version: "1.0.0",
-    title: "BuzzTrip API",
-  },
-});
-app.getOpenAPI31Document({
-  openapi: "3.1.0",
-  info: { title: "BuzzTrip API", version: "1" },
-}); // schema object
+// app.doc("/openapi", {
+//   openapi: "3.1.0",
+//   info: {
+//     version: "1.0.0",
+//     title: "BuzzTrip API",
+//   },
+// });
+// app.getOpenAPI31Document({
+//   openapi: "3.1.0",
+//   info: { title: "BuzzTrip API", version: "1" },
+// }); // schema object
 
 // Routes
 app.get("/health", (c) => {
@@ -123,6 +124,7 @@ const routes = app
   .route("/", getMapUserRoute)
   .route("/", deleteMapUserRoute)
   .route("/", updateMapUserRoute)
+  .route("/", createLabelRoute)
   .route("/", getMapLabelsRoute)
   .route("/", updateLabelRoute)
   .route("/", deleteLabelRoute)
