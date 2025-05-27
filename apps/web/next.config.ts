@@ -4,20 +4,21 @@ import type { NextConfig } from "next";
 import "./env";
 import { env } from "./env";
 
+// turbopack: {
+//   resolveExtensions: [
+//     ".md",
+//     ".mdx",
+//     ".tsx",
+//     ".ts",
+//     ".jsx",
+//     ".js",
+//     ".mjs",
+//     ".json",
+//   ],
+// },
+
 const nextConfig: NextConfig = {
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
-  // turbopack: {
-  //   resolveExtensions: [
-  //     ".md",
-  //     ".mdx",
-  //     ".tsx",
-  //     ".ts",
-  //     ".jsx",
-  //     ".js",
-  //     ".mjs",
-  //     ".json",
-  //   ],
-  // },
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -32,11 +33,6 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
-      },
-      {
-        protocol: "https",
-        hostname: "login.microsoftonline.com",
-        pathname: "",
       },
     ],
   },
@@ -65,21 +61,7 @@ const nextConfig: NextConfig = {
       "@sentry/nextjs",
     ],
   },
-  // webpack: (config, { webpack }) => {
-  //   config.plugins.push(
-  //     new webpack.IgnorePlugin({
-  //       resourceRegExp: /^cloudflare:workers$|^cloudflare:*/,
-  //     })
-  //   );
-
-  //   return config;
-  // },
   skipTrailingSlashRedirect: true,
-  // webpack: (config) => {
-  //   if (process.env.NODE_ENV === "production")
-  //     config.plugins.push(ReactComponentName({}));
-  //   return config;
-  // },
 };
 
 const withMDX = createMDX({
