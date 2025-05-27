@@ -2,6 +2,7 @@
   "name": "@buzztrip/transactional",
   "version": "1.0.0",
   "private": true,
+  "description": "Transactional email templates for BuzzTrip",
   "scripts": {
     "clean:all": "rm -rf node_modules/",
     "build:email": "email build",

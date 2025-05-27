@@ -55,16 +55,51 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
     }
   }, [currentPage, iconsList]);
 
-  // Filter icons based on search query
   const filteredIcons = React.useMemo(() => {
-    if (!searchQuery) return currentPageIcons;
+    if (!searchQuery) {
+      // If no search query, return the icons for the current page
+      return currentPageIcons;
+    }
 
-    const searchResults = currentPageIcons.filter((iconName) =>
-      iconsList.toString().toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const query = searchQuery.toLowerCase().trim();
+    const queryWords = query.split(/\s+/).filter((word) => word.length > 0);
+
+    // Filter the icons on the current page
+    const searchResults = currentPageIcons.filter((iconName) => {
+      const lowerIconName = iconName.toLowerCase();
+
+      // Option 1: Simple includes check for each word
+      // return queryWords.every(queryWord => lowerIconName.includes(queryWord));
+
+      // Option 2: Check if ANY of the query words are included in the icon name
+      // This might be more suitable for icon names which are often single words or hyphenated
+      const anyQueryWordMatches = queryWords.some((queryWord) =>
+        lowerIconName.includes(queryWord)
+      );
+
+      // Option 3: Combine includes and potentially word boundary checks (more like the color example)
+      const allWordsIncluded = queryWords.every((queryWord) =>
+        lowerIconName.includes(queryWord)
+      );
+
+      const wordBoundaryMatch = queryWords.some((queryWord) => {
+        // Escape special regex characters in the query word
+        const escapedQueryWord = queryWord.replace(
+          /[.*+?^${}()|[\]\\]/g,
+          "\\$&"
+        );
+        const nameRegex = new RegExp(`\\b${escapedQueryWord}\\b`);
+        return nameRegex.test(lowerIconName);
+      });
+
+      // Choose the logic that best fits how you want to search for icon names.
+      // For icons, Option 2 or a combination like Option 3 might be good.
+      return anyQueryWordMatches || wordBoundaryMatch; // Example using a combination
+    });
+
     console.log("Search results:", searchResults);
     return searchResults;
-  }, [currentPageIcons, searchQuery]);
+  }, [currentPageIcons, searchQuery]); // Dependencies
 
   const handleNextPage = () => {
     if (currentPage < totalPages - 1) {

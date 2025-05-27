@@ -134,10 +134,10 @@ const UserMaps = ({ usersMaps }: UserMapsProps) => {
       </div>
       <div className="space-y-6">
         <div className="flex flex-wrap gap-2 justify-end items-center">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-muted-foreground">Sort by:</span>
             <Select value={sortOption} onValueChange={setSortOption}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="sm:w-[180px]">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>

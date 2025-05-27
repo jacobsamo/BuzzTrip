@@ -268,16 +268,45 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
   const totalPages = Math.ceil(colors.length / PER_PAGE);
 
   // Filter colors based on search query (name or hex)
+  // const filteredColors = React.useMemo(() => {
+  //   if (!searchQuery) return colors;
+
+  //   const query = searchQuery.toLowerCase();
+  //   return colors.filter(
+  //     (color) =>
+  //       color.name.toLowerCase().includes(query) ||
+  //       color.hex.toLowerCase().includes(query)
+  //   );
+  // }, [searchQuery]);
+
   const filteredColors = React.useMemo(() => {
     if (!searchQuery) return colors;
 
-    const query = searchQuery.toLowerCase();
-    return colors.filter(
-      (color) =>
-        color.name.toLowerCase().includes(query) ||
-        color.hex.toLowerCase().includes(query)
-    );
-  }, [searchQuery]);
+    const query = searchQuery.toLowerCase().trim(); // Trim whitespace
+    const queryWords = query.split(/\s+/).filter(word => word.length > 0); // Split into words
+
+    return colors.filter(color => {
+      const lowerName = color.name.toLowerCase();
+      const lowerHex = color.hex.toLowerCase();
+
+      // Check if ALL query words are present in either name or hex
+      const allQueryWordsMatch = queryWords.every(queryWord =>
+        lowerName.includes(queryWord) || lowerHex.includes(queryWord)
+      );
+
+      // Optional: Add a check for matching at word boundaries for better relevance
+      const wordBoundaryMatch = queryWords.some(queryWord => {
+        const nameRegex = new RegExp(`\\b${queryWord}\\b`); // Word boundary regex
+        const hexRegex = new RegExp(`\\b${queryWord}\\b`);
+        return nameRegex.test(lowerName) || hexRegex.test(lowerHex);
+      });
+
+      // You can adjust the logic here based on how strict you want the match to be.
+      // For "proper" text search without fuzzy matching, ensuring all words
+      // are present is a good starting point.
+      return allQueryWordsMatch || wordBoundaryMatch;
+    });
+  }, [searchQuery, colors]);
 
   // Get current page colors
   const currentPageColors = React.useMemo(() => {

@@ -11,6 +11,7 @@ export const env = createEnv({
     SENTRY_AUTH_TOKEN: z.string().optional(),
     SENTRY_ORG: z.string().optional(),
     SENTRY_PROJECT: z.string().optional(),
+    RESEND_API_KEY: z.string(),
   },
   client: {
     NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: z.string(),
@@ -28,6 +29,7 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     TURSO_CONNECTION_URL: process.env.TURSO_CONNECTION_URL,
     TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
 
     // Sentry
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
