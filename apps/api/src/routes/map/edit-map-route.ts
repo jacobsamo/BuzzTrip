@@ -54,8 +54,7 @@ export const editMapRoute = app.openapi(
       const editMap = c.req.valid("json");
       const db = createDb(
         c.env.TURSO_CONNECTION_URL,
-        c.env.TURSO_AUTH_TOKEN,
-        c.env.ENVIRONMENT === "production"
+        c.env.TURSO_AUTH_TOKEN
       );
 
       const [updatedMap] = await db

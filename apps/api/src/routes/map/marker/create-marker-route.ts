@@ -51,11 +51,7 @@ export const createMarkerRoute = app.openapi(
     try {
       const { mapId } = c.req.valid("param");
       const newMarker = c.req.valid("json");
-      const db = createDb(
-        c.env.TURSO_CONNECTION_URL,
-        c.env.TURSO_AUTH_TOKEN,
-        c.env.ENVIRONMENT === "production"
-      );
+      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
       const { markers, collectionLinks } = await createMarker(db, {
         userId: newMarker.userId,

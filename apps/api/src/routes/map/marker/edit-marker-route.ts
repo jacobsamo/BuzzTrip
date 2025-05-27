@@ -87,11 +87,7 @@ export const editMarkerRoute = app.openapi(
     try {
       const { mapId, markerId } = c.req.valid("param");
       const editMarker = c.req.valid("json");
-      const db = createDb(
-        c.env.TURSO_CONNECTION_URL,
-        c.env.TURSO_AUTH_TOKEN,
-        c.env.ENVIRONMENT === "production"
-      );
+      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
       let collectionLinksCreated: NewCollectionLink[] | null = null;
       let collectionLinksDeleted: string[] | null = null;

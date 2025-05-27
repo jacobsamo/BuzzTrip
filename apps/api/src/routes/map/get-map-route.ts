@@ -28,11 +28,7 @@ export const getMapRoute = app.openapi(
   async (c) => {
     try {
       const { mapId } = c.req.valid("param");
-      const db = createDb(
-        c.env.TURSO_CONNECTION_URL,
-        c.env.TURSO_AUTH_TOKEN,
-        c.env.ENVIRONMENT === "production"
-      );
+      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
       const map = await db.query.maps.findFirst({
         where: (maps, { eq }) => eq(maps.map_id, mapId),
       });

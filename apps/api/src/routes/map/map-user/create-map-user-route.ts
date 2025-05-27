@@ -47,11 +47,7 @@ export const createMapUserRoute = app.openapi(
     try {
       const { mapId } = c.req.valid("param");
       const mapUsers = c.req.valid("json");
-      const db = createDb(
-        c.env.TURSO_CONNECTION_URL,
-        c.env.TURSO_AUTH_TOKEN,
-        c.env.ENVIRONMENT === "production"
-      );
+      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
       const newMapUsers = await shareMap(db, {
         mapId: mapId,

@@ -54,11 +54,7 @@ export const createMapRoute = app.openapi(
     try {
       const req = c.req.valid("json");
 
-      const db = createDb(
-        c.env.TURSO_CONNECTION_URL,
-        c.env.TURSO_AUTH_TOKEN,
-        c.env.ENVIRONMENT === "production"
-      );
+      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
       const data = await createMap(db, {
         userId: req.map.owner_id,
         input: req,

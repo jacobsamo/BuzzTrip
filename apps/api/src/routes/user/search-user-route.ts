@@ -44,11 +44,7 @@ export const searchUserRoute = app.openapi(
   async (c) => {
     try {
       const query = c.req.query("q");
-      const db = createDb(
-        c.env.TURSO_CONNECTION_URL,
-        c.env.TURSO_AUTH_TOKEN,
-        c.env.ENVIRONMENT === "production"
-      );
+      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
       if (!query) {
         return c.json({ users: null }, 200);

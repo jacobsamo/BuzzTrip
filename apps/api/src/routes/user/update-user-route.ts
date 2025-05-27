@@ -65,7 +65,7 @@ export const updateUserRoute = app.openapi(
     try {
       const { userId } = c.req.valid("param");
       const updateData = await c.req.valid("json");
-      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN, c.env.ENVIRONMENT === "production");
+      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
       const user = await getUser(db, userId);
 

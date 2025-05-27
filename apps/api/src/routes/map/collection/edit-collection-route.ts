@@ -70,11 +70,7 @@ export const editCollectionRoute = app.openapi(
     try {
       const { mapId, collectionId } = c.req.valid("param");
       const editCollection = c.req.valid("json");
-      const db = createDb(
-        c.env.TURSO_CONNECTION_URL,
-        c.env.TURSO_AUTH_TOKEN,
-        c.env.ENVIRONMENT === "production"
-      );
+      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
 
       const [updatedCollection] = await db
         .update(collections)
