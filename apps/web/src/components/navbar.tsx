@@ -4,8 +4,12 @@ import { useSession } from "@/lib/auth-client";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from 'next/navigation';
 
 const Navbar = () => {
+   const pathname = usePathname();
+
+  if (pathname.includes("/app")) return null;
   const { data } = useSession();
 
   return (
@@ -52,13 +56,14 @@ const Navbar = () => {
             About
           </Link>
           {data?.session ? (
-            <Link href={"/app"} className={buttonVariants()}>
+            <Link href={"/app"} prefetch={true} className={buttonVariants()}>
               Continue to app
             </Link>
           ) : (
             <>
               <Link
                 href={"/auth/sign-in"}
+                prefetch={true}
                 className={buttonVariants({
                   variant: "outline",
                   className:
@@ -69,6 +74,7 @@ const Navbar = () => {
               </Link>
               <Link
                 href={"/auth/sign-up"}
+                prefetch={true}
                 className={buttonVariants({
                   className:
                     "border-primary text-primary hover:bg-primary hover:text-white",

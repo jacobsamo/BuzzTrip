@@ -23,11 +23,11 @@ export default async function MapPage() {
           <Image
             width={44}
             height={44}
-            src="/logos/logo_x48.png"
+            src="/logos/logo_x128.png"
             alt="Logo"
             className="h-11 w-11 rounded-full"
           />
-          <h1 className="ml-2 text-2xl font-bold">BuzzTrip</h1>
+          <h1 className="ml-2 text-2xl font-bold text-primary">BuzzTrip</h1>
         </Link>
         <UserButton />
       </nav>

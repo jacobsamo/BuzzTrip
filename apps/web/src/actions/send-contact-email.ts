@@ -12,6 +12,14 @@ export const sendContactEmail = publicAction
   .action(async ({ parsedInput }) => {
     const resend = createResend(env.RESEND_API_KEY);
 
+    // const randomUniquePassword = Math.random().toString(36).slice(-8);
+
+    // const newUsers = authClient.admin.createUser({
+    //   email: parsedInput.email,
+    //   name: `${parsedInput.firstName} ${parsedInput.lastName}`,
+    //   password: randomUniquePassword,
+    // });
+
     return sendEmail({
       resend,
       email: parsedInput.email,

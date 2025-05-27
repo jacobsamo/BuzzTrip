@@ -6,11 +6,21 @@ export const users = sqliteTable(
     id: text("user_id").primaryKey().notNull(),
     name: text("full_name").notNull(),
     email: text("email").notNull().unique(),
-    emailVerified: integer("email_verified", { mode: "boolean" }).notNull(),
+    emailVerified: integer("email_verified", { mode: "boolean" })
+      .default(false)
+      .notNull(),
     image: text("profile_picture"),
-    created_at: integer("created_at", { mode: "timestamp" }).notNull(),
-    updated_at: integer("updated_at", { mode: "timestamp" }).notNull(),
+    created_at: integer("created_at", { mode: "timestamp" })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updated_at: integer("updated_at", { mode: "timestamp" })
+      .$defaultFn(() => new Date())
+      .notNull(),
     twoFactorEnabled: integer("two_factor_enabled", { mode: "boolean" }),
+    role: text("role"),
+    banned: integer("banned", { mode: "boolean" }),
+    banReason: text("ban_reason"),
+    banExpires: integer("ban_expires", { mode: "timestamp" }),
     first_name: text("first_name"),
     last_name: text("last_name"),
     username: text("username"),
@@ -32,6 +42,7 @@ export const user_sessions = sqliteTable(
     userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    impersonatedBy: text("impersonated_by"),
   },
   (table) => [
     index("user_sessions_user_id_idx").on(table.userId),
@@ -72,8 +83,12 @@ export const user_verifications = sqliteTable(
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
     expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
-    createdAt: integer("created_at", { mode: "timestamp" }),
-    updatedAt: integer("updated_at", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
+      () => new Date()
+    ),
+    updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(
+      () => new Date()
+    ),
   },
   (table) => [index("identifier_idx").on(table.identifier)]
 );

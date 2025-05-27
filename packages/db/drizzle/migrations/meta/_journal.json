@@ -15,6 +15,13 @@
       "when": 1748221609403,
       "tag": "0001_complete_lady_vermin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1748309642489,
+      "tag": "0002_nosy_shen",
+      "breakpoints": true
     }
   ]
 }

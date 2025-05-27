@@ -29,6 +29,15 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "img.buzztrip.co",
       },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "login.microsoftonline.com",
+        pathname: "",
+      },
     ],
   },
   async rewrites() {

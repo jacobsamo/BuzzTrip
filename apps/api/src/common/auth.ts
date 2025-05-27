@@ -4,7 +4,7 @@ import { checkout, polar, portal, usage } from "@polar-sh/better-auth";
 import { Polar } from "@polar-sh/sdk";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { magicLink, twoFactor } from "better-auth/plugins";
+import { admin, magicLink, twoFactor } from "better-auth/plugins";
 import { passkey } from "better-auth/plugins/passkey";
 import { db } from "./db";
 import { generateOTP } from "./generateOTP";
@@ -30,7 +30,7 @@ export const auth = betterAuth({
     schema: { ...schemas, user: schemas.users },
   }),
   // https://www.better-auth.com/docs/authentication/email-password
-  // emailAndPassword: { enabled: false, requireEmailVerification: true,  },
+  emailAndPassword: { enabled: false, requireEmailVerification: true },
   // emailVerification: {
   //   autoSignInAfterVerification: true,
   //   sendVerificationEmail(data, request) {
@@ -164,6 +164,7 @@ export const auth = betterAuth({
     twoFactor({
       issuer: "buzztrip",
     }),
+    admin(),
   ],
 
   onAPIError: {

@@ -2,9 +2,14 @@
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import SocialLinks from "./social-links";
 
 const Footer = () => {
+  const pathname = usePathname();
+
+  if (pathname.includes("/app")) return null;
+
   return (
     <motion.footer
       initial={{ opacity: 0 }}
