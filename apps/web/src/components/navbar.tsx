@@ -1,54 +1,92 @@
 "use client";
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { buttonVariants } from "@/components/ui/button";
+import { useSession } from "@/lib/auth-client";
+import { motion } from "motion/react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from 'next/navigation';
 
 const Navbar = () => {
+   const pathname = usePathname();
+
+  if (pathname.includes("/app")) return null;
+  const { data } = useSession();
+
   return (
-    <header className="m-auto flex h-14 items-center px-4 lg:px-6">
-      <Link className="flex items-center justify-center" href="/">
-        <Image
-          width={44}
-          height={44}
-          src="/logos/logo_x48.png"
-          alt="Logo"
-          className="h-11 w-11 rounded-full"
-        />
-        <span className="ml-2 text-2xl font-bold">BuzzTrip</span>
-      </Link>
-      <nav className="ml-auto flex items-center gap-4 sm:gap-6">
-        <Link
-          className="text-sm font-medium underline-offset-4 hover:underline"
-          href="#features"
-        >
-          Features
+    <motion.header
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6 }}
+      className="border-b border-gray-100 sticky top-0 bg-white/95 backdrop-blur-sm z-50"
+    >
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <Link href="/" className="flex items-center space-x-3">
+          <Image
+            src="/logos/logo_x128.png"
+            alt="BuzzTrip Logo"
+            width={44}
+            height={44}
+            className="size-11 rounded-full"
+          />
+          <span className="text-2xl font-bold text-primary">BuzzTrip</span>
         </Link>
-        <div>
-          <SignedOut>
-            <SignInButton />
-          </SignedOut>
-          <SignedIn>
-            <Link href={"/app"} className={buttonVariants({ variant: "link" })}>
-              Go To app
-            </Link>
-          </SignedIn>
-        </div>
-        {/* <Link
-            className="text-sm font-medium underline-offset-4 hover:underline"
-            href="#testimonials"
+        <nav className="hidden md:flex items-center space-x-8">
+          <Link
+            href="/#features"
+            className="text-gray-600 hover:text-primary transition-colors"
           >
-            Testimonials
+            Features
           </Link>
           <Link
-            className="text-sm font-medium underline-offset-4 hover:underline"
-            href="#pricing"
+            href="/pricing"
+            className="text-gray-600 hover:text-primary transition-colors"
           >
             Pricing
-          </Link> */}
-      </nav>
-    </header>
+          </Link>
+          <Link
+            href="/roadmap"
+            className="text-gray-600 hover:text-primary transition-colors"
+          >
+            Roadmap
+          </Link>
+          <Link
+            href="/about"
+            className="text-gray-600 hover:text-primary transition-colors"
+          >
+            About
+          </Link>
+          {data?.session ? (
+            <Link href={"/app"} prefetch={true} className={buttonVariants()}>
+              Continue to app
+            </Link>
+          ) : (
+            <>
+              <Link
+                href={"/auth/sign-in"}
+                prefetch={true}
+                className={buttonVariants({
+                  variant: "outline",
+                  className:
+                    "border-primary text-primary hover:bg-primary hover:text-white",
+                })}
+              >
+                Sign In
+              </Link>
+              <Link
+                href={"/auth/sign-up"}
+                prefetch={true}
+                className={buttonVariants({
+                  className:
+                    "border-primary text-primary hover:bg-primary hover:text-white",
+                })}
+              >
+                Get Started
+              </Link>
+            </>
+          )}
+        </nav>
+      </div>
+    </motion.header>
   );
 };
 

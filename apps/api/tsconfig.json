@@ -1,17 +1,22 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "moduleResolution": "Bundler",
-    "baseUrl": ".",
-    "strict": true,
-    "types": ["@cloudflare/workers-types", "bun-types"],
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
-    "lib": ["ESNext"],
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "./dist",
+    "rootDir": "src",
     "target": "ESNext",
     "module": "ESNext",
+    "moduleResolution": "Bundler",
     "moduleDetection": "force",
     "allowJs": true,
+    "strict": true,
     "skipLibCheck": true,
-    "noFallthroughCasesInSwitch": true
-  }
+    "lib": ["ESNext"],
+    "jsx": "react-jsx",
+    "types": ["@cloudflare/workers-types", "@types/bun"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts", "dist"]
 }

@@ -8,7 +8,7 @@
     "@buzztrip/tsconfig": "workspace:*"
   },
   "dependencies": {
-    "@phosphor-icons/react": "^2.1.7"
+    "@phosphor-icons/react": "^2.1.8"
   },
   "exports": {
     ".": "./src/index.tsx",

@@ -10,11 +10,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: "https://buzztrip.co/legal/privacy",
-      lastModified: new Date("2024-12-08"),
+      lastModified: new Date("2025-12-08"),
     },
     {
       url: "https://buzztrip.co/legal/terms",
-      lastModified: new Date("2024-12-08"),
+      lastModified: new Date("2025-12-08"),
     },
   ];
 }

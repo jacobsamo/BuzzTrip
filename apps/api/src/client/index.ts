@@ -1,9 +1,8 @@
-import type { AppType } from "..";
 import { hc } from "hono/client";
+import type { AppType } from "..";
 
-export const client = (url: string, key: string) =>
-  hc<AppType>(url, {
-    headers: {
-      Authorization: `Bearer ${key}`,
-    },
-  });
+const client = hc<AppType>("");
+export type Client = typeof client;
+
+export const hcWithType = (...args: Parameters<typeof hc>): Client =>
+  hc<AppType>(...args);

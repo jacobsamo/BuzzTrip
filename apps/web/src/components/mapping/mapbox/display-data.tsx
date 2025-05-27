@@ -27,7 +27,7 @@ const DisplayMapData = () => {
               setActiveLocation(marker);
             }}
           >
-            <MarkerPin marker={marker} size={16} />
+            <MarkerPin color={marker.color} icon={marker.icon} size={16} />
           </Marker>
         ))}
     </>

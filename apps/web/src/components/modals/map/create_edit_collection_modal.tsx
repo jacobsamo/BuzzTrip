@@ -23,11 +23,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { apiClient } from "@/server/api.client";
 import Icon, { otherIconsList } from "@buzztrip/components/icon";
 import { Collection } from "@buzztrip/db/types";
-import { useAuth } from "@clerk/nextjs";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Edit, Plus } from "lucide-react";
 import * as React from "react";
@@ -109,19 +109,19 @@ export default function CollectionModal({
 const Close = ({ children }: { children: React.ReactNode }) => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  return isDesktop ? <DialogClose asChild>{children}</DialogClose> : <DrawerClose asChild>{children}</DrawerClose>;
-}
+  return isDesktop ? (
+    <DialogClose asChild>{children}</DialogClose>
+  ) : (
+    <DrawerClose asChild>{children}</DrawerClose>
+  );
+};
 
 function CollectionForm({ mode, collection }: CollectionModalProps) {
   const { setCollections, map } = useMapStore((store) => store);
-  const { userId } = useAuth();
+  const { data } = useSession();
+  const userId = data?.session.userId;
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    control,
-  } = useForm<Collection>({
+  const { register, handleSubmit, watch, control } = useForm<Collection>({
     defaultValues: {
       title: collection?.title || "",
       description: collection?.description || "",

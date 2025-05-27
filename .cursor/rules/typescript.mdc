@@ -1,0 +1,5 @@
+---
+description: 
+globs: *.tsx,*.ts,*.d.ts
+alwaysApply: false
+---

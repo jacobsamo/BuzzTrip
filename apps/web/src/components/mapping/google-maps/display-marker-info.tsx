@@ -31,7 +31,7 @@ const DisplayMarkerInfo = ({ location }: DisplayMarkerInfoProps) => {
       <div className="group relative flex flex-col items-center">
         {/* Pin */}
         <div className="absolute bottom-[-4px] flex h-8 w-8 items-center justify-center rounded-full bg-green-600 shadow-lg transition-transform group-hover:scale-110">
-          <MarkerPin marker={location} size={24} />
+          <MarkerPin color={location.color} icon={location.icon} size={24} />
         </div>
 
         {/* Tip */}

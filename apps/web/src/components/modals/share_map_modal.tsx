@@ -34,11 +34,11 @@ import { PermissionEnum } from "@buzztrip/db/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Circle, CircleCheck, SearchIcon, Share2, X } from "lucide-react";
+import Image from "next/image";
 import * as React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ScrollArea } from "../ui/scroll-area";
-import Image from "next/image";
 
 export interface ShareMapProps {
   map_id: string;
@@ -138,9 +138,9 @@ function ShareMapForm({ map_id }: ShareMapProps) {
     });
   };
 
-  const removeUser = (userId: string) => {
+  const removeUser = (id: string) => {
     setSelectedUsers((prev) =>
-      prev ? prev.filter((u) => u.user_id !== userId) : null
+      prev ? prev.filter((u) => u.user_id !== id) : null
     );
   };
 
@@ -148,7 +148,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
     console.log("usesr", selectedUsers);
     if (!selectedUsers || selectedUsers.length == 0) return;
 
-    const share = apiClient.map[":mapId"].share.$post({
+    const share = apiClient.map[":mapId"].users.$post({
       param: { mapId: map_id },
       json: {
         users: selectedUsers,
@@ -173,7 +173,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
           <SearchIcon className="mr-2 h-5 w-5 shrink-0" />
 
           {/* <Command.Input
-            className="flex h-10 w-full rounded-md bg-white py-2 text-base placeholder:text-slate-500 focus:outline-none dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
+            className="flex h-10 w-full rounded-md bg-white py-2 text-base placeholder:text-slate-500 focus:outline-hidden dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
             placeholder="Search users"
             id="search"
             value={searchValue ?? ""}
@@ -204,21 +204,21 @@ function ShareMapForm({ map_id }: ShareMapProps) {
         {users &&
           users.map((user) => {
             const userSelected = selectedUsers?.find(
-              (u) => u.user_id === user.userId
+              (u) => u.user_id === user.id
             );
 
             return (
               <Button
-                key={user.userId}
+                key={user.id}
                 onClick={() => {
                   const userSelected = selectedUsers?.find(
-                    (u) => u.user_id === user.userId
+                    (u) => u.user_id === user.id
                   );
                   if (userSelected) {
-                    removeUser(user.userId);
+                    removeUser(user.id);
                   } else {
                     handleChange({
-                      user_id: user.userId,
+                      user_id: user.id,
                       permission: "editor",
                     });
                   }
@@ -231,12 +231,12 @@ function ShareMapForm({ map_id }: ShareMapProps) {
               >
                 {userSelected ? <CircleCheck /> : <Circle />}
                 <span className="flex items-center gap-2">
-                  {user.profile_picture && (
+                  {user.image && (
                     <Image
                       width={32}
                       height={32}
-                      alt={user.email ?? user.userId}
-                      src={user.profile_picture}
+                      alt={user.email ?? user.id}
+                      src={user.image}
                       className="h-8 w-8 rounded-full"
                       unoptimized
                     />
@@ -249,7 +249,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
                   value={userSelected ? userSelected.permission : "editor"}
                   onValueChange={(e) => {
                     handleChange({
-                      user_id: user.userId,
+                      user_id: user.id,
                       permission: (e as PermissionEnum) ?? "editor",
                     });
                   }}
