@@ -1,4 +1,5 @@
 import { createDb } from "@buzztrip/db";
+import { formatDateForSql } from "@buzztrip/db/helpers";
 import { collection_links, markers } from "@buzztrip/db/schemas";
 import { NewCollectionLink } from "@buzztrip/db/types";
 import {
@@ -6,11 +7,10 @@ import {
   combinedMarkersSchema,
 } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
+import { captureException } from "@sentry/cloudflare";
 import { and, eq } from "drizzle-orm";
 import { ErrorSchema, MapParamsSchema } from "../../../common/schema";
 import { app } from "../../../common/types";
-import { captureException } from "@sentry/cloudflare";
-import { formatDateForSql } from "@buzztrip/db/helpers";
 
 export const MarkerParamsSchema = MapParamsSchema.extend({
   markerId: z.string().openapi({
@@ -87,7 +87,11 @@ export const editMarkerRoute = app.openapi(
     try {
       const { mapId, markerId } = c.req.valid("param");
       const editMarker = c.req.valid("json");
-      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+      const db = createDb(
+        c.env.TURSO_CONNECTION_URL,
+        c.env.TURSO_AUTH_TOKEN,
+        c.env.ENVIRONMENT === "production"
+      );
 
       let collectionLinksCreated: NewCollectionLink[] | null = null;
       let collectionLinksDeleted: string[] | null = null;

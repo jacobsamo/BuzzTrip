@@ -5,9 +5,9 @@ import {
   CreateMarkersReturnSchema,
 } from "@buzztrip/db/mutations";
 import { createRoute } from "@hono/zod-openapi";
+import { captureException } from "@sentry/cloudflare";
 import { ErrorSchema, MapParamsSchema } from "../../../common/schema";
 import { app } from "../../../common/types";
-import { captureException } from "@sentry/cloudflare";
 
 export const createMarkerRoute = app.openapi(
   createRoute({
@@ -51,7 +51,11 @@ export const createMarkerRoute = app.openapi(
     try {
       const { mapId } = c.req.valid("param");
       const newMarker = c.req.valid("json");
-      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+      const db = createDb(
+        c.env.TURSO_CONNECTION_URL,
+        c.env.TURSO_AUTH_TOKEN,
+        c.env.ENVIRONMENT === "production"
+      );
 
       const { markers, collectionLinks } = await createMarker(db, {
         userId: newMarker.userId,

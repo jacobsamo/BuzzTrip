@@ -2,10 +2,10 @@ import { createDb } from "@buzztrip/db";
 import { collections } from "@buzztrip/db/schemas";
 import { collectionsEditSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
+import { captureException } from "@sentry/cloudflare";
 import { eq } from "drizzle-orm";
 import { ErrorSchema, MapParamsSchema } from "../../../common/schema";
 import { app } from "../../../common/types";
-import { captureException } from "@sentry/cloudflare";
 
 export const EditCollectionSchema = collectionsEditSchema.openapi(
   "EditCollectionSchema"
@@ -70,7 +70,11 @@ export const editCollectionRoute = app.openapi(
     try {
       const { mapId, collectionId } = c.req.valid("param");
       const editCollection = c.req.valid("json");
-      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+      const db = createDb(
+        c.env.TURSO_CONNECTION_URL,
+        c.env.TURSO_AUTH_TOKEN,
+        c.env.ENVIRONMENT === "production"
+      );
 
       const [updatedCollection] = await db
         .update(collections)

@@ -8,9 +8,9 @@ import {
   mapsSchema,
 } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
+import { captureException } from "@sentry/cloudflare";
 import { ErrorSchema, MapParamsSchema } from "../../common/schema";
 import { app } from "../../common/types";
-import { captureException } from "@sentry/cloudflare";
 
 const MapDataSchema = z
   .object({
@@ -60,7 +60,11 @@ export const getMapDataRoute = app.openapi(
   async (c) => {
     try {
       const { mapId } = c.req.valid("param");
-      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+      const db = createDb(
+        c.env.TURSO_CONNECTION_URL,
+        c.env.TURSO_AUTH_TOKEN,
+        c.env.ENVIRONMENT === "production"
+      );
 
       const [
         foundCollections,

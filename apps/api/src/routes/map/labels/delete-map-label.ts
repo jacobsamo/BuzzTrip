@@ -31,7 +31,11 @@ export const deleteLabelRoute = app.openapi(
   async (c) => {
     try {
       const { mapId, labelId } = c.req.valid("param");
-      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+      const db = createDb(
+        c.env.TURSO_CONNECTION_URL,
+        c.env.TURSO_AUTH_TOKEN,
+        c.env.ENVIRONMENT === "production"
+      );
 
       const [deleteLabel] = await db
         .delete(labels)

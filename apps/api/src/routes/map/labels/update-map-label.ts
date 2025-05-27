@@ -60,7 +60,11 @@ export const updateLabelRoute = app.openapi(
     try {
       const { mapId, labelId } = c.req.valid("param");
       const newLabel = c.req.valid("json");
-      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+      const db = createDb(
+        c.env.TURSO_CONNECTION_URL,
+        c.env.TURSO_AUTH_TOKEN,
+        c.env.ENVIRONMENT === "production"
+      );
 
       // TODO: Add authorization check here
       // Verify user owns the map or has permission to edit

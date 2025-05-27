@@ -1,5 +1,5 @@
-import { formatDateForSql } from "@buzztrip/db/helpers";
 import { createDb } from "@buzztrip/db";
+import { formatDateForSql } from "@buzztrip/db/helpers";
 import { maps } from "@buzztrip/db/schemas";
 import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute } from "@hono/zod-openapi";
@@ -52,7 +52,11 @@ export const editMapRoute = app.openapi(
     try {
       const { mapId } = c.req.valid("param");
       const editMap = c.req.valid("json");
-      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+      const db = createDb(
+        c.env.TURSO_CONNECTION_URL,
+        c.env.TURSO_AUTH_TOKEN,
+        c.env.ENVIRONMENT === "production"
+      );
 
       const [updatedMap] = await db
         .update(maps)

@@ -2,9 +2,9 @@ import { createDb } from "@buzztrip/db";
 import { searchUsers } from "@buzztrip/db/queries";
 import { refinedUserSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
+import { captureException } from "@sentry/cloudflare";
 import { ErrorSchema } from "../../common/schema";
 import { app } from "../../common/types";
-import { captureException } from "@sentry/cloudflare";
 
 const SearchUsersSchema = z.object({
   q: z.string(),
@@ -44,7 +44,11 @@ export const searchUserRoute = app.openapi(
   async (c) => {
     try {
       const query = c.req.query("q");
-      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+      const db = createDb(
+        c.env.TURSO_CONNECTION_URL,
+        c.env.TURSO_AUTH_TOKEN,
+        c.env.ENVIRONMENT === "production"
+      );
 
       if (!query) {
         return c.json({ users: null }, 200);

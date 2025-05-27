@@ -1,17 +1,11 @@
 import { createDb } from "@buzztrip/db";
 import { map_users } from "@buzztrip/db/schemas";
-import { createRoute, z } from "@hono/zod-openapi";
+import { createRoute } from "@hono/zod-openapi";
 import { captureException } from "@sentry/cloudflare";
 import { and, eq } from "drizzle-orm";
-import {
-  ErrorSchema,
-  MapParamsSchema,
-  SuccessfulDeleteSchema,
-} from "../../../common/schema";
+import { ErrorSchema, SuccessfulDeleteSchema } from "../../../common/schema";
 import { app } from "../../../common/types";
 import { MapUserParamsSchema } from "./schema";
-
-
 
 export const deleteMapUserRoute = app.openapi(
   createRoute({
@@ -37,13 +31,15 @@ export const deleteMapUserRoute = app.openapi(
   async (c) => {
     try {
       const { mapId, userId } = c.req.valid("param");
-      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+      const db = createDb(
+        c.env.TURSO_CONNECTION_URL,
+        c.env.TURSO_AUTH_TOKEN,
+        c.env.ENVIRONMENT === "production"
+      );
 
       const [deletedMapUser] = await db
         .delete(map_users)
-        .where(
-          and(eq(map_users.map_id, mapId), eq(map_users.user_id, userId))
-        )
+        .where(and(eq(map_users.map_id, mapId), eq(map_users.user_id, userId)))
         .returning({
           deletedId: map_users.map_user_id,
         });

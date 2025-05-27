@@ -2,9 +2,9 @@ import { createDb } from "@buzztrip/db";
 import { getUserMaps } from "@buzztrip/db/queries";
 import { userMapsSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute, z } from "@hono/zod-openapi";
+import { captureException } from "@sentry/cloudflare";
 import { ErrorSchema } from "../../common/schema";
 import { app } from "../../common/types";
-import { captureException } from "@sentry/cloudflare";
 
 const MapsParamsSchema = z.object({
   userId: z.string().openapi({
@@ -49,7 +49,11 @@ export const getUserMapsRoute = app.openapi(
   async (c) => {
     try {
       const { userId } = c.req.valid("param");
-      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+      const db = createDb(
+        c.env.TURSO_CONNECTION_URL,
+        c.env.TURSO_AUTH_TOKEN,
+        c.env.ENVIRONMENT === "production"
+      );
       const usersMaps = await getUserMaps(db, userId);
 
       return c.json(usersMaps, 200);

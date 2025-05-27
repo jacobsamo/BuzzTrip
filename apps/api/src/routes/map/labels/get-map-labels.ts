@@ -1,5 +1,4 @@
 import { createDb } from "@buzztrip/db";
-import { IconType } from "@buzztrip/db/types";
 import { labelsSchema } from "@buzztrip/db/zod-schemas";
 import { createRoute } from "@hono/zod-openapi";
 import { captureException } from "@sentry/cloudflare";
@@ -32,11 +31,14 @@ export const getMapLabelsRoute = app.openapi(
   async (c) => {
     try {
       const { mapId } = c.req.valid("param");
-      const db = createDb(c.env.TURSO_CONNECTION_URL, c.env.TURSO_AUTH_TOKEN);
+      const db = createDb(
+        c.env.TURSO_CONNECTION_URL,
+        c.env.TURSO_AUTH_TOKEN,
+        c.env.ENVIRONMENT === "production"
+      );
       const mapLabels = await db.query.labels.findMany({
         where: (maps, { eq }) => eq(maps.map_id, mapId),
       });
-
 
       return c.json(mapLabels, 200);
     } catch (error) {
