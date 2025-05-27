@@ -1,9 +1,17 @@
+-- alter tabls to ingest new data
+ALTER TABLE maps RENAME TO maps_old;
+ALTER TABLE users RENAME TO users_old;
+-- delete and recreate tabls later
+DROP TABLE route_stops;
+DROP TABLE routes;
+
+-- Step 2: run script
 CREATE TABLE `passkey` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text,
 	`public_key` text NOT NULL,
 	`user_id` text NOT NULL,
-	`credential_i_d` text NOT NULL,
+	`credential_id` text NOT NULL,
 	`counter` integer NOT NULL,
 	`device_type` text NOT NULL,
 	`backed_up` integer NOT NULL,
@@ -49,6 +57,7 @@ CREATE TABLE `user_sessions` (
 	`ip_address` text,
 	`user_agent` text,
 	`user_id` text NOT NULL,
+	`impersonated_by` text,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
@@ -69,11 +78,15 @@ CREATE TABLE `users` (
 	`user_id` text PRIMARY KEY NOT NULL,
 	`full_name` text NOT NULL,
 	`email` text NOT NULL,
-	`email_verified` integer NOT NULL,
+	`email_verified` integer DEFAULT false NOT NULL,
 	`profile_picture` text,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`two_factor_enabled` integer,
+	`role` text,
+	`banned` integer,
+	`ban_reason` text,
+	`ban_expires` integer,
 	`first_name` text,
 	`last_name` text,
 	`username` text,
@@ -82,34 +95,11 @@ CREATE TABLE `users` (
 --> statement-breakpoint
 CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);--> statement-breakpoint
 CREATE INDEX `user_email_idx` ON `users` (`email`);--> statement-breakpoint
-CREATE TABLE `collection_links` (
-	`link_id` text PRIMARY KEY NOT NULL,
-	`collection_id` text,
-	`marker_id` text NOT NULL,
-	`map_id` text NOT NULL,
-	`user_id` text NOT NULL,
-	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	FOREIGN KEY (`collection_id`) REFERENCES `collections`(`collection_id`) ON UPDATE cascade ON DELETE cascade,
-	FOREIGN KEY (`marker_id`) REFERENCES `markers`(`marker_id`) ON UPDATE cascade ON DELETE cascade,
-	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE cascade ON DELETE cascade,
-	FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON UPDATE cascade ON DELETE no action
-);
+
 --> statement-breakpoint
 CREATE INDEX `collection_links_map_id_idx` ON `collection_links` (`map_id`);--> statement-breakpoint
 CREATE INDEX `collection_links_marker_id_idx` ON `collection_links` (`marker_id`);--> statement-breakpoint
-CREATE TABLE `collections` (
-	`collection_id` text PRIMARY KEY NOT NULL,
-	`map_id` text NOT NULL,
-	`title` text NOT NULL,
-	`description` text,
-	`created_by` text NOT NULL,
-	`icon` text NOT NULL,
-	`color` text,
-	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE cascade ON DELETE cascade,
-	FOREIGN KEY (`created_by`) REFERENCES `users`(`user_id`) ON UPDATE cascade ON DELETE no action
-);
+
 --> statement-breakpoint
 CREATE INDEX `collections_map_id_idx` ON `collections` (`map_id`);--> statement-breakpoint
 CREATE TABLE `labels` (
@@ -125,14 +115,6 @@ CREATE TABLE `labels` (
 );
 --> statement-breakpoint
 CREATE INDEX `labels_map_id_idx` ON `labels` (`map_id`);--> statement-breakpoint
-CREATE TABLE `map_users` (
-	`map_user_id` text PRIMARY KEY NOT NULL,
-	`map_id` text NOT NULL,
-	`user_id` text NOT NULL,
-	`permission` text DEFAULT 'editor' NOT NULL,
-	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE cascade ON DELETE cascade,
-	FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON UPDATE cascade ON DELETE no action
-);
 --> statement-breakpoint
 CREATE INDEX `map_users_map_id_idx` ON `map_users` (`map_id`);--> statement-breakpoint
 CREATE TABLE `maps` (
@@ -143,31 +125,17 @@ CREATE TABLE `maps` (
 	`icon` text,
 	`color` text,
 	`owner_id` text NOT NULL,
+	`location_name` text,
 	`lat` real,
 	`lng` real,
 	`bounds` blob,
+	`visibility` text DEFAULT 'private' NOT NULL,
 	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
 	FOREIGN KEY (`owner_id`) REFERENCES `users`(`user_id`) ON UPDATE cascade ON DELETE no action
 );
 --> statement-breakpoint
-CREATE TABLE `markers` (
-	`marker_id` text PRIMARY KEY NOT NULL,
-	`title` text NOT NULL,
-	`note` text,
-	`lat` real NOT NULL,
-	`lng` real NOT NULL,
-	`created_by` text NOT NULL,
-	`icon` text NOT NULL,
-	`color` text,
-	`place_id` text NOT NULL,
-	`map_id` text NOT NULL,
-	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	FOREIGN KEY (`created_by`) REFERENCES `users`(`user_id`) ON UPDATE cascade ON DELETE no action,
-	FOREIGN KEY (`place_id`) REFERENCES `places`(`place_id`) ON UPDATE cascade ON DELETE no action,
-	FOREIGN KEY (`map_id`) REFERENCES `maps`(`map_id`) ON UPDATE cascade ON DELETE cascade
-);
+
 --> statement-breakpoint
 CREATE INDEX `markers_map_id_idx` ON `markers` (`map_id`);--> statement-breakpoint
 CREATE INDEX `markers_place_id_idx` ON `markers` (`place_id`);--> statement-breakpoint
@@ -201,30 +169,7 @@ CREATE TABLE `routes` (
 );
 --> statement-breakpoint
 CREATE INDEX `routes_map_id_idx` ON `routes` (`map_id`);--> statement-breakpoint
-CREATE TABLE `places` (
-	`place_id` text PRIMARY KEY NOT NULL,
-	`title` text NOT NULL,
-	`description` text,
-	`lat` real NOT NULL,
-	`lng` real NOT NULL,
-	`bounds` text NOT NULL,
-	`address` text,
-	`gm_place_id` text,
-	`mb_place_id` text,
-	`fq_place_id` text,
-	`plus_code` text,
-	`icon` text NOT NULL,
-	`photos` text,
-	`reviews` text,
-	`rating` real,
-	`avg_price` integer,
-	`types` text,
-	`website` text,
-	`phone` text,
-	`opening_times` text,
-	`created_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-	`updated_at` text DEFAULT (CURRENT_TIMESTAMP) NOT NULL
-);
+
 --> statement-breakpoint
 CREATE INDEX `gm_place_id_ixd` ON `places` (`gm_place_id`);--> statement-breakpoint
 CREATE INDEX `mb_place_id_ixd` ON `places` (`mb_place_id`);--> statement-breakpoint
@@ -232,3 +177,20 @@ CREATE INDEX `fq_place_id_ixd` ON `places` (`fq_place_id`);--> statement-breakpo
 CREATE INDEX `places_lat_idx` ON `places` (`lat`);--> statement-breakpoint
 CREATE INDEX `places_lng_idx` ON `places` (`lng`);--> statement-breakpoint
 CREATE INDEX `places_address_idx` ON `places` (`address`);
+
+
+
+-- Step 3: ingest old data into new tables
+
+INSERT INTO users (user_id, full_name, email, email_verified, profile_picture, created_at, updated_at, two_factor_enabled, role, banned, ban_reason, ban_expires, first_name, last_name, username, bio)
+SELECT user_id, full_name, email, true, profile_picture, created_at, updated_at, false, null, null, null, null, first_name, last_name, username, bio FROM users_old;
+
+INSERT INTO maps (map_id, title, description, image, icon, color, owner_id, location_name, lat, lng, bounds, visibility, created_at, updated_at)
+SELECT map_id, title, description, image, null, null, owner_id, null, null, null, null, "private", created_at, updated_at FROM maps_old;
+
+
+-- Step 4: drop old tables
+DROP TABLE maps_old;    
+DROP TABLE users_old;
+
+

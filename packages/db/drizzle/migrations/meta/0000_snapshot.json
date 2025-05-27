@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e7a7e770-1ceb-4595-bd35-f95193ceb49d",
+  "id": "7c47f7d0-998a-4f00-9df1-1933a940ec4a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "passkey": {
@@ -347,6 +347,13 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "impersonated_by": {
+          "name": "impersonated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -480,7 +487,8 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": false
         },
         "profile_picture": {
           "name": "profile_picture",
@@ -505,6 +513,34 @@
         },
         "two_factor_enabled": {
           "name": "two_factor_enabled",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "banned": {
+          "name": "banned",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "ban_reason": {
+          "name": "ban_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "ban_expires": {
+          "name": "ban_expires",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -1007,6 +1043,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "location_name": {
+          "name": "location_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "lat": {
           "name": "lat",
           "type": "real",
@@ -1027,6 +1070,14 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "visibility": {
+          "name": "visibility",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'private'"
         },
         "created_at": {
           "name": "created_at",
