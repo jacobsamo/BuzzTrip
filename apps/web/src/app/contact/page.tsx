@@ -235,7 +235,7 @@ export default function ContactPage() {
                       <h3 className="font-semibold text-gray-900">
                         Email Support
                       </h3>
-                      <p className="text-gray-600">support@buzztrip.com</p>
+                      <p className="text-gray-600">support@buzztrip.co</p>
                       <p className="text-sm text-gray-500">
                         We typically respond within 24 hours
                       </p>
@@ -250,7 +250,7 @@ export default function ContactPage() {
                       <h3 className="font-semibold text-gray-900">
                         General Inquiries
                       </h3>
-                      <p className="text-gray-600">hello@buzztrip.com</p>
+                      <p className="text-gray-600">hello@buzztrip.co</p>
                       <p className="text-sm text-gray-500">
                         For partnerships, press, and general questions
                       </p>

@@ -1,9 +1,9 @@
 "use client";
 import GeneralCTA from "@/components/cta";
-import XformerlyTwitter from "@/components/icons/X";
+import SocialLinks from "@/components/social-links";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Github, Globe, Heart, Linkedin, Mail, Users, Zap } from "lucide-react";
+import { Globe, Heart, Users, Zap } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 
@@ -223,44 +223,7 @@ export default function AboutPage() {
               development progress, and company news.
             </p>
 
-            <div className="flex justify-center space-x-6">
-              {[
-                {
-                  icon: <XformerlyTwitter className="size-6 text-black" />,
-                  label: "X (Formerly Twitter)",
-                  href: "#",
-                  color: "hover:text-blue-500",
-                },
-                {
-                  icon: <Github className="size-6 text-black" />,
-                  label: "GitHub",
-                  href: "https://git.new/buzztrip",
-                  color: "hover:text-gray-900",
-                },
-                {
-                  icon: <Linkedin className="size-6 text-black" />,
-                  label: "LinkedIn",
-                  href: "#",
-                  color: "hover:text-blue-600",
-                },
-                {
-                  icon: <Mail className="size-6 text-black" />,
-                  label: "Email",
-                  href: "mailto:hello@buzztrip.com",
-                  color: "hover:text-primary",
-                },
-              ].map((social, index) => (
-                <motion.a
-                  key={index}
-                  href={social.href}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md text-gray-600 transition-colors ${social.color}`}
-                >
-                  {social.icon}
-                </motion.a>
-              ))}
-            </div>
+            <SocialLinks />
           </motion.div>
         </div>
       </section>

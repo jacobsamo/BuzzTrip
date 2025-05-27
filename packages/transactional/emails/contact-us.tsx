@@ -128,7 +128,7 @@ const ContactUsEmail = ({
                 123 Mapping Street, Brisbane, Australia
               </Text>
               <Text className="text-[12px] text-gray-400 mt-[8px] m-0">
-                <a href="https://buzztrip.com/unsubscribe" className="text-gray-400">Unsubscribe</a>
+                <a href="https://buzztrip.co/unsubscribe" className="text-gray-400">Unsubscribe</a>
               </Text> */}
             </Section>
           </Container>

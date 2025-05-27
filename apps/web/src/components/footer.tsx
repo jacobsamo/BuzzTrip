@@ -1,8 +1,8 @@
 "use client";
-import { Button, buttonVariants } from "@/components/ui/button";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import SocialLinks from "./social-links";
 
 const Footer = () => {
   return (
@@ -28,7 +28,7 @@ const Footer = () => {
                 alt="BuzzTrip Logo"
                 width={40}
                 height={40}
-                className="w-10 h-10 brightness-0 invert"
+                className="size-11 rounded-full"
               />
               <span className="text-2xl font-bold">BuzzTrip</span>
             </div>
@@ -37,41 +37,7 @@ const Footer = () => {
               Google Maps and Google My Maps together in one seamless,
               cross-platform experience.
             </p>
-            <div className="flex space-x-4">
-              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                <Button
-                  className={buttonVariants({
-                    variant: "outline",
-                    size: "sm",
-                    className: "border-gray-600 hover:bg-primary",
-                  })}
-                >
-                  Twitter
-                </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                <Button
-                  className={buttonVariants({
-                    variant: "outline",
-                    size: "sm",
-                    className: "border-gray-600 hover:bg-primary",
-                  })}
-                >
-                  LinkedIn
-                </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                <Button
-                  className={buttonVariants({
-                    variant: "outline",
-                    size: "sm",
-                    className: "border-gray-600  hover:bg-primary",
-                  })}
-                >
-                  GitHub
-                </Button>
-              </motion.div>
-            </div>
+            <SocialLinks className="flex-wrap justify-start space-x-4" />
           </motion.div>
 
           <motion.div
