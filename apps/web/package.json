@@ -12,6 +12,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@better-fetch/fetch": "^1.1.18",
     "@buzztrip/db": "workspace:*",
     "@buzztrip/transactional": "workspace:*",
     "@hookform/resolvers": "^5.0.1",

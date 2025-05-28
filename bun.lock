@@ -115,6 +115,7 @@
       "name": "@buzztrip/web",
       "version": "0.1.0",
       "dependencies": {
+        "@better-fetch/fetch": "^1.1.18",
         "@buzztrip/db": "workspace:*",
         "@buzztrip/transactional": "workspace:*",
         "@hookform/resolvers": "^5.0.1",
