@@ -57,7 +57,7 @@ export default function CreateMapModal({
             </Button>
           )}
         </DialogTrigger>
-        <DialogContent className="h-10/12 justify-start items-start space-y-2">
+        <DialogContent className="relative h-10/12 justify-start items-start space-y-2">
           <DialogHeader>
             <DialogTitle>Create Map</DialogTitle>
             <DialogDescription>Start your travel plans here</DialogDescription>
@@ -89,7 +89,7 @@ export default function CreateMapModal({
           <DrawerTitle>Create Map</DrawerTitle>
           <DrawerDescription>Start your travel plans here</DrawerDescription>
         </DrawerHeader>
-        <MapForm setMap={setMap} setOpen={setOpen} />
+          <MapForm setMap={setMap} setOpen={setOpen} />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>

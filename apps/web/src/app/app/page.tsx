@@ -19,7 +19,7 @@ export default async function MapPage() {
   const usersMaps = await getUserMaps(db, data.session.userId);
 
   return (
-    <>
+    <div className="p-2">
       <nav className="flex items-center justify-between mb-2">
         <Link className="flex items-center justify-center" href="#">
           <Image
@@ -34,6 +34,6 @@ export default async function MapPage() {
         <UserButton />
       </nav>
       <UserMaps userId={data.session.userId} usersMaps={usersMaps} />
-    </>
+    </div>
   );
 }
