@@ -149,7 +149,16 @@ export const shareMap = async (
 ): Promise<z.infer<typeof ShareMapReturnSchema>> => {
   let newMapUsers: NewMapUser[] = [];
 
-  users.forEach((user) => {
+  // prevent existing users from being added
+  // logic in the frontend should handle this but this is a safety check
+  const existingUsers = await db.query.map_users.findMany();
+  const newUsers = users.filter((user) => {
+    return !existingUsers.some(
+      (existingUser) => existingUser.user_id === user.user_id
+    );
+  });
+
+  newUsers.forEach((user) => {
     newMapUsers.push({
       map_id: mapId,
       user_id: user.user_id,

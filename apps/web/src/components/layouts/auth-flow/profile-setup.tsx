@@ -79,6 +79,7 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
   };
 
   const handleSubmit = async (formData: z.infer<typeof schema>) => {
+    router.prefetch("/app")
     let profilePicture = formData.image;
 
     if (profilePictureFile) {
@@ -132,6 +133,7 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
     toast.promise(updateUserProfile, {
       loading: "Saving profile...",
       success: async (res) => {
+        router.push("/app")
         return "Profile saved successfully!";
       },
       error: "Failed to save profile",
@@ -143,17 +145,17 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <div className="flex flex-col items-center space-y-4">
           <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="cursor-pointer relative"
+            // whileHover={{ scale: 1.05 }}
+            // whileTap={{ scale: 0.95 }}
+            // className="cursor-pointer relative"
           >
             <div
               aria-label="Upload profile picture"
               role="button"
               onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setUploadImageModalOpen(true);
+                // e.preventDefault();
+                // e.stopPropagation();
+                // setUploadImageModalOpen(true);
               }}
             >
               <Avatar className="h-20 w-20">
@@ -162,9 +164,9 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
                   <Icons.user className="h-8 w-8 text-primary" />
                 </AvatarFallback>
               </Avatar>
-              <div className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1">
+              {/* <div className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1">
                 <Icons.camera className="h-4 w-4" />
-              </div>
+              </div> */}
             </div>
 
             <ImageUploadModal

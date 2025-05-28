@@ -106,7 +106,7 @@ export const AuthForm = ({ mode }: AuthFormProps) => {
   };
 
   return (
-    <div className="container flex items-center justify-center min-h-screen py-12">
+    <div className="flex items-center justify-center min-h-screen">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

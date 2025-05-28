@@ -12,7 +12,7 @@ const DisplayActiveState = () => {
     useMapStore((store) => store);
 
   return (
-    <>
+    <div className="flex-1 overflow-y-auto">
       {!activeLocation && (
         <Tabs defaultValue="collections">
           <TabsList className="mx-auto w-11/12 justify-evenly">
@@ -56,7 +56,7 @@ const DisplayActiveState = () => {
       {activeLocation !== null && <ActiveLocation />}
 
       <MarkerModal />
-    </>
+    </div>
   );
 };
 

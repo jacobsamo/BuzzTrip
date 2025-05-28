@@ -66,7 +66,7 @@ const MapStepperForm = () => {
   const StepComponent = steps[stepIndex]!.component;
 
   return (
-    <div className="flex flex-col justify-between h-ull w-full space-y-3">
+    <div className="relative flex flex-col justify-between h-ull w-full space-y-3 pb-4">
       <Stepper value={currentStep} onValueChange={setCurrentStep}>
         {steps.map((step, index) => (
           <StepperItem
@@ -107,7 +107,7 @@ const MapStepperForm = () => {
       <StepComponent />
 
       {/* Navigation */}
-      <div className="absolute bottom-2 left-2 right-2 flex justify-between pt-4">
+      <div className="absolute -bottom-4 left-2 right-2 flex justify-between pt-4">
         <Button
           type="button"
           variant="outline"
