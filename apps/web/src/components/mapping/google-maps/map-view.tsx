@@ -200,6 +200,7 @@ const Mapview = () => {
             ? mapOptions.bounds
             : undefined
         }
+        mapTypeId="hybrid"
         mapId={env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID}
         disableDefaultUI={true}
         onClick={(e) => handleClick(e)}
