@@ -272,7 +272,7 @@ export default function BuzzTripLanding() {
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </motion.div>
-                <motion.div
+                {/* <motion.div
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -283,7 +283,7 @@ export default function BuzzTripLanding() {
                   >
                     View Demo
                   </Button>
-                </motion.div>
+                </motion.div> */}
               </motion.div>
 
               <motion.div

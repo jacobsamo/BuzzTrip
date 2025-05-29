@@ -1,13 +1,20 @@
 import { betterFetch } from "@better-fetch/fetch";
 import { getSessionCookie } from "better-auth/cookies";
 import { env } from "env";
+import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import type { Session } from "./lib/auth-client";
+import { authClient, type Session } from "./lib/auth-client";
 
 export async function middleware(request: NextRequest) {
   const cookies = request.headers.get("cookie");
   const requestHeaders = new Headers(request.headers);
-  const sessionCookie = getSessionCookie(requestHeaders);
+  const sessionViaHeaders = await getSessionCookie(requestHeaders);
+  const sessionViaRequest = await getSessionCookie(request);
+  const authClientTest = await authClient.getSession({
+    fetchOptions: {
+      headers: await headers(),
+    },
+  });
 
   const data = await betterFetch<Session>("/auth/get-session", {
     baseURL: env.NEXT_PUBLIC_API_URL,
@@ -20,13 +27,20 @@ export async function middleware(request: NextRequest) {
 
   console.log("data", {
     data,
-    sessionCookie,
     cookies,
-    requestHeaders,
+    sessionViaHeaders,
+    sessionViaRequest,
+    authClientTest,
     request,
   });
 
-  if (!sessionCookie || data.error || !data.data.session) {
+  if (
+    !sessionViaHeaders ||
+    !sessionViaRequest ||
+    !authClientTest ||
+    data.error ||
+    !data.data.session
+  ) {
     return NextResponse.redirect(new URL("/auth/sign-in", request.url));
   }
 
