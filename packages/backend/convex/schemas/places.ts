@@ -4,7 +4,6 @@ import { bounds } from "./shared";
 
 export const placesSchema = {
   places: defineTable({
-    place_id: v.id("place_id"),
     title: v.string(),
     description: v.optional(v.string()),
     lat: v.float64(),
@@ -31,8 +30,7 @@ export const placesSchema = {
     .index("places_lng_idx", ["lng"])
     .index("places_address_idx", ["address"]),
   places_reviews: defineTable({
-    place_review_id: v.id("place_review_id"),
-    place_id: v.id("place_id"),
+    place_id: v.id("places"),
     author_name: v.string(),
     author_url: v.string(),
     profile_photo_url: v.string(),
@@ -40,9 +38,8 @@ export const placesSchema = {
     description: v.string(),
   }),
   place_photos: defineTable({
-    place_photo_id: v.id("place_photo_id"),
-    place_id: v.id("place_id"),
-    user_id: v.id("user_id"),
+    place_id: v.id("places"),
+    user_id: v.id("users"),
     photo_url: v.string(),
     width: v.number(),
     height: v.number(),

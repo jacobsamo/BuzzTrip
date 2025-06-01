@@ -2,8 +2,12 @@
   "name": "@buzztrip/convex",
   "version": "1.0.0",
   "main": "index.js",
+  "exports": {
+    ".": "./convex/_generated/api"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "convex dev",
+    "setup": "convex dev --until-success"
   },
   "keywords": [],
   "author": "",
