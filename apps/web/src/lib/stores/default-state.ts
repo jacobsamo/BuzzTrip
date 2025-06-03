@@ -6,7 +6,7 @@ import type {
   MapUser,
   Route,
   RouteStop,
-} from "@buzztrip/db/types";
+} from "@buzztrip/backend/types";
 
 export type StoreState = {
   collectionLinks: CollectionLink[] | null;

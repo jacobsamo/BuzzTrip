@@ -14,9 +14,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { User, useSession } from "@/lib/auth-client";
 import { apiClient } from "@/server/api.client";
-import { usersEditSchema } from "@buzztrip/db/zod-schemas";
+import { usersEditSchema } from "@buzztrip/backend/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "motion/react"
+import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -40,15 +40,15 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
   const auth = useSession();
   const router = useRouter();
   const { data } = auth;
-  const user = data?.user as User | null ?? null;
+  const user = (data?.user as User | null) ?? null;
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      first_name:user?.first_name ?? "",
-      last_name:user?.last_name ?? "",
-      username:user?.username ?? "",
-      bio:user?.bio ?? "",
-      image:user?.image ?? "",
+      first_name: user?.first_name ?? "",
+      last_name: user?.last_name ?? "",
+      username: user?.username ?? "",
+      bio: user?.bio ?? "",
+      image: user?.image ?? "",
     },
   });
 
@@ -79,7 +79,7 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
   };
 
   const handleSubmit = async (formData: z.infer<typeof schema>) => {
-    router.prefetch("/app")
+    router.prefetch("/app");
     let profilePicture = formData.image;
 
     if (profilePictureFile) {
@@ -133,7 +133,7 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
     toast.promise(updateUserProfile, {
       loading: "Saving profile...",
       success: async (res) => {
-        router.push("/app")
+        router.push("/app");
         return "Profile saved successfully!";
       },
       error: "Failed to save profile",
@@ -145,9 +145,9 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <div className="flex flex-col items-center space-y-4">
           <motion.div
-            // whileHover={{ scale: 1.05 }}
-            // whileTap={{ scale: 0.95 }}
-            // className="cursor-pointer relative"
+          // whileHover={{ scale: 1.05 }}
+          // whileTap={{ scale: 0.95 }}
+          // className="cursor-pointer relative"
           >
             <div
               aria-label="Upload profile picture"

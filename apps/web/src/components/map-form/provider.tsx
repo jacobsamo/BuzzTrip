@@ -1,12 +1,12 @@
 import { Form } from "@/components/ui/form";
 import { useSession } from "@/lib/auth-client";
-import { formatDateForSql, generateId } from "@buzztrip/db/helpers";
-import { Label, NewLabel, NewMap } from "@buzztrip/db/types";
+import { formatDateForSql, generateId } from "@buzztrip/backend/helpers";
+import { Label, NewLabel, NewMap } from "@buzztrip/backend/types";
 import {
   mapsEditSchema,
   permissionEnumSchema,
   refinedUserSchema,
-} from "@buzztrip/db/zod-schemas";
+} from "@buzztrip/backend/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, {
   createContext,
@@ -304,7 +304,9 @@ export const MapFormProvider = ({
   return (
     <MapFormContext.Provider value={contextValue}>
       <Form {...form}>
-        <form onSubmit={handleSubmit} className="size-full relative">{children}</form>
+        <form onSubmit={handleSubmit} className="size-full relative">
+          {children}
+        </form>
       </Form>
     </MapFormContext.Provider>
   );

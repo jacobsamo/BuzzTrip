@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Label } from "@buzztrip/db/types";
-import { labelsEditSchema } from "@buzztrip/db/zod-schemas";
+import { Label } from "@buzztrip/backend/types";
+import { labelsEditSchema } from "@buzztrip/backend/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
@@ -113,8 +113,7 @@ const LabelForm = ({ label }: LabelFormProps) => {
       </Button>
       <CardContent className="inline-flex flex-wrap items-center gap-2 md:gap-8">
         <Form {...form}>
-            <div className="inline-flex items-center gap-2">
-
+          <div className="inline-flex items-center gap-2">
             <FormField
               control={control}
               name="icon"
@@ -164,25 +163,24 @@ const LabelForm = ({ label }: LabelFormProps) => {
                 );
               }}
             />
-          <FormField
-            control={control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                {/* <FormLabel>Label Name</FormLabel> */}
-                <FormControl>
-                  <Input
-                    placeholder="e.g., Restaurants, Hotels, Attractions"
-                    className=""
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-            </div>
-
+            <FormField
+              control={control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  {/* <FormLabel>Label Name</FormLabel> */}
+                  <FormControl>
+                    <Input
+                      placeholder="e.g., Restaurants, Hotels, Attractions"
+                      className=""
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <FormField
             control={control}

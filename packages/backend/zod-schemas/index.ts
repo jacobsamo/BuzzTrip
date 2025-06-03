@@ -1,5 +1,5 @@
 import { zid } from "convex-helpers/server/zod";
-import { mapSchema, mapUserSchema, markersSchema } from "./maps-schema";
+import { mapsSchema, mapUserSchema, markersSchema } from "./maps-schema";
 import { placesSchema } from "./places-schema";
 import { boundsSchema } from "./shared-schemas";
 
@@ -15,4 +15,4 @@ export const combinedMarkersSchema = placesSchema.extend({
   bounds: boundsSchema.nullable(),
 });
 
-export const userMapsSchema = mapSchema.merge(mapUserSchema);
+export const userMapsSchema = mapsSchema.merge(mapUserSchema);

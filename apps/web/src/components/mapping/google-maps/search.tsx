@@ -1,10 +1,9 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { CombinedMarker } from "@buzztrip/db/types";
+import { CombinedMarker } from "@buzztrip/backend/types";
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
-import { Route, SearchIcon, X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
 import { Command } from "cmdk";
-import { Button } from "@/components/ui/button";
+import { SearchIcon, X } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 interface DetailsRequestCallbackReturn {
   placeDetails: google.maps.places.PlaceResult;

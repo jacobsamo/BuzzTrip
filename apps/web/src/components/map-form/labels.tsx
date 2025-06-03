@@ -1,6 +1,6 @@
 //TODO: Create a component to create, update and delete labels
 import { Button } from "@/components/ui/button";
-import { generateId } from "@buzztrip/db/helpers";
+import { generateId } from "@buzztrip/backend/helpers";
 import { Plus } from "lucide-react";
 import { Label } from "../ui/label";
 import { ScrollArea } from "../ui/scroll-area";

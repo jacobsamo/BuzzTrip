@@ -29,8 +29,8 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { apiClient } from "@/server/api.client";
-import { TShareMapUserSchema } from "@buzztrip/db/mutations/maps";
-import { PermissionEnum } from "@buzztrip/db/types";
+import { TShareMapUserSchema } from "@buzztrip/backend/mutations/maps";
+import { PermissionEnum } from "@buzztrip/backend/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Circle, CircleCheck, SearchIcon, Share2, X } from "lucide-react";

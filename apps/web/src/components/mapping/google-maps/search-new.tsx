@@ -1,7 +1,7 @@
 "use client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { CombinedMarker } from "@buzztrip/db/types";
+import { CombinedMarker } from "@buzztrip/backend/types";
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
 // import { Command, CommandLoading } from "cmdk";
 import {

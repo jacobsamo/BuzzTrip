@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
+import { mapsEditSchema } from "@buzztrip/backend/zod-schemas";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 

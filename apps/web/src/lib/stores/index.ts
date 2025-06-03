@@ -11,7 +11,7 @@ import type {
   MapUser,
   Route,
   RouteStop,
-} from "@buzztrip/db/types";
+} from "@buzztrip/backend/types";
 import { useQuery } from "convex/react";
 
 export type Store = StoreState & StoreActions;

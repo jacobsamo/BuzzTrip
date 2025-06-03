@@ -18,7 +18,7 @@ import {
 import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { apiClient } from "@/server/api.client";
-import { PermissionEnum } from "@buzztrip/db/types";
+import { PermissionEnum } from "@buzztrip/backend/types";
 import { useQuery } from "@tanstack/react-query";
 import { CommandLoading } from "cmdk";
 import { Check, UserPlus, X } from "lucide-react";
@@ -180,7 +180,9 @@ const MapShareForm = () => {
                       <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium text-xs sm:text-sm">{user.name}</p>
+                      <p className="font-medium text-xs sm:text-sm">
+                        {user.name}
+                      </p>
                       <p className="text-xs sm:text-xs text-muted-foreground">
                         {user.email}
                       </p>

@@ -20,10 +20,9 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useSession } from "@/lib/auth-client";
-import { api } from "@buzztrip/backend/convex/_generated/api";
-import { Id } from "@buzztrip/backend/convex/_generated/dataModel";
-import { Map } from "@buzztrip/db/types";
-import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
+import { api } from "@buzztrip/backend/api";
+import { Id } from "@buzztrip/backend/dataModel";
+import { mapsEditSchema } from "@buzztrip/backend/zod-schemas";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { useMutation } from "convex/react";
 import { Plus } from "lucide-react";
@@ -37,14 +36,10 @@ import {
 } from "../map-form/provider";
 
 export interface CreateMapModalProps {
-  setMap?: (map: Map | null) => void;
   trigger?: React.ReactNode;
 }
 
-export default function CreateMapModal({
-  setMap,
-  trigger,
-}: CreateMapModalProps) {
+export default function CreateMapModal({ trigger }: CreateMapModalProps) {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -65,7 +60,7 @@ export default function CreateMapModal({
             <DialogTitle>Create Map</DialogTitle>
             <DialogDescription>Start your travel plans here</DialogDescription>
           </DialogHeader>
-          <MapForm setMap={setMap} setOpen={setOpen} />
+          <MapForm setOpen={setOpen} />
         </DialogContent>
       </Dialog>
     );
@@ -92,7 +87,7 @@ export default function CreateMapModal({
           <DrawerTitle>Create Map</DrawerTitle>
           <DrawerDescription>Start your travel plans here</DrawerDescription>
         </DrawerHeader>
-        <MapForm setMap={setMap} setOpen={setOpen} />
+        <MapForm setOpen={setOpen} />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -104,7 +99,6 @@ export default function CreateMapModal({
 }
 
 function MapForm({
-  setMap,
   setOpen,
 }: CreateMapModalProps & { setOpen: (open: boolean) => void }) {
   const { data } = useSession();
@@ -121,20 +115,11 @@ function MapForm({
       const newUsers =
         users?.map((user) => {
           return {
-            userId: user.id as Id<"users">,
+            user_id: user._id as Id<"user">,
             permission: user.permission,
           };
         }) ?? undefined;
 
-      // const create = apiClient.map.create.$post({
-      //   json: {
-      //     map: {
-      //       ...data,
-      //       owner_id: userId!,
-      //     },
-      //     users: newUsers,
-      //   },
-      // });
       const create = createMap({
         users: newUsers,
         map: {
@@ -149,18 +134,13 @@ function MapForm({
           lng: data.lng ?? undefined,
           location_name: data.location_name ?? undefined,
           bounds: data.bounds ?? undefined,
-          owner_id: "kn786m7j5abny5ws9zkv5e5wfh7h1dw5" as Id<"users">,
+          owner_id: "kn786m7j5abny5ws9zkv5e5wfh7h1dw5" as Id<"user">,
         },
       });
 
       toast.promise(create, {
         loading: "Creating map...",
         success: async (res) => {
-          // if (res.status === 200 && setMap) {
-          //   const d = await res.json();
-          //   setMap(d.map ?? null);
-          //   setOpen(false);
-          // }
           return "Map created successfully!";
         },
         error: "Failed to create map",

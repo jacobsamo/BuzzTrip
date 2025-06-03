@@ -8,8 +8,8 @@
   "exports": {
     "./api": "./convex/_generated/api.d.ts",
     "./dataModel": "./convex/_generated/dataModel.d.ts",
-    "./zod-schemas": "./zod-schemas.ts/index.ts",
-    "./types": "./types.ts"
+    "./zod-schemas": "./zod-schemas/index.ts",
+    "./types": "./types/index.ts"
   },
   "keywords": [],
   "author": "",

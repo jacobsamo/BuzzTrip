@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Map, UserMap } from "@buzztrip/db/types";
+import { Map, UserMap } from "@buzztrip/backend/types";
 import { formatDistanceToNow } from "date-fns";
 import { Calendar, MapIcon, MoreHorizontal, User } from "lucide-react";
 import Image from "next/image";
@@ -23,10 +23,9 @@ import { useState } from "react";
 
 interface MapCardProps {
   map: UserMap;
-  updateMap?: (map: Partial<Map>) => void;
 }
 
-const MapCard = ({ map, updateMap }: MapCardProps) => {
+const MapCard = ({ map }: MapCardProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const mapImage = map.image || "/placeholder.svg?height=200&width=400";
   const mapColor = map.color || "#2C7772";
@@ -105,7 +104,7 @@ const MapCard = ({ map, updateMap }: MapCardProps) => {
               <div className="flex items-center">
                 <Calendar className="h-3 w-3 mr-1" />
                 <span>
-                  {formatDistanceToNow(new Date(map.updated_at), {
+                  {formatDistanceToNow(new Date(map.updatedAt || map._creationTime), {
                     addSuffix: true,
                   })}
                 </span>
@@ -120,7 +119,6 @@ const MapCard = ({ map, updateMap }: MapCardProps) => {
       </Card>
       <EditMapModal
         map={map}
-        updateMap={updateMap}
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
       />

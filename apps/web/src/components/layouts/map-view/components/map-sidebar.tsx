@@ -1,18 +1,14 @@
 "use client";
-import React from "react";
+import CollectionModal from "@/components/modals/map/create_edit_collection_modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import {
   Tooltip,
@@ -20,11 +16,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import CollectionModal from "@/components/modals/map/create_edit_collection_modal";
-import DisplayCollection from "./display-collection";
-import { CombinedMarker } from "@buzztrip/db/types";
+import Link from "next/link";
+import React from "react";
 import DisplayActiveState from "./display-active-state";
 
 const MapSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {

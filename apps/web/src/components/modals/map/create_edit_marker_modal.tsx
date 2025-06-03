@@ -26,13 +26,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/auth-client";
 import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { apiClient } from "@/server/api.client";
+import type { IconType } from "@buzztrip/backend/types";
+import { CombinedMarker } from "@buzztrip/backend/types";
+import { combinedMarkersSchema } from "@buzztrip/backend/zod-schemas";
 import { popularIconsList } from "@buzztrip/components/icon";
-import type { IconType } from "@buzztrip/db/types";
-import { CombinedMarker } from "@buzztrip/db/types";
-import { combinedMarkersSchema } from "@buzztrip/db/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Circle, CircleCheck } from "lucide-react";
@@ -43,7 +44,6 @@ import { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { useSession } from "@/lib/auth-client";
 import IconPickerModal from "../icon-picker-modal";
 
 const Icon = dynamic(() => import("@buzztrip/components/icon"), { ssr: false });
@@ -136,7 +136,7 @@ function MarkerForm() {
     setMarkerOpen,
     markerOpen,
   } = useMapStore((store) => store);
-  const {data} = useSession();
+  const { data } = useSession();
   const userId = data?.session.userId;
 
   const { mode, marker } = markerOpen;

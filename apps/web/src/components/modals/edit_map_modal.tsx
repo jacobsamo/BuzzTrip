@@ -20,8 +20,8 @@ import {
 } from "@/components/ui/drawer";
 import { useSession } from "@/lib/auth-client";
 import { apiClient } from "@/server/api.client";
-import { Label, Map, NewLabel } from "@buzztrip/db/types";
-import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
+import { Label, Map, NewLabel } from "@buzztrip/backend/types";
+import { mapsEditSchema } from "@buzztrip/backend/zod-schemas";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import * as React from "react";
 import { useEffect, useState } from "react";
@@ -35,13 +35,11 @@ import {
 
 export interface EditMapModalProps {
   map: Map;
-  updateMap?: (map: Map) => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
 export default function EditMapModal({
-  updateMap,
   map,
   open: controlledOpen,
   onOpenChange,
@@ -74,21 +72,26 @@ export default function EditMapModal({
             <DialogTitle>Edit Map</DialogTitle>
             <DialogDescription>Start your travel plans here</DialogDescription>
           </DialogHeader>
-          <MapForm updateMap={updateMap} setOpen={setOpen} map={map} />
+          <MapForm setOpen={setOpen} map={map} />
         </DialogContent>
       </Dialog>
     );
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen} activeSnapPoint={0.9} snapPoints={[0.5, 0.75, 0.9]}>
+    <Drawer
+      open={open}
+      onOpenChange={setOpen}
+      activeSnapPoint={0.9}
+      snapPoints={[0.5, 0.75, 0.9]}
+    >
       <Trigger />
       <DrawerContent>
         <DrawerHeader className="text-left">
           <DrawerTitle>Edit Map</DrawerTitle>
           <DrawerDescription>Start your travel plans here</DrawerDescription>
         </DrawerHeader>
-        <MapForm updateMap={updateMap} setOpen={setOpen} map={map} />
+        <MapForm setOpen={setOpen} map={map} />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -100,7 +103,6 @@ export default function EditMapModal({
 }
 
 function MapForm({
-  updateMap,
   setOpen,
   map,
 }: EditMapModalProps & { setOpen: (open: boolean) => void }) {
@@ -119,7 +121,7 @@ function MapForm({
         const [mu, ml] = await Promise.all([
           apiClient.map[":mapId"].users
             .$get({
-              param: { mapId: map.map_id },
+              param: { mapId: map._id },
             })
             .then((res) => {
               if (res && res.ok) return res.json();
@@ -127,7 +129,7 @@ function MapForm({
             }),
           apiClient.map[":mapId"].labels
             .$get({
-              param: { mapId: map.map_id },
+              param: { mapId: map._id },
             })
             .then((res) => {
               if (res && res.ok) return res.json();
@@ -172,9 +174,8 @@ function MapForm({
       toast.promise(edit, {
         loading: "Updating map...",
         success: async (res) => {
-          if (res.status === 200 && updateMap) {
+          if (res.status === 200) {
             const d = await res.json();
-            updateMap(d);
             setOpen(false);
           }
           return "Map updated successfully";

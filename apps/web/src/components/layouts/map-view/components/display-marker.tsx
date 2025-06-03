@@ -4,10 +4,9 @@ import {
   SidebarMenuAction,
   SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
-import { CombinedMarker } from "@buzztrip/db/types";
+import { CombinedMarker } from "@buzztrip/backend/types";
 import { useMap } from "@vis.gl/react-google-maps";
 import { Pencil } from "lucide-react";
-import React from "react";
 
 interface DisplayMarkerProps {
   marker: CombinedMarker;

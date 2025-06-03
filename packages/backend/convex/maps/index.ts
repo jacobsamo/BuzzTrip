@@ -1,11 +1,15 @@
 import { zid } from "convex-helpers/server/zod";
 import { z } from "zod";
 import type { CombinedMarker, IconType } from "../../../db/src/types";
-import { Id } from "../_generated/dataModel";
-import { mutation, MutationCtx } from "../_generated/server";
-import { zodQuery } from "../helpers";
-import {  userMapsSchema } from "../../zod-schemas";
 import type { UserMap } from "../../types";
+import {
+  mapEditSchema,
+  mapUserSchema,
+  userMapsSchema,
+} from "../../zod-schemas";
+import { Id } from "../_generated/dataModel";
+import { MutationCtx } from "../_generated/server";
+import { zodMutation, zodQuery } from "../helpers";
 
 // Get methods
 
@@ -93,7 +97,7 @@ export const getUserMaps = zodQuery({
           ...mapUser,
           _id: mapUser._id,
           map_id: mapUser.map_id,
-        } as UserMap
+        } as UserMap;
       })
     );
 
@@ -111,44 +115,43 @@ export const searchUsers = zodQuery({
   handler: async (ctx, args) => {},
 });
 
-
 // // Mutations
-// export const createMap = mutation({
-//   args: {
-//     users: z
-//       .object({
-//         userId: zid("user"),
-//         permission: permissions,
-//       })
-//       .array()
-//       .optional(),
-//     map: mapSchema,
-//   },
-//   handler: async (ctx, args) => {
-//     const { users, map } = args;
+export const createMap = zodMutation({
+  args: {
+    users: mapUserSchema
+      .pick({
+        user_id: true,
+        permission: true,
+      })
+      .array()
+      .optional(),
+    map: mapEditSchema,
+  },
+  handler: async (ctx, args) => {
+    const { users, map } = args;
 
-//     const mapId = await ctx.db.insert("maps", map);
-//     const newMap = await ctx.db.get(mapId);
+    const mapId = await ctx.db.insert("maps", map);
+    const newMap = await ctx.db.get(mapId);
 
-//     await createMapUser(ctx, {
-//       user_id: map.owner_id,
-//       permission: "owner",
-//       map_id: mapId,
-//     });
+    await createMapUser(ctx, {
+      user_id: map.owner_id,
+      permission: "owner",
+      map_id: mapId,
+    });
 
-//     if (users) {
-//       await Promise.all([
-//         users.map((user) =>
-//           createMapUser(ctx, {
-//             user_id: user.userId,
-//             permission: user.permission,
-//             map_id: mapId,
-//           })
-//         ),
-//       ]);
-//     }
-//   },
-// });
+    if (users) {
+      await Promise.all([
+        users.map((user) =>
+          createMapUser(ctx, {
+            user_id: user.user_id,
+            permission: user.permission,
+            map_id: mapId,
+          })
+        ),
+      ]);
+    }
+  },
+});
 
 async function createMapUser(
   ctx: MutationCtx,

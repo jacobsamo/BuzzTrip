@@ -19,7 +19,7 @@ import {
   collection_linksSchema,
   collectionsSchema,
   labelsSchema,
-  mapSchema,
+  mapsSchema,
   mapUserSchema,
   markersSchema,
   route_stopsSchema,
@@ -28,7 +28,7 @@ import {
 
 export default defineSchema({
   // maps
-  maps: defineTable(zodToConvex(mapSchema)).index("by_visibility", [
+  maps: defineTable(zodToConvex(mapsSchema)).index("by_visibility", [
     "visibility",
   ]),
   map_users: defineTable(zodToConvex(mapUserSchema))

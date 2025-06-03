@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/select";
 import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
-import { Map } from "@buzztrip/db/types";
 import { useQuery } from "convex/react";
 import { MapIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -62,7 +61,6 @@ const UserMaps = ({ userId }: UserMapsProps) => {
         })
       : null;
   }, [filteredMaps, sortOption]);
-
 
   if (!sortedMaps || sortedMaps.length === 0) {
     return (

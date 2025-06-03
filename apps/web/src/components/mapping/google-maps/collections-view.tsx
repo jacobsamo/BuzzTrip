@@ -1,5 +1,4 @@
 "use client";
-import Icon from "@buzztrip/components/icon";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -12,12 +11,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Collection, CombinedMarker } from "@buzztrip/db/types";
+import { Collection, CombinedMarker } from "@buzztrip/backend/types";
+import Icon from "@buzztrip/components/icon";
 import {
   ChevronDown,
   ChevronRight,
   Edit,
-  MapPin,
   MoreVertical,
   Trash,
 } from "lucide-react";
@@ -78,7 +77,7 @@ const CollectionsView = ({ collection, markers }: CollectionsViewProps) => {
               className="flex items-center justify-between py-1"
             >
               <div className="flex items-center">
-                <MarkerPin color={marker.color} icon={marker.icon}/>
+                <MarkerPin color={marker.color} icon={marker.icon} />
                 <span>{marker.title}</span>
               </div>
               <OpenMarkerButton marker={marker} mode="edit" />
