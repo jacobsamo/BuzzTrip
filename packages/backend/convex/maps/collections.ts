@@ -1,9 +1,10 @@
-import { v } from "convex/values";
-import { mutation, query } from "../_generated/server";
+import { z } from "zod";
+import {  zid } from "convex-helpers/server/zod";
+import { authedMutation, authedQuery } from "../helpers";
 
-export const getCollectionsForMap = query({
+export const getCollectionsForMap = authedQuery({
   args: {
-    mapId: v.id("maps"),
+    mapId: zid("maps"),
   },
   handler: async (ctx, args) => {
     return await ctx.db
@@ -12,9 +13,9 @@ export const getCollectionsForMap = query({
   },
 });
 
-export const getCollectionLinksForMap = query({
+export const getCollectionLinksForMap = authedQuery({
   args: {
-    mapId: v.id("maps"),
+    mapId: zid("maps"),
   },
   handler: async (ctx, args) => {
     return await ctx.db
@@ -24,14 +25,14 @@ export const getCollectionLinksForMap = query({
 });
 
 // Mutations for collections
-export const createCollection = mutation({
+export const createCollection = authedMutation({
   args: {
-    mapId: v.id("maps"),
-    userId: v.id("user"),
-    title: v.string(),
-    description: v.string(),
-    icon: v.string(),
-    color: v.string(),
+    mapId: zid("maps"),
+    userId: zid("user"),
+    title: z.string(),
+    description: z.string(),
+    icon: z.string(),
+    color: z.string(),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("collections", {

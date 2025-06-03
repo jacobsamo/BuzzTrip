@@ -1,4 +1,5 @@
-import { customMutation, customQuery } from "convex-helpers/server/customFunctions";
+import { NoOp } from "convex-helpers/server/customFunctions";
+import { zCustomMutation, zCustomQuery } from "convex-helpers/server/zod";
 import type { Id } from "./_generated/dataModel";
 import {
   type MutationCtx,
@@ -7,7 +8,9 @@ import {
   query,
 } from "./_generated/server";
 
-export function withoutSystemFields<T extends { _creationTime: number; _id: Id<any> }>(doc: T) {
+export function withoutSystemFields<
+  T extends { _creationTime: number; _id: Id<any> },
+>(doc: T) {
   const { _id, _creationTime, ...rest } = doc;
   return rest;
 }
@@ -26,7 +29,7 @@ async function getUser(ctx: MutationCtx | QueryCtx) {
   return user;
 }
 
-export const authedMutation = customMutation(mutation, {
+export const authedMutation = zCustomMutation(mutation, {
   args: {},
   input: async (ctx, args) => {
     const user = await getUser(ctx);
@@ -37,7 +40,7 @@ export const authedMutation = customMutation(mutation, {
   },
 });
 
-export const authedQuery = customQuery(query, {
+export const authedQuery = zCustomQuery(query, {
   args: {},
   input: async (ctx, args) => {
     const user = await getUser(ctx);
@@ -47,3 +50,6 @@ export const authedQuery = customQuery(query, {
     return { ctx: { ...ctx, user }, args };
   },
 });
+
+export const zodQuery = zCustomQuery(query, NoOp);
+export const zodMutation = zCustomMutation(mutation, NoOp);

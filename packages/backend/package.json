@@ -1,10 +1,15 @@
 {
   "name": "@buzztrip/backend",
   "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
     "dev": "convex dev",
     "setup": "convex dev --until-success"
+  },
+  "exports": {
+    "./api": "./convex/_generated/api.d.ts",
+    "./dataModel": "./convex/_generated/dataModel.d.ts",
+    "./zod-schemas": "./zod-schemas.ts/index.ts",
+    "./types": "./types.ts"
   },
   "keywords": [],
   "author": "",

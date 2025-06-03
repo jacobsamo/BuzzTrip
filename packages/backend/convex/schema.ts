@@ -1,10 +1,82 @@
-import { defineSchema } from "convex/server";
-import { authSchema } from "./schemas/auth";
-import { mapsSchema } from "./schemas/maps";
-import { placesSchema } from "./schemas/places";
+import { zodToConvex } from "convex-helpers/server/zod";
+import { defineSchema, defineTable } from "convex/server";
+import {
+  accountSchema,
+  jwksSchema,
+  passkeySchema,
+  sessionSchema,
+  twoFactorSchema,
+  userSchema,
+  verificationSchema,
+} from "../zod-schemas/auth-schema";
+import {
+  placePhotoSchema,
+  placesSchema as places,
+  placesReviewSchema,
+} from "../zod-schemas/places-schema";
+
+import {
+  collection_linksSchema,
+  collectionsSchema,
+  labelsSchema,
+  mapSchema,
+  mapUserSchema,
+  markersSchema,
+  route_stopsSchema,
+  routesSchema,
+} from "../zod-schemas/maps-schema";
 
 export default defineSchema({
-  ...mapsSchema,
-  ...placesSchema,
-  ...authSchema,
+  // maps
+  maps: defineTable(zodToConvex(mapSchema)).index("by_visibility", [
+    "visibility",
+  ]),
+  map_users: defineTable(zodToConvex(mapUserSchema))
+    .index("by_map_id", ["map_id"])
+    .index("by_user_id", ["user_id"]),
+  labels: defineTable(zodToConvex(labelsSchema)).index("by_map_id", ["map_id"]),
+  markers: defineTable(zodToConvex(markersSchema))
+    .index("by_map_id", ["map_id"])
+    .index("by_place_id", ["place_id"]),
+  collections: defineTable(zodToConvex(collectionsSchema)).index("by_map_id", [
+    "map_id",
+  ]),
+  collection_links: defineTable(zodToConvex(collection_linksSchema))
+    .index("by_map_id", ["map_id"])
+    .index("by_collection_id", ["collection_id"]),
+  routes: defineTable(zodToConvex(routesSchema)).index("by_map_id", ["map_id"]),
+  route_stops: defineTable(zodToConvex(route_stopsSchema)).index("by_map_id", [
+    "map_id",
+  ]),
+  // places
+  places: defineTable(zodToConvex(places))
+    .index("gm_place_id_ixd", ["gm_place_id"])
+    .index("mb_place_id_ixd", ["mb_place_id"])
+    .index("fq_place_id_ixd", ["fq_place_id"])
+    .index("places_lat_idx", ["lat"])
+    .index("places_lng_idx", ["lng"])
+    .index("places_address_idx", ["address"]),
+  places_reviews: defineTable(zodToConvex(placesReviewSchema)),
+  place_photos: defineTable(zodToConvex(placePhotoSchema)),
+  // better auth items
+  user: defineTable(zodToConvex(userSchema)).index("by_email", ["email"]),
+  session: defineTable(zodToConvex(sessionSchema))
+    .index("byToken", ["token"])
+    .index("byUserId", ["userId"]),
+  account: defineTable(zodToConvex(accountSchema)).index("byUserId", [
+    "userId",
+  ]),
+  verification: defineTable(zodToConvex(verificationSchema)).index(
+    "byIdentifier",
+    ["identifier"]
+  ),
+  passkey: defineTable(zodToConvex(passkeySchema)).index("byUserId", [
+    "userId",
+  ]),
+  twoFactor: defineTable(zodToConvex(twoFactorSchema))
+    .index("byUserId", ["userId"])
+    .index("bySecret", ["secret"]),
+  jwks: defineTable(zodToConvex(jwksSchema)).index("byPublicKey", [
+    "publicKey",
+  ]),
 });
