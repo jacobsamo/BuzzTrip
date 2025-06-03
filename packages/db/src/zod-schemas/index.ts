@@ -63,8 +63,8 @@ export const mapsSchema = createSelectSchema(maps).extend({
   bounds: bounds.nullable(),
 });
 export const mapsEditSchema = createInsertSchema(maps).extend({
-  icon: iconSchema.nullable(),
-  bounds: bounds.nullable(),
+  icon: iconSchema.nullish(),
+  bounds: bounds.nullish(),
 });
 
 export const labelsSchema = createSelectSchema(labels)

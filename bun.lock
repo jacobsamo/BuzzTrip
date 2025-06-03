@@ -116,6 +116,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@better-fetch/fetch": "^1.1.18",
+        "@buzztrip/backend": "workspace:*",
         "@buzztrip/db": "workspace:*",
         "@buzztrip/transactional": "workspace:*",
         "@hookform/resolvers": "^5.0.1",
@@ -165,6 +166,7 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "^1.1.1",
+        "convex": "^1.24.6",
         "date-fns": "^4.1.0",
         "embla-carousel-react": "^8.6.0",
         "input-otp": "^1.4.2",
@@ -214,6 +216,13 @@
         "typescript": "^5.8.3",
       },
     },
+    "packages/backend": {
+      "name": "@buzztrip/backend",
+      "version": "1.0.0",
+      "dependencies": {
+        "convex": "^1.24.3",
+      },
+    },
     "packages/components": {
       "name": "@buzztrip/components",
       "version": "0.0.0",
@@ -223,13 +232,6 @@
       "devDependencies": {
         "@buzztrip/db": "workspace:*",
         "@buzztrip/tsconfig": "workspace:*",
-      },
-    },
-    "packages/convex": {
-      "name": "@buzztrip/convex",
-      "version": "1.0.0",
-      "dependencies": {
-        "convex": "^1.24.3",
       },
     },
     "packages/db": {
@@ -637,9 +639,9 @@
 
     "@buzztrip/api": ["@buzztrip/api@workspace:apps/api"],
 
-    "@buzztrip/components": ["@buzztrip/components@workspace:packages/components"],
+    "@buzztrip/backend": ["@buzztrip/backend@workspace:packages/backend"],
 
-    "@buzztrip/convex": ["@buzztrip/convex@workspace:packages/convex"],
+    "@buzztrip/components": ["@buzztrip/components@workspace:packages/components"],
 
     "@buzztrip/db": ["@buzztrip/db@workspace:packages/db"],
 
@@ -2239,7 +2241,7 @@
 
     "convert-source-map": ["convert-source-map@2.0.0", "", {}, "sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg=="],
 
-    "convex": ["convex@1.24.3", "", { "dependencies": { "esbuild": "0.25.2", "jwt-decode": "^4.0.0", "prettier": "3.5.3" }, "peerDependencies": { "@auth0/auth0-react": "^2.0.1", "@clerk/clerk-react": "^4.12.8 || ^5.0.0", "react": "^18.0.0 || ^19.0.0-0 || ^19.0.0" }, "optionalPeers": ["@auth0/auth0-react", "@clerk/clerk-react", "react"], "bin": { "convex": "bin/main.js" } }, "sha512-ybi+eKf8pGPJKtu7axjkLydmYfxvKfa/jHdnXN4IAjaI/TOAhPx9CrsV9TEHm+Mp4VU7pFbbbtZOrxN0KLn/kA=="],
+    "convex": ["convex@1.24.6", "", { "dependencies": { "esbuild": "0.25.2", "jwt-decode": "^4.0.0", "prettier": "3.5.3" }, "peerDependencies": { "@auth0/auth0-react": "^2.0.1", "@clerk/clerk-react": "^4.12.8 || ^5.0.0", "react": "^18.0.0 || ^19.0.0-0 || ^19.0.0" }, "optionalPeers": ["@auth0/auth0-react", "@clerk/clerk-react", "react"], "bin": { "convex": "bin/main.js" } }, "sha512-NaszfsdOXrEgNrxgY4Yp+Ueo1jNNyuUqodFSiM/POFWLUgndaQQdgSlr9+10aIUXhMLIShbUHLpwFA057pjcVA=="],
 
     "cookie": ["cookie@0.7.2", "", {}, "sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w=="],
 

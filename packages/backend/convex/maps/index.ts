@@ -1,7 +1,8 @@
 import { v } from "convex/values";
+import type { CombinedMarker, IconType } from "../../../db/src/types";
+import { Id } from "../_generated/dataModel";
 import { mutation, MutationCtx, query } from "../_generated/server";
 import { mapSchema, permissionEnum } from "../schemas/maps";
-import { Id } from "../_generated/dataModel";
 
 // Get methods
 
@@ -29,13 +30,15 @@ export const getMarkersView = query({
       markers.map(async (marker) => {
         const place = await ctx.db.get(marker.place_id);
 
-        return {
+        const newMarker: CombinedMarker = {
           ...marker,
           lat: place?.lat ?? marker.lat,
           lng: place?.lng ?? marker.lng,
           place_id: place?._id ?? marker.place_id,
-          place: place ?? null,
+          bounds: place?.bounds ?? null,
+          icon: marker.icon as IconType,
         };
+        return newMarker;
       })
     );
 
@@ -89,6 +92,12 @@ export const getUserMaps = query({
         };
       })
     );
+
+    console.log("getUserMaps", {
+      userId: args.userId,
+      mapUsers: mapUsers.length,
+      combinedMaps: combinedMaps.length,
+    });
     return combinedMaps;
   },
 });
@@ -117,16 +126,23 @@ export const createMap = mutation({
     const mapId = await ctx.db.insert("maps", map);
     const newMap = await ctx.db.get(mapId);
 
+        await createMapUser(ctx, {
+          user_id: map.owner_id,
+          permission: "owner",
+          map_id: mapId,
+        })
+
     if (users) {
-      await Promise.all(
+      await Promise.all([
+    
         users.map((user) =>
           createMapUser(ctx, {
             user_id: user.userId,
             permission: user.permission,
             map_id: mapId,
           })
-        )
-      );
+        ),
+      ]);
     }
   },
 });

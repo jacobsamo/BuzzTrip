@@ -25,14 +25,14 @@ export async function middleware(request: NextRequest) {
     credentials: "include",
   });
 
-  console.log("data", {
-    data,
-    cookies,
-    sessionViaHeaders,
-    sessionViaRequest,
-    authClientTest,
-    request,
-  });
+  // console.log("data", {
+  //   data,
+  //   cookies,
+  //   sessionViaHeaders,
+  //   sessionViaRequest,
+  //   authClientTest,
+  //   request,
+  // });
 
   if (
     !sessionViaHeaders ||
@@ -48,6 +48,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  runtime: "nodejs",
+  // runtime: "nodejs",
   matcher: ["/app"],
 };

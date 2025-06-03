@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import React from "react";
 import { Toaster } from "sonner";
+import { ConvexClientProvider } from "./convex-client-provider";
 
 const PostHogProvider = dynamic(() => import("./posthog"), { ssr: false });
 
@@ -14,15 +15,17 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
     <>
       <PostHogProvider>
         <NuqsAdapter>
-          <QueryClientProvider client={queryClient}>
-            <Toaster
-              position="top-center"
-              richColors={true}
-              closeButton={true}
-            />
-            {children}
-          </QueryClientProvider>
-        </NuqsAdapter>  
+          <ConvexClientProvider>
+            <QueryClientProvider client={queryClient}>
+              <Toaster
+                position="top-center"
+                richColors={true}
+                closeButton={true}
+              />
+              {children}
+            </QueryClientProvider>
+          </ConvexClientProvider>
+        </NuqsAdapter>
       </PostHogProvider>
     </>
   );

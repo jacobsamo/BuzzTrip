@@ -18,7 +18,7 @@ export const mapSchema = {
   image: v.optional(v.string()),
   icon: v.optional(v.string()),
   color: v.optional(v.string()),
-  owner_id: v.id("user_id"),
+  owner_id: v.id("users"),
   location_name: v.optional(v.string()), // the location where the map is saved too e.g Brisbane, Australia, etc
   lat: v.optional(v.float64()),
   lng: v.optional(v.float64()),
@@ -31,10 +31,10 @@ export const mapSchema = {
 };
 
 export const mapUserSchema = {
-    map_id: v.id("maps"),
-    user_id: v.id("users"),
-    permission: permissionEnum,
-  }
+  map_id: v.id("maps"),
+  user_id: v.id("users"),
+  permission: permissionEnum,
+};
 
 export const mapsSchema = {
   maps: defineTable(mapSchema).index("by_visibility", ["visibility"]),

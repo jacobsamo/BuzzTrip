@@ -1,10 +1,7 @@
 {
-  "name": "@buzztrip/convex",
+  "name": "@buzztrip/backend",
   "version": "1.0.0",
   "main": "index.js",
-  "exports": {
-    ".": "./convex/_generated/api"
-  },
   "scripts": {
     "dev": "convex dev",
     "setup": "convex dev --until-success"

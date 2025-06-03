@@ -20,10 +20,12 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useSession } from "@/lib/auth-client";
-import { apiClient } from "@/server/api.client";
+import { api } from "@buzztrip/backend/convex/_generated/api";
+import { Id } from "@buzztrip/backend/convex/_generated/dataModel";
 import { Map } from "@buzztrip/db/types";
 import { mapsEditSchema } from "@buzztrip/db/zod-schemas";
 import { useMediaQuery } from "@uidotdev/usehooks";
+import { useMutation } from "convex/react";
 import { Plus } from "lucide-react";
 import * as React from "react";
 import { useState } from "react";
@@ -33,6 +35,7 @@ import {
   MapFormProvider,
   RefinedUserWithPermission,
 } from "../map-form/provider";
+
 export interface CreateMapModalProps {
   setMap?: (map: Map | null) => void;
   trigger?: React.ReactNode;
@@ -89,7 +92,7 @@ export default function CreateMapModal({
           <DrawerTitle>Create Map</DrawerTitle>
           <DrawerDescription>Start your travel plans here</DrawerDescription>
         </DrawerHeader>
-          <MapForm setMap={setMap} setOpen={setOpen} />
+        <MapForm setMap={setMap} setOpen={setOpen} />
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
             <Button variant="outline">Cancel</Button>
@@ -107,6 +110,7 @@ function MapForm({
   const { data } = useSession();
   const userId = data?.session.userId;
   const [users, setUsers] = useState<RefinedUserWithPermission[] | null>(null);
+  const createMap = useMutation(api.maps.index.createMap);
 
   const onSubmit = async (data: z.infer<typeof mapsEditSchema>) => {
     if (!userId) {
@@ -117,29 +121,46 @@ function MapForm({
       const newUsers =
         users?.map((user) => {
           return {
-            user_id: user.id,
+            userId: user.id as Id<"users">,
             permission: user.permission,
           };
-        }) ?? null;
+        }) ?? undefined;
 
-      const create = apiClient.map.create.$post({
-        json: {
-          map: {
-            ...data,
-            owner_id: userId!,
-          },
-          users: newUsers,
+      // const create = apiClient.map.create.$post({
+      //   json: {
+      //     map: {
+      //       ...data,
+      //       owner_id: userId!,
+      //     },
+      //     users: newUsers,
+      //   },
+      // });
+      const create = createMap({
+        users: newUsers,
+        map: {
+          ...data,
+          description: data.description ?? undefined,
+          title: data.title ?? undefined,
+          image: data.image ?? undefined,
+          icon: data.icon ?? "Map",
+          color: data.color ?? undefined,
+          visibility: data.visibility ?? "private",
+          lat: data.lat ?? undefined,
+          lng: data.lng ?? undefined,
+          location_name: data.location_name ?? undefined,
+          bounds: data.bounds ?? undefined,
+          owner_id: "kn786m7j5abny5ws9zkv5e5wfh7h1dw5" as Id<"users">,
         },
       });
 
       toast.promise(create, {
         loading: "Creating map...",
         success: async (res) => {
-          if (res.status === 200 && setMap) {
-            const d = await res.json();
-            setMap(d.map ?? null);
-            setOpen(false);
-          }
+          // if (res.status === 200 && setMap) {
+          //   const d = await res.json();
+          //   setMap(d.map ?? null);
+          //   setOpen(false);
+          // }
           return "Map created successfully!";
         },
         error: "Failed to create map",

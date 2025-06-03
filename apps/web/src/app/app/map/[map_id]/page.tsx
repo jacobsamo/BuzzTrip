@@ -12,10 +12,16 @@ type Params = Promise<{ map_id: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { map_id } = await params;
+  
 
   const map = await db.query.maps.findFirst({
     where: eq(maps.map_id, map_id),
   });
+
+  // console.log("generateMetadata", {
+  //   map_id,
+  //   map,
+  // });
 
   return constructMetadata({
     title: map?.title,
@@ -26,13 +32,16 @@ export async function generateMetadata({ params }: { params: Params }) {
 export default async function MapPage({ params }: { params: Params }) {
   const { map_id } = await params;
   const { data } = await getSession();
+    console.log("page", {
+    map_id,
+  });
 
   if (!data || !data.session || !map_id) {
     return notFound();
   }
 
   const [foundCollections, collectionLinks, foundMarkers, sharedMap, [map]] =
-    await getAllMapData(db, map_id);
+    await getAllMapData(db, map_id.toString());
 
   if (
     (sharedMap &&
