@@ -7,6 +7,10 @@ import {
   mutation,
   query,
 } from "./_generated/server";
+import { GeospatialIndex } from "@convex-dev/geospatial";
+import { components } from "./_generated/api";
+
+export const geospatial = new GeospatialIndex(components.geospatial);
 
 export function withoutSystemFields<
   T extends { _creationTime: number; _id: Id<any> },

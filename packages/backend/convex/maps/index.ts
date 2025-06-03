@@ -1,59 +1,21 @@
+import { getManyFrom } from "convex-helpers/server/relationships";
 import { zid } from "convex-helpers/server/zod";
 import { z } from "zod";
-import type { CombinedMarker, IconType } from "../../../db/src/types";
 import type { UserMap } from "../../types";
 import {
-  mapEditSchema,
+  mapsEditSchema,
   mapUserSchema,
+  refinedUserSchema,
   userMapsSchema,
 } from "../../zod-schemas";
 import { Id } from "../_generated/dataModel";
 import { MutationCtx } from "../_generated/server";
-import { zodMutation, zodQuery } from "../helpers";
+import { authedMutation, authedQuery } from "../helpers";
+import { createMapUser } from "./mapUsers";
 
 // Get methods
 
-export const getMarkersView = zodQuery({
-  args: {
-    map_id: zid("maps"),
-    markerId: z.optional(zid("markers")),
-  },
-  handler: async (ctx, { map_id, markerId }) => {
-    // Build the initial query on the markers table
-    let markersQuery = ctx.db
-      .query("markers")
-      .withIndex("by_map_id", (q) => q.eq("map_id", map_id));
-
-    // If markerId is provided, add an additional filter
-    if (markerId) {
-      markersQuery = markersQuery.filter((q) => q.eq(q.field("_id"), markerId));
-    }
-
-    // Execute the query to get the markers
-    const markers = await markersQuery.collect();
-
-    // For each marker, fetch the associated place and combine the data
-    const combinedMarkers = await Promise.all(
-      markers.map(async (marker) => {
-        const place = await ctx.db.get(marker.place_id);
-
-        const newMarker: CombinedMarker = {
-          ...marker,
-          lat: place?.lat ?? marker.lat,
-          lng: place?.lng ?? marker.lng,
-          place_id: place?._id ?? marker.place_id,
-          bounds: place?.bounds ?? null,
-          icon: marker.icon as IconType,
-        };
-        return newMarker;
-      })
-    );
-
-    return combinedMarkers;
-  },
-});
-
-export const getMapUsers = zodQuery({
+export const getMapUsers = authedQuery({
   args: {
     mapId: zid("maps"),
   },
@@ -64,7 +26,7 @@ export const getMapUsers = zodQuery({
   },
 });
 
-export const getMap = zodQuery({
+export const getMap = authedQuery({
   args: {
     mapId: zid("maps"),
   },
@@ -77,7 +39,7 @@ export const getMap = zodQuery({
 export const getAllMapData = null;
 
 // get all the maps for a user
-export const getUserMaps = zodQuery({
+export const getUserMaps = authedQuery({
   args: {
     userId: zid("user"),
   },
@@ -110,13 +72,10 @@ export const getUserMaps = zodQuery({
   },
 });
 
-export const searchUsers = zodQuery({
-  args: {},
-  handler: async (ctx, args) => {},
-});
+
 
 // // Mutations
-export const createMap = zodMutation({
+export const createMap = authedMutation({
   args: {
     users: mapUserSchema
       .pick({
@@ -125,13 +84,15 @@ export const createMap = zodMutation({
       })
       .array()
       .optional(),
-    map: mapEditSchema,
+    map: mapsEditSchema,
   },
   handler: async (ctx, args) => {
     const { users, map } = args;
 
-    const mapId = await ctx.db.insert("maps", map);
-    const newMap = await ctx.db.get(mapId);
+    const mapId = await ctx.db.insert("maps", {
+      ...map,
+      owner_id: ctx.user._id,
+    });
 
     await createMapUser(ctx, {
       user_id: map.owner_id,
@@ -153,13 +114,25 @@ export const createMap = zodMutation({
   },
 });
 
-async function createMapUser(
-  ctx: MutationCtx,
-  user: {
-    user_id: Id<"user">;
-    permission: "owner" | "editor" | "viewer" | "commenter";
-    map_id: Id<"maps">;
-  }
-) {
-  await ctx.db.insert("map_users", user);
-}
+export const updateMap = authedMutation({
+  args: {
+    map: mapsEditSchema,
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.replace(args.map._id! as Id<"maps">, {
+      ...args.map,
+      _id: args.map._id as Id<"maps">,
+      owner_id: args.map.owner_id as Id<"user">,
+      updatedAt: new Date().toISOString(),
+    });
+  },
+});
+
+export const deleteMap = authedMutation({
+  args: {
+    mapId: zid("maps"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.mapId as Id<"maps">);
+  },
+});

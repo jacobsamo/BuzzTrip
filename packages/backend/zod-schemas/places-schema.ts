@@ -1,7 +1,7 @@
 import { zid } from "convex-helpers/server/zod";
 import * as z from "zod";
 import {
-  bounds,
+  boundsSchema,
   defaultSchema,
   iconSchema,
   insertSchema,
@@ -12,7 +12,7 @@ export const placesSchema = defaultSchema(
     description: z.string().optional(),
     lat: z.number(),
     lng: z.number(),
-    bounds: bounds,
+    bounds: boundsSchema,
     address: z.string(),
     gm_place_id: z.string(), // google maps place id
     mb_place_id: z.string(), // mapbox place id

@@ -17,6 +17,7 @@
   "description": "",
   "dependencies": {
     "@better-auth-kit/convex": "^1.2.2",
+    "@convex-dev/geospatial": "^0.1.9",
     "convex": "^1.24.3",
     "convex-helpers": "^0.1.90"
   }

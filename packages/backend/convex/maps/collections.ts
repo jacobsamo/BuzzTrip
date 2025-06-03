@@ -1,5 +1,6 @@
-import { z } from "zod";
-import {  zid } from "convex-helpers/server/zod";
+import { zid } from "convex-helpers/server/zod";
+import { IconType } from "../../types";
+import { collectionsEditSchema } from "../../zod-schemas";
 import { authedMutation, authedQuery } from "../helpers";
 
 export const getCollectionsForMap = authedQuery({
@@ -26,22 +27,38 @@ export const getCollectionLinksForMap = authedQuery({
 
 // Mutations for collections
 export const createCollection = authedMutation({
-  args: {
-    mapId: zid("maps"),
-    userId: zid("user"),
-    title: z.string(),
-    description: z.string(),
-    icon: z.string(),
-    color: z.string(),
-  },
+  args: collectionsEditSchema,
   handler: async (ctx, args) => {
     return await ctx.db.insert("collections", {
-      map_id: args.mapId,
-      created_by: args.userId,
-      title: args.title,
-      description: args.description,
-      icon: args.icon,
-      color: args.color,
+      ...args,
+      icon: args.icon as IconType,
+      created_by: ctx.user._id,
     });
+  },
+});
+
+export const editCollection = authedMutation({
+  args: {
+    collectionId: zid("collections"),
+    collection: collectionsEditSchema,
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.replace(args.collectionId, {
+      ...args.collection,
+      _id: args.collectionId,
+      created_by: ctx.user._id,
+    });
+
+    return args.collectionId;
+  },
+});
+
+export const deleteCollection = authedMutation({
+  args: {
+    collectionId: zid("collections"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.collectionId);
+    return args.collectionId;
   },
 });

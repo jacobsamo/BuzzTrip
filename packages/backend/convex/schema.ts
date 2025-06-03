@@ -55,11 +55,17 @@ export default defineSchema({
     .index("fq_place_id_ixd", ["fq_place_id"])
     .index("places_lat_idx", ["lat"])
     .index("places_lng_idx", ["lng"])
+    .index("by_place_lat_lng", ["lat", "lng"])
     .index("places_address_idx", ["address"]),
   places_reviews: defineTable(zodToConvex(placesReviewSchema)),
   place_photos: defineTable(zodToConvex(placePhotoSchema)),
   // better auth items
-  user: defineTable(zodToConvex(userSchema)).index("by_email", ["email"]),
+  user: defineTable(zodToConvex(userSchema))
+    .index("by_email", ["email"])
+    .searchIndex("search_user", {
+      searchField: "name",
+      filterFields: ["email", "username"],
+    }),
   session: defineTable(zodToConvex(sessionSchema))
     .index("byToken", ["token"])
     .index("byUserId", ["userId"]),

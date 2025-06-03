@@ -66,6 +66,7 @@ const labelSchema = z.object({
   description: z.string(),
   icon: iconSchema.nullish(),
   color: z.string().optional(),
+  created_by: zid("user"),
   updatedAt: z.string().datetime().optional(),
 });
 
@@ -117,8 +118,8 @@ export const collectionsEditSchema = insertSchema(collectionsSchema);
 
 export const collection_linksSchema = defaultSchema(
   z.object({
-    collection_id: zid("collection_id"),
-    marker_id: zid("marker_id"),
+    collection_id: zid("collections"),
+    marker_id: zid("markers"),
     map_id: zid("maps"),
     user_id: zid("user"),
   })
@@ -141,8 +142,8 @@ export const routesEditSchema = insertSchema(routesSchema);
 export const route_stopsSchema = defaultSchema(
   z.object({
     map_id: zid("maps"),
-    route_id: zid("route_id"),
-    marker_id: zid("marker_id"),
+    route_id: zid("routes"),
+    marker_id: zid("markers"),
     user_id: zid("user"),
     lat: z.number(),
     lng: z.number(),
