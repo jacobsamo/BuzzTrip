@@ -39,7 +39,7 @@ export const placesSchema = {
   }),
   place_photos: defineTable({
     place_id: v.id("places"),
-    user_id: v.id("users"),
+    user_id: v.id("user"),
     photo_url: v.string(),
     width: v.number(),
     height: v.number(),

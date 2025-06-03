@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.817.0",
+    "@better-auth-kit/convex": "^1.2.2",
     "@buzztrip/db": "workspace:*",
     "@buzztrip/transactional": "workspace:*",
     "@hono/swagger-ui": "^0.5.1",
@@ -24,6 +25,7 @@
     "@polar-sh/better-auth": "^1.0.1",
     "@sentry/cloudflare": "^9.22.0",
     "better-auth": "^1.2.8",
+    "convex": "^1.24.6",
     "file-type": "^21.0.0",
     "hono": "^4.7.10"
   },

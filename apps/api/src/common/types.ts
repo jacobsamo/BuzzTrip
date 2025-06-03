@@ -9,6 +9,8 @@ import type { SecureHeadersVariables } from 'hono/secure-headers'
 
 export interface Bindings {
   AUTH_SECRET: string;
+  BETTER_AUTH_URL: string;
+  CONVEX_URL: string;
   GOOGLE_CLIENT_SECRET: string;
   GOOGLE_CLIENT_ID: string;
   TURSO_CONNECTION_URL: string;

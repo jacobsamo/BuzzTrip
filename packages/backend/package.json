@@ -11,6 +11,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "convex": "^1.24.3"
+    "@better-auth-kit/convex": "^1.2.2",
+    "convex": "^1.24.3",
+    "convex-helpers": "^0.1.90"
   }
 }

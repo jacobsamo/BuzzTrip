@@ -1,13 +1,17 @@
+import { convexAdapter } from "@better-auth-kit/convex";
 import { generateId } from "@buzztrip/db/helpers";
-import * as schemas from "@buzztrip/db/schemas";
 import { checkout, polar, portal, usage } from "@polar-sh/better-auth";
 import { Polar } from "@polar-sh/sdk";
 import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { admin, magicLink, twoFactor } from "better-auth/plugins";
+import { jwt, magicLink, twoFactor } from "better-auth/plugins";
 import { passkey } from "better-auth/plugins/passkey";
-import { db } from "./db";
+import { ConvexHttpClient } from "convex/browser";
 import { generateOTP } from "./generateOTP";
+// import {} from "../../../../packages/backend/convex"
+
+const convexClient = new ConvexHttpClient(
+  "https://brave-pheasant-119.convex.cloud"
+);
 
 const client = new Polar({
   accessToken: process.env.POLAR_ACCESS_TOKEN,
@@ -25,9 +29,9 @@ export const auth = betterAuth({
   basePath: "/auth",
   secret: process.env.AUTH_SECRET!,
   trustedOrigins: [process.env.FRONT_END_URL!, process.env.API_URL!],
-  database: drizzleAdapter(db, {
-    provider: "sqlite", // or "mysql", "sqlite"`
-    schema: { ...schemas, user: schemas.users },
+  database: convexAdapter(convexClient, {
+    convex_dir_path: "../../../../packages/backend/convex",
+    enable_debug_logs: true,
   }),
   // https://www.better-auth.com/docs/authentication/email-password
   emailAndPassword: { enabled: false, requireEmailVerification: true },
@@ -164,7 +168,13 @@ export const auth = betterAuth({
     twoFactor({
       issuer: "buzztrip",
     }),
-    admin(),
+    jwt({
+      jwks: {
+        keyPairConfig: {
+          alg: "RS256", //https://www.better-auth-kit.com/docs/adapters/convex#using-jwt-plugin-in-convex
+        },
+      },
+    }),
   ],
 
   onAPIError: {
@@ -176,7 +186,6 @@ export const auth = betterAuth({
 
   // Alter user, session, account and verification models & settings
   user: {
-    modelName: "users",
     additionalFields: {
       first_name: {
         type: "string",
@@ -203,15 +212,8 @@ export const auth = betterAuth({
         input: false,
       },
     },
-    fields: {
-      // name: "full_name",
-      // image: "profile_picture",
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-    },
   },
   session: {
-    modelName: "user_sessions",
     cookieCache: {
       enabled: true,
       maxAge: 5 * 60, // 7 days
@@ -220,11 +222,9 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24, // 1 day (every 1 day the session expiration is updated)
   },
   verification: {
-    modelName: "user_verifications",
     disableCleanup: true, // TODO: change this in the future
   },
   account: {
-    modelName: "user_accounts",
     accountLinking: {
       enabled: true,
       allowDifferentEmails: true,

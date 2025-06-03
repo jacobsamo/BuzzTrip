@@ -27,7 +27,7 @@ export const getCollectionLinksForMap = query({
 export const createCollection = mutation({
   args: {
     mapId: v.id("maps"),
-    userId: v.id("users"),
+    userId: v.id("user"),
     title: v.string(),
     description: v.string(),
     icon: v.string(),

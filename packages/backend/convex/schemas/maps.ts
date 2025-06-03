@@ -18,7 +18,7 @@ export const mapSchema = {
   image: v.optional(v.string()),
   icon: v.optional(v.string()),
   color: v.optional(v.string()),
-  owner_id: v.id("users"),
+  owner_id: v.id("user"),
   location_name: v.optional(v.string()), // the location where the map is saved too e.g Brisbane, Australia, etc
   lat: v.optional(v.float64()),
   lng: v.optional(v.float64()),
@@ -32,7 +32,7 @@ export const mapSchema = {
 
 export const mapUserSchema = {
   map_id: v.id("maps"),
-  user_id: v.id("users"),
+  user_id: v.id("user"),
   permission: permissionEnum,
 };
 
@@ -73,7 +73,7 @@ export const mapsSchema = {
     collection_id: v.id("collection_id"),
     marker_id: v.id("marker_id"),
     map_id: v.id("maps"),
-    user_id: v.id("users"),
+    user_id: v.id("user"),
   })
     .index("by_map_id", ["map_id"])
     .index("by_collection_id", ["collection_id"]),
@@ -87,13 +87,13 @@ export const mapsSchema = {
       v.literal("transit"),
       v.literal("bicycling")
     ),
-    user_id: v.id("users"),
+    user_id: v.id("user"),
   }).index("by_map_id", ["map_id"]),
   route_stops: defineTable({
     map_id: v.id("maps"),
     route_id: v.id("route_id"),
     marker_id: v.id("marker_id"),
-    user_id: v.id("users"),
+    user_id: v.id("user"),
     lat: v.float64(),
     lng: v.float64(),
     stop_order: v.number(),

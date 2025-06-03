@@ -72,7 +72,7 @@ export const getAllMapData = null;
 // get all the maps for a user
 export const getUserMaps = query({
   args: {
-    userId: v.id("users"),
+    userId: v.id("user"),
   },
   handler: async (ctx, args) => {
     // we want all the links that a user could be added too
@@ -113,7 +113,7 @@ export const createMap = mutation({
     users: v.optional(
       v.array(
         v.object({
-          userId: v.id("users"),
+          userId: v.id("user"),
           permission: permissionEnum,
         })
       )
@@ -126,15 +126,14 @@ export const createMap = mutation({
     const mapId = await ctx.db.insert("maps", map);
     const newMap = await ctx.db.get(mapId);
 
-        await createMapUser(ctx, {
-          user_id: map.owner_id,
-          permission: "owner",
-          map_id: mapId,
-        })
+    await createMapUser(ctx, {
+      user_id: map.owner_id,
+      permission: "owner",
+      map_id: mapId,
+    });
 
     if (users) {
       await Promise.all([
-    
         users.map((user) =>
           createMapUser(ctx, {
             user_id: user.userId,
