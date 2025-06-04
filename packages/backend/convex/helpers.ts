@@ -1,5 +1,7 @@
+import { GeospatialIndex } from "@convex-dev/geospatial";
 import { NoOp } from "convex-helpers/server/customFunctions";
 import { zCustomMutation, zCustomQuery } from "convex-helpers/server/zod";
+import { components } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import {
   type MutationCtx,
@@ -7,8 +9,6 @@ import {
   mutation,
   query,
 } from "./_generated/server";
-import { GeospatialIndex } from "@convex-dev/geospatial";
-import { components } from "./_generated/api";
 
 export const geospatial = new GeospatialIndex(components.geospatial);
 
@@ -40,7 +40,13 @@ export const authedMutation = zCustomMutation(mutation, {
     console.log("USER", user);
     if (!user) throw new Error("Unauthorized");
 
-    return { ctx: { ...ctx, user }, args };
+    return {
+      ctx: {
+        ...ctx,
+        user,
+      },
+      args,
+    };
   },
 });
 

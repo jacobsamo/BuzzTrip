@@ -1,16 +1,17 @@
 import { zid } from "convex-helpers/server/zod";
 import { IconType } from "../../types";
-import { collectionsEditSchema } from "../../zod-schemas";
+import { collectionsEditSchema, collectionsSchema, collection_linksSchema } from "../../zod-schemas";
 import { authedMutation, authedQuery } from "../helpers";
 
 export const getCollectionsForMap = authedQuery({
   args: {
     mapId: zid("maps"),
   },
+  returns: collectionsSchema.array().nullable(),
   handler: async (ctx, args) => {
     return await ctx.db
       .query("collections")
-      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId));
+      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId)).collect();
   },
 });
 
@@ -18,10 +19,11 @@ export const getCollectionLinksForMap = authedQuery({
   args: {
     mapId: zid("maps"),
   },
+  returns: collection_linksSchema.array().nullable(),
   handler: async (ctx, args) => {
     return await ctx.db
       .query("collection_links")
-      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId));
+      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId)).collect();
   },
 });
 

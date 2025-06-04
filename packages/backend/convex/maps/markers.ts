@@ -11,6 +11,7 @@ export const getMarkersView = authedQuery({
     map_id: zid("maps"),
     markerId: z.optional(zid("markers")),
   },
+  returns: combinedMarkersSchema.array().nullable(),
   handler: async (ctx, { map_id, markerId }) => {
     // Build the initial query on the markers table
     let markersQuery = ctx.db
@@ -43,9 +44,9 @@ export const getMarkersView = authedQuery({
 
         return newMarker;
       })
-    );
+    )
 
-    return combinedMarkers;
+    return combinedMarkers.filter((m): m is CombinedMarker => !!m);;
   },
 });
 

@@ -23,6 +23,7 @@ import {
   route_stopsSchema,
   routesEditSchema,
   routesSchema,
+  shareMapUserSchema,
   travelTypeEnumSchema,
   userMapsSchema,
   userSchema,
@@ -39,6 +40,8 @@ export type RefinedUser = z.infer<typeof refinedUserSchema>;
 
 export type Map = z.infer<typeof mapsSchema>;
 export type NewMap = z.infer<typeof mapsEditSchema>;
+
+export type ShareMapUser = z.infer<typeof shareMapUserSchema>;
 
 export type Label = z.infer<typeof labelsSchema>;
 export type NewLabel = z.infer<typeof labelsEditSchema>;

@@ -29,13 +29,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/lib/auth-client";
 import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
-import { apiClient } from "@/server/api.client";
+import { api } from "@buzztrip/backend/api";
 import type { IconType } from "@buzztrip/backend/types";
 import { CombinedMarker } from "@buzztrip/backend/types";
 import { combinedMarkersSchema } from "@buzztrip/backend/zod-schemas";
 import { popularIconsList } from "@buzztrip/components/icon";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "@uidotdev/usehooks";
+import { useMutation } from "convex/react";
 import { Circle, CircleCheck } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -124,6 +125,8 @@ const schema = z.object({
 });
 
 function MarkerForm() {
+  const createMarker = useMutation(api.maps.markers.createMarker);
+  const updateMarker = useMutation(api.maps.markers.updateMarker);
   const {
     collections,
     setMarkers,
@@ -208,15 +211,23 @@ function MarkerForm() {
           (collectionId) => !selectedCollections.includes(collectionId)
         );
 
-        const updatedMarker = apiClient.map[":mapId"].marker[":markerId"].$put({
-          param: { mapId: map!.map_id, markerId: markerId! },
-          json: {
-            marker_id: markerId!,
-            marker: data,
-            collectionIds_to_add: collectionsToAdd,
-            collectionIds_to_remove: collectionsToRemove,
-            userId: userId!,
-          },
+        // const updatedMarker = apiClient.map[":mapId"].marker[":markerId"].$put({
+        //   param: { mapId: map!.map_id, markerId: markerId! },
+        //   json: {
+        //     marker_id: markerId!,
+        //     marker: data,
+        //     collectionIds_to_add: collectionsToAdd,
+        //     collectionIds_to_remove: collectionsToRemove,
+        //     userId: userId!,
+        //   },
+        // });
+
+        const updatedMarker = updateMarker({
+          marker_id: markerId,
+          marker: data,
+          collectionIds_to_add: collectionsToAdd,
+          collectionIds_to_remove: collectionsToRemove,
+          userId: userId!,
         });
 
         toast.promise(updatedMarker, {
@@ -247,15 +258,13 @@ function MarkerForm() {
       }
 
       if (mode == "create") {
-        const createMarker = apiClient.map[":mapId"].marker.create.$post({
-          param: { mapId: map!.map_id },
-          json: {
-            marker: {
-              ...data,
-            },
-            collectionIds: cols,
-            userId: userId!,
+        const createdMarker = createMarker({
+          marker: {
+            ...data,
+            created_by: userId!,
           },
+          collectionIds: cols,
+          map_id: map!.map_id,
         });
 
         toast.promise(createMarker, {

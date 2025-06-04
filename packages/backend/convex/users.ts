@@ -16,7 +16,7 @@ export const searchUsers = authedQuery({
 
     return searchUsers.map((user) => ({
       ...user,
-    }));
+    })) ?? null;
   },
 });
 

@@ -58,6 +58,11 @@ export const mapUserSchema = defaultSchema(
   })
 );
 
+export const shareMapUserSchema = mapUserSchema.pick({
+  user_id: true,
+  permission: true,
+});
+
 export const mapUserEditSchema = insertSchema(mapUserSchema);
 
 const labelSchema = z.object({

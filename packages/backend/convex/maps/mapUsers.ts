@@ -1,6 +1,6 @@
 import { getManyFrom } from "convex-helpers/server/relationships";
 import { zid } from "convex-helpers/server/zod";
-import { mapUserSchema } from "../../zod-schemas";
+import { mapUserSchema, shareMapUserSchema } from "../../zod-schemas";
 import { Id } from "../_generated/dataModel";
 import { MutationCtx } from "../_generated/server";
 import { authedMutation, authedQuery } from "../helpers";
@@ -34,7 +34,7 @@ export async function createMapUser(
 export const shareMap = authedMutation({
   args: {
     mapId: zid("maps"),
-    users: mapUserSchema
+    users: shareMapUserSchema
       .pick({
         user_id: true,
         permission: true,
@@ -78,7 +78,6 @@ export const editMapUser = authedMutation({
     });
   },
 });
-
 
 export const deleteMapUser = authedMutation({
   args: {

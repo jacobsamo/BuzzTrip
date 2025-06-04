@@ -1,177 +1,53 @@
+import { api } from "@buzztrip/backend/api";
+import { Id } from "@buzztrip/backend/dataModel";
+import type { CombinedMarker, Map } from "@buzztrip/backend/types";
+import { useQuery } from "convex/react";
 import { createStore as createZustandStore } from "zustand/vanilla";
 import { defaultState, StoreActions, type StoreState } from "./default-state";
 
-import { api } from "@buzztrip/backend/convex/_generated/api";
-import { Id } from "@buzztrip/backend/convex/_generated/dataModel";
-import type {
-  Collection,
-  CollectionLink,
-  CombinedMarker,
-  Map,
-  MapUser,
-  Route,
-  RouteStop,
-} from "@buzztrip/backend/types";
-import { useQuery } from "convex/react";
-
 export type Store = StoreState & StoreActions;
 
-export const createStore = (initState: Partial<StoreState>) =>
+export type InitState = {
+  map: Map;
+};
+
+export const createStore = (initState: InitState) =>
   createZustandStore<Store>()((set, get) => {
-    const markers = useQuery(api.maps.index.getMarkersView, {
-      map_id: initState.map!.map_id as Id<"maps">,
+    const markers = useQuery(api.maps.markers.getMarkersView, {
+      map_id: initState.map._id as Id<"maps">,
     });
+    const collections = useQuery(api.maps.collections.getCollectionsForMap, {
+      mapId: initState.map._id as Id<"maps">,
+    });
+    const collectionLinks = useQuery(
+      api.maps.collections.getCollectionLinksForMap,
+      {
+        mapId: initState.map._id as Id<"maps">,
+      }
+    );
+    const labels = useQuery(api.maps.labels.getMapLabels, {
+      mapId: initState.map._id as Id<"maps">,
+    });
+    const mapUsers = useQuery(api.maps.mapUsers.getMapUsers, {
+      mapId: initState.map._id as Id<"maps">,
+    });
+    // const routes = useQuery(api.maps.routes.getRoutesForMap , {
+    //   map_id: initState.map._id as Id<"maps">,
+    // })
+    // const routeStops = useQuery(api.maps.routes.getRouteStopsForMap , {
+    //   map_id: initState.map._id as Id<"maps">,
+    // })
 
     return {
       ...defaultState,
       ...initState,
       markers: markers ?? null,
-      setCollectionLinks: (collectionLinks: CollectionLink[] | null) => {
-        if (!collectionLinks) return;
-
-        return set(({ collectionLinks: prevCollectionLinks }) => {
-          const prevCollectionLinksMap = prevCollectionLinks
-            ? new Map(
-                prevCollectionLinks.map((collectionLink) => [
-                  collectionLink.link_id,
-                  collectionLink,
-                ])
-              )
-            : new Map();
-
-          collectionLinks.forEach((collectionLink) => {
-            prevCollectionLinksMap.set(collectionLink.link_id, {
-              ...prevCollectionLinksMap.get(collectionLink.link_id),
-              ...collectionLink,
-            });
-          });
-
-          const updatedCollectionLinks = Array.from(
-            prevCollectionLinksMap.values()
-          );
-
-          return { collectionLinks: updatedCollectionLinks };
-        });
-      },
-      setCollections: (collections: Collection[] | null) => {
-        if (!collections) return;
-
-        return set(({ collections: prevCollections }) => {
-          const prevCollectionsMap = prevCollections
-            ? new Map(
-                prevCollections.map((collection) => [
-                  collection.collection_id,
-                  collection,
-                ])
-              )
-            : new Map();
-
-          collections.forEach((collection) => {
-            prevCollectionsMap.set(collection.collection_id, {
-              ...prevCollectionsMap.get(collection.collection_id),
-              ...collection,
-            });
-          });
-
-          const updatedCollections = Array.from(prevCollectionsMap.values());
-
-          return { collections: updatedCollections };
-        });
-      },
-      setMapUsers: (mapUsers: MapUser[] | null) => {
-        if (!mapUsers) return;
-
-        return set(({ mapUsers: prevMapUsers }) => {
-          const prevMapUsersMap = prevMapUsers
-            ? new Map(prevMapUsers.map((mapUser) => [mapUser.map_id, mapUser]))
-            : new Map();
-
-          mapUsers.forEach((mapUser) => {
-            prevMapUsersMap.set(mapUser.map_id, {
-              ...prevMapUsersMap.get(mapUser.map_id),
-              ...mapUser,
-            });
-          });
-
-          return { mapUsers: Array.from(prevMapUsersMap.values()) };
-        });
-      },
-      setMap: (map: Map | null) => {
-        if (!map) return;
-
-        return set({ map: map });
-      },
-      setMarkers: (markers: CombinedMarker[] | null) => {
-        // if (!markers) return;
-
-        // return set(({ markers: prevMarkers }) => {
-        //   const prevMarkersMap = prevMarkers
-        //     ? new Map(prevMarkers.map((marker) => [marker.marker_id, marker]))
-        //     : new Map();
-
-        //   markers.forEach((marker) => {
-        //     prevMarkersMap.set(marker.marker_id, {
-        //       ...prevMarkersMap.get(marker.marker_id),
-        //       ...marker,
-        //     });
-        //   });
-
-        //   const updatedMarkers = Array.from(prevMarkersMap.values());
-
-        //   return {
-        //     markers: updatedMarkers,
-        //     searchValue: null,
-        //     activeLocation: null,
-        //   };
-        // });
-        set(() => ({
-          searchValue: null,
-          activeLocation: null,
-        }));
-      },
-      setRoute: (routes: Route[] | null) => {
-        if (!routes) return;
-
-        return set(({ routes: prevRoutes }) => {
-          const prevRouteMap = prevRoutes
-            ? new Map(prevRoutes.map((route) => [route.route_id, route]))
-            : new Map();
-
-          routes.forEach((route) => {
-            prevRouteMap.set(route.route_id, {
-              ...prevRouteMap.get(route.route_id),
-              ...route,
-            });
-          });
-          const updatedRoute = Array.from(prevRouteMap.values());
-
-          return { routes: updatedRoute };
-        });
-      },
-      setRouteStops: (routeStops: RouteStop[] | null) => {
-        if (!routeStops) return;
-
-        return set(({ routeStops: prevRouteStops }) => {
-          const prevRouteStopsMap = prevRouteStops
-            ? new Map(
-                prevRouteStops.map((routeStop) => [
-                  routeStop.route_stop_id,
-                  routeStop,
-                ])
-              )
-            : new Map();
-
-          routeStops.forEach((routeStop) => {
-            prevRouteStopsMap.set(routeStop.route_stop_id, {
-              ...prevRouteStopsMap.get(routeStop.route_stop_id),
-              ...routeStop,
-            });
-          });
-          const updatedRouteStops = Array.from(prevRouteStopsMap.values());
-
-          return { routeStops: updatedRouteStops };
-        });
-      },
+      collections: collections ?? null,
+      collectionLinks: collectionLinks ?? null,
+      labels: labels ?? null,
+      mapUsers: mapUsers ?? null,
+      routes: null,
+      routeStops: null,
       getCollectionsForMarker: (markerId: string | null) => {
         if (!markerId) return null;
         const links = get().collectionLinks;
@@ -184,7 +60,7 @@ export const createStore = (initState: Partial<StoreState>) =>
 
         // Get the collections that match the collection IDs
         const markerCollections = collections.filter((collection) =>
-          collectionIds.includes(collection.collection_id)
+          collectionIds.includes(collection._id as Id<"collections">)
         );
 
         return markerCollections;
@@ -202,29 +78,12 @@ export const createStore = (initState: Partial<StoreState>) =>
 
         // Get the markers that match the marker IDs
         const collectionLinks = markers.filter((marker) =>
-          markerIds.includes(marker.marker_id!)
+          markerIds.includes(marker._id as Id<"markers">)
         );
 
         return collectionLinks;
       },
-      removeCollectionLinks: (collectionLinks: string | string[]) => {
-        return set(({ collectionLinks: prevLinks }) => {
-          let newLinks = prevLinks ? [...prevLinks] : [];
-
-          if (Array.isArray(collectionLinks)) {
-            newLinks = newLinks.filter(
-              (link) => !collectionLinks.includes(link.link_id)
-            );
-          } else {
-            newLinks = newLinks.filter(
-              (link) => link.collection_id !== collectionLinks
-            );
-          }
-
-          return { collectionLinks: newLinks };
-        });
-      },
-
+    
       // Modals
       setActiveLocation: (place: CombinedMarker | null) =>
         set(() => {

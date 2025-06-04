@@ -28,10 +28,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { apiClient } from "@/server/api.client";
-import { TShareMapUserSchema } from "@buzztrip/backend/mutations/maps";
-import { PermissionEnum } from "@buzztrip/backend/types";
-import { useQuery } from "@tanstack/react-query";
+import { api } from "@buzztrip/backend/api";
+import { useMutation, useQuery } from "convex/react";
+import { Id } from "@buzztrip/backend/dataModel";
+import { PermissionEnum, ShareMapUser } from "@buzztrip/backend/types";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Circle, CircleCheck, SearchIcon, Share2, X } from "lucide-react";
 import Image from "next/image";
@@ -100,27 +100,15 @@ const Close = ({ children }: { children: React.ReactNode }) => {
 
 function ShareMapForm({ map_id }: ShareMapProps) {
   const [searchValue, setSearchValue] = useState("");
-  const { data: users } = useQuery({
-    queryKey: ["search", searchValue],
-    queryFn: async () => {
-      if (searchValue === "") return undefined;
-      const res = await apiClient.users.search.$get({
-        query: { q: searchValue },
-      });
-      console.log("va;ue", res);
-      if (res.status == 200) {
-        const val = await res.json();
-        return val?.users ?? null;
-      }
-
-      return null;
-    },
-  });
+  const users = useQuery(api.users.searchUsers, {
+query: searchValue
+  })
+  const shareMap = useMutation(api.maps.mapUsers.shareMap)
   const [selectedUsers, setSelectedUsers] = useState<
-    TShareMapUserSchema[] | null
+    ShareMapUser[] | null
   >(null);
 
-  const handleChange = (user: TShareMapUserSchema) => {
+  const handleChange = (user: ShareMapUser) => {
     setSelectedUsers((prev) => {
       if (!prev) return [user];
 
@@ -145,16 +133,14 @@ function ShareMapForm({ map_id }: ShareMapProps) {
   };
 
   const onSubmit = async () => {
-    console.log("usesr", selectedUsers);
+    console.log("users", selectedUsers);
     if (!selectedUsers || selectedUsers.length == 0) return;
 
-    const share = apiClient.map[":mapId"].users.$post({
-      param: { mapId: map_id },
-      json: {
-        users: selectedUsers,
-        mapId: map_id,
-      },
-    });
+
+    const share = shareMap({
+      mapId: map_id as Id<"maps">,
+      users: selectedUsers,
+    })
 
     toast.promise(share, {
       loading: "sharing map...",
@@ -204,21 +190,21 @@ function ShareMapForm({ map_id }: ShareMapProps) {
         {users &&
           users.map((user) => {
             const userSelected = selectedUsers?.find(
-              (u) => u.user_id === user.id
+              (u) => u.user_id === user._id
             );
 
             return (
               <Button
-                key={user.id}
+                key={user._id}
                 onClick={() => {
                   const userSelected = selectedUsers?.find(
-                    (u) => u.user_id === user.id
+                    (u) => u.user_id === user._id
                   );
                   if (userSelected) {
-                    removeUser(user.id);
+                    removeUser(user._id);
                   } else {
                     handleChange({
-                      user_id: user.id,
+                      user._id: user._id,
                       permission: "editor",
                     });
                   }
@@ -235,7 +221,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
                     <Image
                       width={32}
                       height={32}
-                      alt={user.email ?? user.id}
+                      alt={user.email ?? user._id}
                       src={user.image}
                       className="h-8 w-8 rounded-full"
                       unoptimized
@@ -249,7 +235,7 @@ function ShareMapForm({ map_id }: ShareMapProps) {
                   value={userSelected ? userSelected.permission : "editor"}
                   onValueChange={(e) => {
                     handleChange({
-                      user_id: user.id,
+                      user_id: user._id,
                       permission: (e as PermissionEnum) ?? "editor",
                     });
                   }}

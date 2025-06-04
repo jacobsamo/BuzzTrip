@@ -30,18 +30,10 @@ export type StoreState = {
 };
 
 export type StoreActions = {
-  setCollectionLinks: (collectionLinks: CollectionLink[] | null) => void;
-  setCollections: (collections: Collection[] | null) => void;
-  setMapUsers: (mapUsers: MapUser[] | null) => void;
-  setMap: (maps: Map | null) => void;
-  setMarkers: (markers: CombinedMarker[] | null) => void;
-  setRoute: (routes: Route[] | null) => void;
-  setRouteStops: (routeStops: RouteStop[] | null) => void;
   getMarkersForCollection: (
     collectionId: string | null
   ) => CombinedMarker[] | null;
   getCollectionsForMarker: (markerId: string | null) => Collection[] | null;
-  removeCollectionLinks: (collectionIds: string | string[]) => void;
 
   // Modals
   setActiveLocation: (location: CombinedMarker | null) => void;
