@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "clean:all": "rm -rf node_modules/ && rm -rf .next",
-    "dev": "next dev --port 5173 --turbopack",
+    "dev": "next dev --port 5173",
     "dev:secure": "bun dev --experimental-https",
     "scan": "bun dev & bunx react-scan@latest localhost:5173",
     "build": "next build --debug",
@@ -12,8 +12,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@buzztrip/backend": "workspace:*",
     "@better-fetch/fetch": "^1.1.18",
+    "@buzztrip/backend": "workspace:*",
     "@buzztrip/transactional": "workspace:*",
     "@hookform/resolvers": "^5.0.1",
     "@mapbox/search-js-react": "^1.1.0",
@@ -21,7 +21,7 @@
     "@mdx-js/react": "^3.1.0",
     "@next/mdx": "^15.3.3",
     "@polar-sh/better-auth": "^1.0.1",
-    "@polar-sh/sdk": "^0.32.16",
+    "@polar-sh/sdk": "^0.33.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-aspect-ratio": "^1.1.7",

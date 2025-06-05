@@ -13,9 +13,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { User, useSession } from "@/lib/auth-client";
-import { apiClient } from "@/server/api.client";
+import { api } from "@buzztrip/backend/api";
+import { Id } from "@buzztrip/backend/dataModel";
 import { usersEditSchema } from "@buzztrip/backend/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "convex/react";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -41,6 +43,7 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
   const router = useRouter();
   const { data } = auth;
   const user = (data?.user as User | null) ?? null;
+  const updateUser = useMutation(api.users.updateUser);
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -80,6 +83,7 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
 
   const handleSubmit = async (formData: z.infer<typeof schema>) => {
     router.prefetch("/app");
+    if (!user) return;
     let profilePicture = formData.image;
 
     if (profilePictureFile) {
@@ -118,11 +122,9 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
       user: data,
     });
 
-    const updateUserProfile = apiClient.users[":userId"].$put({
-      param: {
-        userId: data?.user?.id!,
-      },
-      json: {
+    const updateUserProfile = updateUser({
+      userId: user.id as Id<"user">,
+      updateData: {
         image: profilePicture,
         first_name: formData.first_name,
         last_name: formData.last_name,

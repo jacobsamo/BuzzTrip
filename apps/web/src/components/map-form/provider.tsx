@@ -1,6 +1,5 @@
 import { Form } from "@/components/ui/form";
 import { useSession } from "@/lib/auth-client";
-import { formatDateForSql, generateId } from "@buzztrip/backend/helpers";
 import { Label, NewLabel, NewMap } from "@buzztrip/backend/types";
 import {
   mapsEditSchema,
@@ -184,7 +183,7 @@ export const MapFormProvider = ({
   const addUser = useCallback((user: RefinedUserWithPermission) => {
     setUsers((prev) => {
       if (!prev) return [user];
-      const exists = prev.find((u) => u.id === user.id);
+      const exists = prev.find((u) => u._id === user._id);
       if (exists) return prev;
       return [...prev, user];
     });
@@ -194,7 +193,7 @@ export const MapFormProvider = ({
   const removeUser = useCallback((userId: string) => {
     setUsers((prev) => {
       if (!prev) return null;
-      const filtered = prev.filter((u) => u.id !== userId);
+      const filtered = prev.filter((u) => u._id !== userId);
       return filtered.length === 0 ? null : filtered;
     });
     onUserChangeRef.current?.({ event: "user:removed", payload: userId });
@@ -205,7 +204,7 @@ export const MapFormProvider = ({
       setUsers((prev) => {
         if (!prev) return null;
         return prev.map((u) => {
-          if (u.id === userId) {
+          if (u._id === userId) {
             const updated = { ...u, ...user };
             return updated;
           }
@@ -224,14 +223,13 @@ export const MapFormProvider = ({
   const addLabel = useCallback((label: NewLabel) => {
     const newLabel: Label = {
       ...label,
-      label_id: label.label_id || generateId("generic"),
+      _id: "",
+      _creationTime: 0,
       map_id: label.map_id!,
       title: label.title ?? "",
-      color: label?.color ?? null,
+      color: label?.color ?? undefined,
       icon: label?.icon ?? null,
       description: label?.description ?? null,
-      created_at: label?.created_at ?? formatDateForSql(new Date()),
-      updated_at: label?.updated_at ?? formatDateForSql(new Date()),
     };
 
     setLabels((prev) => {
@@ -244,7 +242,7 @@ export const MapFormProvider = ({
   const removeLabel = useCallback((labelId: string) => {
     setLabels((prev) => {
       if (!prev) return null;
-      const filtered = prev.filter((l) => l.label_id !== labelId);
+      const filtered = prev.filter((l) => l._id !== labelId);
       return filtered.length === 0 ? null : filtered;
     });
     onLabelChangeRef.current?.({ event: "label:removed", payload: labelId });
@@ -254,7 +252,7 @@ export const MapFormProvider = ({
     setLabels((prev) => {
       if (!prev) return null;
       return prev.map((l) => {
-        if (l.label_id === labelId) {
+        if (l._id === labelId) {
           const updated = { ...l, ...label };
           return updated;
         }

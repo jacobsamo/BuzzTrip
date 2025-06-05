@@ -1,22 +1,29 @@
 import { Map_page } from "@/components/layouts/map-view";
 import { MapStoreProvider } from "@/components/providers/map-state-provider";
 import { constructMetadata } from "@/lib/utils/metadata";
-import { db } from "@/server/db";
 import { getSession } from "@/server/getSession";
-import { getAllMapData } from "@buzztrip/db/queries";
-import { maps } from "@buzztrip/db/schemas";
-import { eq } from "drizzle-orm";
+import { api } from "@buzztrip/backend/api";
+import { Id } from "@buzztrip/backend/dataModel";
+import { type NextjsOptions, fetchQuery } from "convex/nextjs";
+import { env } from "env";
 import { notFound } from "next/navigation";
+
+const options: NextjsOptions = {
+  url: env.NEXT_PUBLIC_CONVEX_URL,
+};
 
 type Params = Promise<{ map_id: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { map_id } = await params;
-  
 
-  const map = await db.query.maps.findFirst({
-    where: eq(maps.map_id, map_id),
-  });
+  const map = await fetchQuery(
+    api.maps.index.getMap,
+    {
+      mapId: map_id as Id<"maps">,
+    },
+    options
+  );
 
   // console.log("generateMetadata", {
   //   map_id,
@@ -32,7 +39,7 @@ export async function generateMetadata({ params }: { params: Params }) {
 export default async function MapPage({ params }: { params: Params }) {
   const { map_id } = await params;
   const { data } = await getSession();
-    console.log("page", {
+  console.log("page", {
     map_id,
   });
 
@@ -40,13 +47,25 @@ export default async function MapPage({ params }: { params: Params }) {
     return notFound();
   }
 
-  const [foundCollections, collectionLinks, foundMarkers, sharedMap, [map]] =
-    await getAllMapData(db, map_id.toString());
+  const map = await fetchQuery(
+    api.maps.index.getMap,
+    {
+      mapId: map_id as Id<"maps">,
+    },
+    options
+  );
+  const mapUsers = await fetchQuery(
+    api.maps.mapUsers.getMapUsers,
+    {
+      mapId: map_id as Id<"maps">,
+    },
+    options
+  );
 
   if (
-    (sharedMap &&
-      sharedMap.length > 0 &&
-      !sharedMap.find((sm) => sm.user_id == data.session.userId)) ||
+    (mapUsers &&
+      mapUsers.length > 0 &&
+      !mapUsers.find((mu) => mu.user_id == data.session.userId)) ||
     !map
   ) {
     return notFound();
@@ -55,16 +74,7 @@ export default async function MapPage({ params }: { params: Params }) {
   return (
     <MapStoreProvider
       initialState={{
-        collections: foundCollections,
-        markers: foundMarkers.map((marker) => ({
-          ...marker,
-          lat: marker.lat as number,
-          lng: marker.lng as number,
-          bounds: marker.bounds ?? null,
-        })),
-        collectionLinks: collectionLinks,
         map: map,
-        mapUsers: sharedMap,
       }}
     >
       <Map_page />

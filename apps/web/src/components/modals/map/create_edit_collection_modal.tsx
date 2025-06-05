@@ -25,7 +25,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
-import { apiClient } from "@/server/api.client";
+import { Id } from "@buzztrip/backend/dataModel";
+import { api } from "@buzztrip/backend/api";
+import { useMutation, useQuery } from "convex/react";
 import { Collection } from "@buzztrip/backend/types";
 import Icon, { otherIconsList } from "@buzztrip/components/icon";
 import { useMediaQuery } from "@uidotdev/usehooks";
@@ -117,9 +119,11 @@ const Close = ({ children }: { children: React.ReactNode }) => {
 };
 
 function CollectionForm({ mode, collection }: CollectionModalProps) {
-  const { setCollections, map } = useMapStore((store) => store);
+  const {  map } = useMapStore((store) => store);
   const { data } = useSession();
   const userId = data?.session.userId;
+  const createCollection = useMutation(api.maps.collections.createCollection)
+  const editCollection = useMutation(api.maps.collections.editCollection);
 
   const { register, handleSubmit, watch, control } = useForm<Collection>({
     defaultValues: {
@@ -133,26 +137,47 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
   const onSubmit: SubmitHandler<Collection> = async (data: Collection) => {
     try {
       if (mode === "create") {
-        const create = apiClient.map[":mapId"].collection.create.$post({
-          param: { mapId: map!.map_id },
-          json: {
-            ...data,
-            created_by: userId!,
-            map_id: map!.map_id,
-          },
+        // const create = apiClient.map[":mapId"].collection.create.$post({
+        //   param: { mapId: map!.map_id },
+        //   json: {
+        //     ...data,
+        //     created_by: userId!,
+        //     map_id: map!.map_id,
+        //   },
+        // });
+
+        const create = createCollection({
+          ...data,
+          map_id: map._id as Id<"maps">,
+          created_by: userId as Id<"user">,
         });
+
 
         toast.promise(create, {
           loading: "Creating collection...",
           success: async (res) => {
-            if (res.status == 200) {
-              const data = await res.json();
-              setCollections([data]);
-            }
             return "Collection created successfully!";
           },
           error: "Failed to create collection",
         });
+      }
+
+      if (mode === "edit" && collection) {
+        const edit = editCollection({
+          collectionId: collection._id as Id<"collections">,
+          collection: {
+            ...data,
+          },
+        });
+
+        toast.promise(edit, {
+          loading: "Editing collection...",
+          success: async (res) => {
+            if (res) {
+              return "Collection edited successfully!";
+            }
+            return "Failed to edit collection";
+          }})
       }
 
       // if (mode === "edit" && collection) {}

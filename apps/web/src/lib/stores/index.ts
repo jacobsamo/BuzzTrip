@@ -3,7 +3,7 @@ import { Id } from "@buzztrip/backend/dataModel";
 import type { CombinedMarker, Map } from "@buzztrip/backend/types";
 import { useQuery } from "convex/react";
 import { createStore as createZustandStore } from "zustand/vanilla";
-import { defaultState, StoreActions, type StoreState } from "./default-state";
+import { StoreActions, type StoreState } from "./default-state";
 
 export type Store = StoreState & StoreActions;
 
@@ -39,8 +39,7 @@ export const createStore = (initState: InitState) =>
     // })
 
     return {
-      ...defaultState,
-      ...initState,
+      map: initState.map,
       markers: markers ?? null,
       collections: collections ?? null,
       collectionLinks: collectionLinks ?? null,
@@ -48,6 +47,15 @@ export const createStore = (initState: InitState) =>
       mapUsers: mapUsers ?? null,
       routes: null,
       routeStops: null,
+      activeLocation: null,
+      collectionsOpen: false,
+      searchValue: null,
+      snap: 0.1,
+      markerOpen: {
+        open: false,
+        marker: null,
+        mode: null,
+      },
       getCollectionsForMarker: (markerId: string | null) => {
         if (!markerId) return null;
         const links = get().collectionLinks;
@@ -83,7 +91,7 @@ export const createStore = (initState: InitState) =>
 
         return collectionLinks;
       },
-    
+
       // Modals
       setActiveLocation: (place: CombinedMarker | null) =>
         set(() => {

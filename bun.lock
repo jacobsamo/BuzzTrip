@@ -126,7 +126,7 @@
         "@mdx-js/react": "^3.1.0",
         "@next/mdx": "^15.3.3",
         "@polar-sh/better-auth": "^1.0.1",
-        "@polar-sh/sdk": "^0.32.16",
+        "@polar-sh/sdk": "^0.33.0",
         "@radix-ui/react-accordion": "^1.2.11",
         "@radix-ui/react-alert-dialog": "^1.1.14",
         "@radix-ui/react-aspect-ratio": "^1.1.7",
@@ -224,15 +224,6 @@
         "@better-auth-kit/convex": "^1.2.2",
         "@convex-dev/geospatial": "^0.1.9",
         "convex": "^1.24.8",
-        "convex-helpers": "^0.1.90",
-      },
-    },
-    "packages/better-auth-convex-adapter": {
-      "name": "@buzztrip/better-auth-convex-adapter",
-      "version": "1.0.0",
-      "dependencies": {
-        "better-auth": "^1.2.8",
-        "convex": "^1.24.6",
         "convex-helpers": "^0.1.90",
       },
     },
@@ -652,8 +643,6 @@
     "@buzztrip/api": ["@buzztrip/api@workspace:apps/api"],
 
     "@buzztrip/backend": ["@buzztrip/backend@workspace:packages/backend"],
-
-    "@buzztrip/better-auth-convex-adapter": ["@buzztrip/better-auth-convex-adapter@workspace:packages/better-auth-convex-adapter"],
 
     "@buzztrip/components": ["@buzztrip/components@workspace:packages/components"],
 

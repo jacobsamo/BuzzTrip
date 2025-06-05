@@ -7,6 +7,7 @@ import { jwt, magicLink, twoFactor } from "better-auth/plugins";
 import { passkey } from "better-auth/plugins/passkey";
 import { ConvexHttpClient } from "convex/browser";
 import { generateOTP } from "./generateOTP";
+import { nextCookies } from "better-auth/next-js";
 // import {} from "../../../../packages/backend/convex"
 
 const convexClient = new ConvexHttpClient(
@@ -175,6 +176,7 @@ export const auth = betterAuth({
         },
       },
     }),
+    nextCookies()
   ],
 
   onAPIError: {

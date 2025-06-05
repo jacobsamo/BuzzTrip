@@ -12,7 +12,7 @@ export type StoreState = {
   collectionLinks: CollectionLink[] | null;
   collections: Collection[] | null;
   mapUsers: MapUser[] | null;
-  map: Map | null;
+  map: Map;
   markers: CombinedMarker[] | null;
   routes: Route[] | null;
   routeStops: RouteStop[] | null;
@@ -47,23 +47,3 @@ export type StoreActions = {
   ) => void;
 };
 
-export const defaultState: StoreState = {
-  collectionLinks: null,
-  collections: null,
-  mapUsers: null,
-  map: null,
-  markers: null,
-  routes: null,
-  routeStops: null,
-
-  // Modals
-  activeLocation: null,
-  collectionsOpen: false,
-  searchValue: null,
-  snap: 0.1,
-  markerOpen: {
-    open: false,
-    marker: null,
-    mode: null,
-  },
-};

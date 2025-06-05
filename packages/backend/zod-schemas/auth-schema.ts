@@ -1,6 +1,6 @@
 import { zid } from "convex-helpers/server/zod";
 import * as z from "zod";
-import { defaultFields } from "./shared-schemas";
+import { defaultFields, insertSchema } from "./shared-schemas";
 
 export const userSchema = z.object({
   ...defaultFields,
@@ -19,6 +19,8 @@ export const userSchema = z.object({
   username: z.string().optional(),
   bio: z.string().optional(),
 });
+
+export const usersEditSchema = insertSchema(userSchema)
 
 export const refinedUserSchema = userSchema.pick({
   _id: true,
