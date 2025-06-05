@@ -6,6 +6,9 @@ import { constructMetadata } from "@/lib/utils/metadata";
 import type { Metadata, Viewport } from "next";
 import React from "react";
 import { Monitoring } from "react-scan/monitoring/next";
+import {
+  ClerkProvider,
+} from '@clerk/nextjs'
 
 export const metadata: Metadata = constructMetadata();
 
@@ -23,6 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <ClerkProvider>
+
     <html lang="en">
       <body>
         <Monitoring
@@ -38,5 +43,6 @@ export default function RootLayout({
         </Providers>
       </body>
     </html>
+    </ClerkProvider>
   );
 }

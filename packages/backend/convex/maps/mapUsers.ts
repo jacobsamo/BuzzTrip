@@ -23,7 +23,7 @@ export const getMapUsers = authedQuery({
 export async function createMapUser(
   ctx: MutationCtx,
   user: {
-    user_id: Id<"user">;
+    user_id: Id<"users">;
     permission: "owner" | "editor" | "viewer" | "commenter";
     map_id: Id<"maps">;
   }

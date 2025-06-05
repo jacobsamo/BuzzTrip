@@ -34,7 +34,7 @@ export const placesEditSchema = insertSchema(placesSchema);
 export const placesReviewSchema = defaultSchema(
   z.object({
     place_id: zid("places"),
-    user_id: zid("user"),
+    user_id: zid("users"),
     author_name: z.string(),
     author_url: z.string().nullable(),
     profile_photo_url: z.string(),
@@ -48,7 +48,7 @@ export const placesReviewEditSchema = insertSchema(placesReviewSchema);
 export const placePhotoSchema = defaultSchema(
   z.object({
     place_id: zid("places"),
-    user_id: zid("user"),
+    user_id: zid("users"),
     photo_url: z.string(),
     width: z.number(),
     height: z.number(),

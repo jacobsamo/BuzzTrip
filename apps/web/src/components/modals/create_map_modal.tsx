@@ -115,7 +115,7 @@ function MapForm({
       const newUsers =
         users?.map((user) => {
           return {
-            user_id: user._id as Id<"user">,
+            user_id: user._id as Id<"users">,
             permission: user.permission,
           };
         }) ?? undefined;
@@ -134,7 +134,7 @@ function MapForm({
           lng: data.lng ?? undefined,
           location_name: data.location_name ?? undefined,
           bounds: data.bounds ?? undefined,
-          owner_id: "kn786m7j5abny5ws9zkv5e5wfh7h1dw5" as Id<"user">,
+          owner_id: "kn786m7j5abny5ws9zkv5e5wfh7h1dw5" as Id<"users">,
         },
       });
 

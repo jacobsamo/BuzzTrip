@@ -123,7 +123,7 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
     });
 
     const updateUserProfile = updateUser({
-      userId: user.id as Id<"user">,
+      userId: user.id as Id<"users">,
       updateData: {
         image: profilePicture,
         first_name: formData.first_name,

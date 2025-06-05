@@ -10,7 +10,7 @@ export * from "./shared-schemas";
 
 export const combinedMarkersSchema = placesSchema.extend({
   ...markersSchema.shape,
-  created_by: zid("user"),
+  created_by: zid("users"),
   place_id: zid("places").optional(),
   bounds: boundsSchema.nullable(),
 });

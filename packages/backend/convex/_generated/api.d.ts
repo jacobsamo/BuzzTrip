@@ -8,8 +8,8 @@
  * @module
  */
 
-import type * as betterAuth from "../betterAuth.js";
 import type * as helpers from "../helpers.js";
+import type * as http from "../http.js";
 import type * as maps_collections from "../maps/collections.js";
 import type * as maps_index from "../maps/index.js";
 import type * as maps_labels from "../maps/labels.js";
@@ -32,8 +32,8 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  betterAuth: typeof betterAuth;
   helpers: typeof helpers;
+  http: typeof http;
   "maps/collections": typeof maps_collections;
   "maps/index": typeof maps_index;
   "maps/labels": typeof maps_labels;

@@ -23,7 +23,7 @@ interface UserMapsProps {
 
 const UserMaps = ({ userId }: UserMapsProps) => {
   const maps = useQuery(api.maps.index.getUserMaps, {
-    userId: userId as Id<"user">,
+    userId: userId as Id<"users">,
   });
   const [sortOption, setSortOption] = useState("updatedAt");
   const [searchValue, setSearchValue] = useState("");

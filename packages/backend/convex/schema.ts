@@ -1,13 +1,7 @@
 import { zodToConvex } from "convex-helpers/server/zod";
 import { defineSchema, defineTable } from "convex/server";
 import {
-  accountSchema,
-  jwksSchema,
-  passkeySchema,
-  sessionSchema,
-  twoFactorSchema,
   userSchema,
-  verificationSchema,
 } from "../zod-schemas/auth-schema";
 import {
   placePhotoSchema,
@@ -60,29 +54,11 @@ export default defineSchema({
   places_reviews: defineTable(zodToConvex(placesReviewSchema)),
   place_photos: defineTable(zodToConvex(placePhotoSchema)),
   // better auth items
-  user: defineTable(zodToConvex(userSchema))
+  users: defineTable(zodToConvex(userSchema))
     .index("by_email", ["email"])
+    .index("by_clerk_id", ["clerkUserId"])
     .searchIndex("search_user", {
       searchField: "name",
       filterFields: ["email", "username"],
     }),
-  session: defineTable(zodToConvex(sessionSchema))
-    .index("byToken", ["token"])
-    .index("byUserId", ["userId"]),
-  account: defineTable(zodToConvex(accountSchema)).index("byUserId", [
-    "userId",
-  ]),
-  verification: defineTable(zodToConvex(verificationSchema)).index(
-    "byIdentifier",
-    ["identifier"]
-  ),
-  passkey: defineTable(zodToConvex(passkeySchema)).index("byUserId", [
-    "userId",
-  ]),
-  twoFactor: defineTable(zodToConvex(twoFactorSchema))
-    .index("byUserId", ["userId"])
-    .index("bySecret", ["secret"]),
-  jwks: defineTable(zodToConvex(jwksSchema)).index("byPublicKey", [
-    "publicKey",
-  ]),
 });

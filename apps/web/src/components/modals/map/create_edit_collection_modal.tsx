@@ -25,12 +25,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
-import { Id } from "@buzztrip/backend/dataModel";
 import { api } from "@buzztrip/backend/api";
-import { useMutation, useQuery } from "convex/react";
+import { Id } from "@buzztrip/backend/dataModel";
 import { Collection } from "@buzztrip/backend/types";
 import Icon, { otherIconsList } from "@buzztrip/components/icon";
 import { useMediaQuery } from "@uidotdev/usehooks";
+import { useMutation } from "convex/react";
 import { Edit, Plus } from "lucide-react";
 import * as React from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
@@ -119,10 +119,10 @@ const Close = ({ children }: { children: React.ReactNode }) => {
 };
 
 function CollectionForm({ mode, collection }: CollectionModalProps) {
-  const {  map } = useMapStore((store) => store);
+  const { map } = useMapStore((store) => store);
   const { data } = useSession();
   const userId = data?.session.userId;
-  const createCollection = useMutation(api.maps.collections.createCollection)
+  const createCollection = useMutation(api.maps.collections.createCollection);
   const editCollection = useMutation(api.maps.collections.editCollection);
 
   const { register, handleSubmit, watch, control } = useForm<Collection>({
@@ -149,9 +149,8 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
         const create = createCollection({
           ...data,
           map_id: map._id as Id<"maps">,
-          created_by: userId as Id<"user">,
+          created_by: userId as Id<"users">,
         });
-
 
         toast.promise(create, {
           loading: "Creating collection...",
@@ -177,7 +176,8 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
               return "Collection edited successfully!";
             }
             return "Failed to edit collection";
-          }})
+          },
+        });
       }
 
       // if (mode === "edit" && collection) {}

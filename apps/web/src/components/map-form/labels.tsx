@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
+import { useSession } from "@/lib/auth-client";
+import { Id } from "@buzztrip/backend/dataModel";
 import { Plus } from "lucide-react";
 import { Label } from "../ui/label";
 import { ScrollArea } from "../ui/scroll-area";
 import LabelForm from "./label-form";
 import { useMapFormContext } from "./provider";
-import { Id } from "@buzztrip/backend/dataModel";
-import { useSession } from "@/lib/auth-client";
 
 const MapLabelsForm = () => {
   const {
@@ -35,7 +35,7 @@ const MapLabelsForm = () => {
               map_id: mapId as Id<"maps">,
               _id: "",
               _creationTime: 0,
-              created_by: userId as Id<"user">,
+              created_by: userId as Id<"users">,
               description: "",
             })
           }

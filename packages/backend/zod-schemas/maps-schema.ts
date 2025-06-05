@@ -38,7 +38,7 @@ export const mapsSchema = defaultSchema(
     image: z.string().optional(),
     icon: iconSchema.nullish(),
     color: z.string().optional(),
-    owner_id: zid("user"),
+    owner_id: zid("users"),
     location_name: z.string().optional(), // the location where the map is saved too e.g Brisbane, Australia, etc
     lat: z.optional(z.number()),
     lng: z.optional(z.number()),
@@ -53,7 +53,7 @@ export const mapsEditSchema = insertSchema(mapsSchema);
 export const mapUserSchema = defaultSchema(
   z.object({
     map_id: zid("maps"),
-    user_id: zid("user"),
+    user_id: zid("users"),
     permission: permissionEnumSchema.default("editor"),
   })
 );
@@ -71,7 +71,7 @@ const labelSchema = z.object({
   description: z.string(),
   icon: iconSchema.nullish(),
   color: z.string().optional(),
-  created_by: zid("user"),
+  created_by: zid("users"),
   updatedAt: z.string().datetime().optional(),
 });
 
@@ -96,7 +96,7 @@ export const markersSchema = defaultSchema(
     note: z.string().optional(),
     lat: z.number(),
     lng: z.number(),
-    created_by: zid("user"),
+    created_by: zid("users"),
     icon: iconSchema.nullish(),
     color: z.string(),
     place_id: zid("places"),
@@ -112,7 +112,7 @@ export const collectionsSchema = defaultSchema(
     map_id: zid("maps"),
     title: z.string(),
     description: z.string().optional(),
-    created_by: zid("user"),
+    created_by: zid("users"),
     icon: iconSchema.nullish(),
     color: z.string().optional(),
     updatedAt: z.string().datetime().optional(),
@@ -126,7 +126,7 @@ export const collection_linksSchema = defaultSchema(
     collection_id: zid("collections"),
     marker_id: zid("markers"),
     map_id: zid("maps"),
-    user_id: zid("user"),
+    user_id: zid("users"),
   })
 );
 export const collection_linksEditSchema = insertSchema(collection_linksSchema);
@@ -137,7 +137,7 @@ export const routesSchema = defaultSchema(
     name: z.string(),
     description: z.string().optional(),
     travel_type: travelTypeEnumSchema,
-    user_id: zid("user"),
+    user_id: zid("users"),
     updatedAt: z.string().datetime().optional(),
   })
 );
@@ -149,7 +149,7 @@ export const route_stopsSchema = defaultSchema(
     map_id: zid("maps"),
     route_id: zid("routes"),
     marker_id: zid("markers"),
-    user_id: zid("user"),
+    user_id: zid("users"),
     lat: z.number(),
     lng: z.number(),
     stop_order: z.number(),

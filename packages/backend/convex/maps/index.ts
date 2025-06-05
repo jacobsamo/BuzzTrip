@@ -1,15 +1,11 @@
-import { getManyFrom } from "convex-helpers/server/relationships";
 import { zid } from "convex-helpers/server/zod";
-import { z } from "zod";
 import type { UserMap } from "../../types";
 import {
   mapsEditSchema,
   mapUserSchema,
-  refinedUserSchema,
   userMapsSchema,
 } from "../../zod-schemas";
 import { Id } from "../_generated/dataModel";
-import { MutationCtx } from "../_generated/server";
 import { authedMutation, authedQuery } from "../helpers";
 import { createMapUser } from "./mapUsers";
 
@@ -41,7 +37,7 @@ export const getAllMapData = null;
 // get all the maps for a user
 export const getUserMaps = authedQuery({
   args: {
-    userId: zid("user"),
+    userId: zid("users"),
   },
   returns: userMapsSchema.array(),
   handler: async (ctx, args) => {
@@ -71,8 +67,6 @@ export const getUserMaps = authedQuery({
     return combinedMaps;
   },
 });
-
-
 
 // // Mutations
 export const createMap = authedMutation({
@@ -122,7 +116,7 @@ export const updateMap = authedMutation({
     await ctx.db.replace(args.map._id! as Id<"maps">, {
       ...args.map,
       _id: args.map._id as Id<"maps">,
-      owner_id: args.map.owner_id as Id<"user">,
+      owner_id: args.map.owner_id as Id<"users">,
       updatedAt: new Date().toISOString(),
     });
   },

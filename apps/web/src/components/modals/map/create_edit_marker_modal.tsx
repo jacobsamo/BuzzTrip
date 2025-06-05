@@ -29,12 +29,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/lib/auth-client";
 import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { api } from "@buzztrip/backend/api";
+import { Id } from "@buzztrip/backend/dataModel";
 import type { IconType } from "@buzztrip/backend/types";
 import { CombinedMarker } from "@buzztrip/backend/types";
 import { combinedMarkersSchema } from "@buzztrip/backend/zod-schemas";
 import { popularIconsList } from "@buzztrip/components/icon";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "@uidotdev/usehooks";
+import { useMutation } from "convex/react";
 import { Circle, CircleCheck } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -44,10 +47,6 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import IconPickerModal from "../icon-picker-modal";
-import { Id } from "@buzztrip/backend/dataModel";
-import { api } from "@buzztrip/backend/api";
-import { useMutation, useQuery } from "convex/react";
-
 
 const Icon = dynamic(() => import("@buzztrip/components/icon"), { ssr: false });
 
@@ -171,8 +170,7 @@ function MarkerForm() {
 
   useEffect(() => {
     const saved = marker
-      ? (markers?.find((marker) => marker._id == marker._id) ??
-        null)
+      ? (markers?.find((marker) => marker._id == marker._id) ?? null)
       : null;
     setIsSaved(saved);
 
@@ -225,14 +223,14 @@ function MarkerForm() {
           marker_id: markerId as Id<"markers">,
           marker: data,
           collectionIds_to_add: collectionsToAdd as Id<"collections">[],
-          collectionIds_to_remove: collectionsToRemove as Id<"collection_links">[],
+          collectionIds_to_remove:
+            collectionsToRemove as Id<"collection_links">[],
           mapId: map._id as Id<"maps">,
         });
 
         toast.promise(updatedMarker, {
           loading: "Updating marker...",
           success: async (res) => {
-          
             return "Marker updated successfully!";
           },
           error: "Failed to update marker",
@@ -243,7 +241,7 @@ function MarkerForm() {
         const createdMarker = createMarker({
           marker: {
             ...data,
-            created_by: userId as Id<"user">,
+            created_by: userId as Id<"users">,
           },
           collectionIds: cols,
           mapId: map._id as Id<"maps">,
