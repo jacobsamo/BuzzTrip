@@ -7,16 +7,14 @@ import { Id } from "@buzztrip/backend/dataModel";
 import { type NextjsOptions, fetchQuery } from "convex/nextjs";
 import { env } from "env";
 import { notFound } from "next/navigation";
+import { convexNextjsOptions, getConvexServerSession } from "@/lib/auth";
 
-const options: NextjsOptions = {
-  url: env.NEXT_PUBLIC_CONVEX_URL,
-};
 
 type Params = Promise<{ map_id: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { map_id } = await params;
-
+  const options = await convexNextjsOptions();
   const map = await fetchQuery(
     api.maps.index.getMap,
     {
@@ -24,11 +22,6 @@ export async function generateMetadata({ params }: { params: Params }) {
     },
     options
   );
-
-  // console.log("generateMetadata", {
-  //   map_id,
-  //   map,
-  // });
 
   return constructMetadata({
     title: map?.title,
@@ -38,12 +31,10 @@ export async function generateMetadata({ params }: { params: Params }) {
 
 export default async function MapPage({ params }: { params: Params }) {
   const { map_id } = await params;
-  const { data } = await getSession();
-  console.log("page", {
-    map_id,
-  });
+  const options = await convexNextjsOptions();
+  const session = await getConvexServerSession()
 
-  if (!data || !data.session || !map_id) {
+  if (!session || session.message !== "Logged In" || !map_id) {
     return notFound();
   }
 
@@ -65,7 +56,7 @@ export default async function MapPage({ params }: { params: Params }) {
   if (
     (mapUsers &&
       mapUsers.length > 0 &&
-      !mapUsers.find((mu) => mu.user_id == data.session.userId)) ||
+      !mapUsers.find((mu) => mu.user_id == session.user._id)) ||
     !map
   ) {
     return notFound();
@@ -74,7 +65,10 @@ export default async function MapPage({ params }: { params: Params }) {
   return (
     <MapStoreProvider
       initialState={{
-        map: map,
+        map: {
+          ...map,
+          visibility: map.visibility || "private",
+        },
       }}
     >
       <Map_page />

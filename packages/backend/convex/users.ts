@@ -31,6 +31,10 @@ export const searchUsers = authedQuery({
   },
 });
 
+type UserLoginStatus = {message: "No JWT Token", user: null} |
+  {message: "No Clerk User", user: null} |
+  {message: "Logged In", user: Doc<"users">}
+
 /**
  * Whether the current user is fully logged in, including having their information
  * synced from Clerk via webhook.
@@ -41,22 +45,20 @@ export const userLoginStatus = query(
   async (
     ctx
   ): Promise<
-    | ["No JWT Token", null]
-    | ["No Clerk User", null]
-    | ["Logged In", Doc<"users">]
+    UserLoginStatus
   > => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       // no JWT token, user hasn't completed login flow yet
-      return ["No JWT Token", null];
+      return {message: "No JWT Token", user: null};
     }
     const user = await getCurrentUser(ctx);
     if (user === null) {
       // If Clerk has not told us about this user we're still waiting for the
       // webhook notification.
-      return ["No Clerk User", null];
+      return {message: "No Clerk User", user: null};
     }
-    return ["Logged In", user];
+    return {message: "Logged In", user}; 
   }
 );
 
@@ -64,7 +66,7 @@ export const userLoginStatus = query(
 export const currentUser = query((ctx: QueryCtx) => getCurrentUser(ctx));
 
 /** Get user by Clerk use id (AKA "subject" on auth)  */
-export const getUser = internalQuery({
+export const getUser = query({
   args: { subject: v.string() },
   async handler(ctx, args) {
     return await userQuery(ctx, args.subject);

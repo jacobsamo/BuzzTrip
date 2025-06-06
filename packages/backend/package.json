@@ -6,8 +6,14 @@
     "setup": "convex dev --until-success"
   },
   "exports": {
-    "./api": "./convex/_generated/api.d.ts",
-    "./dataModel": "./convex/_generated/dataModel.d.ts",
+    "./api": {
+      "import": "./convex/_generated/api.js",
+      "types": "./convex/_generated/api.d.ts"
+    },
+    "./dataModel": {
+      "import": "./convex/_generated/dataModel.js",
+      "types": "./convex/_generated/dataModel.d.ts"
+    },
     "./zod-schemas": "./zod-schemas/index.ts",
     "./types": "./types/index.ts"
   },

@@ -19,6 +19,7 @@ import { env } from "./env";
 
 const nextConfig: NextConfig = {
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
+  transpilePackages: ["@buzztrip/backend"],
   images: {
     unoptimized: true,
     remotePatterns: [

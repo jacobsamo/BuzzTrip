@@ -18,8 +18,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { useSession } from "@/lib/auth-client";
-import { apiClient } from "@/server/api.client";
 import { Label, Map, NewLabel } from "@buzztrip/backend/types";
 import { mapsEditSchema } from "@buzztrip/backend/zod-schemas";
 import { useMediaQuery } from "@uidotdev/usehooks";
@@ -32,6 +30,9 @@ import {
   MapFormProvider,
   RefinedUserWithPermission,
 } from "../map-form/provider";
+import { useMutation, useQuery } from "convex/react";
+import { api} from "@buzztrip/backend/api";
+import { Id } from "@buzztrip/backend/dataModel";
 
 export interface EditMapModalProps {
   map: Map;
@@ -106,57 +107,24 @@ function MapForm({
   setOpen,
   map,
 }: EditMapModalProps & { setOpen: (open: boolean) => void }) {
-  const { data } = useSession();
-  const userId = data?.session.userId;
-  const [mapUsers, setMapUsers] = useState<RefinedUserWithPermission[] | null>(
-    null
-  );
-  const [mapLabels, setMapLabels] = useState<Label[] | null>(null);
+      const userStatus =  useQuery(api.users.userLoginStatus);
 
-  useEffect(() => {
-    let isCancelled = false;
+      const updateMap = useMutation(api.maps.index.updateMap);
+      const mapUsers = useQuery(api.maps.mapUsers.getMapUsers, {
+        mapId: map._id as Id<"maps">,
+      })
+      const createMapUser = useMutation(api.maps.mapUsers.shareMap)
+      const updateMapUser = useMutation(api.maps.mapUsers.editMapUser)
+      const deleteMapUser = useMutation(api.maps.mapUsers.deleteMapUser)
 
-    const fetchData = async () => {
-      try {
-        const [mu, ml] = await Promise.all([
-          apiClient.map[":mapId"].users
-            .$get({
-              param: { mapId: map._id },
-            })
-            .then((res) => {
-              if (res && res.ok) return res.json();
-              return null;
-            }),
-          apiClient.map[":mapId"].labels
-            .$get({
-              param: { mapId: map._id },
-            })
-            .then((res) => {
-              if (res && res.ok) return res.json();
-              return null;
-            }),
-        ]);
+      const mapLabels = useQuery(api.maps.labels.getMapLabels, {
+        mapId: map._id as Id<"maps">,
+      })
+      const createMapLabel = useMutation(api.maps.labels.createLabel)
+      const updateMapLabel = useMutation(api.maps.labels.editLabel)
+      const deleteMapLabel = useMutation(api.maps.labels.deleteLabel)
 
-        if (!isCancelled) {
-          setMapUsers(
-            mu?.map((user) => ({
-              ...user.user,
-              permission: user.permission,
-            })) ?? null
-          );
-          setMapLabels(ml);
-        }
-      } catch (error) {
-        console.error("Failed to fetch map data:", error);
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [map.map_id]); // Add only necessary dependencies
+  const userId = userStatus?.user?._id;
 
   const onSubmit = async (data: z.infer<typeof mapsEditSchema>) => {
     try {

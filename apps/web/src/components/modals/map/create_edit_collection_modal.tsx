@@ -23,7 +23,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
@@ -120,8 +119,6 @@ const Close = ({ children }: { children: React.ReactNode }) => {
 
 function CollectionForm({ mode, collection }: CollectionModalProps) {
   const { map } = useMapStore((store) => store);
-  const { data } = useSession();
-  const userId = data?.session.userId;
   const createCollection = useMutation(api.maps.collections.createCollection);
   const editCollection = useMutation(api.maps.collections.editCollection);
 
@@ -149,7 +146,6 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
         const create = createCollection({
           ...data,
           map_id: map._id as Id<"maps">,
-          created_by: userId as Id<"users">,
         });
 
         toast.promise(create, {

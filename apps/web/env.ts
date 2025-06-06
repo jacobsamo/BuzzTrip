@@ -13,7 +13,7 @@ export const env = createEnv({
     SENTRY_PROJECT: z.string().optional(),
     RESEND_API_KEY: z.string(),
     POLAR_ACCESS_TOKEN: z.string(),
-    CLERK_SECRET_KEY: z.stirng().optional()
+    CLERK_SECRET_KEY: z.string().optional()
   },
   client: {
     NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: z.string(),

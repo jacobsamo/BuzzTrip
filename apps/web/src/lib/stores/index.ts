@@ -3,59 +3,21 @@ import { Id } from "@buzztrip/backend/dataModel";
 import type { CombinedMarker, Map } from "@buzztrip/backend/types";
 import { useQuery } from "convex/react";
 import { createStore as createZustandStore } from "zustand/vanilla";
-import { StoreActions, type StoreState } from "./default-state";
+import { defaultState, StoreActions, type StoreState } from "./default-state";
 
 export type Store = StoreState & StoreActions;
 
-export type InitState = {
+export interface InitState extends Partial<StoreState>  {
   map: Map;
 };
 
 export const createStore = (initState: InitState) =>
   createZustandStore<Store>()((set, get) => {
-    const markers = useQuery(api.maps.markers.getMarkersView, {
-      map_id: initState.map._id as Id<"maps">,
-    });
-    const collections = useQuery(api.maps.collections.getCollectionsForMap, {
-      mapId: initState.map._id as Id<"maps">,
-    });
-    const collectionLinks = useQuery(
-      api.maps.collections.getCollectionLinksForMap,
-      {
-        mapId: initState.map._id as Id<"maps">,
-      }
-    );
-    const labels = useQuery(api.maps.labels.getMapLabels, {
-      mapId: initState.map._id as Id<"maps">,
-    });
-    const mapUsers = useQuery(api.maps.mapUsers.getMapUsers, {
-      mapId: initState.map._id as Id<"maps">,
-    });
-    // const routes = useQuery(api.maps.routes.getRoutesForMap , {
-    //   map_id: initState.map._id as Id<"maps">,
-    // })
-    // const routeStops = useQuery(api.maps.routes.getRouteStopsForMap , {
-    //   map_id: initState.map._id as Id<"maps">,
-    // })
 
     return {
+      ...defaultState,
+      ...initState,
       map: initState.map,
-      markers: markers ?? null,
-      collections: collections ?? null,
-      collectionLinks: collectionLinks ?? null,
-      labels: labels ?? null,
-      mapUsers: mapUsers ?? null,
-      routes: null,
-      routeStops: null,
-      activeLocation: null,
-      collectionsOpen: false,
-      searchValue: null,
-      snap: 0.1,
-      markerOpen: {
-        open: false,
-        marker: null,
-        mode: null,
-      },
       getCollectionsForMarker: (markerId: string | null) => {
         if (!markerId) return null;
         const links = get().collectionLinks;

@@ -1,5 +1,5 @@
 import { Form } from "@/components/ui/form";
-import { useSession } from "@/lib/auth-client";
+import { api } from "@buzztrip/backend/api";
 import { Label, NewLabel, NewMap } from "@buzztrip/backend/types";
 import {
   mapsEditSchema,
@@ -7,6 +7,7 @@ import {
   refinedUserSchema,
 } from "@buzztrip/backend/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "convex/react";
 import React, {
   createContext,
   use,
@@ -92,8 +93,9 @@ export const MapFormProvider = ({
   onLabelChange,
   onUserChange,
 }: MapFormProviderProps) => {
-  const { data } = useSession();
-  const userId = data?.session.userId;
+  const userStatus = useQuery(api.users.userLoginStatus);
+  console.log("userStatus", userStatus);
+  const userId = userStatus?.user?._id || "";
 
   // Use refs to store callback functions to prevent unnecessary re-renders
   const onUserChangeRef = useRef(onUserChange);
@@ -119,12 +121,13 @@ export const MapFormProvider = ({
   }, [setExternalLabels]);
 
   const form = useForm<z.infer<typeof mapsEditSchema>>({
-    resolver: zodResolver(mapsEditSchema),
-    defaultValues: formProps?.defaultValues ?? {
-      icon: "Map",
-      owner_id: userId || "",
-    },
     ...formProps,
+    resolver: zodResolver(mapsEditSchema),
+    defaultValues: {
+      icon: "Map",
+      visibility: "private",
+      ...formProps?.defaultValues,
+    },
   });
 
   const {

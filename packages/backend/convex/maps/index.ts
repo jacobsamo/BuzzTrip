@@ -5,10 +5,10 @@ import {
   mapUserSchema,
   userMapsSchema,
 } from "../../zod-schemas";
+import { api } from "../_generated/api";
 import { Id } from "../_generated/dataModel";
 import { authedMutation, authedQuery } from "../helpers";
 import { createMapUser } from "./mapUsers";
-
 // Get methods
 
 export const getMapUsers = authedQuery({
@@ -31,8 +31,40 @@ export const getMap = authedQuery({
   },
 });
 
-// we don't need this any more really
-export const getAllMapData = null;
+/**
+ * We only want to fetch this as a preload before than using all the other queries
+ */
+// export const getAllMapData = authedQuery({
+//   args: {
+//     mapId: zid("maps"),
+//   },
+//   handler: async (ctx, args) => {
+//     const markersPromise = ctx.runQuery(api.maps.markers.getMarkersView, {
+//       map_id: args.mapId,
+//     });
+//     const collectionsPromise = ctx.runQuery(
+//       api.maps.collections.getCollectionsForMap,
+//       {
+//         mapId: args.mapId,
+//       }
+//     );
+//     const collectionLinksPromise = ctx.runQuery(
+//       api.maps.collections.getCollectionLinksForMap,
+//       {
+//         mapId: args.mapId,
+//       }
+//     );
+//     const labelsPromise = ctx.runQuery(api.maps.labels.getMapLabels, {
+//       mapId: args.mapId,
+//     });
+//     const mapUsersPromise = ctx.runQuery(api.maps.mapUsers.getMapUsers, {
+//       mapId: args.mapId,
+//     });
+
+
+  
+//   },
+// });
 
 // get all the maps for a user
 export const getUserMaps = authedQuery({
@@ -89,7 +121,7 @@ export const createMap = authedMutation({
     });
 
     await createMapUser(ctx, {
-      user_id: map.owner_id,
+      user_id: ctx.user._id,
       permission: "owner",
       map_id: mapId,
     });

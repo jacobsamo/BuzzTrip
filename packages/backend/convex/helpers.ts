@@ -26,7 +26,7 @@ async function getUser(ctx: MutationCtx | QueryCtx) {
 
   const user = await ctx.db
     .query("users")
-    .withIndex("by_id", (q) => q.eq("_id", identity.subject as any))
+    .withIndex("by_clerk_id", (q) => q.eq("clerkUserId", identity.subject as any))
     .unique();
   if (!user) return null;
 

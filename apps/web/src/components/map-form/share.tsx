@@ -15,12 +15,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
-import { apiClient } from "@/server/api.client";
+import { api } from "@buzztrip/backend/api";
 import { PermissionEnum } from "@buzztrip/backend/types";
+import { convexQuery } from "@convex-dev/react-query";
 import { useQuery } from "@tanstack/react-query";
 import { CommandLoading } from "cmdk";
+import { useQuery as useConvexQuery } from "convex/react";
 import { Check, UserPlus, X } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
@@ -30,25 +31,15 @@ import { useMapFormContext } from "./provider";
 
 const MapShareForm = () => {
   const { users, addUser, removeUser, updateUser } = useMapFormContext();
-  const { data } = useSession();
+  const userStatus = useConvexQuery(api.users.userLoginStatus);
+  const userId = userStatus?.user?._id;
   const [searchValue, setSearchValue] = useState("");
   const [commandOpen, setCommandOpen] = useState(false);
-
   const { data: fetchedUsers, isLoading } = useQuery({
-    queryKey: ["users", searchValue],
-    queryFn: async () => {
-      const res = await apiClient.users.search.$get({
-        query: { q: searchValue },
-      });
-
-      if (res.ok) {
-        const { users } = await res.json();
-        console.log("Fetched users:", users);
-        return users ?? undefined;
-      }
-
-      return undefined;
-    },
+    // queryKey: ["users", searchValue],
+    ...convexQuery(api.users.searchUsers, {
+      query: searchValue,
+    }),
     enabled: searchValue?.length >= 2,
   });
 
@@ -104,8 +95,8 @@ const MapShareForm = () => {
                       }}
                       className="flex items-center justify-between p-2 cursor-pointer"
                       disabled={
-                        users?.some((u) => u.id === user.id) ||
-                        data?.session?.userId === user.id
+                        users?.some((u) => u._id === user._id) ||
+                        userId === user._id
                       }
                     >
                       <div className="flex items-center gap-2">
@@ -125,8 +116,8 @@ const MapShareForm = () => {
                       </div>
 
                       <div className="flex items-center">
-                        {(users && users.some((u) => u.id === user.id)) ||
-                        data?.session?.userId === user.id ? (
+                        {(users && users.some((u) => u._id === user._id)) ||
+                        userId === user._id ? (
                           <Check className="h-4 w-4 text-green-500" />
                         ) : (
                           <Button
@@ -159,7 +150,7 @@ const MapShareForm = () => {
             <div className="space-y-2 max-h-40">
               {users.map((user) => (
                 <motion.div
-                  key={user.id}
+                  key={user._id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   className={cn(
@@ -167,7 +158,7 @@ const MapShareForm = () => {
                     {
                       // if the user is the owner of the map, we don't want to allow them to remove themselves
                       "opacity-50 cursor-not-allowed pointer-events-none":
-                        user.id === data?.session?.userId,
+                        user._id === userId,
                     }
                   )}
                 >
@@ -192,12 +183,12 @@ const MapShareForm = () => {
                     <Select
                       value={user.permission}
                       onValueChange={(value) =>
-                        updateUser(user.id, {
+                        updateUser(user._id, {
                           ...user,
                           permission: value as PermissionEnum,
                         })
                       }
-                      disabled={user.id === data?.session?.userId}
+                      disabled={user._id === userId}
                     >
                       <SelectTrigger className="w-24">
                         <SelectValue />
@@ -212,8 +203,8 @@ const MapShareForm = () => {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => removeUser(user.id)}
-                      disabled={user.id === data?.session?.userId}
+                      onClick={() => removeUser(user._id)}
+                      disabled={user._id === userId}
                     >
                       Remove
                     </Button>

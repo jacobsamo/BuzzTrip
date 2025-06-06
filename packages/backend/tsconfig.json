@@ -1,6 +1,21 @@
 {
-  "extends": "@buzztrip/tsconfig/base.json",
   "compilerOptions": {
-    "jsx": "react",
-  }
+    "allowJs": true,
+    "strict": true,
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ESNext",
+    "lib": ["ES2021", "dom"],
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "isolatedModules": true,
+    "noEmit": true,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true
+  },
+  "include": ["./**/*"],
+  "exclude": ["./_generated"]
 }

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { useSession } from "@/lib/auth-client";
+import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
+import { useQuery } from "convex/react";
 import { Plus } from "lucide-react";
 import { Label } from "../ui/label";
 import { ScrollArea } from "../ui/scroll-area";
@@ -15,10 +16,15 @@ const MapLabelsForm = () => {
     removeLabel,
   } = useMapFormContext();
   const mapId = watch("_id");
-  const { data } = useSession();
-  const userId = data?.session.userId;
+  const userStatus = useQuery(api.users.userLoginStatus);
 
-  if (!mapId) return null;
+  if (
+    !mapId ||
+    !userStatus ||
+    userStatus.message !== "Logged In" ||
+    !userStatus.user
+  )
+    return null;
 
   return (
     <>
@@ -35,7 +41,7 @@ const MapLabelsForm = () => {
               map_id: mapId as Id<"maps">,
               _id: "",
               _creationTime: 0,
-              created_by: userId as Id<"users">,
+              created_by: userStatus.user._id,
               description: "",
             })
           }

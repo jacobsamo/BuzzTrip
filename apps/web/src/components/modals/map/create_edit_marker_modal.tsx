@@ -26,7 +26,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { useSession } from "@/lib/auth-client";
 import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { api } from "@buzztrip/backend/api";
@@ -137,8 +136,6 @@ function MarkerForm() {
     setMarkerOpen,
     markerOpen,
   } = useMapStore((store) => store);
-  const { data } = useSession();
-  const userId = data?.session.userId;
 
   const { mode, marker } = markerOpen;
   const [inCollections, setInCollections] = React.useState<string[] | null>(
@@ -241,7 +238,6 @@ function MarkerForm() {
         const createdMarker = createMarker({
           marker: {
             ...data,
-            created_by: userId as Id<"users">,
           },
           collectionIds: cols,
           mapId: map._id as Id<"maps">,

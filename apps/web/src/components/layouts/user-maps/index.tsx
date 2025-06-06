@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
-import { useQuery } from "convex/react";
+import { useConvexAuth, useQuery } from "convex/react";
 import { MapIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
@@ -22,6 +22,7 @@ interface UserMapsProps {
 }
 
 const UserMaps = ({ userId }: UserMapsProps) => {
+  const {isAuthenticated} = useConvexAuth();
   const maps = useQuery(api.maps.index.getUserMaps, {
     userId: userId as Id<"users">,
   });

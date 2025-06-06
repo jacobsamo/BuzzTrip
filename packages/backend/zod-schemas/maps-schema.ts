@@ -43,12 +43,14 @@ export const mapsSchema = defaultSchema(
     lat: z.optional(z.number()),
     lng: z.optional(z.number()),
     bounds: mapBoundsSchema.nullish(),
-    visibility: z.enum(visibilityOptions),
+    visibility: z.enum(visibilityOptions).default("private"),
     updatedAt: z.string().datetime().optional(),
   })
 );
 
-export const mapsEditSchema = insertSchema(mapsSchema);
+export const mapsEditSchema = insertSchema(mapsSchema).extend({
+  owner_id: zid("users").optional(),
+});
 
 export const mapUserSchema = defaultSchema(
   z.object({
@@ -105,7 +107,9 @@ export const markersSchema = defaultSchema(
   })
 );
 
-export const markersEditSchema = insertSchema(markersSchema);
+export const markersEditSchema = insertSchema(markersSchema).extend({
+  created_by: zid("users").optional(),
+});
 
 export const collectionsSchema = defaultSchema(
   z.object({
@@ -119,7 +123,9 @@ export const collectionsSchema = defaultSchema(
   })
 );
 
-export const collectionsEditSchema = insertSchema(collectionsSchema);
+export const collectionsEditSchema = insertSchema(collectionsSchema).extend({
+  created_by: zid("users").optional(),
+});
 
 export const collection_linksSchema = defaultSchema(
   z.object({

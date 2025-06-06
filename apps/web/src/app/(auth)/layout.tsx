@@ -7,7 +7,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="relative">
+    <main className="relative min-h-screen flex flex-col items-center justify-center">
       {children}
       <Image
         src="/assets/app-screenshot.webp"

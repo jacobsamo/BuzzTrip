@@ -2,6 +2,7 @@ import type {
   Collection,
   CollectionLink,
   CombinedMarker,
+  Label,
   Map,
   MapUser,
   Route,
@@ -13,6 +14,7 @@ export type StoreState = {
   collections: Collection[] | null;
   mapUsers: MapUser[] | null;
   map: Map;
+  labels: Label[] | null;
   markers: CombinedMarker[] | null;
   routes: Route[] | null;
   routeStops: RouteStop[] | null;
@@ -47,3 +49,23 @@ export type StoreActions = {
   ) => void;
 };
 
+export const defaultState: Omit<StoreState, "map"> = {
+  collectionLinks: null,
+  collections: null,
+  mapUsers: null,
+  markers: null,
+  routes: null,
+  routeStops: null,
+  labels: null,
+
+  // Modals
+  activeLocation: null,
+  collectionsOpen: false,
+  searchValue: null,
+  snap: 0.1,
+  markerOpen: {
+    open: false,
+    marker: null,
+    mode: null,
+  },
+};

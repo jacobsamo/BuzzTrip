@@ -121,6 +121,7 @@
         "@buzztrip/backend": "workspace:*",
         "@buzztrip/transactional": "workspace:*",
         "@clerk/nextjs": "^6.21.0",
+        "@convex-dev/react-query": "^0.0.0-alpha.8",
         "@hookform/resolvers": "^5.0.1",
         "@mapbox/search-js-react": "^1.1.0",
         "@mdx-js/loader": "^3.1.0",
@@ -228,15 +229,6 @@
         "convex": "^1.24.8",
         "convex-helpers": "^0.1.90",
         "svix": "^1.66.0",
-      },
-    },
-    "packages/better-auth-convex-adapter": {
-      "name": "@buzztrip/better-auth-convex-adapter",
-      "version": "1.0.0",
-      "dependencies": {
-        "better-auth": "^1.2.8",
-        "convex": "^1.24.6",
-        "convex-helpers": "^0.1.90",
       },
     },
     "packages/components": {
@@ -656,8 +648,6 @@
 
     "@buzztrip/backend": ["@buzztrip/backend@workspace:packages/backend"],
 
-    "@buzztrip/better-auth-convex-adapter": ["@buzztrip/better-auth-convex-adapter@workspace:packages/better-auth-convex-adapter"],
-
     "@buzztrip/components": ["@buzztrip/components@workspace:packages/components"],
 
     "@buzztrip/db": ["@buzztrip/db@workspace:packages/db"],
@@ -709,6 +699,8 @@
     "@coinbase/wallet-sdk": ["@coinbase/wallet-sdk@4.3.0", "", { "dependencies": { "@noble/hashes": "^1.4.0", "clsx": "^1.2.1", "eventemitter3": "^5.0.1", "preact": "^10.24.2" } }, "sha512-T3+SNmiCw4HzDm4we9wCHCxlP0pqCiwKe4sOwPH3YAK2KSKjxPRydKu6UQJrdONFVLG7ujXvbd/6ZqmvJb8rkw=="],
 
     "@convex-dev/geospatial": ["@convex-dev/geospatial@0.1.9", "", { "dependencies": { "async-channel": "^0.2.0", "heap-js": "^2.5.0" }, "peerDependencies": { "convex": "~1.16.5 || >=1.17.0 <1.35.0" } }, "sha512-xYqMIzLZ3iWEzJ2RN3AZ6ArAp9Zx0qeG3Xkli0jo4vtdDZ/KhRl4GGd50ZI3E7QWmNIQSR9XJaw9aewwvNUSVQ=="],
+
+    "@convex-dev/react-query": ["@convex-dev/react-query@0.0.0-alpha.8", "", { "peerDependencies": { "@tanstack/react-query": "^5.0.0", "convex": "^1.17.0" } }, "sha512-Rv/q7/CplU75f7ckBd2vh+HoeeQ0tOrjwMl14Hk7D/03e55oUIU0TV5JYYzC79ZQyyAtoj7CmCo5ZxcmtKNv1Q=="],
 
     "@cspotcode/source-map-support": ["@cspotcode/source-map-support@0.8.1", "", { "dependencies": { "@jridgewell/trace-mapping": "0.3.9" } }, "sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw=="],
 

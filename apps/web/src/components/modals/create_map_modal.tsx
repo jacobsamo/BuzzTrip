@@ -19,7 +19,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { useSession } from "@/lib/auth-client";
 import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
 import { mapsEditSchema } from "@buzztrip/backend/zod-schemas";
@@ -101,16 +100,10 @@ export default function CreateMapModal({ trigger }: CreateMapModalProps) {
 function MapForm({
   setOpen,
 }: CreateMapModalProps & { setOpen: (open: boolean) => void }) {
-  const { data } = useSession();
-  const userId = data?.session.userId;
   const [users, setUsers] = useState<RefinedUserWithPermission[] | null>(null);
   const createMap = useMutation(api.maps.index.createMap);
 
   const onSubmit = async (data: z.infer<typeof mapsEditSchema>) => {
-    if (!userId) {
-      toast.error("Please sign in to create a map");
-      return;
-    }
     try {
       const newUsers =
         users?.map((user) => {
@@ -134,7 +127,6 @@ function MapForm({
           lng: data.lng ?? undefined,
           location_name: data.location_name ?? undefined,
           bounds: data.bounds ?? undefined,
-          owner_id: "kn786m7j5abny5ws9zkv5e5wfh7h1dw5" as Id<"users">,
         },
       });
 
@@ -151,16 +143,7 @@ function MapForm({
   };
 
   return (
-    <MapFormProvider
-      formProps={{
-        defaultValues: {
-          icon: "Map",
-          owner_id: userId!,
-        },
-      }}
-      onSubmit={onSubmit}
-      setExternalUsers={setUsers}
-    >
+    <MapFormProvider onSubmit={onSubmit} setExternalUsers={setUsers}>
       <MapStepperForm />
     </MapFormProvider>
   );

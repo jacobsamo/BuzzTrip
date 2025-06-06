@@ -13,18 +13,18 @@ export const placesSchema = defaultSchema(
     lat: z.number(),
     lng: z.number(),
     bounds: boundsSchema,
-    address: z.string(),
-    gm_place_id: z.string(), // google maps place id
-    mb_place_id: z.string(), // mapbox place id
-    fq_place_id: z.string(), // foursquare place id
-    plus_code: z.string(),
+    address: z.string().optional(),
+    gm_place_id: z.string().optional(), // google maps place id
+    mb_place_id: z.string().optional(), // mapbox place id
+    fq_place_id: z.string().optional(), // foursquare place id
+    plus_code: z.string().optional(),
     icon: iconSchema,
     photos: z.array(z.string()).nullish(),
     rating: z.number(),
-    avg_price: z.number(),
+    avg_price: z.number().optional(),
     types: z.array(z.string()).nullish(),
-    website: z.string(),
-    phone: z.string(),
+    website: z.string().optional(),
+    phone: z.string().optional(),
     opening_times: z.array(z.string()).nullish(),
   })
 );
