@@ -43,7 +43,7 @@ export const mapsSchema = defaultSchema(
     lat: z.optional(z.number()),
     lng: z.optional(z.number()),
     bounds: mapBoundsSchema.nullish(),
-    visibility: z.enum(visibilityOptions).default("private"),
+    visibility: z.enum(visibilityOptions),
     updatedAt: z.string().datetime().optional(),
   })
 );
@@ -99,7 +99,7 @@ export const markersSchema = defaultSchema(
     lat: z.number(),
     lng: z.number(),
     created_by: zid("users"),
-    icon: iconSchema.nullish(),
+    icon: iconSchema,
     color: z.string(),
     place_id: zid("places"),
     map_id: zid("maps"),
@@ -117,7 +117,7 @@ export const collectionsSchema = defaultSchema(
     title: z.string(),
     description: z.string().optional(),
     created_by: zid("users"),
-    icon: iconSchema.nullish(),
+    icon: iconSchema,
     color: z.string().optional(),
     updatedAt: z.string().datetime().optional(),
   })

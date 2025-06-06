@@ -1,6 +1,6 @@
 import { Form } from "@/components/ui/form";
 import { api } from "@buzztrip/backend/api";
-import { NewLabel, NewLabel, NewMap } from "@buzztrip/backend/types";
+import { NewLabel, NewMap } from "@buzztrip/backend/types";
 import {
   mapsEditSchema,
   permissionEnumSchema,

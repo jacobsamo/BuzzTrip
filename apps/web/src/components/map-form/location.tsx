@@ -104,15 +104,15 @@ const MapLocationForm = () => {
                   details?.placeDetails?.formatted_address ??
                   ""
               );
-              setValue("lat", details?.location.lat ?? null, {
+              setValue("lat", details?.location.lat ?? undefined, {
                 shouldDirty: true,
                 shouldTouch: true,
               });
-              setValue("lng", details?.location.lng ?? null, {
+              setValue("lng", details?.location.lng ?? undefined, {
                 shouldDirty: true,
                 shouldTouch: true,
               });
-              setValue("bounds", details?.bounds.toJSON() ?? null, {
+              setValue("bounds", details?.bounds.toJSON() ?? undefined, {
                 shouldDirty: true,
                 shouldTouch: true,
               });
@@ -120,7 +120,7 @@ const MapLocationForm = () => {
                 "location_name",
                 details?.placeDetails.name ??
                   details?.placeDetails?.formatted_address ??
-                  null,
+                  undefined,
                 {
                   shouldDirty: true,
                   shouldTouch: true,

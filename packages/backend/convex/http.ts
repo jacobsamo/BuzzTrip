@@ -1,7 +1,7 @@
 import type { WebhookEvent } from "@clerk/backend";
 import { httpRouter } from "convex/server";
 import { Webhook } from "svix";
-import { internal } from "./_generated/api";
+import { internal, api } from "./_generated/api";
 import { httpAction } from "./_generated/server";
 
 function ensureEnvironmentVariable(name: string): string {
@@ -24,7 +24,7 @@ const handleClerkWebhook = httpAction(async (ctx, request) => {
   switch (event.type) {
     case "user.created": // intentional fallthrough
     case "user.updated": {
-      const existingUser = await ctx.runQuery(internal.users.getUser, {
+      const existingUser = await ctx.runQuery(api.users.getUser, {
         subject: event.data.id,
       });
       if (existingUser && event.type === "user.created") {

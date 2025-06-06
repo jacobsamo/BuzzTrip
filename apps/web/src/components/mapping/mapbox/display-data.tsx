@@ -19,7 +19,7 @@ const DisplayMapData = () => {
         markers &&
         markers.map((marker) => (
           <Marker
-            key={marker.marker_id}
+            key={marker._id}
             latitude={marker.lat}
             longitude={marker.lng}
             onClick={() => {

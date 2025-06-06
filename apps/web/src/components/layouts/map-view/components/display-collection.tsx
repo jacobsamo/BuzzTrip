@@ -46,7 +46,7 @@ const DisplayCollection = ({ collection, markers }: DisplayCollectionProps) => {
 
   return (
     <Collapsible
-      key={collection.collection_id}
+      key={collection._id}
       defaultOpen={true}
       className="group/collapsible"
     >
@@ -62,7 +62,7 @@ const DisplayCollection = ({ collection, markers }: DisplayCollectionProps) => {
           <CollapsibleContent>
             <SidebarMenuSub className="space-y-2">
               {markers.map((marker) => (
-                <SidebarMenuSubItem key={marker.marker_id}>
+                <SidebarMenuSubItem key={marker._id}>
                   <DisplayMarker marker={marker} />
                 </SidebarMenuSubItem>
               ))}

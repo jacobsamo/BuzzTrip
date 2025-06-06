@@ -8,15 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { UserMap } from "@buzztrip/backend/types";
 import { formatDistanceToNow } from "date-fns";
-import { Calendar, MapIcon, MoreHorizontal, User } from "lucide-react";
+import { Calendar, Edit2, MapIcon, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -59,35 +53,16 @@ const MapCard = ({ map }: MapCardProps) => {
             <div className="flex justify-between items-start">
               <CardTitle className="text-lg truncate">{map.title}</CardTitle>
               {(map.permission === "owner" || map.permission === "editor") && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      <MoreHorizontal className="size-4" />
-                      <span className="sr-only">Open menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setIsEditModalOpen(true);
-                      }}
-                    >
-                      Edit Map
-                    </DropdownMenuItem>
-                    {/* Open edit modal */}
-                    <DropdownMenuItem>Share</DropdownMenuItem>{" "}
-                    {/* Open edit modal to share */}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsEditModalOpen(true);
+                  }}
+                  variant={"ghost"}
+                  size="icon"
+                >
+                  <Edit2 />
+                </Button>
               )}
             </div>
           </CardHeader>

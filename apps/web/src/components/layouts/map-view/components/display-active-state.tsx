@@ -24,11 +24,11 @@ const DisplayActiveState = () => {
               {collections ? (
                 collections?.map((collection) => {
                   const mark = getMarkersForCollection(
-                    collection.collection_id
+                    collection._id
                   );
                   return (
                     <DisplayCollection
-                      key={collection.collection_id}
+                      key={collection._id}
                       collection={collection}
                       markers={mark}
                     />
@@ -43,7 +43,7 @@ const DisplayActiveState = () => {
             <ScrollArea>
               {markers ? (
                 markers.map((marker) => (
-                  <DisplayMarker marker={marker} key={marker.marker_id} />
+                  <DisplayMarker marker={marker} key={marker._id} />
                 ))
               ) : (
                 <p>No Markers</p>

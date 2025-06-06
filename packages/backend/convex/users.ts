@@ -78,11 +78,21 @@ export const updateOrCreateUser = internalMutation({
   args: { data: v.any() }, // no runtime validation, trust Clerk
   async handler(ctx, { data }: { data: UserJSON }) {
     const userRecord = await userQuery(ctx, data.id);
+    const userEmailAddress = data.email_addresses.find(email => email.id === data.primary_email_address_id) || data.email_addresses[0];
+    if (!userEmailAddress) {
+      console.error("No email address found for user", {
+        data,
+        userRecord,
+        userEmailAddress,
+      })
+      return;
+    }
+
     const user = {
       clerkUserId: data.id,
       name: `${data.first_name} ${data.last_name}`,
       first_name: data.first_name ?? undefined,
-      email: data.email_addresses[0].email_address,
+      email: userEmailAddress.email_address,
       last_name: data.last_name ?? undefined,
       username: data.username ?? undefined,
       image: data.image_url,

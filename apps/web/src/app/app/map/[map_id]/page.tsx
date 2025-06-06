@@ -1,7 +1,6 @@
 import { Map_page } from "@/components/layouts/map-view";
 import { MapStoreProvider } from "@/components/providers/map-state-provider";
 import { constructMetadata } from "@/lib/utils/metadata";
-import { getSession } from "@/server/getSession";
 import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
 import { type NextjsOptions, fetchQuery } from "convex/nextjs";

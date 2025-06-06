@@ -37,7 +37,7 @@ const CollectionsView = ({ collection, markers }: CollectionsViewProps) => {
 
   return (
     <Collapsible
-      key={collection.collection_id}
+      key={collection._id}
       open={open}
       onOpenChange={() => setOpen(!open)}
       className="w-full"
@@ -49,7 +49,7 @@ const CollectionsView = ({ collection, markers }: CollectionsViewProps) => {
           ) : (
             <ChevronRight className="mr-1 h-4 w-4" />
           )}
-          <Icon name={collection.icon} />
+          <Icon name={collection.icon ?? "MapPin"} />
 
           <span>{collection.title}</span>
         </CollapsibleTrigger>
@@ -73,11 +73,11 @@ const CollectionsView = ({ collection, markers }: CollectionsViewProps) => {
         {markers &&
           markers.map((marker) => (
             <div
-              key={marker.marker_id}
+              key={marker._id}
               className="flex items-center justify-between py-1"
             >
               <div className="flex items-center">
-                <MarkerPin color={marker.color} icon={marker.icon} />
+                <MarkerPin color={marker.color} icon={marker.icon ?? "MapPin"} />
                 <span>{marker.title}</span>
               </div>
               <OpenMarkerButton marker={marker} mode="edit" />
