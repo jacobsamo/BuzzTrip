@@ -15,7 +15,8 @@
       "types": "./convex/_generated/dataModel.d.ts"
     },
     "./zod-schemas": "./zod-schemas/index.ts",
-    "./types": "./types/index.ts"
+    "./types": "./types/index.ts",
+    "./generateId": "./generateId.ts"
   },
   "keywords": [],
   "author": "",

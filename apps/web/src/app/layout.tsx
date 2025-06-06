@@ -9,6 +9,7 @@ import { Monitoring } from "react-scan/monitoring/next";
 import {
   ClerkProvider,
 } from '@clerk/nextjs'
+import {ReactScan} from "@/components/react-scan";
 
 export const metadata: Metadata = constructMetadata();
 
@@ -36,6 +37,7 @@ export default function RootLayout({
           commit={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}
           branch={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF}
         />
+        <ReactScan />
         <Providers>
           <Navbar />
           {children}

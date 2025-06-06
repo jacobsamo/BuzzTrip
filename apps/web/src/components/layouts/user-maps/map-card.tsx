@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Map, UserMap } from "@buzztrip/backend/types";
+import { UserMap } from "@buzztrip/backend/types";
 import { formatDistanceToNow } from "date-fns";
 import { Calendar, MapIcon, MoreHorizontal, User } from "lucide-react";
 import Image from "next/image";
@@ -29,6 +29,7 @@ const MapCard = ({ map }: MapCardProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const mapImage = map.image || "/placeholder.svg?height=200&width=400";
   const mapColor = map.color || "#2C7772";
+  console.log("map", map);
 
   return (
     <>
@@ -104,9 +105,12 @@ const MapCard = ({ map }: MapCardProps) => {
               <div className="flex items-center">
                 <Calendar className="h-3 w-3 mr-1" />
                 <span>
-                  {formatDistanceToNow(new Date(map.updatedAt || map._creationTime), {
-                    addSuffix: true,
-                  })}
+                  {formatDistanceToNow(
+                    new Date(map.updatedAt || map._creationTime),
+                    {
+                      addSuffix: true,
+                    }
+                  )}
                 </span>
               </div>
               <div className="flex items-center">
@@ -118,7 +122,22 @@ const MapCard = ({ map }: MapCardProps) => {
         </Link>
       </Card>
       <EditMapModal
-        map={map}
+        map={{
+          _id: map.map_id,
+          title: map.title,
+          description: map.description,
+          image: map.image,
+          icon: map.icon,
+          color: map.color,
+          owner_id: map.owner_id,
+          location_name: map.location_name,
+          lat: map.lat,
+          lng: map.lng,
+          bounds: map.bounds,
+          visibility: map.visibility,
+          updatedAt: map.updatedAt,
+          _creationTime: map._creationTime,
+        }}
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
       />

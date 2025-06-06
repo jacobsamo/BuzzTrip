@@ -61,7 +61,7 @@ const LabelForm = ({ label }: LabelFormProps) => {
   const performUpdate = useCallback(() => {
     if (!isUpdatingRef.current && hasChangedSinceLastUpdate) {
       isUpdatingRef.current = true;
-      updateLabel(label.label_id, currentValues);
+      updateLabel(label._id, currentValues);
       lastUpdatedValuesRef.current = { ...currentValues };
 
       // Reset the updating flag after a short delay
@@ -69,7 +69,7 @@ const LabelForm = ({ label }: LabelFormProps) => {
         isUpdatingRef.current = false;
       }, 100);
     }
-  }, [hasChangedSinceLastUpdate, label.label_id, updateLabel, currentValues]);
+  }, [hasChangedSinceLastUpdate, label._id, updateLabel, currentValues]);
 
   // Debounced auto-update effect
   useEffect(() => {
@@ -97,8 +97,8 @@ const LabelForm = ({ label }: LabelFormProps) => {
 
   // Memoized remove handler
   const handleRemoveLabel = useCallback(() => {
-    removeLabel(label.label_id);
-  }, [removeLabel, label.label_id]);
+    removeLabel(label._id);
+  }, [removeLabel, label._id]);
 
   return (
     <Card className="relative gap-0 py-1 mt-2">

@@ -158,7 +158,7 @@ const MapShareForm = () => {
                     {
                       // if the user is the owner of the map, we don't want to allow them to remove themselves
                       "opacity-50 cursor-not-allowed pointer-events-none":
-                        user._id === userId,
+                        user.permission === "owner",
                     }
                   )}
                 >
@@ -168,7 +168,7 @@ const MapShareForm = () => {
                         src={user.image || "/placeholder.svg"}
                         alt={user.name}
                       />
-                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{user.email}</AvatarFallback>
                     </Avatar>
                     <div>
                       <p className="font-medium text-xs sm:text-sm">
@@ -188,7 +188,7 @@ const MapShareForm = () => {
                           permission: value as PermissionEnum,
                         })
                       }
-                      disabled={user._id === userId}
+                      disabled={user.permission === "owner"}
                     >
                       <SelectTrigger className="w-24">
                         <SelectValue />
@@ -204,7 +204,7 @@ const MapShareForm = () => {
                       size="sm"
                       variant="outline"
                       onClick={() => removeUser(user._id)}
-                      disabled={user._id === userId}
+                      disabled={user.permission === "owner"}
                     >
                       Remove
                     </Button>

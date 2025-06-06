@@ -1,6 +1,12 @@
 import { getManyFrom } from "convex-helpers/server/relationships";
 import { zid } from "convex-helpers/server/zod";
-import { mapUserSchema, shareMapUserSchema } from "../../zod-schemas";
+import type { RefinedUser } from "../../types";
+import {
+  combinedMapUser,
+  mapUserEditSchema,
+  mapUserSchema,
+  shareMapUserSchema,
+} from "../../zod-schemas";
 import { Id } from "../_generated/dataModel";
 import { MutationCtx } from "../_generated/server";
 import { authedMutation, authedQuery } from "../helpers";
@@ -15,6 +21,39 @@ export const getMapUsers = authedQuery({
       .query("map_users")
       .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
       .collect();
+  },
+});
+
+/**
+ * Combine a refined user with the map user
+ */
+export const getCombinedMapUsers = authedQuery({
+  args: {
+    mapId: zid("maps"),
+  },
+  returns: combinedMapUser.array(),
+  handler: async (ctx, args) => {
+    const mapUsers = await ctx.db
+      .query("map_users")
+      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+      .collect();
+
+    const combinedUsers = await Promise.all(
+      mapUsers.map(async (mapUser) => {
+        const user = await ctx.db.get(mapUser.user_id);
+        if (!user) return null;
+
+        return {
+          ...mapUser,
+          user,
+        };
+      })
+    );
+
+    // Properly filter out nulls and type narrow
+    return combinedUsers.filter(
+      (m): m is typeof m & { user: RefinedUser } => m !== null
+    );
   },
 });
 
@@ -71,7 +110,7 @@ export const shareMap = authedMutation({
 });
 
 export const editMapUser = authedMutation({
-  args: mapUserSchema,
+  args: mapUserEditSchema,
   handler: async (ctx, args) => {
     await ctx.db.patch(args._id as Id<"map_users">, {
       permission: args.permission,

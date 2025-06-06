@@ -59,13 +59,13 @@ export const mapUserSchema = defaultSchema(
     permission: permissionEnumSchema.default("editor"),
   })
 );
+export const mapUserEditSchema = insertSchema(mapUserSchema);
 
 export const shareMapUserSchema = mapUserSchema.pick({
   user_id: true,
   permission: true,
 });
 
-export const mapUserEditSchema = insertSchema(mapUserSchema);
 
 const labelSchema = z.object({
   map_id: zid("maps"),

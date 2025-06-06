@@ -27,6 +27,7 @@ import {
   travelTypeEnumSchema,
   userMapsSchema,
   userSchema,
+  combinedMapUser
 } from "../zod-schemas";
 
 export * from "./icons";
@@ -35,6 +36,8 @@ export type User = z.infer<typeof userSchema>;
 // export type NewUser = typeof users.$inferInsert>
 
 export type UserMap = z.infer<typeof userMapsSchema>;
+
+export type CombinedMapUser = z.infer<typeof combinedMapUser>;
 
 export type RefinedUser = z.infer<typeof refinedUserSchema>;
 

@@ -3,6 +3,7 @@ import { mapsSchema, mapUserSchema, markersEditSchema, markersSchema } from "./m
 import { placesEditSchema, placesSchema } from "./places-schema";
 import { boundsSchema } from "./shared-schemas";
 import { z } from "zod";
+import { refinedUserSchema } from "./auth-schema";
 
 export * from "./auth-schema";
 export * from "./maps-schema";
@@ -17,3 +18,8 @@ export const combinedMarkersSchema = placesEditSchema.extend({
 });
 
 export const userMapsSchema = mapsSchema.merge(mapUserSchema);
+
+
+export const combinedMapUser = mapUserSchema.extend({
+  user: refinedUserSchema
+})

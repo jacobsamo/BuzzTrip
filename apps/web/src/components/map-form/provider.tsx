@@ -1,6 +1,6 @@
 import { Form } from "@/components/ui/form";
 import { api } from "@buzztrip/backend/api";
-import { Label, NewLabel, NewMap } from "@buzztrip/backend/types";
+import { NewLabel, NewLabel, NewMap } from "@buzztrip/backend/types";
 import {
   mapsEditSchema,
   permissionEnumSchema,
@@ -35,7 +35,7 @@ type MapFormContextType = {
   form: UseFormReturn<z.infer<typeof mapsEditSchema>>;
   onSubmit: () => void;
   users: RefinedUserWithPermission[] | null;
-  labels: Label[] | null;
+  labels: NewLabel[] | null;
   addUser: (user: RefinedUserWithPermission) => void;
   removeUser: (userId: string) => void;
   updateUser: (userId: string, user: RefinedUserWithPermission) => void;
@@ -75,7 +75,7 @@ type MapFormProviderProps = {
   onSubmit: SubmitHandler<z.infer<typeof mapsEditSchema>>;
   initialMapData?: NewMap;
   initialUsers?: RefinedUserWithPermission[] | null;
-  initialLabels?: Label[] | null;
+  initialLabels?: NewLabel[] | null;
   setExternalUsers?: (users: RefinedUserWithPermission[] | null) => void;
   setExternalLabels?: (labels: NewLabel[] | null) => void;
   onUserChange?: (e: MapFormUserEvents) => void;
@@ -137,7 +137,7 @@ export const MapFormProvider = ({
   const [users, setUsers] = useState<RefinedUserWithPermission[] | null>(
     initialUsers
   );
-  const [labels, setLabels] = useState<Label[] | null>(initialLabels);
+  const [labels, setLabels] = useState<NewLabel[] | null>(initialLabels);
 
   // Only update state when initialUsers actually changes (deep comparison)
   const initialUsersStringified = useMemo(
@@ -224,15 +224,13 @@ export const MapFormProvider = ({
 
   // Memoized label handlers to prevent unnecessary re-renders
   const addLabel = useCallback((label: NewLabel) => {
-    const newLabel: Label = {
+    const newLabel: NewLabel = {
       ...label,
-      _id: "",
-      _creationTime: 0,
       map_id: label.map_id!,
       title: label.title ?? "",
       color: label?.color ?? undefined,
-      icon: label?.icon ?? null,
-      description: label?.description ?? null,
+      icon: label?.icon ?? undefined,
+      description: label?.description ?? undefined,
     };
 
     setLabels((prev) => {

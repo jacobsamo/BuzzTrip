@@ -7,6 +7,7 @@ import { Label } from "../ui/label";
 import { ScrollArea } from "../ui/scroll-area";
 import LabelForm from "./label-form";
 import { useMapFormContext } from "./provider";
+import { generateId } from "@buzztrip/backend/generateId";
 
 const MapLabelsForm = () => {
   const {
@@ -39,8 +40,6 @@ const MapLabelsForm = () => {
               icon: "MapPin",
               title: "",
               map_id: mapId as Id<"maps">,
-              _id: "",
-              _creationTime: 0,
               created_by: userStatus.user._id,
               description: "",
             })

@@ -215,7 +215,7 @@ function MarkerForm() {
         //     userId: userId!,
         //   },
         // });
-
+        delete data.collection_ids;
         const updatedMarker = updateMarker({
           marker_id: markerId as Id<"markers">,
           marker: data,
@@ -235,12 +235,13 @@ function MarkerForm() {
       }
 
       if (mode == "create") {
+        // remove collection_ids from data
+        delete data.collection_ids;
+        console.log("Data", data);
         const createdMarker = createMarker({
-          marker: {
-            ...data,
-          },
-          collectionIds: cols,
           mapId: map._id as Id<"maps">,
+          marker: data,
+          collectionIds: cols,
         });
 
         toast.promise(createdMarker, {

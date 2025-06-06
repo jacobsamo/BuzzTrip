@@ -58,42 +58,42 @@ const Mapview = () => {
     );
   }, [routesLibrary, googleMap]);
 
-  useEffect(() => {
-    if (!directionsService || !directionsRenderer || !routeStops || !routes)
-      return;
+  // useEffect(() => {
+  //   if (!directionsService || !directionsRenderer || !routeStops || !routes)
+  //     return;
 
-    routes.forEach((route) => {
-      const stops = routeStops
-        .filter((stop) => stop.route_id === route.route_id)
-        .sort((a, b) => a.stop_order - b.stop_order);
-      const start = stops[0];
-      const end = stops[stops.length - 1];
-      const mid = stops.slice(1, stops.length - 1);
+  //   routes.forEach((route) => {
+  //     const stops = routeStops
+  //       .filter((stop) => stop.route_id === route.route_id)
+  //       .sort((a, b) => a.stop_order - b.stop_order);
+  //     const start = stops[0];
+  //     const end = stops[stops.length - 1];
+  //     const mid = stops.slice(1, stops.length - 1);
 
-      if (!stops || !start || !end) return;
+  //     if (!stops || !start || !end) return;
 
-      directionsService
-        .route({
-          origin: { lat: start.lat, lng: start.lng },
-          destination: { lat: end.lat, lng: end.lng },
-          waypoints: mid.map((stop) => ({
-            location: { lat: stop.lat, lng: stop.lng },
-            stopover: true,
-          })),
-          travelMode: getGoogleMapsTravelMode(route.travel_type),
-          provideRouteAlternatives: false,
-        })
-        .then((response) => {
-          directionsRenderer.setDirections(response);
-          setGoogleRoutes(response.routes);
-        });
-    });
+  //     directionsService
+  //       .route({
+  //         origin: { lat: start.lat, lng: start.lng },
+  //         destination: { lat: end.lat, lng: end.lng },
+  //         waypoints: mid.map((stop) => ({
+  //           location: { lat: stop.lat, lng: stop.lng },
+  //           stopover: true,
+  //         })),
+  //         travelMode: getGoogleMapsTravelMode(route.travel_type),
+  //         provideRouteAlternatives: false,
+  //       })
+  //       .then((response) => {
+  //         directionsRenderer.setDirections(response);
+  //         setGoogleRoutes(response.routes);
+  //       });
+  //   });
 
-    return () => {
-      directionsRenderer.setMap(null);
-      setGoogleRoutes([]);
-    };
-  }, [directionsService, directionsRenderer, routes, routeStops]);
+  //   return () => {
+  //     directionsRenderer.setMap(null);
+  //     setGoogleRoutes([]);
+  //   };
+  // }, [directionsService, directionsRenderer, routes, routeStops]);
 
   const handleClick = async (e: any) => {
     if (!places || !googleMap) return;
@@ -221,7 +221,7 @@ const Mapview = () => {
         {markers &&
           markers.map((marker) => (
             <AdvancedMarker
-              key={marker.marker_id}
+              key={marker._id}
               position={{ lat: marker.lat, lng: marker.lng }}
               title={marker.title}
               onClick={() => {
@@ -229,7 +229,7 @@ const Mapview = () => {
                 setActiveLocation(marker);
               }}
             >
-              <MarkerPin color={marker.color} icon={marker.icon} size={16} />
+              <MarkerPin color={marker.color} icon={marker.icon!} size={16} />
             </AdvancedMarker>
           ))}
       </GoogleMap>

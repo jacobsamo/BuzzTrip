@@ -44,9 +44,9 @@ export const getMarkersView = authedQuery({
 
         return newMarker;
       })
-    )
+    );
 
-    return combinedMarkers.filter((m): m is CombinedMarker => !!m);;
+    return combinedMarkers.filter((m): m is CombinedMarker => !!m);
   },
 });
 
@@ -80,24 +80,27 @@ export const createMarker = authedMutation({
     }
 
     const newMarkerId = await ctx.db.insert("markers", {
-      ...args.marker,
-      map_id: args.mapId,
-      place_id: place?._id ?? (placeId as Id<"places">),
+      title: args.marker.title,
+      note: args.marker.note,
+      lat: args.marker.lat,
+      lng: args.marker.lng,
       created_by: ctx.user._id,
       icon: args.marker.icon as IconType,
+      color: args.marker.color,
+      place_id: place?._id ?? (placeId as Id<"places">),
+      map_id: args.mapId,
+      updatedAt: args.marker.updatedAt,
     });
 
     if (args.collectionIds) {
-      await Promise.all(
-        args.collectionIds.map((collectionId) => {
-          ctx.db.insert("collection_links", {
-            marker_id: newMarkerId,
-            collection_id: collectionId as Id<"collections">,
-            map_id: args.mapId,
-            user_id: ctx.user._id,
-          });
-        })
-      );
+      for (const collectionId of args.collectionIds) {
+        await ctx.db.insert("collection_links", {
+          marker_id: newMarkerId,
+          collection_id: collectionId as Id<"collections">,
+          map_id: args.mapId,
+          user_id: ctx.user._id,
+        });
+      }
     }
 
     return newMarkerId;
@@ -106,8 +109,24 @@ export const createMarker = authedMutation({
 
 const createPlace = async (ctx: MutationCtx, place: NewPlace) => {
   const newPlaceId = await ctx.db.insert("places", {
-    ...place,
+    title: place.title,
+    description: place.description,
+    lat: place.lat,
+    lng: place.lng,
+    bounds: place.bounds,
+    address: place.address,
+    gm_place_id: place.gm_place_id,
+    mb_place_id: place.mb_place_id,
+    fq_place_id: place.fq_place_id,
+    plus_code: place.plus_code,
     icon: place.icon as IconType,
+    photos: place.photos,
+    rating: place.rating,
+    avg_price: place.avg_price,
+    types: place.types,
+    website: place.website,
+    phone: place.phone,
+    opening_times: place.opening_times,
   });
 
   await geospatial.insert(
@@ -119,7 +138,6 @@ const createPlace = async (ctx: MutationCtx, place: NewPlace) => {
     },
     {
       placeTypes: place.types ?? null,
-      address: place.address,
     }
   );
   return newPlaceId;

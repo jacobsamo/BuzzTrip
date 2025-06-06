@@ -1,10 +1,10 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
+import { Id } from "@buzztrip/backend/dataModel";
 import { CombinedMarker } from "@buzztrip/backend/types";
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { Command } from "cmdk";
 import { SearchIcon, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import {Id} from "@buzztrip/backend/dataModel";
 
 interface DetailsRequestCallbackReturn {
   placeDetails: google.maps.places.PlaceResult;
@@ -14,10 +14,8 @@ interface DetailsRequestCallbackReturn {
 
 export const detailsRequestCallback = (
   map: google.maps.Map,
-  mapId: string,
   placeDetails: google.maps.places.PlaceResult | null
 ): DetailsRequestCallbackReturn | null => {
-
   if (
     placeDetails == null ||
     !placeDetails.geometry ||
@@ -41,7 +39,7 @@ export const detailsRequestCallback = (
   const location: CombinedMarker = {
     note: undefined,
     color: "#0b7138",
-    map_id: mapId as Id<"maps">,
+    map_id: "" as Id<"maps">,
     gm_place_id: placeDetails.place_id ?? undefined,
     lat: placeDetails.geometry.location.lat(),
     lng: placeDetails.geometry.location.lng(),
@@ -74,9 +72,6 @@ export const AutocompleteCustomInput = () => {
   const places = useMapsLibrary("places");
   const { setActiveLocation, searchValue, setSearchValue } = useMapStore(
     (state) => state
-  );
-  const buzzTripMap = useMapStore(
-    (state) => state.map
   );
 
   // https://developers.google.com/maps/documentation/javascript/reference/places-autocomplete-service#AutocompleteSessionToken
@@ -167,7 +162,7 @@ export const AutocompleteCustomInput = () => {
       };
 
       placesService?.getDetails(detailRequestOptions, (data) => {
-        const res = detailsRequestCallback(map!, buzzTripMap._id, data);
+        const res = detailsRequestCallback(map!, data);
         if (res) {
           setActiveLocation(res.location);
           setSearchValue(

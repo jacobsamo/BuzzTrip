@@ -15,6 +15,7 @@ import {
 import { CommandLoading } from "cmdk";
 import { X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { Id } from "@buzztrip/backend/dataModel";
 
 interface DetailsRequestCallbackReturn {
   placeDetails: google.maps.places.PlaceResult;
@@ -47,11 +48,10 @@ export const detailsRequestCallback = (
   }
 
   const location: CombinedMarker = {
-    marker_id: undefined,
-    note: null,
-    color: null,
-    map_id: "",
-    gm_place_id: placeDetails.place_id ?? null,
+  note: undefined,
+    color: "#0b7138",
+    map_id: "" as Id<"maps">,
+    gm_place_id: placeDetails.place_id ?? undefined,
     lat: placeDetails.geometry.location.lat(),
     lng: placeDetails.geometry.location.lng(),
     bounds: bounds.toJSON(),
@@ -59,26 +59,16 @@ export const detailsRequestCallback = (
     title: placeDetails.name
       ? placeDetails.name
       : `${placeDetails.geometry.location.lat()}, ${placeDetails.geometry.location.lng()}`,
-    description: placeDetails?.html_attributions?.[0] ?? null,
-    plus_code: placeDetails.plus_code?.global_code ?? null,
-    address: placeDetails.formatted_address ?? null,
-    photos: placeDetails?.photos?.map((photo) => photo.getUrl({})) ?? null,
-    reviews:
-      placeDetails?.reviews?.map((review) => {
-        return {
-          author_name: review.author_name,
-          author_url: review.author_url ?? null,
-          profile_photo_url: review.profile_photo_url,
-          rating: review.rating ?? null,
-          description: review.text,
-        };
-      }) ?? null,
-    rating: placeDetails.rating ?? null,
-    avg_price: placeDetails.price_level ?? null,
-    types: placeDetails.types ?? null,
-    website: placeDetails.website ?? null,
-    phone: placeDetails.formatted_phone_number ?? null,
-    opening_times: placeDetails.opening_hours?.weekday_text ?? null,
+    description: placeDetails?.html_attributions?.[0] ?? undefined,
+    plus_code: placeDetails.plus_code?.global_code ?? undefined,
+    address: placeDetails.formatted_address ?? undefined,
+    photos: placeDetails?.photos?.map((photo) => photo.getUrl({})) ?? undefined,
+    rating: placeDetails.rating ?? 0,
+    avg_price: placeDetails.price_level ?? undefined,
+    types: placeDetails.types ?? undefined,
+    website: placeDetails.website ?? undefined,
+    phone: placeDetails.formatted_phone_number ?? undefined,
+    opening_times: placeDetails.opening_hours?.weekday_text ?? undefined,
   };
 
   return {
