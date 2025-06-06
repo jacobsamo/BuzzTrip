@@ -1,1 +1,0 @@
-ALTER TABLE `passkey` RENAME COLUMN "credential_i_d" TO "credential_id";

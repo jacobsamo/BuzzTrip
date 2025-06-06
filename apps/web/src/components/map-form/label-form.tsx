@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Label } from "@buzztrip/db/types";
-import { labelsEditSchema } from "@buzztrip/db/zod-schemas";
+import { Label } from "@buzztrip/backend/types";
+import { labelsEditSchema } from "@buzztrip/backend/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
@@ -61,7 +61,7 @@ const LabelForm = ({ label }: LabelFormProps) => {
   const performUpdate = useCallback(() => {
     if (!isUpdatingRef.current && hasChangedSinceLastUpdate) {
       isUpdatingRef.current = true;
-      updateLabel(label.label_id, currentValues);
+      updateLabel(label._id, currentValues);
       lastUpdatedValuesRef.current = { ...currentValues };
 
       // Reset the updating flag after a short delay
@@ -69,7 +69,7 @@ const LabelForm = ({ label }: LabelFormProps) => {
         isUpdatingRef.current = false;
       }, 100);
     }
-  }, [hasChangedSinceLastUpdate, label.label_id, updateLabel, currentValues]);
+  }, [hasChangedSinceLastUpdate, label._id, updateLabel, currentValues]);
 
   // Debounced auto-update effect
   useEffect(() => {
@@ -97,8 +97,8 @@ const LabelForm = ({ label }: LabelFormProps) => {
 
   // Memoized remove handler
   const handleRemoveLabel = useCallback(() => {
-    removeLabel(label.label_id);
-  }, [removeLabel, label.label_id]);
+    removeLabel(label._id);
+  }, [removeLabel, label._id]);
 
   return (
     <Card className="relative gap-0 py-1 mt-2">
@@ -113,8 +113,7 @@ const LabelForm = ({ label }: LabelFormProps) => {
       </Button>
       <CardContent className="inline-flex flex-wrap items-center gap-2 md:gap-8">
         <Form {...form}>
-            <div className="inline-flex items-center gap-2">
-
+          <div className="inline-flex items-center gap-2">
             <FormField
               control={control}
               name="icon"
@@ -164,25 +163,24 @@ const LabelForm = ({ label }: LabelFormProps) => {
                 );
               }}
             />
-          <FormField
-            control={control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                {/* <FormLabel>Label Name</FormLabel> */}
-                <FormControl>
-                  <Input
-                    placeholder="e.g., Restaurants, Hotels, Attractions"
-                    className=""
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-            </div>
-
+            <FormField
+              control={control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  {/* <FormLabel>Label Name</FormLabel> */}
+                  <FormControl>
+                    <Input
+                      placeholder="e.g., Restaurants, Hotels, Attractions"
+                      className=""
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <FormField
             control={control}

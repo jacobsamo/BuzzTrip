@@ -18,7 +18,7 @@ import type {
   OtherIcon,
   IconType,
   PopularIcon,
-} from "@buzztrip/db/types";
+} from "@buzztrip/backend/types";
 
 export interface IconProps {
   name: IconType;

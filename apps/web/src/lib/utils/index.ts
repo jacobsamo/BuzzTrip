@@ -1,6 +1,6 @@
+import { TravelTypeEnum } from "@buzztrip/backend/types";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { TravelTypeEnum } from "@buzztrip/db/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

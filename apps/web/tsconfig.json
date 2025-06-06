@@ -39,7 +39,4 @@
     "instrumentation-client.s"
   ],
   "exclude": ["node_modules"],
-  "references": [
-    { "path": "../api" },
-  ]
 }

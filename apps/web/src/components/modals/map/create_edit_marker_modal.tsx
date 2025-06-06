@@ -28,13 +28,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
-import { apiClient } from "@/server/api.client";
+import { api } from "@buzztrip/backend/api";
+import { Id } from "@buzztrip/backend/dataModel";
+import type { IconType } from "@buzztrip/backend/types";
+import { CombinedMarker } from "@buzztrip/backend/types";
+import { combinedMarkersSchema } from "@buzztrip/backend/zod-schemas";
 import { popularIconsList } from "@buzztrip/components/icon";
-import type { IconType } from "@buzztrip/db/types";
-import { CombinedMarker } from "@buzztrip/db/types";
-import { combinedMarkersSchema } from "@buzztrip/db/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMediaQuery } from "@uidotdev/usehooks";
+import { useMutation } from "convex/react";
 import { Circle, CircleCheck } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -43,7 +45,6 @@ import { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { useSession } from "@/lib/auth-client";
 import IconPickerModal from "../icon-picker-modal";
 
 const Icon = dynamic(() => import("@buzztrip/components/icon"), { ssr: false });
@@ -124,20 +125,17 @@ const schema = z.object({
 });
 
 function MarkerForm() {
+  const createMarker = useMutation(api.maps.markers.createMarker);
+  const updateMarker = useMutation(api.maps.markers.editMarker);
   const {
     collections,
-    setMarkers,
     map,
     markers,
     getCollectionsForMarker,
-    setCollectionLinks,
-    removeCollectionLinks,
     collectionLinks,
     setMarkerOpen,
     markerOpen,
   } = useMapStore((store) => store);
-  const {data} = useSession();
-  const userId = data?.session.userId;
 
   const { mode, marker } = markerOpen;
   const [inCollections, setInCollections] = React.useState<string[] | null>(
@@ -153,7 +151,7 @@ function MarkerForm() {
       icon: marker?.icon ?? "MapPin",
       color: marker?.color ?? "#0B7138",
       bounds: marker?.bounds ?? null,
-      map_id: map!.map_id,
+      map_id: map._id as Id<"maps">,
     },
   });
 
@@ -169,14 +167,13 @@ function MarkerForm() {
 
   useEffect(() => {
     const saved = marker
-      ? (markers?.find((marker) => marker.marker_id == marker.marker_id) ??
-        null)
+      ? (markers?.find((marker) => marker._id == marker._id) ?? null)
       : null;
     setIsSaved(saved);
 
     const inCols =
-      getCollectionsForMarker(saved?.marker_id ?? null)?.map(
-        (collection) => collection.collection_id
+      getCollectionsForMarker(saved?._id ?? null)?.map(
+        (collection) => collection._id
       ) ?? null;
     setInCollections(inCols);
     setValue("collection_ids", inCols, {
@@ -195,7 +192,7 @@ function MarkerForm() {
       const cols = data.collection_ids ?? null;
 
       if (mode == "edit") {
-        const markerId = marker!.marker_id!;
+        const markerId = marker!._id!;
         const selectedCollections = cols ?? [];
 
         // Collections to add are those in the selected list but not in the current list
@@ -208,38 +205,29 @@ function MarkerForm() {
           (collectionId) => !selectedCollections.includes(collectionId)
         );
 
-        const updatedMarker = apiClient.map[":mapId"].marker[":markerId"].$put({
-          param: { mapId: map!.map_id, markerId: markerId! },
-          json: {
-            marker_id: markerId!,
-            marker: data,
-            collectionIds_to_add: collectionsToAdd,
-            collectionIds_to_remove: collectionsToRemove,
-            userId: userId!,
-          },
+        // const updatedMarker = apiClient.map[":mapId"].marker[":markerId"].$put({
+        //   param: { mapId: map!.map_id, markerId: markerId! },
+        //   json: {
+        //     marker_id: markerId!,
+        //     marker: data,
+        //     collectionIds_to_add: collectionsToAdd,
+        //     collectionIds_to_remove: collectionsToRemove,
+        //     userId: userId!,
+        //   },
+        // });
+        delete data.collection_ids;
+        const updatedMarker = updateMarker({
+          marker_id: markerId as Id<"markers">,
+          marker: data,
+          collectionIds_to_add: collectionsToAdd as Id<"collections">[],
+          collectionIds_to_remove:
+            collectionsToRemove as Id<"collection_links">[],
+          mapId: map._id as Id<"maps">,
         });
 
         toast.promise(updatedMarker, {
           loading: "Updating marker...",
           success: async (res) => {
-            if (res.status == 200) {
-              const data = await res.json();
-
-              if (data.collectionLinksDeleted) {
-                removeCollectionLinks(data.collectionLinksDeleted);
-              }
-              if (data.collectionLinksCreated) {
-                setCollectionLinks(data.collectionLinksCreated);
-              }
-              if (data.marker) {
-                setMarkers([
-                  {
-                    ...data.marker,
-                    place_id: data.marker.place_id ?? undefined,
-                  },
-                ]);
-              }
-            }
             return "Marker updated successfully!";
           },
           error: "Failed to update marker",
@@ -247,27 +235,18 @@ function MarkerForm() {
       }
 
       if (mode == "create") {
-        const createMarker = apiClient.map[":mapId"].marker.create.$post({
-          param: { mapId: map!.map_id },
-          json: {
-            marker: {
-              ...data,
-            },
-            collectionIds: cols,
-            userId: userId!,
-          },
+        // remove collection_ids from data
+        delete data.collection_ids;
+        console.log("Data", data);
+        const createdMarker = createMarker({
+          mapId: map._id as Id<"maps">,
+          marker: data,
+          collectionIds: cols,
         });
 
-        toast.promise(createMarker, {
+        toast.promise(createdMarker, {
           loading: "Creating marker...",
-          success: async (res) => {
-            if (res.status == 200) {
-              const data = await res.json();
-              setMarkers(data.markers);
-              setCollectionLinks(data.collectionLinks);
-            }
-            return "Marker created successfully!";
-          },
+          success: "Marker created successfully!",
           error: "Failed to create marker",
         });
       }
@@ -397,7 +376,7 @@ function MarkerForm() {
                               "scale-105 border border-gray-500 text-black shadow-lg",
                           })}
                         >
-                          <Icon name={selectedIcon} size={24} />
+                          <Icon name={selectedIcon ?? "MapPin"} size={24} />
                         </div>
                       )}
                       {popularIconsList.map((icon, index) => (
@@ -415,7 +394,7 @@ function MarkerForm() {
                         </Button>
                       ))}
                       <IconPickerModal
-                        selectedIcon={watch("icon")}
+                        selectedIcon={watch("icon") ?? "MapPin"}
                         setSelectedIcon={field.onChange}
                       />
                     </div>
@@ -431,12 +410,12 @@ function MarkerForm() {
             {collections &&
               collections.map((collection, index) => {
                 const isChecked = watch("collection_ids")?.includes(
-                  collection.collection_id
+                  collection._id
                 );
 
                 return (
                   <Button
-                    onClick={() => handleChange(collection.collection_id!)}
+                    onClick={() => handleChange(collection._id!)}
                     key={index}
                     className={cn(
                       "group h-fit w-full flex-row items-start justify-start gap-2",

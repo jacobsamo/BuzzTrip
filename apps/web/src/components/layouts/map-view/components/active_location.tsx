@@ -19,7 +19,7 @@ const ActiveLocation = () => {
           <span className="flex flex-row gap-2">
             <MarkerPin
               color={activeLocation.color}
-              icon={activeLocation.icon}
+              icon={activeLocation.icon!}
             />
             <h1 className="text-2xl text-gray-900">{activeLocation.title}</h1>
           </span>

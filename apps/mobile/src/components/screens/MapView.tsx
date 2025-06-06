@@ -9,7 +9,7 @@ import {
   CombinedMarker,
   Map,
   MapUser,
-} from "@buzztrip/db/src/types";
+} from "@buzztrip/backend/src/types";
 
 export interface MapViewProps {
   initState: {

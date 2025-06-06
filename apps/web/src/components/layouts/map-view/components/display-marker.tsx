@@ -4,10 +4,9 @@ import {
   SidebarMenuAction,
   SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
-import { CombinedMarker } from "@buzztrip/db/types";
+import { CombinedMarker } from "@buzztrip/backend/types";
 import { useMap } from "@vis.gl/react-google-maps";
 import { Pencil } from "lucide-react";
-import React from "react";
 
 interface DisplayMarkerProps {
   marker: CombinedMarker;
@@ -31,7 +30,7 @@ const DisplayMarker = ({ marker }: DisplayMarkerProps) => {
       onClick={() => onMarkerClick(marker)}
       className="flex flex-row items-center justify-start gap-0 py-1"
     >
-      <MarkerPin color={marker.color} icon={marker.icon} size={16} />
+      <MarkerPin color={marker.color} icon={marker.icon ?? "MapPin"} size={16} />
       <span className="wrap ml-2 text-center text-sm">{marker.title}</span>
       <SidebarMenuAction onClick={() => setMarkerOpen(true, marker, "edit")}>
         <Pencil />

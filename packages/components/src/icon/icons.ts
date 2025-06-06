@@ -68,7 +68,7 @@ import type {
   OtherIcon,
   IconType,
   PopularIcon,
-} from "@buzztrip/db/types";
+} from "@buzztrip/backend/types";
 
 
 export const transport: Record<TransportIcon, Icon> = {

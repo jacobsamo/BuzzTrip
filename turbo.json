@@ -9,7 +9,7 @@
       "outputs": ["!.next/cache/**", ".next/**", "dist/**"]
     },
     "@buzztrip/web#build": {
-      "dependsOn": ["@buzztrip/api#build", "^build"],
+      "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["!.next/cache/**", ".next/**", "dist/**"]
     },

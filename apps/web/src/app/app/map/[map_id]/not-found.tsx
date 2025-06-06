@@ -1,9 +1,9 @@
-import { getSession } from "@/server/getSession";
+import { getConvexServerSession } from "@/lib/auth";
 import * as Sentry from "@sentry/nextjs";
 import { headers } from "next/headers";
 
 export default async function NotFound() {
-  const { data } = await getSession();
+  const session = await getConvexServerSession();
 
   const headersList = await headers();
   const path = headersList.get("referer");
@@ -11,15 +11,15 @@ export default async function NotFound() {
   Sentry.addBreadcrumb({
     data: {
       path: path,
-      userId: data?.session.userId,
+      session,
     },
     category: "request",
   });
   Sentry.captureMessage("User attempted to access a map that does not exist", {
     level: "warning",
-    user: data?.session.userId
+    user: session?.user?._id
       ? {
-          id: data?.session.userId,
+          id: session?.user?._id,
         }
       : undefined,
   });

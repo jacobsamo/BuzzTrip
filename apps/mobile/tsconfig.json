@@ -16,9 +16,4 @@
     "tailwind.config.js",
     "nativewind-env.d.ts",
   ],
-  "references": [
-    {
-      "path": "../api/tsconfig.json"
-    }
-  ]
 }

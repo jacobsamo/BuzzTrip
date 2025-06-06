@@ -4,7 +4,7 @@
   "private": true,
   "main": "./src/index.ts",
   "devDependencies": {
-    "@buzztrip/db": "workspace:*",
+    "@buzztrip/backend": "workspace:*",
     "@buzztrip/tsconfig": "workspace:*"
   },
   "dependencies": {

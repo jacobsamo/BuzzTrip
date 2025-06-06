@@ -41,10 +41,10 @@ const MainView = () => {
           <ScrollArea className="w-full grow">
             <div className="p-4">
               {collections?.map((collection) => {
-                const mark = getMarkersForCollection(collection.collection_id);
+                const mark = getMarkersForCollection(collection._id);
                 return (
                   <CollectionsView
-                    key={collection.collection_id}
+                    key={collection._id}
                     collection={collection}
                     markers={mark}
                   />

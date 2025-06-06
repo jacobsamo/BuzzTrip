@@ -1,7 +1,7 @@
 "use client";
 import GeneralCTA from "@/components/cta";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   ArrowRight,
@@ -64,6 +64,14 @@ const availableFeatures: Feature[] = [
     delay: 0.4,
     available: true,
   },
+  {
+    icon: <Users className="h-6 w-6 text-amber-700" />,
+    title: "Real-time Collaboration",
+    description:
+      "Work together with your team in real-time. See changes instantly as others edit the map.",
+    delay: 0.4,
+    available: true,
+  },
 ];
 
 const upComingFeatures: Feature[] = [
@@ -82,14 +90,6 @@ const upComingFeatures: Feature[] = [
       "Precise measurement tools for distances, areas, and elevations with multiple unit options.",
     delay: 0.6,
     timeline: "Q3 2025",
-  },
-  {
-    icon: <Users className="h-6 w-6 text-amber-700" />,
-    title: "Real-time Collaboration",
-    description:
-      "Work together with your team in real-time. See changes instantly as others edit the map.",
-    delay: 0.2,
-    timeline: "Q4 2025",
   },
   {
     icon: <Download className="h-6 w-6 text-amber-700" />,
@@ -173,6 +173,7 @@ const roadMap = [
     status: "in-progress",
     title: "Paths, Routes & Measurements",
     features: [
+      "Real-time collaborative editing",
       "Paths & routes with measurements",
       "Advanced marker customization",
       "Improved sharing options",
@@ -183,7 +184,6 @@ const roadMap = [
     status: "planned",
     title: "Collaboration & Sharing",
     features: [
-      "Real-time collaborative editing",
       "Advanced sharing permissions",
       "Email notifications for collaborators",
       "Comments and annotations",
@@ -653,7 +653,7 @@ export default function BuzzTripLanding() {
       </section>
 
       {/* CTA Section */}
-              <GeneralCTA />
+      <GeneralCTA />
       <div className="bg-purple-100" />
       <div className="text-purple-600" />
       <div className="bg-green-100" />

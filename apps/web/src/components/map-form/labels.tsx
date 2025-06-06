@@ -1,11 +1,13 @@
-//TODO: Create a component to create, update and delete labels
 import { Button } from "@/components/ui/button";
-import { generateId } from "@buzztrip/db/helpers";
+import { api } from "@buzztrip/backend/api";
+import { Id } from "@buzztrip/backend/dataModel";
+import { useQuery } from "convex/react";
 import { Plus } from "lucide-react";
 import { Label } from "../ui/label";
 import { ScrollArea } from "../ui/scroll-area";
 import LabelForm from "./label-form";
 import { useMapFormContext } from "./provider";
+import { generateId } from "@buzztrip/backend/generateId";
 
 const MapLabelsForm = () => {
   const {
@@ -14,9 +16,16 @@ const MapLabelsForm = () => {
     addLabel,
     removeLabel,
   } = useMapFormContext();
-  const mapId = watch("map_id");
+  const mapId = watch("_id");
+  const userStatus = useQuery(api.users.userLoginStatus);
 
-  if (!mapId) return null;
+  if (
+    !mapId ||
+    !userStatus ||
+    userStatus.message !== "Logged In" ||
+    !userStatus.user
+  )
+    return null;
 
   return (
     <>
@@ -30,8 +39,9 @@ const MapLabelsForm = () => {
             addLabel({
               icon: "MapPin",
               title: "",
-              map_id: mapId,
-              label_id: generateId("generic"),
+              map_id: mapId as Id<"maps">,
+              created_by: userStatus.user._id,
+              description: "",
             })
           }
           size="sm"
@@ -44,16 +54,16 @@ const MapLabelsForm = () => {
         {labels &&
           labels.map((label, index) => (
             <LabelForm
-              key={label.label_id}
+              key={label._id}
               label={{
-                label_id: label.label_id!,
-                description: label?.description ?? null,
+                _id: label._id!,
+                description: label?.description ?? undefined,
                 map_id: label.map_id!,
-                title: label.title!,
-                color: label?.color ?? null,
-                icon: label?.icon ?? null,
-                created_at: label?.created_at,
-                updated_at: label?.updated_at,
+                title: label.title ?? undefined,
+                color: label?.color ?? undefined,
+                icon: label?.icon ?? undefined,
+                _creationTime: label._creationTime ?? 0,
+                created_by: label.created_by ?? undefined,
               }}
             />
           ))}

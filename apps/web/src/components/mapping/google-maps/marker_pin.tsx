@@ -1,5 +1,5 @@
+import type { IconType } from "@buzztrip/backend/types";
 import type { IconProps } from "@buzztrip/components/icon";
-import type { IconType } from "@buzztrip/db/types";
 import dynamic from "next/dynamic";
 
 const Icon = dynamic(() => import("@buzztrip/components/icon"), { ssr: false });

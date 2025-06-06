@@ -9,7 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Map, UserMap } from "@buzztrip/db/types";
+import { api } from "@buzztrip/backend/api";
+import { Id } from "@buzztrip/backend/dataModel";
+import { useConvexAuth, useQuery } from "convex/react";
 import { MapIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
@@ -17,12 +19,14 @@ import MapCard from "./map-card";
 
 interface UserMapsProps {
   userId: string;
-  usersMaps: UserMap[] | null;
 }
 
-const UserMaps = ({ usersMaps }: UserMapsProps) => {
-  const [maps, setMaps] = useState<UserMap[] | null>(usersMaps);
-  const [sortOption, setSortOption] = useState("updated_at");
+const UserMaps = ({ userId }: UserMapsProps) => {
+  const {isAuthenticated} = useConvexAuth();
+  const maps = useQuery(api.maps.index.getUserMaps, {
+    userId: userId as Id<"users">,
+  });
+  const [sortOption, setSortOption] = useState("updatedAt");
   const [searchValue, setSearchValue] = useState("");
 
   const filteredMaps = useMemo(() => {
@@ -42,68 +46,22 @@ const UserMaps = ({ usersMaps }: UserMapsProps) => {
           switch (sortOption) {
             case "title":
               return a.title.localeCompare(b.title);
-            case "created_at":
+            case "_creationTime":
               return (
-                new Date(b.created_at).getTime() -
-                new Date(a.created_at).getTime()
+                new Date(b._creationTime).getTime() -
+                new Date(a._creationTime).getTime()
               );
-            case "updated_at":
+            case "updatedAt":
             default:
+              if (!a.updatedAt || !b.updatedAt) return 0;
               return (
-                new Date(b.updated_at).getTime() -
-                new Date(a.updated_at).getTime()
+                new Date(b.updatedAt).getTime() -
+                new Date(a.updatedAt).getTime()
               );
           }
         })
       : null;
   }, [filteredMaps, sortOption]);
-
-  const handleMapCreated = (map: Map | null) => {
-    if (map) {
-      const newMap: UserMap = {
-        title: map.title,
-        description: map.description,
-        map_id: map.map_id,
-        owner_id: map.owner_id,
-        image: map.image,
-        bounds: map.bounds,
-        icon: map.icon,
-        location_name: map.location_name,
-        visibility: map.visibility,
-        lat: map.lat,
-        lng: map.lng,
-        color: map.color,
-        user_id: map.owner_id,
-        permission: "owner",
-        map_user_id: map.owner_id,
-        created_at: map.created_at,
-        updated_at: map.updated_at,
-      };
-      setMaps((prev) => (prev ? [...prev, newMap] : [newMap]));
-    }
-  };
-
-  const handleMapUpdated = (map: Partial<Map>) => {
-    console.log("handleMapUpdated", map);
-    if (!maps) return;
-
-    const foundMap = maps.find((m) => m.map_id === map.map_id);
-    console.log("foundMap", foundMap);
-    if (foundMap) {
-      const newMap: UserMap = {
-        ...foundMap,
-        ...map,
-      };
-      console.log("newMap", newMap);
-      setMaps((prev) => {
-        if (!prev) return [newMap];
-
-        return prev.map((m) =>
-          m.map_id === map.map_id ? { ...m, ...map } : m
-        );
-      });
-    }
-  };
 
   if (!sortedMaps || sortedMaps.length === 0) {
     return (
@@ -121,7 +79,6 @@ const UserMaps = ({ usersMaps }: UserMapsProps) => {
               Create Your First Map
             </Button>
           }
-          setMap={handleMapCreated}
         />
       </div>
     );
@@ -130,7 +87,7 @@ const UserMaps = ({ usersMaps }: UserMapsProps) => {
   return (
     <div className="space-y-6">
       <div className="inline-flex w-full items-center justify-end">
-        <MapModal setMap={handleMapCreated} />
+        <MapModal />
       </div>
       <div className="space-y-6">
         <div className="flex flex-wrap gap-2 justify-end items-center">
@@ -141,8 +98,8 @@ const UserMaps = ({ usersMaps }: UserMapsProps) => {
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="updated_at">Last Updated</SelectItem>
-                <SelectItem value="created_at">Date Created</SelectItem>
+                <SelectItem value="updatedAt">Last Updated</SelectItem>
+                <SelectItem value="._creationTime">Date Created</SelectItem>
                 <SelectItem value="title">Title</SelectItem>
               </SelectContent>
             </Select>
@@ -158,18 +115,19 @@ const UserMaps = ({ usersMaps }: UserMapsProps) => {
 
         <AnimatePresence mode="sync">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {sortedMaps.map((map) => (
-              <motion.div
-                key={map.map_id}
-                layout
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-              >
-                <MapCard map={map} updateMap={handleMapUpdated} />
-              </motion.div>
-            ))}
+            {sortedMaps &&
+              sortedMaps.map((map) => (
+                <motion.div
+                  key={map.map_id}
+                  layout
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <MapCard map={map} />
+                </motion.div>
+              ))}
           </div>
         </AnimatePresence>
       </div>
