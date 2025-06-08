@@ -226,8 +226,8 @@ function MarkerForm() {
             icon: data.icon,
             color: data.color,
           },
-          collectionIds_to_add: collectionsToAdd,
-          collectionIds_to_remove: collectionsToRemove,
+          collectionIds_to_add: collectionsToAdd as Id<"collections">[],
+          collectionIds_to_remove: collectionsToRemove as Id<"collections">[],
           mapId: map._id as Id<"maps">,
         });
 
