@@ -23,12 +23,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
-import { apiClient } from "@/server/api.client";
+import { api } from "@buzztrip/backend/api";
+import { Id } from "@buzztrip/backend/dataModel";
+import { Collection } from "@buzztrip/backend/types";
 import Icon, { otherIconsList } from "@buzztrip/components/icon";
-import { Collection } from "@buzztrip/db/types";
 import { useMediaQuery } from "@uidotdev/usehooks";
+import { useMutation } from "convex/react";
 import { Edit, Plus } from "lucide-react";
 import * as React from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
@@ -117,9 +118,9 @@ const Close = ({ children }: { children: React.ReactNode }) => {
 };
 
 function CollectionForm({ mode, collection }: CollectionModalProps) {
-  const { setCollections, map } = useMapStore((store) => store);
-  const { data } = useSession();
-  const userId = data?.session.userId;
+  const { map } = useMapStore((store) => store);
+  const createCollection = useMutation(api.maps.collections.createCollection);
+  const editCollection = useMutation(api.maps.collections.editCollection);
 
   const { register, handleSubmit, watch, control } = useForm<Collection>({
     defaultValues: {
@@ -133,25 +134,45 @@ function CollectionForm({ mode, collection }: CollectionModalProps) {
   const onSubmit: SubmitHandler<Collection> = async (data: Collection) => {
     try {
       if (mode === "create") {
-        const create = apiClient.map[":mapId"].collection.create.$post({
-          param: { mapId: map!.map_id },
-          json: {
-            ...data,
-            created_by: userId!,
-            map_id: map!.map_id,
-          },
+        // const create = apiClient.map[":mapId"].collection.create.$post({
+        //   param: { mapId: map!.map_id },
+        //   json: {
+        //     ...data,
+        //     created_by: userId!,
+        //     map_id: map!.map_id,
+        //   },
+        // });
+
+        const create = createCollection({
+          ...data,
+          map_id: map._id as Id<"maps">,
         });
 
         toast.promise(create, {
           loading: "Creating collection...",
           success: async (res) => {
-            if (res.status == 200) {
-              const data = await res.json();
-              setCollections([data]);
-            }
             return "Collection created successfully!";
           },
           error: "Failed to create collection",
+        });
+      }
+
+      if (mode === "edit" && collection) {
+        const edit = editCollection({
+          collectionId: collection._id as Id<"collections">,
+          collection: {
+            ...data,
+          },
+        });
+
+        toast.promise(edit, {
+          loading: "Editing collection...",
+          success: async (res) => {
+            if (res) {
+              return "Collection edited successfully!";
+            }
+            return "Failed to edit collection";
+          },
         });
       }
 

@@ -1,8 +1,7 @@
 import { cn } from "@/lib/utils";
-import { CombinedMarker } from "@buzztrip/db/types";
+import { CombinedMarker } from "@buzztrip/backend/types";
 import { InfoWindow, InfoWindowProps } from "@vis.gl/react-google-maps";
 import Image from "next/image";
-import React from "react";
 
 interface InfoBoxProps extends InfoWindowProps {
   activeLocation: CombinedMarker;

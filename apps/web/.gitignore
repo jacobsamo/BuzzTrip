@@ -45,3 +45,6 @@ next-env.d.ts
 .db
 certificates
 
+
+# clerk configuration (can include secrets)
+/.clerk/

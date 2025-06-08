@@ -1,22 +1,16 @@
 import UserMaps from "@/components/layouts/user-maps";
-import { UserButton } from "@/components/user-button";
-import { db } from "@/server/db";
-import { getSession } from "@/server/getSession";
-import { getUserMaps } from "@buzztrip/db/queries";
+import { getConvexServerSession } from "@/lib/auth";
+import { UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-
 export default async function MapPage() {
-  const { data } = await getSession();
+  const session = await getConvexServerSession();
 
-  if (!data || !data.session) {
+  if (!session || session.message !== "Logged In" || !session.user._id) {
     return notFound();
   }
-
-  const usersMaps = await getUserMaps(db, data.session.userId);
 
   return (
     <div className="p-2">
@@ -33,7 +27,7 @@ export default async function MapPage() {
         </Link>
         <UserButton />
       </nav>
-      <UserMaps userId={data.session.userId} usersMaps={usersMaps} />
+      <UserMaps userId={session.user._id} />
     </div>
   );
 }

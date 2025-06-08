@@ -56,6 +56,7 @@ export default function RoadmapPage() {
       description:
         "Adding powerful tools for planning routes and measuring distances.",
       features: [
+        { name: "Real-time collaborative editing", icon: Users },
         { name: "Draw custom paths and routes", icon: Route },
         { name: "Distance and area measurements", icon: Ruler },
         { name: "Elevation profiles for routes", icon: Route },
@@ -71,7 +72,6 @@ export default function RoadmapPage() {
       description:
         "Making it easier to work together and share your maps with others.",
       features: [
-        { name: "Real-time collaborative editing", icon: Users },
         { name: "Advanced sharing permissions", icon: Users },
         { name: "Comments and annotations", icon: Users },
         { name: "Activity feed for shared maps", icon: Users },
