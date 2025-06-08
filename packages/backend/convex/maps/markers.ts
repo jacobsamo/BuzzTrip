@@ -1,7 +1,7 @@
 import { zid } from "convex-helpers/server/zod";
 import { z } from "zod";
 import type { CombinedMarker, IconType, NewPlace } from "../../types";
-import { combinedMarkersSchema } from "../../zod-schemas";
+import { combinedMarkersSchema, markersEditSchema } from "../../zod-schemas";
 import { Id } from "../_generated/dataModel";
 import { MutationCtx } from "../_generated/server";
 import { authedMutation, authedQuery, geospatial } from "../helpers";
@@ -145,9 +145,11 @@ export const editMarker = authedMutation({
   args: {
     marker_id: zid("markers"),
     mapId: zid("maps"),
-    marker: combinedMarkersSchema,
+    marker: markersEditSchema
+      .omit({ _id: true, _creationTime: true })
+      .partial(),
     collectionIds_to_add: zid("collections").array().nullable(),
-    collectionIds_to_remove: zid("collection_links").array().nullable(),
+    collectionIds_to_remove: zid("collections").array().nullable(),
   },
   handler: async (ctx, args) => {
     let collectionLinkCreatedIds: string[] | null = null;
@@ -155,7 +157,7 @@ export const editMarker = authedMutation({
       for (const collectionId of args.collectionIds_to_add) {
         await ctx.db.insert("collection_links", {
           marker_id: args.marker_id,
-          collection_id: collectionId,
+          collection_id: collectionId as Id<"collections">,
           map_id: args.mapId,
           user_id: ctx.user._id,
         });
@@ -167,19 +169,22 @@ export const editMarker = authedMutation({
     let collectionLinksDeleted: string[] = [];
     if (args.collectionIds_to_remove) {
       for (const collectionId of args.collectionIds_to_remove) {
-        await ctx.db.delete(collectionId);
+        const collectionLink = await ctx.db
+          .query("collection_links")
+          .withIndex("by_collection_id", (q) =>
+            q.eq("collection_id", collectionId)
+          )
+          .first();
+        if (!collectionLink) continue;
+        await ctx.db.delete(collectionLink._id);
         collectionLinksDeleted = collectionLinksDeleted ?? [];
         collectionLinksDeleted.push(collectionId);
       }
     }
 
-    await ctx.db.replace(args.marker_id, {
+    await ctx.db.patch(args.marker_id, {
       ...args.marker,
-      _id: args.marker_id,
-      map_id: args.mapId,
       icon: args.marker.icon as IconType,
-      created_by: ctx.user._id,
-      place_id: args.marker.place_id as Id<"places">,
       updatedAt: new Date().toISOString(),
     });
 
@@ -187,5 +192,14 @@ export const editMarker = authedMutation({
       collectionLinksDeleted: collectionLinksDeleted,
       collectionLinksCreated: collectionLinkCreatedIds,
     };
+  },
+});
+
+export const deleteMarker = authedMutation({
+  args: {
+    markerId: zid("markers"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.markerId);
   },
 });

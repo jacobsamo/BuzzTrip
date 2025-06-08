@@ -142,13 +142,12 @@ export const createMap = authedMutation({
 
 export const updateMap = authedMutation({
   args: {
-    map: mapsEditSchema,
+    mapId: zid("maps"),
+    map: mapsEditSchema.omit({ _id: true, _creationTime: true }),
   },
   handler: async (ctx, args) => {
-    await ctx.db.replace(args.map._id! as Id<"maps">, {
+    await ctx.db.patch(args.mapId, {
       ...args.map,
-      _id: args.map._id as Id<"maps">,
-      owner_id: args.map.owner_id as Id<"users">,
       updatedAt: new Date().toISOString(),
     });
   },

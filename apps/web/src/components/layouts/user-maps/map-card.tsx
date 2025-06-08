@@ -23,7 +23,6 @@ const MapCard = ({ map }: MapCardProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const mapImage = map.image || "/placeholder.svg?height=200&width=400";
   const mapColor = map.color || "#2C7772";
-  console.log("map", map);
 
   return (
     <>

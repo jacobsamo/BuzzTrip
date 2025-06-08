@@ -65,7 +65,7 @@ const availableFeatures: Feature[] = [
     available: true,
   },
   {
-    icon: <Users className="h-6 w-6 text-amber-700" />,
+    icon: <Users className="h-6 w-6 text-white" />,
     title: "Real-time Collaboration",
     description:
       "Work together with your team in real-time. See changes instantly as others edit the map.",

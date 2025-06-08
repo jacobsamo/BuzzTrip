@@ -1,4 +1,9 @@
-import { TravelTypeEnum } from "@buzztrip/backend/types";
+import { Id } from "@buzztrip/backend/dataModel";
+import {
+  Collection,
+  CollectionLink,
+  TravelTypeEnum,
+} from "@buzztrip/backend/types";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -20,3 +25,37 @@ export function getGoogleMapsTravelMode(travelType: TravelTypeEnum) {
       return google.maps.TravelMode.DRIVING;
   }
 }
+
+export const getCollectionsForMarker = (
+  collections: Collection[],
+  collectionLinks: CollectionLink[],
+  markerId: string
+) => {
+  const collectionIds = collectionLinks
+    .filter((link) => link.marker_id === markerId)
+    .map((link) => link.collection_id);
+
+  // Get the collections that match the collection IDs
+  const markerCollections = collections.filter((collection) =>
+    collectionIds.includes(collection._id as Id<"collections">)
+  );
+
+  return markerCollections;
+};
+
+export const getMarkersForCollection = (
+  markers: Collection[],
+  collectionLinks: CollectionLink[],
+  collectionId: string
+) => {
+  const markerIds = collectionLinks
+    .filter((link) => link.collection_id === collectionId)
+    .map((link) => link.marker_id);
+
+  // Get the markers that match the marker IDs
+  const links = markers.filter((marker) =>
+    markerIds.includes(marker._id as Id<"markers">)
+  );
+
+  return links;
+};

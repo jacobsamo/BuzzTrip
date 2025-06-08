@@ -127,7 +127,11 @@ function MapForm({
 
   const onSubmit = async (data: z.infer<typeof mapsEditSchema>) => {
     try {
+      delete data._id;
+      delete data._creationTime;
+
       const edit = updateMap({
+        mapId: map._id as Id<"maps">,
         map: {
           ...data,
           title: data.title,

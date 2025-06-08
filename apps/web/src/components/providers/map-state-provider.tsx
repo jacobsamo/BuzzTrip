@@ -2,8 +2,7 @@
 import { type InitState, type Store, createStore } from "@/lib/stores";
 import { type StoreState } from "@/lib/stores/default-state";
 import { api } from "@buzztrip/backend/api";
-import { Id } from "@buzztrip/backend/dataModel";
-import { useQuery } from "convex/react";
+import { Preloaded, usePreloadedQuery } from "convex/react";
 import {
   ReactNode,
   createContext,
@@ -20,33 +19,34 @@ export const MapStoreContext = createContext<MapStoreApi | undefined>(
   undefined
 );
 
+type MapStoreProviderPreloadedQueries = {
+  markers: Preloaded<typeof api.maps.markers.getMarkersView>;
+  collections: Preloaded<typeof api.maps.collections.getCollectionsForMap>;
+  collectionLinks: Preloaded<
+    typeof api.maps.collections.getCollectionLinksForMap
+  >;
+  labels: Preloaded<typeof api.maps.labels.getMapLabels>;
+  mapUsers: Preloaded<typeof api.maps.mapUsers.getMapUsers>;
+  // routes: Preloaded<typeof api.maps.routes.getRoutesForMap>;
+  // routeStops: Preloaded<typeof api.maps.routes.getRouteStopsForMap>;
+};
+
 export interface MapStoreProviderProps {
   children: ReactNode;
   initialState: InitState & Partial<StoreState>;
+  preloadedQueries: MapStoreProviderPreloadedQueries;
 }
 
 export const MapStoreProvider = ({
   children,
   initialState,
+  preloadedQueries,
 }: MapStoreProviderProps) => {
-  const markers = useQuery(api.maps.markers.getMarkersView, {
-    map_id: initialState.map._id as Id<"maps">,
-  });
-  const collections = useQuery(api.maps.collections.getCollectionsForMap, {
-    mapId: initialState.map._id as Id<"maps">,
-  });
-  const collectionLinks = useQuery(
-    api.maps.collections.getCollectionLinksForMap,
-    {
-      mapId: initialState.map._id as Id<"maps">,
-    }
-  );
-  const labels = useQuery(api.maps.labels.getMapLabels, {
-    mapId: initialState.map._id as Id<"maps">,
-  });
-  const mapUsers = useQuery(api.maps.mapUsers.getMapUsers, {
-    mapId: initialState.map._id as Id<"maps">,
-  });
+  const markers = usePreloadedQuery(preloadedQueries.markers);
+  const collections = usePreloadedQuery(preloadedQueries.collections);
+  const collectionLinks = usePreloadedQuery(preloadedQueries.collectionLinks);
+  const labels = usePreloadedQuery(preloadedQueries.labels);
+  const mapUsers = usePreloadedQuery(preloadedQueries.mapUsers);
   // const routes = useQuery(api.maps.routes.getRoutesForMap , {
   //   map_id: initialState.map._id as Id<"maps">,
   // })

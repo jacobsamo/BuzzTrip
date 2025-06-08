@@ -1,6 +1,10 @@
 import { zid } from "convex-helpers/server/zod";
 import { IconType } from "../../types";
-import { collectionsEditSchema, collectionsSchema, collection_linksSchema } from "../../zod-schemas";
+import {
+  collection_linksSchema,
+  collectionsEditSchema,
+  collectionsSchema,
+} from "../../zod-schemas";
 import { authedMutation, authedQuery } from "../helpers";
 
 export const getCollectionsForMap = authedQuery({
@@ -11,7 +15,8 @@ export const getCollectionsForMap = authedQuery({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("collections")
-      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId)).collect();
+      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+      .collect();
   },
 });
 
@@ -23,7 +28,8 @@ export const getCollectionLinksForMap = authedQuery({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("collection_links")
-      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId)).collect();
+      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+      .collect();
   },
 });
 
@@ -42,13 +48,12 @@ export const createCollection = authedMutation({
 export const editCollection = authedMutation({
   args: {
     collectionId: zid("collections"),
-    collection: collectionsEditSchema,
+    collection: collectionsEditSchema.omit({ _id: true, _creationTime: true }),
   },
   handler: async (ctx, args) => {
-    await ctx.db.replace(args.collectionId, {
+    await ctx.db.patch(args.collectionId, {
       ...args.collection,
-      _id: args.collectionId,
-      created_by: ctx.user._id,
+      updatedAt: new Date().toISOString(),
     });
 
     return args.collectionId;

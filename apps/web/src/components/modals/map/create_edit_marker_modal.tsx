@@ -119,7 +119,7 @@ export default function MarkerModal() {
 //   );
 // };
 
-const schema = z.object({
+const editSchema = z.object({
   ...combinedMarkersSchema.shape,
   collection_ids: z.array(z.string()).nullish(),
 });
@@ -127,6 +127,7 @@ const schema = z.object({
 function MarkerForm() {
   const createMarker = useMutation(api.maps.markers.createMarker);
   const updateMarker = useMutation(api.maps.markers.editMarker);
+  const deleteMarker = useMutation(api.maps.markers.deleteMarker);
   const {
     collections,
     map,
@@ -135,6 +136,7 @@ function MarkerForm() {
     collectionLinks,
     setMarkerOpen,
     markerOpen,
+    setActiveLocation,
   } = useMapStore((store) => store);
 
   const { mode, marker } = markerOpen;
@@ -144,8 +146,8 @@ function MarkerForm() {
   const [isSaved, setIsSaved] = React.useState<CombinedMarker | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
+  const form = useForm<z.infer<typeof editSchema>>({
+    resolver: zodResolver(editSchema),
     defaultValues: {
       ...marker,
       icon: marker?.icon ?? "MapPin",
@@ -186,7 +188,13 @@ function MarkerForm() {
     console.log("Errors: ", errors);
   }, [errors]);
 
-  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async (data) => {
+  const clearForm = () => {
+    reset();
+    setMarkerOpen(false, null, null);
+    setActiveLocation(null);
+  };
+
+  const onSubmit: SubmitHandler<z.infer<typeof editSchema>> = async (data) => {
     try {
       setIsLoading(true);
       const cols = data.collection_ids ?? null;
@@ -205,23 +213,21 @@ function MarkerForm() {
           (collectionId) => !selectedCollections.includes(collectionId)
         );
 
-        // const updatedMarker = apiClient.map[":mapId"].marker[":markerId"].$put({
-        //   param: { mapId: map!.map_id, markerId: markerId! },
-        //   json: {
-        //     marker_id: markerId!,
-        //     marker: data,
-        //     collectionIds_to_add: collectionsToAdd,
-        //     collectionIds_to_remove: collectionsToRemove,
-        //     userId: userId!,
-        //   },
-        // });
         delete data.collection_ids;
+        delete data._id;
+        delete data._creationTime;
         const updatedMarker = updateMarker({
           marker_id: markerId as Id<"markers">,
-          marker: data,
-          collectionIds_to_add: collectionsToAdd as Id<"collections">[],
-          collectionIds_to_remove:
-            collectionsToRemove as Id<"collection_links">[],
+          marker: {
+            title: data.title,
+            note: data.note,
+            lat: data.lat,
+            lng: data.lng,
+            icon: data.icon,
+            color: data.color,
+          },
+          collectionIds_to_add: collectionsToAdd,
+          collectionIds_to_remove: collectionsToRemove,
           mapId: map._id as Id<"maps">,
         });
 
@@ -251,8 +257,7 @@ function MarkerForm() {
         });
       }
 
-      reset();
-      setMarkerOpen(false, null, null);
+      clearForm();
     } catch (error) {
       console.error(error);
     }
@@ -260,17 +265,18 @@ function MarkerForm() {
   };
 
   const handleDelete = () => {
-    // const deleteCollection = fetch(
-    //   `/api/map/${map!.uid}/marker/${marker!.uid}`,
-    //   {
-    //     method: "DELETE",
-    //   }
-    // );
-    // toast.promise(deleteCollection, {
-    //   loading: "Deleting marker...",
-    //   success: "Markker deleted successfully",
-    //   error: "Failed to delete marker",
-    // });
+    const deletedMarker = deleteMarker({
+      markerId: marker!._id as Id<"markers">,
+    });
+
+    toast.promise(deletedMarker, {
+      loading: "Deleting marker...",
+      success: () => {
+        clearForm();
+        return "Marker deleted successfully";
+      },
+      error: "Failed to delete marker",
+    });
   };
 
   const handleChange = (id: string) => {

@@ -34,7 +34,7 @@ export default function RootLayout({
             commit={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}
             branch={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF}
           />
-          <ReactScan />
+          {process.env.NODE_ENV === "development" && <ReactScan />}
           <Providers>
             <Navbar />
             {children}
