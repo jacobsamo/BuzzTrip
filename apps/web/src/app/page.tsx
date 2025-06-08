@@ -260,7 +260,7 @@ export default function BuzzTripLanding() {
                   whileTap={{ scale: 0.98 }}
                 >
                   <Link
-                    href="/auth/sign-up"
+                    href="/sign-up"
                     className={buttonVariants({
                       variant: "outline",
                       size: "lg",
