@@ -122,11 +122,9 @@ const createPlace = async (ctx: MutationCtx, place: NewPlace) => {
     icon: place.icon as IconType,
     photos: place.photos,
     rating: place.rating,
-    avg_price: place.avg_price,
     types: place.types,
     website: place.website,
     phone: place.phone,
-    opening_times: place.opening_times,
   });
 
   await geospatial.insert(

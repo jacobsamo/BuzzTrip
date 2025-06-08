@@ -12,10 +12,10 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Id } from "@buzztrip/backend/dataModel";
 import { CommandLoading } from "cmdk";
 import { X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { Id } from "@buzztrip/backend/dataModel";
 
 interface DetailsRequestCallbackReturn {
   placeDetails: google.maps.places.PlaceResult;
@@ -48,7 +48,7 @@ export const detailsRequestCallback = (
   }
 
   const location: CombinedMarker = {
-  note: undefined,
+    note: undefined,
     color: "#0b7138",
     map_id: "" as Id<"maps">,
     gm_place_id: placeDetails.place_id ?? undefined,
@@ -64,11 +64,9 @@ export const detailsRequestCallback = (
     address: placeDetails.formatted_address ?? undefined,
     photos: placeDetails?.photos?.map((photo) => photo.getUrl({})) ?? undefined,
     rating: placeDetails.rating ?? 0,
-    avg_price: placeDetails.price_level ?? undefined,
     types: placeDetails.types ?? undefined,
     website: placeDetails.website ?? undefined,
     phone: placeDetails.formatted_phone_number ?? undefined,
-    opening_times: placeDetails.opening_hours?.weekday_text ?? undefined,
   };
 
   return {

@@ -21,11 +21,9 @@ export const placesSchema = defaultSchema(
     icon: iconSchema,
     photos: z.array(z.string()).nullish(),
     rating: z.number(),
-    avg_price: z.number().optional(),
     types: z.array(z.string()).nullish(),
     website: z.string().optional(),
     phone: z.string().optional(),
-    opening_times: z.array(z.string()).nullish(),
   })
 );
 

@@ -27,6 +27,7 @@
     "@better-auth-kit/convex": "^1.2.2",
     "@clerk/backend": "^2.0.0",
     "@convex-dev/geospatial": "^0.1.9",
+    "@convex-dev/migrations": "^0.2.9",
     "convex": "^1.24.8",
     "convex-helpers": "^0.1.90",
     "svix": "^1.66.0"

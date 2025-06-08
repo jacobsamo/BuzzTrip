@@ -53,11 +53,9 @@ export const detailsRequestCallback = (
     address: placeDetails.formatted_address ?? undefined,
     photos: placeDetails?.photos?.map((photo) => photo.getUrl({})) ?? undefined,
     rating: placeDetails.rating ?? 0,
-    avg_price: placeDetails.price_level ?? undefined,
     types: placeDetails.types ?? undefined,
     website: placeDetails.website ?? undefined,
     phone: placeDetails.formatted_phone_number ?? undefined,
-    opening_times: placeDetails.opening_hours?.weekday_text ?? undefined,
   };
 
   return {
