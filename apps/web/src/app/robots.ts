@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/auth", "/app"],
+      disallow: ["/sign-in", "/sign-up", "/app"],
     },
     sitemap: ["https://buzztrip.co/sitemap.xml"],
   };

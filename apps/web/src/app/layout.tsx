@@ -1,6 +1,7 @@
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
 import Providers from "@/components/providers";
+import { ReactScan } from "@/components/react-scan";
 import "@/lib/styles/globals.css";
 import { constructMetadata } from "@/lib/utils/metadata";
 import type { Metadata, Viewport } from "next";
@@ -23,20 +24,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
-        <Monitoring
-          apiKey="_N7F5vj5e4CAmWIMbP3ymcuvBkK-zCIa" // Safe to expose publically
-          url="https://monitoring.react-scan.com/api/v1/ingest"
-          commit={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}
-          branch={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF}
-        />
-        <Providers>
-          <Navbar />
-          {children}
-          <Footer />
-        </Providers>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body>
+          <Monitoring
+            apiKey="_N7F5vj5e4CAmWIMbP3ymcuvBkK-zCIa" // Safe to expose publically
+            url="https://monitoring.react-scan.com/api/v1/ingest"
+            commit={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA}
+            branch={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF}
+          />
+          {process.env.NODE_ENV === "development" && <ReactScan />}
+          <Providers>
+            <Navbar />
+            {children}
+            <Footer />
+          </Providers>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

@@ -1,13 +1,13 @@
 import { Form } from "@/components/ui/form";
-import { useSession } from "@/lib/auth-client";
-import { formatDateForSql, generateId } from "@buzztrip/db/helpers";
-import { Label, NewLabel, NewMap } from "@buzztrip/db/types";
+import { api } from "@buzztrip/backend/api";
+import { NewLabel, NewMap } from "@buzztrip/backend/types";
 import {
   mapsEditSchema,
   permissionEnumSchema,
   refinedUserSchema,
-} from "@buzztrip/db/zod-schemas";
+} from "@buzztrip/backend/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "convex/react";
 import React, {
   createContext,
   use,
@@ -35,7 +35,7 @@ type MapFormContextType = {
   form: UseFormReturn<z.infer<typeof mapsEditSchema>>;
   onSubmit: () => void;
   users: RefinedUserWithPermission[] | null;
-  labels: Label[] | null;
+  labels: NewLabel[] | null;
   addUser: (user: RefinedUserWithPermission) => void;
   removeUser: (userId: string) => void;
   updateUser: (userId: string, user: RefinedUserWithPermission) => void;
@@ -75,7 +75,7 @@ type MapFormProviderProps = {
   onSubmit: SubmitHandler<z.infer<typeof mapsEditSchema>>;
   initialMapData?: NewMap;
   initialUsers?: RefinedUserWithPermission[] | null;
-  initialLabels?: Label[] | null;
+  initialLabels?: NewLabel[] | null;
   setExternalUsers?: (users: RefinedUserWithPermission[] | null) => void;
   setExternalLabels?: (labels: NewLabel[] | null) => void;
   onUserChange?: (e: MapFormUserEvents) => void;
@@ -93,8 +93,9 @@ export const MapFormProvider = ({
   onLabelChange,
   onUserChange,
 }: MapFormProviderProps) => {
-  const { data } = useSession();
-  const userId = data?.session.userId;
+  const userStatus = useQuery(api.users.userLoginStatus);
+  console.log("userStatus", userStatus);
+  const userId = userStatus?.user?._id || "";
 
   // Use refs to store callback functions to prevent unnecessary re-renders
   const onUserChangeRef = useRef(onUserChange);
@@ -120,12 +121,13 @@ export const MapFormProvider = ({
   }, [setExternalLabels]);
 
   const form = useForm<z.infer<typeof mapsEditSchema>>({
-    resolver: zodResolver(mapsEditSchema),
-    defaultValues: formProps?.defaultValues ?? {
-      icon: "Map",
-      owner_id: userId || "",
-    },
     ...formProps,
+    resolver: zodResolver(mapsEditSchema),
+    defaultValues: {
+      icon: "Map",
+      visibility: "private",
+      ...formProps?.defaultValues,
+    },
   });
 
   const {
@@ -135,7 +137,7 @@ export const MapFormProvider = ({
   const [users, setUsers] = useState<RefinedUserWithPermission[] | null>(
     initialUsers
   );
-  const [labels, setLabels] = useState<Label[] | null>(initialLabels);
+  const [labels, setLabels] = useState<NewLabel[] | null>(initialLabels);
 
   // Only update state when initialUsers actually changes (deep comparison)
   const initialUsersStringified = useMemo(
@@ -184,7 +186,7 @@ export const MapFormProvider = ({
   const addUser = useCallback((user: RefinedUserWithPermission) => {
     setUsers((prev) => {
       if (!prev) return [user];
-      const exists = prev.find((u) => u.id === user.id);
+      const exists = prev.find((u) => u._id === user._id);
       if (exists) return prev;
       return [...prev, user];
     });
@@ -194,7 +196,7 @@ export const MapFormProvider = ({
   const removeUser = useCallback((userId: string) => {
     setUsers((prev) => {
       if (!prev) return null;
-      const filtered = prev.filter((u) => u.id !== userId);
+      const filtered = prev.filter((u) => u._id !== userId);
       return filtered.length === 0 ? null : filtered;
     });
     onUserChangeRef.current?.({ event: "user:removed", payload: userId });
@@ -205,7 +207,7 @@ export const MapFormProvider = ({
       setUsers((prev) => {
         if (!prev) return null;
         return prev.map((u) => {
-          if (u.id === userId) {
+          if (u._id === userId) {
             const updated = { ...u, ...user };
             return updated;
           }
@@ -222,16 +224,13 @@ export const MapFormProvider = ({
 
   // Memoized label handlers to prevent unnecessary re-renders
   const addLabel = useCallback((label: NewLabel) => {
-    const newLabel: Label = {
+    const newLabel: NewLabel = {
       ...label,
-      label_id: label.label_id || generateId("generic"),
       map_id: label.map_id!,
       title: label.title ?? "",
-      color: label?.color ?? null,
-      icon: label?.icon ?? null,
-      description: label?.description ?? null,
-      created_at: label?.created_at ?? formatDateForSql(new Date()),
-      updated_at: label?.updated_at ?? formatDateForSql(new Date()),
+      color: label?.color ?? undefined,
+      icon: label?.icon ?? undefined,
+      description: label?.description ?? undefined,
     };
 
     setLabels((prev) => {
@@ -244,7 +243,7 @@ export const MapFormProvider = ({
   const removeLabel = useCallback((labelId: string) => {
     setLabels((prev) => {
       if (!prev) return null;
-      const filtered = prev.filter((l) => l.label_id !== labelId);
+      const filtered = prev.filter((l) => l._id !== labelId);
       return filtered.length === 0 ? null : filtered;
     });
     onLabelChangeRef.current?.({ event: "label:removed", payload: labelId });
@@ -254,7 +253,7 @@ export const MapFormProvider = ({
     setLabels((prev) => {
       if (!prev) return null;
       return prev.map((l) => {
-        if (l.label_id === labelId) {
+        if (l._id === labelId) {
           const updated = { ...l, ...label };
           return updated;
         }
@@ -304,7 +303,9 @@ export const MapFormProvider = ({
   return (
     <MapFormContext.Provider value={contextValue}>
       <Form {...form}>
-        <form onSubmit={handleSubmit} className="size-full relative">{children}</form>
+        <form onSubmit={handleSubmit} className="size-full relative">
+          {children}
+        </form>
       </Form>
     </MapFormContext.Provider>
   );

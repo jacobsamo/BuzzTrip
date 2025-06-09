@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import Icon from "@buzztrip/components/icon";
-import type { IconType } from "@buzztrip/db/types";
-import { iconsList } from "@buzztrip/db/types/icon";
+import type { IconType } from "@buzztrip/backend/types";
+import { iconsList } from "@buzztrip/backend/types/icon";
 import { Check, ChevronLeft, ChevronRight, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
 

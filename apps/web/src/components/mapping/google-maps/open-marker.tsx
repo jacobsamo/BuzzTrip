@@ -1,9 +1,8 @@
 "use client";
-import React from "react";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
+import { CombinedMarker } from "@buzztrip/backend/types";
 import { Pencil, Plus } from "lucide-react";
-import { CombinedMarker } from "@buzztrip/db/types";
 
 interface OpenMarkerButtonProps {
   marker: CombinedMarker;

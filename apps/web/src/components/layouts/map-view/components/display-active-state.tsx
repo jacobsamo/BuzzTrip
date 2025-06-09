@@ -12,7 +12,7 @@ const DisplayActiveState = () => {
     useMapStore((store) => store);
 
   return (
-    <>
+    <div className="flex-1 overflow-y-auto">
       {!activeLocation && (
         <Tabs defaultValue="collections">
           <TabsList className="mx-auto w-11/12 justify-evenly">
@@ -24,11 +24,11 @@ const DisplayActiveState = () => {
               {collections ? (
                 collections?.map((collection) => {
                   const mark = getMarkersForCollection(
-                    collection.collection_id
+                    collection._id
                   );
                   return (
                     <DisplayCollection
-                      key={collection.collection_id}
+                      key={collection._id}
                       collection={collection}
                       markers={mark}
                     />
@@ -43,7 +43,7 @@ const DisplayActiveState = () => {
             <ScrollArea>
               {markers ? (
                 markers.map((marker) => (
-                  <DisplayMarker marker={marker} key={marker.marker_id} />
+                  <DisplayMarker marker={marker} key={marker._id} />
                 ))
               ) : (
                 <p>No Markers</p>
@@ -56,7 +56,7 @@ const DisplayActiveState = () => {
       {activeLocation !== null && <ActiveLocation />}
 
       <MarkerModal />
-    </>
+    </div>
   );
 };
 

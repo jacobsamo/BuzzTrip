@@ -1,9 +1,9 @@
 import MarkerPin from "@/components/mapping/google-maps/marker_pin";
 import { useMapStore } from "@/components/providers/map-state-provider";
+import { Button } from "@/components/ui/button";
 import { BookmarkCheck } from "lucide-react";
 import Image from "next/image";
 import OpenMarkerButton from "../../../mapping/google-maps/open-marker";
-import { Button } from "@/components/ui/button";
 
 const ActiveLocation = () => {
   const { markers, activeLocation, setMarkerOpen } = useMapStore(
@@ -19,7 +19,7 @@ const ActiveLocation = () => {
           <span className="flex flex-row gap-2">
             <MarkerPin
               color={activeLocation.color}
-              icon={activeLocation.icon}
+              icon={activeLocation.icon!}
             />
             <h1 className="text-2xl text-gray-900">{activeLocation.title}</h1>
           </span>
@@ -39,12 +39,19 @@ const ActiveLocation = () => {
             )}
           </span>
         </div>
-        <p className="text-base text-gray-900">{activeLocation.address}</p>
-        <p className="text-base text-gray-900">
-          {activeLocation.lat}, {activeLocation.lng}
-        </p>
+        {activeLocation.address ? (
+          <p className="text-base text-gray-900">{activeLocation.address}</p>
+        ) : (
+          <p className="text-base text-gray-900">
+            {activeLocation.lat}, {activeLocation.lng}
+          </p>
+        )}
 
-        <p>{activeLocation.note}</p>
+        {activeLocation.note && (
+          <p className="py-2">
+            <strong>Notes:</strong> {activeLocation.note}
+          </p>
+        )}
 
         <div className="flex h-44 w-fit flex-row gap-2 overflow-x-auto overflow-y-hidden">
           {activeLocation.photos &&

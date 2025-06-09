@@ -6,7 +6,7 @@ import {
   Map as GoogleMap,
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import MarkerPin from "../mapping/google-maps/marker_pin";
 import { useMapFormContext } from "./provider";
 
@@ -14,11 +14,14 @@ const MapLocationForm = () => {
   const {
     form: { setValue, watch },
   } = useMapFormContext();
-  const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
-
   const lat = watch("lat");
   const lng = watch("lng");
   const bounds = watch("bounds");
+  const locationName = watch("location_name");
+
+  const [searchValue, setSearchValue] = useState<string | undefined>(
+    locationName
+  );
 
   // Memoize the map center to prevent unnecessary re-renders
   const mapCenter = useMemo(
@@ -33,51 +36,6 @@ const MapLocationForm = () => {
   const markerPosition = useMemo(
     () => (lat && lng ? { lat, lng } : null),
     [lat, lng]
-  );
-
-  // Memoized selection handler
-  const handleLocationSelect = useCallback(
-    (pred: any, details: any) => {
-      const locationName =
-        details?.placeDetails.name ??
-        details?.placeDetails?.formatted_address ??
-        "";
-
-      setSearchValue(locationName);
-
-      // Batch setValue calls to minimize re-renders
-      const updates = [
-        { name: "lat", value: details?.location.lat ?? null },
-        { name: "lng", value: details?.location.lng ?? null },
-        { name: "bounds", value: details?.bounds.toJSON() ?? null },
-        { name: "location_name", value: locationName || null },
-      ] as const;
-
-      updates.forEach(({ name, value }) => {
-        setValue(name, value, {
-          shouldDirty: true,
-          shouldTouch: true,
-        });
-      });
-    },
-    [setValue]
-  );
-
-  // Memoize the autocomplete props
-  const autocompleteProps = useMemo(
-    () => ({
-      value: searchValue,
-      onValueChange: setSearchValue,
-      locationTypes: ["(regions)"] as const,
-      autoFocus: true,
-      classNames: {
-        scrollArea: "max-h-20",
-        predictions: "max-h-20",
-        container: "w-full",
-      },
-      onSelect: handleLocationSelect,
-    }),
-    [searchValue, handleLocationSelect]
   );
 
   return (
@@ -99,33 +57,31 @@ const MapLocationForm = () => {
               container: "w-full", // Custom width
             }}
             onSelect={(pred, details) => {
-              setSearchValue(
+              const locationName =
                 details?.placeDetails.name ??
-                  details?.placeDetails?.formatted_address ??
-                  ""
-              );
-              setValue("lat", details?.location.lat ?? null, {
+                details?.placeDetails?.formatted_address ??
+                "";
+
+              setSearchValue(locationName);
+
+              // Batch setValue calls to minimize re-renders
+
+              setValue("lat", details?.location.lat ?? undefined, {
                 shouldDirty: true,
                 shouldTouch: true,
-              });
-              setValue("lng", details?.location.lng ?? null, {
-                shouldDirty: true,
-                shouldTouch: true,
-              });
-              setValue("bounds", details?.bounds.toJSON() ?? null, {
-                shouldDirty: true,
-                shouldTouch: true,
-              });
-              setValue(
-                "location_name",
-                details?.placeDetails.name ??
-                  details?.placeDetails?.formatted_address ??
-                  null,
-                {
+              }),
+                setValue("lng", details?.location.lng ?? undefined, {
                   shouldDirty: true,
                   shouldTouch: true,
-                }
-              );
+                });
+              setValue("bounds", details?.bounds.toJSON() ?? undefined, {
+                shouldDirty: true,
+                shouldTouch: true,
+              });
+              setValue("location_name", locationName || undefined, {
+                shouldDirty: true,
+                shouldTouch: true,
+              });
             }}
           />
         </div>
@@ -133,8 +89,11 @@ const MapLocationForm = () => {
         {/* Map Preview Container */}
         <div>
           <p>
-            Map Preview
-            {lat && lng && ` of ${lat.toFixed(4)}, ${lng.toFixed(4)}`}
+            Map Preview of{" "}
+            {locationName
+              ? locationName
+              : lat && lng && ` of ${lat.toFixed(4)}, ${lng.toFixed(4)}`}
+            {/* {} */}
           </p>
           <div className="h-[200px] w-full rounded-lg border bg-muted">
             <GoogleMap
@@ -144,6 +103,7 @@ const MapLocationForm = () => {
               reuseMaps
               defaultZoom={3}
               defaultCenter={mapCenter}
+              defaultBounds={bounds ?? undefined}
             >
               {markerPosition && (
                 <AdvancedMarker

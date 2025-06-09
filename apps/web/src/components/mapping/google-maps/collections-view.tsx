@@ -1,5 +1,4 @@
 "use client";
-import Icon from "@buzztrip/components/icon";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -12,12 +11,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Collection, CombinedMarker } from "@buzztrip/db/types";
+import { Collection, CombinedMarker } from "@buzztrip/backend/types";
+import Icon from "@buzztrip/components/icon";
 import {
   ChevronDown,
   ChevronRight,
   Edit,
-  MapPin,
   MoreVertical,
   Trash,
 } from "lucide-react";
@@ -38,7 +37,7 @@ const CollectionsView = ({ collection, markers }: CollectionsViewProps) => {
 
   return (
     <Collapsible
-      key={collection.collection_id}
+      key={collection._id}
       open={open}
       onOpenChange={() => setOpen(!open)}
       className="w-full"
@@ -50,7 +49,7 @@ const CollectionsView = ({ collection, markers }: CollectionsViewProps) => {
           ) : (
             <ChevronRight className="mr-1 h-4 w-4" />
           )}
-          <Icon name={collection.icon} />
+          <Icon name={collection.icon ?? "MapPin"} />
 
           <span>{collection.title}</span>
         </CollapsibleTrigger>
@@ -74,11 +73,11 @@ const CollectionsView = ({ collection, markers }: CollectionsViewProps) => {
         {markers &&
           markers.map((marker) => (
             <div
-              key={marker.marker_id}
+              key={marker._id}
               className="flex items-center justify-between py-1"
             >
               <div className="flex items-center">
-                <MarkerPin color={marker.color} icon={marker.icon}/>
+                <MarkerPin color={marker.color} icon={marker.icon ?? "MapPin"} />
                 <span>{marker.title}</span>
               </div>
               <OpenMarkerButton marker={marker} mode="edit" />

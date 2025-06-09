@@ -1,0 +1,35 @@
+{
+  "name": "@buzztrip/backend",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "convex dev",
+    "setup": "convex dev --until-success"
+  },
+  "exports": {
+    "./api": {
+      "import": "./convex/_generated/api.js",
+      "types": "./convex/_generated/api.d.ts"
+    },
+    "./dataModel": {
+      "import": "./convex/_generated/dataModel.js",
+      "types": "./convex/_generated/dataModel.d.ts"
+    },
+    "./zod-schemas": "./zod-schemas/index.ts",
+    "./types": "./types/index.ts",
+    "./types/icon": "./types/icons.ts",
+    "./generateId": "./generateId.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@better-auth-kit/convex": "^1.2.2",
+    "@clerk/backend": "^2.0.0",
+    "@convex-dev/geospatial": "^0.1.9",
+    "@convex-dev/migrations": "^0.2.9",
+    "convex": "^1.24.8",
+    "convex-helpers": "^0.1.90",
+    "svix": "^1.66.0"
+  }
+}

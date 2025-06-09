@@ -13,7 +13,7 @@ export default function RootLayout({
         apiKey={env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
         libraries={["places", "marker", "routes"]}
       >
-        <main className="p-2">{children}</main>
+        <main>{children}</main>
       </APIProvider>
     </>
   );

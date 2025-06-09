@@ -1,8 +1,7 @@
 import { cn } from "@/lib/utils";
-import { CombinedMarker } from "@buzztrip/db/types";
+import { CombinedMarker } from "@buzztrip/backend/types";
 import { InfoWindow, InfoWindowProps } from "@vis.gl/react-google-maps";
 import Image from "next/image";
-import React from "react";
 
 interface InfoBoxProps extends InfoWindowProps {
   activeLocation: CombinedMarker;
@@ -25,7 +24,7 @@ const InfoBox = ({ activeLocation, ...props }: InfoBoxProps) => {
   return (
     <InfoWindow
       onClose={handleClose}
-      className={cn("h-44 w-44 rounded-md", props.className)}
+      className={cn("h-44 w-44 rounded-md z-10", props.className)}
       {...props}
     >
       <div className="h-44 w-44 flex-row gap-2 overflow-x-auto overflow-y-hidden rounded-t-md">

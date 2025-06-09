@@ -1,21 +1,24 @@
 import { Map_page } from "@/components/layouts/map-view";
 import { MapStoreProvider } from "@/components/providers/map-state-provider";
+import { convexNextjsOptions, getConvexServerSession } from "@/lib/auth";
 import { constructMetadata } from "@/lib/utils/metadata";
-import { db } from "@/server/db";
-import { getSession } from "@/server/getSession";
-import { getAllMapData } from "@buzztrip/db/queries";
-import { maps } from "@buzztrip/db/schemas";
-import { eq } from "drizzle-orm";
+import { api } from "@buzztrip/backend/api";
+import { Id } from "@buzztrip/backend/dataModel";
+import { fetchQuery, preloadQuery } from "convex/nextjs";
 import { notFound } from "next/navigation";
 
 type Params = Promise<{ map_id: string }>;
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { map_id } = await params;
-
-  const map = await db.query.maps.findFirst({
-    where: eq(maps.map_id, map_id),
-  });
+  const options = await convexNextjsOptions();
+  const map = await fetchQuery(
+    api.maps.index.getMap,
+    {
+      mapId: map_id as Id<"maps">,
+    },
+    options
+  );
 
   return constructMetadata({
     title: map?.title,
@@ -25,37 +28,91 @@ export async function generateMetadata({ params }: { params: Params }) {
 
 export default async function MapPage({ params }: { params: Params }) {
   const { map_id } = await params;
-  const { data } = await getSession();
+  const options = await convexNextjsOptions();
+  const session = await getConvexServerSession();
 
-  if (!data || !data.session || !map_id) {
+  if (!session || session.message !== "Logged In" || !map_id) {
     return notFound();
   }
 
-  const [foundCollections, collectionLinks, foundMarkers, sharedMap, [map]] =
-    await getAllMapData(db, map_id);
+  const map = await fetchQuery(
+    api.maps.index.getMap,
+    {
+      mapId: map_id as Id<"maps">,
+    },
+    options
+  );
+  const fetchedMapUsers = await fetchQuery(
+    api.maps.mapUsers.getMapUsers,
+    {
+      mapId: map_id as Id<"maps">,
+    },
+    options
+  );
 
   if (
-    (sharedMap &&
-      sharedMap.length > 0 &&
-      !sharedMap.find((sm) => sm.user_id == data.session.userId)) ||
+    (fetchedMapUsers &&
+      fetchedMapUsers.length > 0 &&
+      !fetchedMapUsers.find((mu) => mu.user_id == session.user._id)) ||
     !map
   ) {
     return notFound();
   }
 
+  // preload on server to avoid any lag on the client
+  const [markers, collections, collectionLinks, labels, mapUsers] =
+    await Promise.all([
+      preloadQuery(
+        api.maps.markers.getMarkersView,
+        {
+          map_id: map._id,
+        },
+        options
+      ),
+      preloadQuery(
+        api.maps.collections.getCollectionsForMap,
+        {
+          mapId: map._id,
+        },
+        options
+      ),
+      preloadQuery(
+        api.maps.collections.getCollectionLinksForMap,
+        {
+          mapId: map._id,
+        },
+        options
+      ),
+      preloadQuery(
+        api.maps.labels.getMapLabels,
+        {
+          mapId: map._id,
+        },
+        options
+      ),
+      preloadQuery(
+        api.maps.mapUsers.getMapUsers,
+        {
+          mapId: map._id,
+        },
+        options
+      ),
+    ]);
+
   return (
     <MapStoreProvider
       initialState={{
-        collections: foundCollections,
-        markers: foundMarkers.map((marker) => ({
-          ...marker,
-          lat: marker.lat as number,
-          lng: marker.lng as number,
-          bounds: marker.bounds ?? null,
-        })),
-        collectionLinks: collectionLinks,
-        map: map,
-        mapUsers: sharedMap,
+        map: {
+          ...map,
+          visibility: map.visibility || "private",
+        },
+      }}
+      preloadedQueries={{
+        markers,
+        collections,
+        collectionLinks,
+        labels,
+        mapUsers,
       }}
     >
       <Map_page />

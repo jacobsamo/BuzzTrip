@@ -8,25 +8,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Map, UserMap } from "@buzztrip/db/types";
+import { UserMap } from "@buzztrip/backend/types";
 import { formatDistanceToNow } from "date-fns";
-import { Calendar, MapIcon, MoreHorizontal, User } from "lucide-react";
+import { Calendar, Edit2, MapIcon, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
 interface MapCardProps {
   map: UserMap;
-  updateMap?: (map: Partial<Map>) => void;
 }
 
-const MapCard = ({ map, updateMap }: MapCardProps) => {
+const MapCard = ({ map }: MapCardProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const mapImage = map.image || "/placeholder.svg?height=200&width=400";
   const mapColor = map.color || "#2C7772";
@@ -59,35 +52,16 @@ const MapCard = ({ map, updateMap }: MapCardProps) => {
             <div className="flex justify-between items-start">
               <CardTitle className="text-lg truncate">{map.title}</CardTitle>
               {(map.permission === "owner" || map.permission === "editor") && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      <MoreHorizontal className="size-4" />
-                      <span className="sr-only">Open menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    onClick={(e) => e.preventDefault()}
-                  >
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setIsEditModalOpen(true);
-                      }}
-                    >
-                      Edit Map
-                    </DropdownMenuItem>
-                    {/* Open edit modal */}
-                    <DropdownMenuItem>Share</DropdownMenuItem>{" "}
-                    {/* Open edit modal to share */}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsEditModalOpen(true);
+                  }}
+                  variant={"ghost"}
+                  size="icon"
+                >
+                  <Edit2 />
+                </Button>
               )}
             </div>
           </CardHeader>
@@ -105,9 +79,12 @@ const MapCard = ({ map, updateMap }: MapCardProps) => {
               <div className="flex items-center">
                 <Calendar className="h-3 w-3 mr-1" />
                 <span>
-                  {formatDistanceToNow(new Date(map.updated_at), {
-                    addSuffix: true,
-                  })}
+                  {formatDistanceToNow(
+                    new Date(map.updatedAt || map._creationTime),
+                    {
+                      addSuffix: true,
+                    }
+                  )}
                 </span>
               </div>
               <div className="flex items-center">
@@ -119,8 +96,22 @@ const MapCard = ({ map, updateMap }: MapCardProps) => {
         </Link>
       </Card>
       <EditMapModal
-        map={map}
-        updateMap={updateMap}
+        map={{
+          _id: map.map_id,
+          title: map.title,
+          description: map.description,
+          image: map.image,
+          icon: map.icon,
+          color: map.color,
+          owner_id: map.owner_id,
+          location_name: map.location_name,
+          lat: map.lat,
+          lng: map.lng,
+          bounds: map.bounds,
+          visibility: map.visibility,
+          updatedAt: map.updatedAt,
+          _creationTime: map._creationTime,
+        }}
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
       />

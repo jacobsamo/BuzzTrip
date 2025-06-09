@@ -1,14 +1,11 @@
-import React from "react";
-import Image from "next/image";
-import { CombinedMarker } from "@buzztrip/db/types";
-import MarkerPin from "./marker_pin";
+import { useMapStore } from "@/components/providers/map-state-provider";
+import { CombinedMarker } from "@buzztrip/backend/types";
 import {
   AdvancedMarker,
   useAdvancedMarkerRef,
 } from "@vis.gl/react-google-maps";
-import { Button } from "@/components/ui/button";
-import { useMapStore } from "@/components/providers/map-state-provider";
-import { X } from "lucide-react";
+import Image from "next/image";
+import MarkerPin from "./marker_pin";
 
 interface DisplayMarkerInfoProps {
   location: CombinedMarker;
@@ -38,7 +35,7 @@ const DisplayMarkerInfo = ({ location }: DisplayMarkerInfoProps) => {
         {/* <div className="absolute bottom-[-4px] h-3 w-3 rotate-45 bg-green-600"></div> */}
 
         {/* Info Card */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 transition-opacity duration-300 group-hover:block">
+        <div className="absolute z-10 bottom-8 left-1/2 -translate-x-1/2 transition-opacity duration-300 group-hover:block">
           <div className="w-[300px] overflow-hidden rounded-lg bg-white shadow-lg">
             {/* Image */}
             <Image
@@ -58,13 +55,14 @@ const DisplayMarkerInfo = ({ location }: DisplayMarkerInfoProps) => {
             </div>
 
             {/* Close Button */}
-            <Button
+            {/* <Button
               className="absolute right-2 top-2 h-8 w-8"
-              variant="ghost"
+              variant="secondary"
+              size="icon"
               onClick={() => setActiveLocation(null)}
             >
               <X className="h-4 w-4" />
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>
