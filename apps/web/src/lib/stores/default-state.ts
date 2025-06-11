@@ -5,30 +5,64 @@ import type {
   Label,
   Map,
   MapUser,
+  NewCollection,
   Route,
   RouteStop,
 } from "@buzztrip/backend/types";
+import { createAction } from "@buzztrip/backend/helpers"
+
+const eventType = [
+  ...createAction("collections", ["create", "update"]),
+  ...createAction("markers", ["create", "update"]),
+  "activeLocation"
+] as const;
+type EventType = (typeof eventType)[number];
+
+type EventPayloadMap = {
+  "collections:create": null;
+  "collections:update": NewCollection;
+  "markers:create": CombinedMarker;
+  "markers:update": CombinedMarker;
+  "activeLocation": CombinedMarker;
+};
+
+export type ActiveState = {
+  [K in keyof EventPayloadMap]: {
+    event: K;
+    payload: EventPayloadMap[K];
+  }
+}[keyof EventPayloadMap];
+
+
+export type DrawerState = {
+  snap: number | string | null;
+  dismissible: boolean; // whether the user can close to a smaller snap point
+}
 
 export type StoreState = {
-  collectionLinks: CollectionLink[] | null;
-  collections: Collection[] | null;
-  mapUsers: MapUser[] | null;
   map: Map;
-  labels: Label[] | null;
+  mapUsers: MapUser[] | null;
+  collections: Collection[] | null;
   markers: CombinedMarker[] | null;
+  collectionLinks: CollectionLink[] | null;
+  labels: Label[] | null;
   routes: Route[] | null;
   routeStops: RouteStop[] | null;
 
   // Modals
-  activeLocation: CombinedMarker | null;
-  collectionsOpen: boolean;
+  isMobile: boolean;
+  activeState: ActiveState | null;
+  drawerState: DrawerState
   searchValue: string | null;
-  snap: number | string | null;
-  markerOpen: {
-    open: boolean;
-    marker: CombinedMarker | null;
-    mode: "create" | "edit" | null;
-  };
+
+  // activeLocation: CombinedMarker | null;
+  // collectionsOpen: boolean;
+  // snap: number | string | null;
+  // markerOpen: {
+  //   open: boolean;
+  //   marker: CombinedMarker | null;
+  //   mode: "create" | "edit" | null;
+  // };
 };
 
 export type StoreActions = {
@@ -38,15 +72,20 @@ export type StoreActions = {
   getCollectionsForMarker: (markerId: string | null) => Collection[] | null;
 
   // Modals
-  setActiveLocation: (location: CombinedMarker | null) => void;
-  setCollectionsOpen: (open: boolean) => void;
+  setMobile: (isMobile: boolean) => void;
+  setActiveState: (state: ActiveState | null) => void;
+  setDrawerState: (state: DrawerState) => void;
   setSearchValue: (value: string | null) => void;
-  setSnap: (snap: number | string | null) => void;
-  setMarkerOpen: (
-    open: boolean,
-    marker: CombinedMarker | null,
-    mode: "create" | "edit" | null
-  ) => void;
+
+
+  // setActiveLocation: (location: CombinedMarker | null) => void;
+  // setCollectionsOpen: (open: boolean) => void;
+  // setSnap: (snap: number | string | null) => void;
+  // setMarkerOpen: (
+  //   open: boolean,
+  //   marker: CombinedMarker | null,
+  //   mode: "create" | "edit" | null
+  // ) => void;
 };
 
 export const defaultState: Omit<StoreState, "map"> = {
@@ -59,13 +98,20 @@ export const defaultState: Omit<StoreState, "map"> = {
   labels: null,
 
   // Modals
-  activeLocation: null,
-  collectionsOpen: false,
-  searchValue: null,
-  snap: 0.1,
-  markerOpen: {
-    open: false,
-    marker: null,
-    mode: null,
+  isMobile: false,
+  activeState: null,
+  drawerState: {
+    snap: 0.2,
+    dismissible: true,
   },
+  searchValue: null,
+
+  // activeLocation: null,
+  // collectionsOpen: false,
+  // snap: 0.1,
+  // markerOpen: {
+  //   open: false,
+  //   marker: null,
+  //   mode: null,
+  // },
 };

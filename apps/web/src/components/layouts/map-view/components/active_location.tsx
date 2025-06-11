@@ -3,14 +3,19 @@ import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
 import { BookmarkCheck } from "lucide-react";
 import Image from "next/image";
+import { useMemo } from "react";
 import OpenMarkerButton from "../../../mapping/google-maps/open-marker";
 
 const ActiveLocation = () => {
-  const { markers, activeLocation, setMarkerOpen } = useMapStore(
-    (store) => store
-  );
+  const [markers, activeState, setActiveState] = useMapStore((store) => [
+    store.markers,
+    store.activeState,
+    store.setActiveState,
+  ]);
 
-  if (activeLocation === null) return null;
+  if (!activeState || activeState.event !== "activeLocation") return null;
+
+  const activeLocation = useMemo(() => activeState.payload, [activeState]);
 
   return (
     <>
@@ -25,12 +30,18 @@ const ActiveLocation = () => {
           </span>
           <span>
             {markers?.find(
-              (marker) => marker.gm_place_id === activeLocation.gm_place_id
+              (marker) =>
+                marker.place.gm_place_id === activeLocation.place.gm_place_id
             ) ? (
               <Button
                 variant="ghost"
                 className="h-8 w-8"
-                onClick={() => setMarkerOpen(true, activeLocation, "edit")}
+                onClick={() =>
+                  setActiveState({
+                    event: "markers:update",
+                    payload: activeLocation,
+                  })
+                }
               >
                 <BookmarkCheck className="h-8 w-8" />
               </Button>
@@ -39,8 +50,10 @@ const ActiveLocation = () => {
             )}
           </span>
         </div>
-        {activeLocation.address ? (
-          <p className="text-base text-gray-900">{activeLocation.address}</p>
+        {activeLocation.place.address ? (
+          <p className="text-base text-gray-900">
+            {activeLocation.place.address}
+          </p>
         ) : (
           <p className="text-base text-gray-900">
             {activeLocation.lat}, {activeLocation.lng}
@@ -54,8 +67,8 @@ const ActiveLocation = () => {
         )}
 
         <div className="flex h-44 w-fit flex-row gap-2 overflow-x-auto overflow-y-hidden">
-          {activeLocation.photos &&
-            activeLocation.photos.map((photo) => (
+          {activeLocation.place.photos &&
+            activeLocation.place.photos.map((photo) => (
               // eslint-disable-next-line jsx-a11y/img-redundant-alt
               <Image
                 key={photo}

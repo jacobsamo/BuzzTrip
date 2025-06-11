@@ -1,19 +1,22 @@
-import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
-import type { CombinedMarker, Map } from "@buzztrip/backend/types";
-import { useQuery } from "convex/react";
+import type { Map } from "@buzztrip/backend/types";
 import { createStore as createZustandStore } from "zustand/vanilla";
-import { defaultState, StoreActions, type StoreState } from "./default-state";
+import {
+  ActiveState,
+  defaultState,
+  DrawerState,
+  StoreActions,
+  type StoreState,
+} from "./default-state";
 
 export type Store = StoreState & StoreActions;
 
-export interface InitState extends Partial<StoreState>  {
+export interface InitState extends Partial<StoreState> {
   map: Map;
-};
+}
 
 export const createStore = (initState: InitState) =>
   createZustandStore<Store>()((set, get) => {
-
     return {
       ...defaultState,
       ...initState,
@@ -54,28 +57,56 @@ export const createStore = (initState: InitState) =>
         return collectionLinks;
       },
 
-      // Modals
-      setActiveLocation: (place: CombinedMarker | null) =>
-        set(() => {
-          if (place) {
-            return {
-              activeLocation: place,
-              snap: 0.5,
-              searchValue: place.address,
-            };
-          }
+      setActiveState: (state: ActiveState | null) => {
+        const prevState = get().activeState;
+        let drawerState = { snap: 0.75, dismissible: false };
 
-          return { activeLocation: null, snap: 0.1, searchValue: "" };
-        }),
-      setCollectionsOpen: (open: boolean) =>
-        set(() => ({ collectionsOpen: open })),
+        switch (state?.event) {
+          case "markers:create":
+          case "markers:update":
+          case "collections:create":
+          case "collections:update":
+            drawerState = { snap: 0.75, dismissible: false };
+            break;
+          case "activeLocation":
+            drawerState = { snap: 0.5, dismissible: true };
+            break;
+          default:
+            break;
+        }
+
+        if (prevState && prevState.event === "activeLocation" && !state) {
+          // if the previous state was an activeLocation, and we're setting it to null, we want to set it back to the active location
+          set(() => ({
+            activeState: prevState,
+            drawerState,
+          }));
+        }
+
+        // set the active state and drawer state
+        set(() => ({
+          activeState: state,
+          drawerState,
+        }));
+      },
+
+      setDrawerState: (state: DrawerState) => {
+        set(() => ({ drawerState: state }));
+      },
+
+      setMobile: (isMobile: boolean) => {
+        if (isMobile) {
+          set(() => ({
+            drawerState: { snap: 0.2, dismissible: false },
+            isMobile: true,
+          }));
+        } else {
+          set(() => ({
+            isMobile: false,
+          }));
+        }
+      },
       setSearchValue: (value: string | null) =>
         set(() => ({ searchValue: value })),
-      setSnap: (snap: number | string | null) => set(() => ({ snap: snap })),
-      setMarkerOpen: (
-        open: boolean,
-        marker: CombinedMarker | null,
-        mode: "create" | "edit" | null
-      ) => set(() => ({ markerOpen: { open, marker, mode } })),
     };
   });

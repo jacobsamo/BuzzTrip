@@ -1,5 +1,4 @@
 "use client";
-import MarkerModal from "@/components/modals/map/create_edit_marker_modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,12 +7,17 @@ import DisplayCollection from "./display-collection";
 import DisplayMarker from "./display-marker";
 
 const DisplayActiveState = () => {
-  const { activeLocation, collections, markers, getMarkersForCollection } =
-    useMapStore((store) => store);
+  const [activeState, collections, markers, getMarkersForCollection] =
+    useMapStore((store) => [
+      store.activeState,
+      store.collections,
+      store.markers,
+      store.getMarkersForCollection,
+    ]);
 
   return (
     <div className="flex-1 overflow-y-auto">
-      {!activeLocation && (
+      {!activeState && (
         <Tabs defaultValue="collections">
           <TabsList className="mx-auto w-11/12 justify-evenly">
             <TabsTrigger value="collections">Collections</TabsTrigger>
@@ -23,9 +27,7 @@ const DisplayActiveState = () => {
             <ScrollArea>
               {collections ? (
                 collections?.map((collection) => {
-                  const mark = getMarkersForCollection(
-                    collection._id
-                  );
+                  const mark = getMarkersForCollection(collection._id);
                   return (
                     <DisplayCollection
                       key={collection._id}
@@ -53,9 +55,9 @@ const DisplayActiveState = () => {
         </Tabs>
       )}
 
-      {activeLocation !== null && <ActiveLocation />}
-
-      <MarkerModal />
+      {activeState && activeState.event === "activeLocation" && (
+        <ActiveLocation />
+      )}
     </div>
   );
 };

@@ -17,15 +17,23 @@ const MarkerPin = lazy(() => import("./marker_pin"));
 const Mapview = () => {
   const googleMap = useMap();
   const places = useMapsLibrary("places");
-  const {
-    activeLocation,
+  const [
+    activeState,
+    setActiveState,
     markers,
-    setActiveLocation,
     setSearchValue,
     routes,
     routeStops,
     map,
-  } = useMapStore((store) => store);
+  ] = useMapStore((store) => [
+    store.activeState,
+    store.setActiveState,
+    store.markers,
+    store.setSearchValue,
+    store.routes,
+    store.routeStops,
+    store.map,
+  ]);
 
   if (!map) return null;
 
@@ -174,7 +182,7 @@ const Mapview = () => {
         }
         const res = detailsRequestCallback(googleMap!, data);
         if (res) {
-          setActiveLocation(res.location);
+          setActiveState({ event: "activeLocation", payload: res.location });
           setSearchValue(
             res.placeDetails?.name ?? res.placeDetails?.formatted_address ?? ""
           );
@@ -207,14 +215,14 @@ const Mapview = () => {
         gestureHandling="greedy"
         reuseMaps
       >
-        {activeLocation && (
+        {activeState && activeState.event === "activeLocation" && (
           // !markers?.some(
           //   (marker) =>
           //     marker.lat === activeLocation.lat &&
           //     marker.lng === activeLocation.lng
           // ) &&
           <>
-            <DisplayMarkerInfo location={activeLocation} />
+            <DisplayMarkerInfo location={activeState.payload} />
           </>
         )}
 
@@ -226,7 +234,7 @@ const Mapview = () => {
               title={marker.title}
               onClick={() => {
                 googleMap!.panTo({ lat: marker.lat, lng: marker.lng });
-                setActiveLocation(marker);
+                setActiveState({ event: "activeLocation", payload: marker });
               }}
             >
               <MarkerPin color={marker.color} icon={marker.icon!} size={16} />

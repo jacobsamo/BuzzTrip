@@ -2,6 +2,7 @@
 import MapView from "@/components/mapping/google-maps/map-view";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { useMediaQuery } from "@uidotdev/usehooks";
+import MainModal from "./components/main-modal";
 import MapDrawer from "./components/map-drawer";
 import MapSidebar from "./components/map-sidebar";
 
@@ -41,6 +42,7 @@ export function Map_page() {
               <>
                 <MapSidebar />
                 <SidebarTrigger className="mt-2" />
+                {/* <MainModal /> */}
               </>
             ) : (
               /* Drawer trigger is inside MapDrawer already */

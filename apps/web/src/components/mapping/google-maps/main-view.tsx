@@ -3,41 +3,46 @@ import { Button } from "@/components/ui/button";
 // import * as Accordion from "@radix-ui/react-accordion";
 import { ArrowLeft } from "lucide-react";
 // import CollectionCard from "../collection_card";
-import CollectionModal from "@/components/modals/map/create_edit_collection_modal";
+import OpenCollectionModal from "@/components/modals/open-collection-modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ActiveLocation from "../../layouts/map-view/components/active_location";
 import CollectionsView from "./collections-view";
-import MarkerModal from "@/components/modals/map/create_edit_marker_modal";
 
 const MainView = () => {
-  const {
-    markers,
+  const [
     collections,
-    activeLocation,
-    setActiveLocation,
-    map,
+    activeState,
+    setActiveState,
     setSearchValue,
     getMarkersForCollection,
-    snap,
-    setSnap,
-  } = useMapStore((store) => store);
+    setDrawerState
+  ] = useMapStore((store) => [
+    store.collections,
+    store.activeState,
+    store.setActiveState,
+    store.setSearchValue,
+    store.getMarkersForCollection,
+    store.setDrawerState
+  ]);
+
+
   return (
     <>
       <div
         id="content"
         className="mb-4 flex w-full flex-col items-start justify-between"
       >
-        {!activeLocation && (
+        {!activeState && (
           <>
             {/* <h2 className="text-lg font-bold">{map!.title}</h2> */}
             <div className="inline-flex items-center gap-2">
               {/* <FeedbackModal /> */}
-              <CollectionModal />
+              <OpenCollectionModal />
             </div>
           </>
         )}
-        {!activeLocation && collections && (
+        {!activeState && collections && (
           <ScrollArea className="w-full grow">
             <div className="p-4">
               {collections?.map((collection) => {
@@ -54,13 +59,12 @@ const MainView = () => {
           </ScrollArea>
         )}
 
-        {activeLocation && (
+        {activeState && activeState.event === "activeLocation" && (
           <Button
             onClick={() => {
-              setActiveLocation(null);
+              setActiveState(null);
               setSearchValue("");
-              setSnap(0.2);
-              setActiveLocation(null);
+              setDrawerState({snap: 0.2, dismissible: false});
             }}
             variant={"link"}
             className="text-base"
@@ -70,9 +74,7 @@ const MainView = () => {
         )}
       </div>
 
-      {activeLocation !== null && <ActiveLocation />}
-
-      <MarkerModal />
+      {activeState && activeState.event === "activeLocation" && <ActiveLocation />}
     </>
   );
 };

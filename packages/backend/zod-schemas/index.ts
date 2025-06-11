@@ -10,12 +10,11 @@ export * from "./maps-schema";
 export * from "./places-schema";
 export * from "./shared-schemas";
 
-export const combinedMarkersSchema = placesEditSchema.extend({
-  ...markersEditSchema.shape,
-  place_id: zid("places").optional(),
-  bounds: boundsSchema.nullable(),
-  note: z.string().optional(),
-});
+export const combinedMarkersSchema = markersEditSchema.extend({
+  place: placesEditSchema.extend({
+    bounds: boundsSchema.nullable(),
+  }),
+})
 
 export const userMapsSchema = mapsSchema.merge(mapUserSchema);
 

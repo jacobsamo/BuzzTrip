@@ -13,15 +13,14 @@ interface DisplayMarkerProps {
 }
 
 const DisplayMarker = ({ marker }: DisplayMarkerProps) => {
-  const { setMarkerOpen, setActiveLocation } = useMapStore((store) => store);
-
+  const setActiveState = useMapStore((store) => store.setActiveState);
   const map = useMap();
 
   const onMarkerClick = (marker: CombinedMarker) => {
     if (map) {
       map.panTo({ lat: marker.lat, lng: marker.lng });
       map.moveCamera({ zoom: 15 });
-      setActiveLocation(marker);
+      setActiveState({ event: "activeLocation", payload: marker });
     }
   };
 
@@ -30,9 +29,17 @@ const DisplayMarker = ({ marker }: DisplayMarkerProps) => {
       onClick={() => onMarkerClick(marker)}
       className="flex flex-row items-center justify-start gap-0 py-1"
     >
-      <MarkerPin color={marker.color} icon={marker.icon ?? "MapPin"} size={16} />
+      <MarkerPin
+        color={marker.color}
+        icon={marker.icon ?? "MapPin"}
+        size={16}
+      />
       <span className="wrap ml-2 text-center text-sm">{marker.title}</span>
-      <SidebarMenuAction onClick={() => setMarkerOpen(true, marker, "edit")}>
+      <SidebarMenuAction
+        onClick={() =>
+          setActiveState({ event: "markers:update", payload: marker })
+        }
+      >
         <Pencil />
       </SidebarMenuAction>
     </SidebarMenuSubButton>

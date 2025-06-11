@@ -17,7 +17,8 @@
     "./zod-schemas": "./zod-schemas/index.ts",
     "./types": "./types/index.ts",
     "./types/icon": "./types/icons.ts",
-    "./generateId": "./generateId.ts"
+    "./generateId": "./generateId.ts",
+    "./helpers": "./helpers/index.ts"
   },
   "keywords": [],
   "author": "",

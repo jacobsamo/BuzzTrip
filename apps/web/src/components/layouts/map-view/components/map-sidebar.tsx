@@ -1,5 +1,5 @@
 "use client";
-import CollectionModal from "@/components/modals/map/create_edit_collection_modal";
+import OpenCollectionModal from "@/components/modals/open-collection-modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import {
   Sidebar,
@@ -20,26 +20,20 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import DisplayActiveState from "./display-active-state";
+import shallow from 'zustand/shallow'
 
 const MapSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
-  const {
-    activeLocation,
-    markers,
-    setActiveLocation,
-    searchValue,
-    setSearchValue,
-    collections,
-    getMarkersForCollection,
-    map,
-  } = useMapStore((store) => store);
+  const { map, activeState, setActiveState } = useMapStore((store) => ({map: store.map,
+    activeState: store.activeState,
+    setActiveState: store.setActiveState}), shallow);
 
   return (
     <Sidebar variant="floating" {...props}>
       <SidebarHeader className="inline-flex items-center gap-2 p-2">
         <SidebarMenu className="flex flex-row items-center gap-2">
           <SidebarMenuItem>
-            {activeLocation ? (
-              <SidebarMenuButton onClick={() => setActiveLocation(null)}>
+            {activeState && activeState.event === "activeLocation" ? (
+              <SidebarMenuButton onClick={() => setActiveState(null)}>
                 <ArrowLeft />
               </SidebarMenuButton>
             ) : (
@@ -60,7 +54,11 @@ const MapSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
             )}
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <h1>{activeLocation ? activeLocation.title : map!.title}</h1>
+            <h1>
+              {activeState && activeState.event === "activeLocation"
+                ? activeState.payload.title
+                : map!.title}
+            </h1>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
@@ -70,7 +68,7 @@ const MapSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
       </SidebarContent>
 
       <SidebarFooter>
-        <CollectionModal />
+        <OpenCollectionModal />
       </SidebarFooter>
     </Sidebar>
   );

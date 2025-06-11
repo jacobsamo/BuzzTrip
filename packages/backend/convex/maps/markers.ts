@@ -33,13 +33,16 @@ export const getMarkersView = authedQuery({
         if (!place) return;
 
         const newMarker: CombinedMarker = {
-          ...place,
           ...marker,
           lat: place?.lat ?? marker.lat,
           lng: place?.lng ?? marker.lng,
           place_id: place?._id ?? marker.place_id,
-          bounds: place?.bounds ?? null,
+
           icon: marker.icon as IconType,
+          place: {
+            ...place,
+            bounds: place?.bounds ?? null,
+          },
         };
 
         return newMarker;
@@ -68,12 +71,12 @@ export const createMarker = authedMutation({
 
     if (!place) {
       placeId = await createPlace(ctx, {
-        ...args.marker,
-        bounds: args.marker.bounds ?? {
-          lat: args.marker.lat,
-          lng: args.marker.lng,
+        ...args.marker.place,
+        bounds: args.marker.place.bounds ?? {
+          lat: args.marker.place.lat,
+          lng: args.marker.place.lng,
         },
-        icon: args.marker.icon as IconType,
+        icon: args.marker.place.icon as IconType,
       });
     } else {
       placeId = place._id;

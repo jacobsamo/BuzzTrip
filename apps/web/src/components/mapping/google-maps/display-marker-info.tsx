@@ -13,7 +13,7 @@ interface DisplayMarkerInfoProps {
 
 const DisplayMarkerInfo = ({ location }: DisplayMarkerInfoProps) => {
   const [markerRef, marker] = useAdvancedMarkerRef();
-  const { setActiveLocation } = useMapStore((store) => store);
+  // const setActiveState = useMapStore((store) => store.setActiveState);
 
   return (
     <AdvancedMarker
@@ -39,7 +39,7 @@ const DisplayMarkerInfo = ({ location }: DisplayMarkerInfoProps) => {
           <div className="w-[300px] overflow-hidden rounded-lg bg-white shadow-lg">
             {/* Image */}
             <Image
-              src={(location?.photos && location?.photos[0]) || ""}
+              src={(location?.place.photos && location?.place.photos[0]) || ""}
               alt={location.title}
               width={300}
               height={300}
@@ -51,7 +51,7 @@ const DisplayMarkerInfo = ({ location }: DisplayMarkerInfoProps) => {
               <h3 className="text-lg font-semibold text-gray-800">
                 {location.title}
               </h3>
-              <p className="text-sm text-gray-600">{location.address}</p>
+              <p className="text-sm text-gray-600">{location.place.address}</p>
             </div>
 
             {/* Close Button */}
