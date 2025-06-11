@@ -14,7 +14,6 @@ import { createAction } from "@buzztrip/backend/helpers"
 const eventType = [
   ...createAction("collections", ["create", "update"]),
   ...createAction("markers", ["create", "update"]),
-  "activeLocation"
 ] as const;
 type EventType = (typeof eventType)[number];
 
@@ -23,7 +22,6 @@ type EventPayloadMap = {
   "collections:update": NewCollection;
   "markers:create": CombinedMarker;
   "markers:update": CombinedMarker;
-  "activeLocation": CombinedMarker;
 };
 
 export type ActiveState = {
@@ -51,11 +49,11 @@ export type StoreState = {
 
   // Modals
   isMobile: boolean;
+  activeLocation: CombinedMarker | null; // mainly for internal use 
   activeState: ActiveState | null;
   drawerState: DrawerState
   searchValue: string | null;
 
-  // activeLocation: CombinedMarker | null;
   // collectionsOpen: boolean;
   // snap: number | string | null;
   // markerOpen: {
@@ -74,6 +72,7 @@ export type StoreActions = {
   // Modals
   setMobile: (isMobile: boolean) => void;
   setActiveState: (state: ActiveState | null) => void;
+  setActiveLocation: (location: CombinedMarker | null) => void;
   setDrawerState: (state: DrawerState) => void;
   setSearchValue: (value: string | null) => void;
 
@@ -99,6 +98,7 @@ export const defaultState: Omit<StoreState, "map"> = {
 
   // Modals
   isMobile: false,
+  activeLocation: null,
   activeState: null,
   drawerState: {
     snap: 0.2,

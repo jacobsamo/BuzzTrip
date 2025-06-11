@@ -57,7 +57,9 @@ export const getMarkersView = authedQuery({
 export const createMarker = authedMutation({
   args: {
     mapId: zid("maps"),
-    marker: combinedMarkersSchema,
+    marker: combinedMarkersSchema.extend({
+      place_id: zid("places").optional(),
+    }),
     collectionIds: z.string().array().nullish(),
   },
   handler: async (ctx, args) => {

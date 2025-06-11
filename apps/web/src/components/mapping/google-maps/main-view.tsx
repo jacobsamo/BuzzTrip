@@ -6,26 +6,19 @@ import { ArrowLeft } from "lucide-react";
 import OpenCollectionModal from "@/components/modals/open-collection-modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import ActiveLocation from "../../layouts/map-view/components/active_location";
+import ActiveLocation from "../../layouts/map-view-old/components/active_location";
 import CollectionsView from "./collections-view";
 
 const MainView = () => {
-  const [
+  const {
     collections,
     activeState,
+    activeLocation,
     setActiveState,
     setSearchValue,
     getMarkersForCollection,
-    setDrawerState
-  ] = useMapStore((store) => [
-    store.collections,
-    store.activeState,
-    store.setActiveState,
-    store.setSearchValue,
-    store.getMarkersForCollection,
-    store.setDrawerState
-  ]);
-
+    setDrawerState,
+  } = useMapStore((state) => state);
 
   return (
     <>
@@ -59,12 +52,12 @@ const MainView = () => {
           </ScrollArea>
         )}
 
-        {activeState && activeState.event === "activeLocation" && (
+        {activeLocation && (
           <Button
             onClick={() => {
               setActiveState(null);
               setSearchValue("");
-              setDrawerState({snap: 0.2, dismissible: false});
+              setDrawerState({ snap: 0.2, dismissible: false });
             }}
             variant={"link"}
             className="text-base"
@@ -74,7 +67,9 @@ const MainView = () => {
         )}
       </div>
 
-      {activeState && activeState.event === "activeLocation" && <ActiveLocation />}
+      {activeLocation && (
+        <ActiveLocation />
+      )}
     </>
   );
 };

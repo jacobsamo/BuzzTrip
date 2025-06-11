@@ -1,20 +1,13 @@
 "use client";
 import MapView from "@/components/mapping/google-maps/map-view";
-import { useMapStore } from "@/components/providers/map-state-provider";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { useMediaQuery } from "@uidotdev/usehooks";
-import { useEffect } from "react";
 import MainModal from "./components/main-modal";
 import MapDrawer from "./components/map-drawer";
 import MapSidebar from "./components/map-sidebar";
 
 export function Map_page() {
-  const setIsMobile = useMapStore((store) => store.setMobile);
-  const isMobileDevice = useMediaQuery("only screen and (max-width : 769px)");
-
-  useEffect(() => {
-    setIsMobile(isMobileDevice);
-  }, [isMobileDevice]);
+  const isMediumDevice = useMediaQuery("only screen and (min-width : 769px)");
 
   return (
     <SidebarProvider
@@ -45,15 +38,15 @@ export function Map_page() {
         <div className="absolute inset-0 z-10 pointer-events-none">
           {/* Search bar (or sidebar trigger on desktop) */}
           <div className="pointer-events-auto">
-            {isMobileDevice ? (
-              /* Drawer trigger is inside MapDrawer already */
-              <MapDrawer />
-            ) : (
+            {isMediumDevice ? (
               <>
                 <MapSidebar />
                 <SidebarTrigger className="mt-2" />
                 <MainModal />
               </>
+            ) : (
+              /* Drawer trigger is inside MapDrawer already */
+              <MapDrawer />
             )}
           </div>
         </div>

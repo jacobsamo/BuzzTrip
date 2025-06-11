@@ -43,6 +43,7 @@ export default function MarkerForm() {
     map,
     activeState,
     setActiveState,
+    setActiveLocation,
     collections,
     markers,
     getCollectionsForMarker,
@@ -99,7 +100,7 @@ export default function MarkerForm() {
         shouldDirty: true,
         shouldTouch: true,
       });
-    }, [markers, collections, activeState]);
+    }, [markers, collections]);
 
     useEffect(() => {
       console.log("Errors: ", errors);
@@ -134,6 +135,7 @@ export default function MarkerForm() {
           delete data.collection_ids;
           delete data._id;
           delete data._creationTime;
+
           const updatedMarker = updateMarker({
             marker_id: markerId as Id<"markers">,
             marker: {
@@ -148,6 +150,8 @@ export default function MarkerForm() {
             collectionIds_to_remove: collectionsToRemove as Id<"collections">[],
             mapId: map._id as Id<"maps">,
           });
+
+          setActiveLocation(null);
 
           toast.promise(updatedMarker, {
             loading: "Updating marker...",
@@ -167,6 +171,7 @@ export default function MarkerForm() {
             marker: data,
             collectionIds: cols,
           });
+          setActiveLocation(null);
 
           toast.promise(createdMarker, {
             loading: "Creating marker...",

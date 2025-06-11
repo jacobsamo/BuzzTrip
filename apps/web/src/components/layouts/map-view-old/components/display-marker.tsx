@@ -13,14 +13,14 @@ interface DisplayMarkerProps {
 }
 
 const DisplayMarker = ({ marker }: DisplayMarkerProps) => {
-  const setActiveState = useMapStore((store) => store.setActiveState);
+  const {setActiveState, setActiveLocation} = useMapStore((store) => store);
   const map = useMap();
 
   const onMarkerClick = (marker: CombinedMarker) => {
     if (map) {
       map.panTo({ lat: marker.lat, lng: marker.lng });
       map.moveCamera({ zoom: 15 });
-      setActiveState({ event: "activeLocation", payload: marker });
+      setActiveLocation(marker);
     }
   };
 
@@ -36,9 +36,10 @@ const DisplayMarker = ({ marker }: DisplayMarkerProps) => {
       />
       <span className="wrap ml-2 text-center text-sm">{marker.title}</span>
       <SidebarMenuAction
-        onClick={() =>
-          setActiveState({ event: "markers:update", payload: marker })
-        }
+        onClick={(e) => {
+          e.stopPropagation();
+          setActiveState({ event: "markers:update", payload: marker });
+        }}
       >
         <Pencil />
       </SidebarMenuAction>

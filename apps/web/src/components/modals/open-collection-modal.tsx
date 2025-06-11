@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Collection } from "@buzztrip/backend/types";
-import { Edit, Plus } from "lucide-react";
+import { Edit2, Plus } from "lucide-react";
 import { useMapStore } from "../providers/map-state-provider";
 
 interface CollectionModalProps {
@@ -10,8 +10,8 @@ interface CollectionModalProps {
 }
 
 export default function OpenCollectionModal({
-  triggerType,
-  mode,
+  triggerType = "text",
+  mode = "create",
   collection,
 }: CollectionModalProps) {
   const setActiveState = useMapStore((store) => store.setActiveState);
@@ -30,7 +30,7 @@ export default function OpenCollectionModal({
           <Plus className="h-6 w-6" /> Create Collection
         </>
       ) : (
-        <Edit className="h-6 w-6" />
+        <Edit2 className="h-6 w-6" />
       )}
     </Button>
   );

@@ -1,5 +1,5 @@
 import { Id } from "@buzztrip/backend/dataModel";
-import type { Map } from "@buzztrip/backend/types";
+import type { CombinedMarker, Map } from "@buzztrip/backend/types";
 import { createStore as createZustandStore } from "zustand/vanilla";
 import {
   ActiveState,
@@ -56,37 +56,23 @@ export const createStore = (initState: InitState) =>
 
         return collectionLinks;
       },
+      setActiveLocation: (location: CombinedMarker | null) => {
+        const searchValue = location
+          ? location.place.title
+            ? location.place.title
+            : `${location.lat}, ${location.lng}`
+          : null;
 
+        set(() => ({
+          activeLocation: location,
+          drawerState: { snap: 0.5, dismissible: true },
+          searchValue,
+        }));
+      },
       setActiveState: (state: ActiveState | null) => {
-        const prevState = get().activeState;
-        let drawerState = { snap: 0.75, dismissible: false };
-
-        switch (state?.event) {
-          case "markers:create":
-          case "markers:update":
-          case "collections:create":
-          case "collections:update":
-            drawerState = { snap: 0.75, dismissible: false };
-            break;
-          case "activeLocation":
-            drawerState = { snap: 0.5, dismissible: true };
-            break;
-          default:
-            break;
-        }
-
-        if (prevState && prevState.event === "activeLocation" && !state) {
-          // if the previous state was an activeLocation, and we're setting it to null, we want to set it back to the active location
-          set(() => ({
-            activeState: prevState,
-            drawerState,
-          }));
-        }
-
-        // set the active state and drawer state
         set(() => ({
           activeState: state,
-          drawerState,
+          drawerState: { snap: 0.75, dismissible: false },
         }));
       },
 

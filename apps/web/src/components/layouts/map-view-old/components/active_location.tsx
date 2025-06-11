@@ -7,15 +7,10 @@ import { useMemo } from "react";
 import OpenMarkerButton from "../../../mapping/google-maps/open-marker";
 
 const ActiveLocation = () => {
-  const [markers, activeState, setActiveState] = useMapStore((store) => [
-    store.markers,
-    store.activeState,
-    store.setActiveState,
-  ]);
+  const { markers, activeLocation, setActiveState } = useMapStore((state) => state);
 
-  if (!activeState || activeState.event !== "activeLocation") return null;
+  if (!activeLocation) return null;
 
-  const activeLocation = useMemo(() => activeState.payload, [activeState]);
 
   return (
     <>

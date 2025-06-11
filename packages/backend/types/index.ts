@@ -27,7 +27,8 @@ import {
   travelTypeEnumSchema,
   userMapsSchema,
   userSchema,
-  combinedMapUser
+  combinedMapUser,
+  mapTypeIdEnum
 } from "../zod-schemas";
 
 export * from "./icons";
@@ -77,3 +78,5 @@ export type Review = z.infer<typeof reviewsSchema>;
 export type PermissionEnum = z.infer<typeof permissionEnumSchema>;
 
 export type TravelTypeEnum = z.infer<typeof travelTypeEnumSchema>;
+
+export type MapTypeId = z.infer<typeof mapTypeIdEnum>

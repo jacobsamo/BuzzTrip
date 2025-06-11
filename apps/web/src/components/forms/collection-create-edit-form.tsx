@@ -13,7 +13,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function CollectionForm() {
-  const { map, activeState, setActiveState } = useMapStore((store) => store);
+  const { map, activeState, setActiveState } = useMapStore((state) => state);
   if (
     activeState &&
     (activeState.event === "collections:create" ||

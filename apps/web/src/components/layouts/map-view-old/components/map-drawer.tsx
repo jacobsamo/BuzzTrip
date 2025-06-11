@@ -9,10 +9,10 @@ import { DrawerFooter } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-// import DisplayActiveState from "./display-active-state";
+import DisplayActiveState from "./display-active-state";
 
 export default function MapDrawer() {
-  const { activeState, setActiveState, map, drawerState, setDrawerState } =
+  const { activeLocation,activeState, setActiveState, map, drawerState, setDrawerState } =
     useMapStore((state) => state);
 
   return (
@@ -41,8 +41,8 @@ export default function MapDrawer() {
             id="handle"
             className="top-0 mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted"
           />
-          {/* <Drawer.Title className="mb-2 flex flex-row items-center gap-2">
-            {activeState?.event === "activeLocation" ? (
+          <Drawer.Title className="mb-2 flex flex-row items-center gap-2">
+            {activeLocation ? (
               <Button variant="outline" onClick={() => setActiveState(null)}>
                 <ArrowLeft /> Back
               </Button>
@@ -60,7 +60,7 @@ export default function MapDrawer() {
 
           <DrawerFooter className="mb-12">
             <OpenCollectionModal />
-          </DrawerFooter> */}
+          </DrawerFooter>
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>

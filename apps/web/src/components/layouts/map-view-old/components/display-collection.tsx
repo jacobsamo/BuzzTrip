@@ -22,7 +22,7 @@ interface DisplayCollectionProps {
 }
 
 const DisplayCollection = ({ collection, markers }: DisplayCollectionProps) => {
-  const setActiveState = useMapStore((store) => store.setActiveState);
+  const {setActiveState, setActiveLocation} = useMapStore((store) => store);
 
   // All for zooming to marker using google maps
   const map = useMap();
@@ -31,7 +31,7 @@ const DisplayCollection = ({ collection, markers }: DisplayCollectionProps) => {
     if (map) {
       map.panTo({ lat: marker.lat, lng: marker.lng });
       map.moveCamera({ zoom: 15 });
-      setActiveState({ event: "activeLocation", payload: marker });
+      setActiveLocation(marker);
     }
   };
 

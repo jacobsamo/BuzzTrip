@@ -46,7 +46,6 @@ export const detailsRequestCallback = (
     lat: placeDetails.geometry.location.lat(),
     lng: placeDetails.geometry.location.lng(),
     note: undefined,
-    place_id: (placeDetails.place_id as Id<"places">) ?? ("" as Id<"places">),
     title: title,
     map_id: "" as Id<"maps">,
     place: {
@@ -78,9 +77,7 @@ export const detailsRequestCallback = (
 export const AutocompleteCustomInput = () => {
   const map = useMap();
   const places = useMapsLibrary("places");
-  const [setActiveLocation, searchValue, setSearchValue] = useMapStore(
-    (state) => [state.setActiveState, state.searchValue, state.setSearchValue]
-  );
+  const { setActiveState, setActiveLocation, searchValue, setSearchValue } =  useMapStore((state) => state);
 
   // https://developers.google.com/maps/documentation/javascript/reference/places-autocomplete-service#AutocompleteSessionToken
   const [sessionToken, setSessionToken] =
@@ -172,7 +169,7 @@ export const AutocompleteCustomInput = () => {
       placesService?.getDetails(detailRequestOptions, (data) => {
         const res = detailsRequestCallback(map!, data);
         if (res) {
-          setActiveLocation({ event: "activeLocation", payload: res.location });
+          setActiveLocation(res.location);
           setSearchValue(
             res.placeDetails?.name ?? res.placeDetails?.formatted_address ?? ""
           );
@@ -187,7 +184,7 @@ export const AutocompleteCustomInput = () => {
       places,
       placesService,
       sessionToken,
-      setActiveLocation,
+      setActiveState,
       setSearchValue,
     ]
   );
@@ -216,6 +213,7 @@ export const AutocompleteCustomInput = () => {
                 onClick={() => {
                   setSearchValue("");
                   setPredictionResults([]);
+                  setActiveState(null);
                   setActiveLocation(null);
                 }}
               >

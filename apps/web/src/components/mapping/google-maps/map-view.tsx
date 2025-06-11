@@ -1,6 +1,5 @@
 "use client";
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { getGoogleMapsTravelMode } from "@/lib/utils/index";
 import {
   AdvancedMarker,
   Map as GoogleMap,
@@ -8,16 +7,19 @@ import {
   useMapsLibrary,
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
-import { lazy, memo, useEffect, useMemo, useState } from "react";
+import { lazy, memo, useMemo, useState } from "react";
 import DisplayMarkerInfo from "./display-marker-info";
 import { AutocompleteCustomInput, detailsRequestCallback } from "./search";
+import ChangeMapStyle from "./change-map-style";
 
 const MarkerPin = lazy(() => import("./marker_pin"));
 
 const Mapview = () => {
   const googleMap = useMap();
   const places = useMapsLibrary("places");
-  const [
+  const {
+    activeLocation,
+    setActiveLocation,
     activeState,
     setActiveState,
     markers,
@@ -25,15 +27,7 @@ const Mapview = () => {
     routes,
     routeStops,
     map,
-  ] = useMapStore((store) => [
-    store.activeState,
-    store.setActiveState,
-    store.markers,
-    store.setSearchValue,
-    store.routes,
-    store.routeStops,
-    store.map,
-  ]);
+  } = useMapStore((state) => state);
 
   if (!map) return null;
 
@@ -58,13 +52,13 @@ const Mapview = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (!routesLibrary || !routeStops || !routes || !googleMap) return;
-    setDirectionsService(new routesLibrary.DirectionsService());
-    setDirectionsRenderer(
-      new routesLibrary.DirectionsRenderer({ map: googleMap })
-    );
-  }, [routesLibrary, googleMap]);
+  // useEffect(() => {
+  //   if (!routesLibrary || !routeStops || !routes || !googleMap) return;
+  //   setDirectionsService(new routesLibrary.DirectionsService());
+  //   setDirectionsRenderer(
+  //     new routesLibrary.DirectionsRenderer({ map: googleMap })
+  //   );
+  // }, [routesLibrary, googleMap]);
 
   // useEffect(() => {
   //   if (!directionsService || !directionsRenderer || !routeStops || !routes)
@@ -107,6 +101,7 @@ const Mapview = () => {
     if (!places || !googleMap) return;
     e.domEvent?.stopPropagation();
     e.stop();
+
     console.log("Clicked on area:", e);
     const placesService = new places.PlacesService(googleMap);
     const latLng = e.detail.latLng;
@@ -119,7 +114,6 @@ const Mapview = () => {
         if (zoom < 6) return 1000;
         if (zoom < 8) return 100;
         if (zoom > 10) return 100;
-
         return 300;
       };
 
@@ -146,7 +140,7 @@ const Mapview = () => {
         });
       } catch (error) {
         console.error("Error during nearby search:", error);
-        return; // Exit early if search fails
+        return;
       }
     }
 
@@ -182,10 +176,11 @@ const Mapview = () => {
         }
         const res = detailsRequestCallback(googleMap!, data);
         if (res) {
-          setActiveState({ event: "activeLocation", payload: res.location });
-          setSearchValue(
-            res.placeDetails?.name ?? res.placeDetails?.formatted_address ?? ""
-          );
+          // Batch state updates together
+          const newSearchValue =
+            res.placeDetails?.name ?? res.placeDetails?.formatted_address ?? "";
+          setActiveLocation(res.location);
+          setSearchValue(newSearchValue);
         }
       });
     } catch (error) {
@@ -196,6 +191,7 @@ const Mapview = () => {
   return (
     <div className="absolute inset-0 h-screen w-full flex-1 touch-none">
       <AutocompleteCustomInput />
+      <ChangeMapStyle />
       <GoogleMap
         defaultCenter={mapOptions.center}
         defaultZoom={mapOptions.zoom}
@@ -208,21 +204,21 @@ const Mapview = () => {
             ? mapOptions.bounds
             : undefined
         }
-        mapTypeId="hybrid"
+        mapTypeId={map.mapTypeId?.toLowerCase() ?? "hybrid"}
         mapId={env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID}
         disableDefaultUI={true}
         onClick={(e) => handleClick(e)}
         gestureHandling="greedy"
         reuseMaps
       >
-        {activeState && activeState.event === "activeLocation" && (
+        {activeLocation && (
           // !markers?.some(
           //   (marker) =>
           //     marker.lat === activeLocation.lat &&
           //     marker.lng === activeLocation.lng
           // ) &&
           <>
-            <DisplayMarkerInfo location={activeState.payload} />
+            <DisplayMarkerInfo location={activeLocation} />
           </>
         )}
 
@@ -234,7 +230,7 @@ const Mapview = () => {
               title={marker.title}
               onClick={() => {
                 googleMap!.panTo({ lat: marker.lat, lng: marker.lng });
-                setActiveState({ event: "activeLocation", payload: marker });
+                setActiveLocation(marker);
               }}
             >
               <MarkerPin color={marker.color} icon={marker.icon!} size={16} />
