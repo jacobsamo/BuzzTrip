@@ -67,6 +67,7 @@ export const createStore = (initState: InitState) =>
           activeLocation: location,
           drawerState: { snap: 0.5, dismissible: true },
           searchValue,
+          searchActive: false,
         }));
       },
       setActiveState: (state: ActiveState | null) => {
@@ -94,5 +95,7 @@ export const createStore = (initState: InitState) =>
       },
       setSearchValue: (value: string | null) =>
         set(() => ({ searchValue: value })),
+      setSearchActive: (active: boolean) =>
+        set(() => ({ searchActive: active, drawerState: { snap: 0.98, dismissible: true } })),
     };
   });

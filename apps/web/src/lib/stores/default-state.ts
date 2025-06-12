@@ -53,6 +53,7 @@ export type StoreState = {
   activeState: ActiveState | null;
   drawerState: DrawerState
   searchValue: string | null;
+  searchActive: boolean;
 
   // collectionsOpen: boolean;
   // snap: number | string | null;
@@ -75,7 +76,7 @@ export type StoreActions = {
   setActiveLocation: (location: CombinedMarker | null) => void;
   setDrawerState: (state: DrawerState) => void;
   setSearchValue: (value: string | null) => void;
-
+  setSearchActive: (active: boolean) => void;
 
   // setActiveLocation: (location: CombinedMarker | null) => void;
   // setCollectionsOpen: (open: boolean) => void;
@@ -105,6 +106,7 @@ export const defaultState: Omit<StoreState, "map"> = {
     dismissible: true,
   },
   searchValue: null,
+  searchActive: false,
 
   // activeLocation: null,
   // collectionsOpen: false,

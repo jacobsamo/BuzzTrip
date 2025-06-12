@@ -10,22 +10,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { api } from "@buzztrip/backend/api";
-import { Id } from "@buzztrip/backend/dataModel";
-import { useConvexAuth, useQuery } from "convex/react";
+import { Preloaded, usePreloadedQuery } from "convex/react";
 import { MapIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
 import MapCard from "./map-card";
 
 interface UserMapsProps {
-  userId: string;
+  preloadedMaps: Preloaded<typeof api.maps.index.getUserMaps>;
 }
 
-const UserMaps = ({ userId }: UserMapsProps) => {
-  const {isAuthenticated} = useConvexAuth();
-  const maps = useQuery(api.maps.index.getUserMaps, {
-    userId: userId as Id<"users">,
-  });
+const UserMaps = ({ preloadedMaps }: UserMapsProps) => {
+  const maps = usePreloadedQuery(preloadedMaps);
   const [sortOption, setSortOption] = useState("updatedAt");
   const [searchValue, setSearchValue] = useState("");
 

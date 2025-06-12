@@ -8,9 +8,9 @@ import {
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
 import { lazy, memo, useMemo, useState } from "react";
+import ChangeMapStyle from "./change-map-style";
 import DisplayMarkerInfo from "./display-marker-info";
 import { AutocompleteCustomInput, detailsRequestCallback } from "./search";
-import ChangeMapStyle from "./change-map-style";
 
 const MarkerPin = lazy(() => import("./marker_pin"));
 
@@ -20,13 +20,10 @@ const Mapview = () => {
   const {
     activeLocation,
     setActiveLocation,
-    activeState,
-    setActiveState,
     markers,
     setSearchValue,
-    routes,
-    routeStops,
     map,
+    isMobile,
   } = useMapStore((state) => state);
 
   if (!map) return null;
@@ -174,7 +171,7 @@ const Mapview = () => {
           console.error("Error fetching place details:", status);
           return;
         }
-        const res = detailsRequestCallback(googleMap!, data);
+        const res = detailsRequestCallback(googleMap!, data, isMobile);
         if (res) {
           // Batch state updates together
           const newSearchValue =
@@ -190,7 +187,7 @@ const Mapview = () => {
 
   return (
     <div className="absolute inset-0 h-screen w-full flex-1 touch-none">
-      <AutocompleteCustomInput />
+      {!isMobile && <AutocompleteCustomInput />}
       <ChangeMapStyle />
       <GoogleMap
         defaultCenter={mapOptions.center}

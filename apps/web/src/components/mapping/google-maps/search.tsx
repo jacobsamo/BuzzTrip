@@ -14,7 +14,8 @@ interface DetailsRequestCallbackReturn {
 
 export const detailsRequestCallback = (
   map: google.maps.Map,
-  placeDetails: google.maps.places.PlaceResult | null
+  placeDetails: google.maps.places.PlaceResult | null,
+  isMobile: boolean = false
 ): DetailsRequestCallbackReturn | null => {
   if (
     placeDetails == null ||
@@ -28,11 +29,30 @@ export const detailsRequestCallback = (
   const bounds = new google.maps.LatLngBounds();
 
   if (placeDetails.geometry.viewport) {
-    bounds.union(placeDetails.geometry.viewport);
-    map!.fitBounds(placeDetails.geometry.viewport);
+    const viewport = placeDetails.geometry.viewport;
+    if (isMobile) {
+      const offsetViewport = new google.maps.LatLngBounds(
+        new google.maps.LatLng(
+          viewport.getSouthWest().lat() - 0.3,
+          viewport.getSouthWest().lng()
+        ),
+        viewport.getNorthEast()
+      );
+      bounds.union(offsetViewport);
+      map!.fitBounds(offsetViewport);
+    } else {
+      bounds.union(viewport);
+      map!.fitBounds(viewport);
+    }
   } else {
     bounds.extend(placeDetails.geometry.location);
-    map!.setCenter(placeDetails.geometry.location);
+    const center = placeDetails.geometry.location;
+    if (isMobile) {
+      const offset = new google.maps.LatLng(center.lat() - 0.3, center.lng());
+      map!.setCenter(offset);
+    } else {
+      map!.setCenter(center);
+    }
     map!.setZoom(8);
   }
 
@@ -77,7 +97,14 @@ export const detailsRequestCallback = (
 export const AutocompleteCustomInput = () => {
   const map = useMap();
   const places = useMapsLibrary("places");
-  const { setActiveState, setActiveLocation, searchValue, setSearchValue } =  useMapStore((state) => state);
+  const {
+    setActiveState,
+    setActiveLocation,
+    searchValue,
+    setSearchValue,
+    setSearchActive,
+    isMobile,
+  } = useMapStore((state) => state);
 
   // https://developers.google.com/maps/documentation/javascript/reference/places-autocomplete-service#AutocompleteSessionToken
   const [sessionToken, setSessionToken] =
@@ -167,7 +194,7 @@ export const AutocompleteCustomInput = () => {
       };
 
       placesService?.getDetails(detailRequestOptions, (data) => {
-        const res = detailsRequestCallback(map!, data);
+        const res = detailsRequestCallback(map!, data, isMobile);
         if (res) {
           setActiveLocation(res.location);
           setSearchValue(
@@ -175,18 +202,12 @@ export const AutocompleteCustomInput = () => {
           );
           setPredictionResults([]);
           setSessionToken(new places.AutocompleteSessionToken());
+          setSearchActive(false);
         }
         setFetchingData(false);
       });
     },
-    [
-      map,
-      places,
-      placesService,
-      sessionToken,
-      setActiveState,
-      setSearchValue,
-    ]
+    [map, places, placesService, sessionToken, setActiveState, setSearchValue]
   );
 
   return (
@@ -205,6 +226,7 @@ export const AutocompleteCustomInput = () => {
               id="search"
               value={searchValue ?? ""}
               onValueChange={onInputChange}
+              onFocus={() => setSearchActive(true)}
             />
 
             {searchValue && (
@@ -215,6 +237,7 @@ export const AutocompleteCustomInput = () => {
                   setPredictionResults([]);
                   setActiveState(null);
                   setActiveLocation(null);
+                  setSearchActive(false);
                 }}
               >
                 <X className="h-5 w-5" />
