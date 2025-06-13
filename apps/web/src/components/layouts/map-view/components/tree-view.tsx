@@ -18,6 +18,7 @@ import {
   TreeState,
 } from "@headless-tree/core";
 import { useTree } from "@headless-tree/react";
+import { useMap } from "@vis.gl/react-google-maps";
 import { FolderIcon, FolderOpenIcon, Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -102,6 +103,8 @@ export default function CollectionTree() {
     setActiveState,
     setActiveLocation,
   } = useMapStore((state) => state);
+  const map = useMap();
+
   const [treeState, setTreeState] = useState<Partial<TreeState<Item>>>({
     expandedItems: collections?.map((collection) => collection._id) ?? [],
   });
@@ -144,7 +147,11 @@ export default function CollectionTree() {
               onClick={() => {
                 const payload = item.getItemData().payload;
                 if (isCombinedMarker(payload)) {
-                  setActiveLocation(payload);
+                  if (map) {
+                    map.panTo({ lat: payload.lat, lng: payload.lng });
+                    map.moveCamera({ zoom: 15 });
+                    setActiveLocation(payload);
+                  }
                 }
               }}
             >
