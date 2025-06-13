@@ -52,34 +52,37 @@ export default function MapDrawer() {
     <Drawer.Root
       open
       dismissible={false}
-      snapPoints={[0.1, 0.2, 0.5, 0.75, 0.9, 0.98]}
+      snapPoints={[0.1, 0.2, 0.5, 0.75, 0.9]}
       activeSnapPoint={drawerState.snap}
-      setActiveSnapPoint={(snapPoint) =>
-        setDrawerState({ snap: snapPoint, dismissible: true })
-      }
+      setActiveSnapPoint={(snapPoint) => {
+        if (typeof snapPoint === "number") {
+          setDrawerState({ snap: snapPoint, dismissible: true });
+        }
+      }}
       modal={false}
       fixed={true}
+      repositionInputs={false}
+      shouldScaleBackground={false}
     >
       <Drawer.Portal>
         <Drawer.Content
           className={cn(
-            "fixed inset-0 bottom-0 z-50",
+            "fixed inset-0 bottom-0 right-0 left-0 z-50",
             "mx-auto flex w-full flex-col",
             "rounded-t-[10px] border bg-background",
             "p-2 pb-6 md:w-3/4",
-            "overflow-hidden",
+            "overflow-y-auto overflow-x-hidden",
             "touch-pan-y"
           )}
         >
-          <div
-            id="handle"
-            className="top-0 mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted"
-          />
+          <Drawer.Handle />
 
           {!activeLocation && !markerFormOpen && !collectionFormOpen && (
             <>
               <AutocompleteCustomInput />
-              {!searchActive && <MarkersCollectionTabs />}
+              <div className="mt-5">
+                {!searchActive && <MarkersCollectionTabs />}
+              </div>
             </>
           )}
           {activeLocation && (!markerFormOpen || !collectionFormOpen) && (

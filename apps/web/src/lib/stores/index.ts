@@ -57,6 +57,15 @@ export const createStore = (initState: InitState) =>
         return collectionLinks;
       },
       setActiveLocation: (location: CombinedMarker | null) => {
+        if (!location) {
+          set(() => ({
+            activeLocation: null,
+            drawerState: { snap: 0.2, dismissible: true },
+            searchValue: null,
+            searchActive: false,
+          }));
+        }
+
         const searchValue = location
           ? location.place.title
             ? location.place.title
@@ -71,6 +80,14 @@ export const createStore = (initState: InitState) =>
         }));
       },
       setActiveState: (state: ActiveState | null) => {
+        if (!state) {
+          set(() => ({
+            activeState: state,
+            drawerState: { snap: 0.2, dismissible: true },
+          }));
+          return;
+        }
+
         set(() => ({
           activeState: state,
           drawerState: { snap: 0.75, dismissible: false },
@@ -96,6 +113,9 @@ export const createStore = (initState: InitState) =>
       setSearchValue: (value: string | null) =>
         set(() => ({ searchValue: value })),
       setSearchActive: (active: boolean) =>
-        set(() => ({ searchActive: active, drawerState: { snap: 0.98, dismissible: true } })),
+        set(() => ({
+          searchActive: active,
+          // drawerState: { snap: 0.9, dismissible: true },
+        })),
     };
   });

@@ -45,7 +45,7 @@ const ActiveLocation = () => {
   }, [collections, collectionLinks, activeLocation]);
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden max-w-md mx-auto">
+    <div className="bg-white rounded-lg overflow-hidden w-full sm:max-w-md mx-auto">
       {/* Header with photos */}
       <Button
         className="absolute right-1 top-1 h-6 w-6 p-0 rounded-full bg-white hover:bg-gray-100 border border-gray-300 shadow"

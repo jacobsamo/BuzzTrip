@@ -1,3 +1,4 @@
+import { createAction } from "@buzztrip/backend/helpers";
 import type {
   Collection,
   CollectionLink,
@@ -9,7 +10,6 @@ import type {
   Route,
   RouteStop,
 } from "@buzztrip/backend/types";
-import { createAction } from "@buzztrip/backend/helpers"
 
 const eventType = [
   ...createAction("collections", ["create", "update"]),
@@ -28,14 +28,13 @@ export type ActiveState = {
   [K in keyof EventPayloadMap]: {
     event: K;
     payload: EventPayloadMap[K];
-  }
+  };
 }[keyof EventPayloadMap];
 
-
 export type DrawerState = {
-  snap: number | string | null;
+  snap: number | null;
   dismissible: boolean; // whether the user can close to a smaller snap point
-}
+};
 
 export type StoreState = {
   map: Map;
@@ -49,9 +48,9 @@ export type StoreState = {
 
   // Modals
   isMobile: boolean;
-  activeLocation: CombinedMarker | null; // mainly for internal use 
+  activeLocation: CombinedMarker | null; // mainly for internal use
   activeState: ActiveState | null;
-  drawerState: DrawerState
+  drawerState: DrawerState;
   searchValue: string | null;
   searchActive: boolean;
 
