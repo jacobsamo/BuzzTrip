@@ -90,7 +90,7 @@ export const createStore = (initState: InitState) =>
 
         set(() => ({
           activeState: state,
-          drawerState: { snap: 0.75, dismissible: false },
+          drawerState: { snap: 0.9, dismissible: false },
         }));
       },
 

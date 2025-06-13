@@ -1,16 +1,15 @@
 "use client";
-// import * as Accordion from "@radix-ui/react-accordion";
-import { Drawer } from "vaul";
-// import CollectionCard from "../collection_card";
 import { AutocompleteCustomInput } from "@/components/mapping/google-maps/search";
 import { useMapStore } from "@/components/providers/map-state-provider";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
+import { Drawer } from "vaul";
 import ActiveLocation from "./active-location";
 import MarkersCollectionTabs from "./markers-collections";
-// import DisplayActiveState from "./display-active-state";
 
 const MarkerForm = dynamic(
   () => import("../../../forms/marker-create-edit-form"),
@@ -56,7 +55,11 @@ export default function MapDrawer() {
       activeSnapPoint={drawerState.snap}
       setActiveSnapPoint={(snapPoint) => {
         if (typeof snapPoint === "number") {
-          setDrawerState({ snap: snapPoint, dismissible: true });
+          if (drawerState.dismissible) {
+            setDrawerState({ snap: snapPoint, dismissible: true });
+          } else if (snapPoint >= drawerState.snap) {
+            setDrawerState({ snap: snapPoint, dismissible: false });
+          }
         }
       }}
       modal={false}
@@ -89,15 +92,31 @@ export default function MapDrawer() {
             <ActiveLocation />
           )}
 
-          {activeState && markerFormOpen && (
-            <ScrollArea>
-              <MarkerForm />
-            </ScrollArea>
-          )}
-          {activeState && collectionFormOpen && (
-            <ScrollArea>
-              <CollectionForm />
-            </ScrollArea>
+          {activeState && (markerFormOpen || collectionFormOpen) && (
+            <div>
+              <Button
+                className="absolute right-1 top-1 h-6 w-6 p-0 rounded-full bg-white hover:bg-gray-100 border border-gray-300 shadow"
+                variant="secondary"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveState(null);
+                }}
+                aria-label="Close info box"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+              {markerFormOpen && (
+                <ScrollArea>
+                  <MarkerForm />
+                </ScrollArea>
+              )}
+              {collectionFormOpen && (
+                <ScrollArea>
+                  <CollectionForm />
+                </ScrollArea>
+              )}
+            </div>
           )}
         </Drawer.Content>
       </Drawer.Portal>

@@ -13,7 +13,7 @@ import { useMap } from "@vis.gl/react-google-maps";
 import { useMutation } from "convex/react";
 import { Map } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 // TODO: change to use my own images for map style (future)
 const mapTypes: { id: MapTypeId; image: string; description: string }[] = [
@@ -43,10 +43,6 @@ const ChangeMapStyle = () => {
   const { map, isMobile } = useMapStore((state) => state);
   const updateMap = useMutation(api.maps.index.partialMapUpdate);
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    console.log("isMobile", isMobile);
-  }, [isMobile]);
 
   if (!googleMap) return null;
 
@@ -82,13 +78,13 @@ const ChangeMapStyle = () => {
       >
         {mapTypes.map((type) => (
           <button
+            key={type.id}
             onClick={() => {
               handleMapTypeChange(type.id);
             }}
             className="flex flex-col items-center"
           >
             <Image
-              key={type.id}
               src={type.image}
               alt={type.description}
               width={40}

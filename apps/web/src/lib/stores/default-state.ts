@@ -32,7 +32,7 @@ export type ActiveState = {
 }[keyof EventPayloadMap];
 
 export type DrawerState = {
-  snap: number | null;
+  snap: number;
   dismissible: boolean; // whether the user can close to a smaller snap point
 };
 
