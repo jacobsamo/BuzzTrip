@@ -10,6 +10,7 @@ import { useMemo } from "react";
 import { Drawer } from "vaul";
 import ActiveLocation from "./active-location";
 import MarkersCollectionTabs from "./markers-collections";
+import OpenCollectionModal from "@/components/modals/open-collection-modal";
 
 const MarkerForm = dynamic(
   () => import("../../../forms/marker-create-edit-form"),
@@ -84,7 +85,15 @@ export default function MapDrawer() {
             <>
               <AutocompleteCustomInput />
               <div className="mt-5">
-                {!searchActive && <MarkersCollectionTabs />}
+                {!searchActive && (
+                  <>
+                  <MarkersCollectionTabs />
+                  <div className="flex items-center justify-center gap-2 mt-5">
+
+                  <OpenCollectionModal />
+                  </div>
+                  </>
+                )}
               </div>
             </>
           )}
@@ -95,7 +104,7 @@ export default function MapDrawer() {
           {activeState && (markerFormOpen || collectionFormOpen) && (
             <div>
               <Button
-                className="absolute right-1 top-1 h-6 w-6 p-0 rounded-full bg-white hover:bg-gray-100 border border-gray-300 shadow"
+                className="absolute right-1 top-1 size-8 p-0 rounded-md bg-white hover:bg-gray-100 border border-gray-300 shadow"
                 variant="secondary"
                 size="icon"
                 onClick={(e) => {

@@ -133,6 +133,7 @@ function MapForm({
       toast.promise(create, {
         loading: "Creating map...",
         success: async (res) => {
+          setOpen(false);
           return "Map created successfully!";
         },
         error: "Failed to create map",

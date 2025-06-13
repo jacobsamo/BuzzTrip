@@ -1,5 +1,4 @@
 import { Form } from "@/components/ui/form";
-import { api } from "@buzztrip/backend/api";
 import { NewLabel, NewMap } from "@buzztrip/backend/types";
 import {
   mapsEditSchema,
@@ -7,7 +6,6 @@ import {
   refinedUserSchema,
 } from "@buzztrip/backend/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "convex/react";
 import React, {
   createContext,
   use,
@@ -93,10 +91,6 @@ export const MapFormProvider = ({
   onLabelChange,
   onUserChange,
 }: MapFormProviderProps) => {
-  const userStatus = useQuery(api.users.userLoginStatus);
-  console.log("userStatus", userStatus);
-  const userId = userStatus?.user?._id || "";
-
   // Use refs to store callback functions to prevent unnecessary re-renders
   const onUserChangeRef = useRef(onUserChange);
   const onLabelChangeRef = useRef(onLabelChange);

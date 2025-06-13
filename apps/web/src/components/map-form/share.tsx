@@ -179,7 +179,7 @@ const MapShareForm = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center justify-end gap-2 flex-wrap">
                     <Select
                       value={user.permission}
                       onValueChange={(value) =>

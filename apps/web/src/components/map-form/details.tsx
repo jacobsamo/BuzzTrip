@@ -25,7 +25,7 @@ const MapDetailsForm = () => {
           <FormItem>
             <FormLabel>Title</FormLabel>
             <FormControl>
-              <Input placeholder="Enter map title" {...field} autoFocus />
+              <Input placeholder="Enter map title" {...field} />
             </FormControl>
             <FormDescription>Give your map a descriptive name.</FormDescription>
             <FormMessage />

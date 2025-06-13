@@ -87,8 +87,8 @@ const UserMaps = ({ preloadedMaps }: UserMapsProps) => {
     <div className="space-y-6">
       <div className="inline-flex w-full items-center justify-end">
         <MapModal trigger={isMobileDevice ? (
-          <Button className="fixed bottom-2 right-2 rounded-full size-10">
-            <Plus className="size-4" />
+          <Button className="fixed bottom-2 right-2 rounded-full size-14">
+            <Plus className="size-7" />
           </Button>
         ) : undefined} />
       </div>
