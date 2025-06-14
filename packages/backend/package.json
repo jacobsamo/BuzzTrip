@@ -17,7 +17,8 @@
     "./zod-schemas": "./zod-schemas/index.ts",
     "./types": "./types/index.ts",
     "./types/icon": "./types/icons.ts",
-    "./generateId": "./generateId.ts"
+    "./generateId": "./generateId.ts",
+    "./helpers": "./helpers/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -29,7 +30,8 @@
     "@convex-dev/geospatial": "^0.1.9",
     "@convex-dev/migrations": "^0.2.9",
     "convex": "^1.24.8",
-    "convex-helpers": "^0.1.90",
-    "svix": "^1.66.0"
+    "convex-helpers": "^0.1.92",
+    "svix": "^1.67.0",
+    "zod": "^3.25.58"
   }
 }

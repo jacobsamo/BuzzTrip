@@ -27,9 +27,13 @@ const visibilityOptions = [
   "unlisted", //Viewable with link, but not discoverable
 ] as const;
 
+const mapTypeIdOptions = ["hybrid", "roadmap", "satellite", "terrain"] as const;
+
 export const permissionEnumSchema = z.enum(permissionEnum);
 
 export const travelTypeEnumSchema = z.enum(routeTravelTypeEnum);
+
+export const mapTypeIdEnum = z.enum(mapTypeIdOptions);
 
 export const mapsSchema = defaultSchema(
   z.object({
@@ -44,6 +48,7 @@ export const mapsSchema = defaultSchema(
     lng: z.optional(z.number()),
     bounds: mapBoundsSchema.nullish(),
     visibility: z.enum(visibilityOptions),
+    mapTypeId: mapTypeIdEnum.optional(),
     updatedAt: z.string().datetime().optional(),
   })
 );
@@ -65,7 +70,6 @@ export const shareMapUserSchema = mapUserSchema.pick({
   user_id: true,
   permission: true,
 });
-
 
 const labelSchema = z.object({
   map_id: zid("maps"),

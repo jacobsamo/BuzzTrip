@@ -10,10 +10,10 @@ interface OpenMarkerButtonProps {
 }
 
 const OpenMarkerButton = ({ marker, mode }: OpenMarkerButtonProps) => {
-  const setMarkerOpen = useMapStore((store) => store.setMarkerOpen);
+  const setActiveState = useMapStore((store) => store.setActiveState);
 
   return (
-    <Button variant="ghost" onClick={() => setMarkerOpen(true, marker, mode)}>
+    <Button variant="ghost" onClick={() => setActiveState({ event: "markers:update", payload: marker })}>
       {mode === "create" ? <Plus /> : <Pencil />}
     </Button>
   );

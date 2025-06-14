@@ -6,11 +6,10 @@ import MarkerPin from "../google-maps/marker_pin";
 const DisplayMapData = () => {
   const { current: map } = useMap();
   const {
-    activeLocation,
     markers,
-    setActiveLocation,
     searchValue,
     setSearchValue,
+    setActiveLocation
   } = useMapStore((store) => store);
 
   return (

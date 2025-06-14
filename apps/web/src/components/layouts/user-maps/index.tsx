@@ -10,24 +10,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { api } from "@buzztrip/backend/api";
-import { Id } from "@buzztrip/backend/dataModel";
-import { useConvexAuth, useQuery } from "convex/react";
-import { MapIcon } from "lucide-react";
+import { Preloaded, usePreloadedQuery } from "convex/react";
+import { MapIcon, Plus } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
 import MapCard from "./map-card";
+import { useMediaQuery } from "@uidotdev/usehooks";
 
 interface UserMapsProps {
-  userId: string;
+  preloadedMaps: Preloaded<typeof api.maps.index.getUserMaps>;
 }
 
-const UserMaps = ({ userId }: UserMapsProps) => {
-  const {isAuthenticated} = useConvexAuth();
-  const maps = useQuery(api.maps.index.getUserMaps, {
-    userId: userId as Id<"users">,
-  });
+const UserMaps = ({ preloadedMaps }: UserMapsProps) => {
+  const maps = usePreloadedQuery(preloadedMaps);
   const [sortOption, setSortOption] = useState("updatedAt");
   const [searchValue, setSearchValue] = useState("");
+  const isMobileDevice = useMediaQuery("only screen and (max-width : 600px)");
+
 
   const filteredMaps = useMemo(() => {
     if (!maps) return null;
@@ -87,7 +86,11 @@ const UserMaps = ({ userId }: UserMapsProps) => {
   return (
     <div className="space-y-6">
       <div className="inline-flex w-full items-center justify-end">
-        <MapModal />
+        <MapModal trigger={isMobileDevice ? (
+          <Button className="fixed bottom-2 right-2 rounded-full size-14">
+            <Plus className="size-7" />
+          </Button>
+        ) : undefined} />
       </div>
       <div className="space-y-6">
         <div className="flex flex-wrap gap-2 justify-end items-center">

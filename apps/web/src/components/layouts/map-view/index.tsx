@@ -1,12 +1,23 @@
 "use client";
 import MapView from "@/components/mapping/google-maps/map-view";
+import { useMapStore } from "@/components/providers/map-state-provider";
+import { buttonVariants } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { useMediaQuery } from "@uidotdev/usehooks";
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
+import { useEffect } from "react";
+import MainModal from "./components/main-modal";
 import MapDrawer from "./components/map-drawer";
 import MapSidebar from "./components/map-sidebar";
 
 export function Map_page() {
-  const isMediumDevice = useMediaQuery("only screen and (min-width : 769px)");
+  const setIsMobile = useMapStore((store) => store.setMobile);
+  const isMobileDevice = useMediaQuery("only screen and (max-width : 769px)");
+
+  useEffect(() => {
+    setIsMobile(isMobileDevice);
+  }, [isMobileDevice]);
 
   return (
     <SidebarProvider
@@ -24,6 +35,7 @@ export function Map_page() {
           overflow: hidden;
           margin: 0;
           padding: 0;
+          touch-action: none;
         }
       `}</style>
       {/* full-screen, relative positioning, locked scroll */}
@@ -37,14 +49,28 @@ export function Map_page() {
         <div className="absolute inset-0 z-10 pointer-events-none">
           {/* Search bar (or sidebar trigger on desktop) */}
           <div className="pointer-events-auto">
-            {isMediumDevice ? (
+            {isMobileDevice ? (
+              /* Drawer trigger is inside MapDrawer already */
+              <>
+                <MapDrawer />
+                <Link
+                  href="/app"
+                  prefetch={true}
+                  className={buttonVariants({
+                    variant: "outline",
+                    size: "icon",
+                    className: "absolute top-2 left-2 z-10",
+                  })}
+                >
+                  <ChevronLeft />
+                </Link>
+              </>
+            ) : (
               <>
                 <MapSidebar />
                 <SidebarTrigger className="mt-2" />
+                <MainModal />
               </>
-            ) : (
-              /* Drawer trigger is inside MapDrawer already */
-              <MapDrawer />
             )}
           </div>
         </div>

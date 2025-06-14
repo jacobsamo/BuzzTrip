@@ -113,7 +113,7 @@ const LabelForm = ({ label }: LabelFormProps) => {
       </Button>
       <CardContent className="inline-flex flex-wrap items-center gap-2 md:gap-8">
         <Form {...form}>
-          <div className="inline-flex items-center gap-2">
+          <div className="inline-flex items-center gap-2 flex-wrap">
             <FormField
               control={control}
               name="icon"
