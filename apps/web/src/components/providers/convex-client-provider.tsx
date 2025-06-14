@@ -37,7 +37,7 @@ export default function ConvexClientProvider({
   useEffect(() => {
     if (session && session.userId) {
       posthog.identify(session.userId);
-      Sentry.setUser({ id: session.userId,  });
+      Sentry.setUser({ id: session.userId });
     }
   }, [posthog, session]);
 

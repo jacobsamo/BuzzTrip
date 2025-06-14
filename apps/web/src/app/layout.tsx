@@ -9,7 +9,6 @@ import type { Viewport } from "next";
 import React from "react";
 import { Monitoring } from "react-scan/monitoring/next";
 
-export const metadata = constructMetadata();
 
 export const viewport: Viewport = {
   maximumScale: 1,
@@ -18,6 +17,8 @@ export const viewport: Viewport = {
   userScalable: false,
   width: "device-width",
 };
+
+export const metadata = constructMetadata();
 
 export default function RootLayout({
   children,
