@@ -1,6 +1,6 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import DisplayMarker from "./display-marker";
 import CollectionTree from "./tree-view";

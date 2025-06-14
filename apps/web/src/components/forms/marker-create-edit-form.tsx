@@ -18,7 +18,6 @@ import { cn } from "@/lib/utils";
 import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
 import type { IconType } from "@buzztrip/backend/types";
-import { CombinedMarker } from "@buzztrip/backend/types";
 import { combinedMarkersSchema } from "@buzztrip/backend/zod-schemas";
 import { popularIconsList } from "@buzztrip/components/icon";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,7 +25,7 @@ import { useMutation } from "convex/react";
 import { Circle, CircleCheck } from "lucide-react";
 import dynamic from "next/dynamic";
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -62,7 +61,6 @@ export default function MarkerForm() {
     const [inCollections, setInCollections] = React.useState<string[] | null>(
       null
     );
-    const [isSaved, setIsSaved] = React.useState<CombinedMarker | null>(null);
     const [isLoading, setIsLoading] = React.useState(false);
 
     const form = useForm<z.infer<typeof editSchema>>({
@@ -85,16 +83,19 @@ export default function MarkerForm() {
       formState: { errors },
     } = form;
 
+    const isSaved = useMemo(() => {
+      if (!markers || !marker || !marker._id) return false;
+      return markers.find((m) => m._id == marker._id) ?? false;
+    }, [marker, markers]);
+
     useEffect(() => {
-      const saved = marker
-        ? (markers?.find((marker) => marker._id == marker._id) ?? null)
-        : null;
-      setIsSaved(saved);
+      if (!isSaved || !marker) return;
+      const collectionsForMarker = getCollectionsForMarker(isSaved._id ?? null);
+      if (!collectionsForMarker) return;
 
       const inCols =
-        getCollectionsForMarker(saved?._id ?? null)?.map(
-          (collection) => collection._id
-        ) ?? null;
+        collectionsForMarker.map((collection) => collection._id) ?? null;
+
       setInCollections(inCols);
       setValue("collection_ids", inCols, {
         shouldDirty: true,
@@ -217,7 +218,7 @@ export default function MarkerForm() {
     };
 
     return (
-      <div className="p-2">
+      <div className="p-2 z-10">
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <FormField
@@ -341,10 +342,9 @@ export default function MarkerForm() {
             <ScrollArea className="h-36 w-full">
               {collections &&
                 collections.map((collection, index) => {
-                  const isChecked = watch("collection_ids")?.includes(
-                    collection._id
-                  );
-
+                  const isChecked =
+                    watch("collection_ids")?.includes(collection._id) ?? false;
+                  console.log(collection, isChecked);
                   return (
                     <Button
                       onClick={() => handleChange(collection._id!)}
@@ -378,7 +378,7 @@ export default function MarkerForm() {
                 })}
             </ScrollArea>
 
-            <div className="mt-4 inline-flex items-center justify-end gap-2">
+            <div className="absolute bottom-2 right-2 mt-4 inline-flex items-center justify-end gap-2">
               {activeState.event === "markers:update" && marker && (
                 <Button
                   aria-label="delete marker"

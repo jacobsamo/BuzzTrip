@@ -165,9 +165,9 @@ const Navbar = () => {
             <nav className="flex flex-col items-center gap-8 text-lg font-medium">
               <NavbarLinks />
             </nav>
-            {/* <div className="flex flex-col gap-4 mt-8 w-full max-w-xs">
+            <div className="flex flex-col gap-4 mt-8 w-full max-w-xs">
               <NavbarAuth />
-            </div> */}
+            </div>
           </motion.div>
         )}
       </div>

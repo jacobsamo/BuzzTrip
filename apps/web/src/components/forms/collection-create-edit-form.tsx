@@ -88,7 +88,7 @@ export default function CollectionForm() {
     // };
 
     return (
-      <div className="p-2">
+      <div className="p-2 z-10  ">
         <form
           method="post"
           className={cn("flex flex-col gap-4")}

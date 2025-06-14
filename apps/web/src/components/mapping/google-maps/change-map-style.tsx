@@ -63,7 +63,7 @@ const ChangeMapStyle = () => {
         <Button
           variant="outline"
           size="icon"
-          className={cn("fixed z-10 right-2", {
+          className={cn("fixed z-50 right-2", {
             "top-2": isMobile,
             "bottom-2": !isMobile,
           })}

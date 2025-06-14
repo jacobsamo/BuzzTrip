@@ -114,6 +114,7 @@ export const createMap = authedMutation({
 
     const mapId = await ctx.db.insert("maps", {
       ...map,
+      title: `${map.title.charAt(0).toUpperCase()} ${map.title.slice(1)}`,
       owner_id: ctx.user._id,
       mapTypeId: map.mapTypeId ?? "hybrid",
     });

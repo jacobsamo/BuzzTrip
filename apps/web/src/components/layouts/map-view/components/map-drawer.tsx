@@ -11,6 +11,7 @@ import { Drawer } from "vaul";
 import ActiveLocation from "./active-location";
 import MarkersCollectionTabs from "./markers-collections";
 import OpenCollectionModal from "@/components/modals/open-collection-modal";
+import CloseButton from "./close-button";
 
 const MarkerForm = dynamic(
   () => import("../../../forms/marker-create-edit-form"),
@@ -75,7 +76,7 @@ export default function MapDrawer() {
             "mx-auto flex w-full flex-col",
             "rounded-t-[10px] border bg-background",
             "p-2 pb-6 md:w-3/4",
-            "overflow-y-auto overflow-x-hidden",
+            "overflow-clip",
             "touch-pan-y"
           )}
         >
@@ -84,7 +85,7 @@ export default function MapDrawer() {
           {!activeLocation && !markerFormOpen && !collectionFormOpen && (
             <>
               <AutocompleteCustomInput />
-              <div className="mt-5">
+              <div className="mt-16">
                 {!searchActive && (
                   <>
                   <MarkersCollectionTabs />
@@ -97,24 +98,13 @@ export default function MapDrawer() {
               </div>
             </>
           )}
-          {activeLocation && (!markerFormOpen || !collectionFormOpen) && (
+          {activeLocation && !activeState && (!markerFormOpen || !collectionFormOpen) && (
             <ActiveLocation />
           )}
 
           {activeState && (markerFormOpen || collectionFormOpen) && (
             <div>
-              <Button
-                className="absolute right-1 top-1 size-8 p-0 rounded-md bg-white hover:bg-gray-100 border border-gray-300 shadow"
-                variant="secondary"
-                size="icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setActiveState(null);
-                }}
-                aria-label="Close info box"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+            <CloseButton />
               {markerFormOpen && (
                 <ScrollArea>
                   <MarkerForm />

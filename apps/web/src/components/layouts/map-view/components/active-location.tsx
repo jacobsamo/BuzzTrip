@@ -14,6 +14,8 @@ import { getCollectionsForMarker } from "@/lib/utils";
 import { ExternalLink, Globe, Pencil, Phone, Plus, X } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
+import CloseButton from "./close-button";
+
 
 const ActiveLocation = () => {
   const {
@@ -47,18 +49,7 @@ const ActiveLocation = () => {
   return (
     <div className="bg-white rounded-lg overflow-hidden w-full sm:max-w-md mx-auto">
       {/* Header with photos */}
-      <Button
-        className="absolute right-1 top-1 h-6 w-6 p-0 rounded-full bg-white hover:bg-gray-100 border border-gray-300 shadow"
-        variant="secondary"
-        size="icon"
-        onClick={(e) => {
-          e.stopPropagation();
-          setActiveLocation(null);
-        }}
-        aria-label="Close info box"
-      >
-        <X className="h-4 w-4" />
-      </Button>
+      <CloseButton />
       {activeLocation.place.photos && activeLocation.place.photos.length > 0 ? (
         <Carousel
           opts={{
