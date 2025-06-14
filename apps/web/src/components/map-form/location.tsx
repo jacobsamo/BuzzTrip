@@ -49,7 +49,7 @@ const MapLocationForm = () => {
             value={searchValue}
             onValueChange={setSearchValue}
             locationTypes={["(regions)"]}
-            autoFocus={true}
+            // autoFocus={true} // we might want to add autofocus for desktop
             // limit={3}
             classNames={{
               scrollArea: "max-h-20", // Custom height

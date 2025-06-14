@@ -20,9 +20,11 @@ export async function generateMetadata({ params }: { params: Params }) {
     options
   );
 
+  if (!map) return notFound();
+
   return constructMetadata({
-    title: map?.title,
-    description: map?.description ?? "Plan the trip you've always dreamed of",
+    title: map.title,
+    description: map.description ?? "Plan the trip you've always dreamed of",
   });
 }
 

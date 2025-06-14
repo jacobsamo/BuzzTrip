@@ -1,9 +1,11 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
+import { Button } from "@/components/ui/button";
 import { CombinedMarker } from "@buzztrip/backend/types";
 import {
   AdvancedMarker,
   useAdvancedMarkerRef,
 } from "@vis.gl/react-google-maps";
+import { X } from "lucide-react";
 import Image from "next/image";
 import MarkerPin from "./marker_pin";
 
@@ -13,7 +15,7 @@ interface DisplayMarkerInfoProps {
 
 const DisplayMarkerInfo = ({ location }: DisplayMarkerInfoProps) => {
   const [markerRef, marker] = useAdvancedMarkerRef();
-  const { setActiveLocation } = useMapStore((store) => store);
+  const setActiveLocation = useMapStore((store) => store.setActiveLocation);
 
   return (
     <AdvancedMarker
@@ -27,42 +29,52 @@ const DisplayMarkerInfo = ({ location }: DisplayMarkerInfoProps) => {
     >
       <div className="group relative flex flex-col items-center">
         {/* Pin */}
-        <div className="absolute bottom-[-4px] flex h-8 w-8 items-center justify-center rounded-full bg-green-600 shadow-lg transition-transform group-hover:scale-110">
-          <MarkerPin color={location.color} icon={location.icon} size={24} />
+        <div className="absolute bottom-[-4px] flex size-8 items-center justify-center rounded-full bg-green-700 shadow-lg z-20">
+          <MarkerPin color={location.color} icon={location.icon} size={28} />
         </div>
 
-        {/* Tip */}
-        {/* <div className="absolute bottom-[-4px] h-3 w-3 rotate-45 bg-green-600"></div> */}
-
-        {/* Info Card */}
-        <div className="absolute z-10 bottom-8 left-1/2 -translate-x-1/2 transition-opacity duration-300 group-hover:block">
-          <div className="w-[300px] overflow-hidden rounded-lg bg-white shadow-lg">
+        {/* Info Card (always visible) */}
+        <div className="absolute z-30 bottom-8 left-1/2 -translate-x-1/2 w-[200px]">
+          <div className="relative overflow-hidden rounded-md bg-white shadow-xl border border-gray-200">
             {/* Image */}
-            <Image
-              src={(location?.photos && location?.photos[0]) || ""}
-              alt={location.title}
-              width={300}
-              height={300}
-              className="h-40 object-cover object-center"
-            />
+            {location?.place.photos && location?.place.photos[0] ? (
+              <Image
+                src={location.place.photos[0]}
+                alt={location.title}
+                width={200}
+                height={100}
+                className="h-[80px] w-full object-cover object-center"
+                style={{ minHeight: 60 }}
+              />
+            ) : (
+              <div className="h-[60px] w-full bg-gray-100 flex items-center justify-center text-xs text-gray-400">
+                No Image
+              </div>
+            )}
 
             {/* Text Content */}
-            <div className="p-4">
-              <h3 className="text-lg font-semibold text-gray-800">
+            <div className="p-2">
+              <h3 className="text-base font-semibold text-gray-800 truncate">
                 {location.title}
               </h3>
-              <p className="text-sm text-gray-600">{location.address}</p>
+              <p className="text-xs text-gray-600 truncate">
+                {location.place.address}
+              </p>
             </div>
 
             {/* Close Button */}
-            {/* <Button
-              className="absolute right-2 top-2 h-8 w-8"
+            <Button
+              className="absolute right-1 top-1 h-6 w-6 p-0 rounded-full bg-white hover:bg-gray-100 border border-gray-300 shadow"
               variant="secondary"
               size="icon"
-              onClick={() => setActiveLocation(null)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveLocation(null);
+              }}
+              aria-label="Close info box"
             >
               <X className="h-4 w-4" />
-            </Button> */}
+            </Button>
           </div>
         </div>
       </div>

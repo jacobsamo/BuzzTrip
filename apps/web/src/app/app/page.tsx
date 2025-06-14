@@ -1,6 +1,8 @@
 import UserMaps from "@/components/layouts/user-maps";
-import { getConvexServerSession } from "@/lib/auth";
+import { convexNextjsOptions, getConvexServerSession } from "@/lib/auth";
+import { api } from "@buzztrip/backend/api";
 import { UserButton } from "@clerk/nextjs";
+import { preloadQuery } from "convex/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -11,6 +13,16 @@ export default async function MapPage() {
   if (!session || session.message !== "Logged In" || !session.user._id) {
     return notFound();
   }
+
+  const options = await convexNextjsOptions();
+
+  const preloadedMaps = await preloadQuery(
+    api.maps.index.getUserMaps,
+    {
+      userId: session.user._id,
+    },
+    options
+  );
 
   return (
     <div className="p-2">
@@ -27,7 +39,7 @@ export default async function MapPage() {
         </Link>
         <UserButton />
       </nav>
-      <UserMaps userId={session.user._id} />
+      <UserMaps preloadedMaps={preloadedMaps} />
     </div>
   );
 }

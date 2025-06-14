@@ -9,9 +9,7 @@ import DisplayMapData from "./display-data";
 
 const MapView = () => {
   const {
-    activeLocation,
     markers,
-    setActiveLocation,
     searchValue,
     setSearchValue,
   } = useMapStore((store) => store);

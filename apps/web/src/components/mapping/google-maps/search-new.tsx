@@ -47,26 +47,36 @@ export const detailsRequestCallback = (
     map!.setZoom(8);
   }
 
+  const title = placeDetails.name
+    ? placeDetails.name
+    : `${placeDetails.geometry.location.lat()}, ${placeDetails.geometry.location.lng()}`;
+
   const location: CombinedMarker = {
-    note: undefined,
     color: "#0b7138",
-    map_id: "" as Id<"maps">,
-    gm_place_id: placeDetails.place_id ?? undefined,
+    icon: "MapPin",
     lat: placeDetails.geometry.location.lat(),
     lng: placeDetails.geometry.location.lng(),
-    bounds: bounds.toJSON(),
-    icon: "MapPin",
-    title: placeDetails.name
-      ? placeDetails.name
-      : `${placeDetails.geometry.location.lat()}, ${placeDetails.geometry.location.lng()}`,
-    description: placeDetails?.html_attributions?.[0] ?? undefined,
-    plus_code: placeDetails.plus_code?.global_code ?? undefined,
-    address: placeDetails.formatted_address ?? undefined,
-    photos: placeDetails?.photos?.map((photo) => photo.getUrl({})) ?? undefined,
-    rating: placeDetails.rating ?? 0,
-    types: placeDetails.types ?? undefined,
-    website: placeDetails.website ?? undefined,
-    phone: placeDetails.formatted_phone_number ?? undefined,
+    note: undefined,
+    place_id: (placeDetails.place_id as Id<"places">) ?? ("" as Id<"places">),
+    title: title,
+    map_id: "" as Id<"maps">,
+    place: {
+      gm_place_id: placeDetails.place_id ?? undefined,
+      lat: placeDetails.geometry.location.lat(),
+      lng: placeDetails.geometry.location.lng(),
+      bounds: bounds.toJSON(),
+      icon: "MapPin",
+      title: title,
+      description: placeDetails?.html_attributions?.[0] ?? undefined,
+      plus_code: placeDetails.plus_code?.global_code ?? undefined,
+      address: placeDetails.formatted_address ?? undefined,
+      photos:
+        placeDetails?.photos?.map((photo) => photo.getUrl({})) ?? undefined,
+      rating: placeDetails.rating ?? 0,
+      types: placeDetails.types ?? undefined,
+      website: placeDetails.website ?? undefined,
+      phone: placeDetails.formatted_phone_number ?? undefined,
+    },
   };
 
   return {

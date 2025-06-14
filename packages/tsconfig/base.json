@@ -15,9 +15,6 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "ES2022",
-    "paths": {
-      "drizzle-orm": ["./node_modules/drizzle-orm"]
-    }
+    "target": "ES2022"
   }
 }

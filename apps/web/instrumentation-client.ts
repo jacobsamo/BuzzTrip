@@ -4,6 +4,7 @@
 
 import * as Sentry from "@sentry/nextjs";
 import { env } from "env";
+import posthog from "posthog-js";
 
 Sentry.init({
   dsn: env.NEXT_PUBLIC_SENTRY_DSN,
@@ -24,6 +25,11 @@ Sentry.init({
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
+});
+
+posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY!, {
+  api_host: env.NEXT_PUBLIC_POSTHOG_HOST,
+  capture_pageview: "history_change",
 });
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

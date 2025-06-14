@@ -2,6 +2,7 @@ import { Id } from "@buzztrip/backend/dataModel";
 import {
   Collection,
   CollectionLink,
+  Marker,
   TravelTypeEnum,
 } from "@buzztrip/backend/types";
 import { type ClassValue, clsx } from "clsx";
@@ -43,8 +44,10 @@ export const getCollectionsForMarker = (
   return markerCollections;
 };
 
+type PartialMarkerWithId = Pick<Marker, "_id"> & Partial<Marker>;
+
 export const getMarkersForCollection = (
-  markers: Collection[],
+  markers: PartialMarkerWithId[],
   collectionLinks: CollectionLink[],
   collectionId: string
 ) => {

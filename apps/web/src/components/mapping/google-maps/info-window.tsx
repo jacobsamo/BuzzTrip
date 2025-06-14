@@ -28,8 +28,8 @@ const InfoBox = ({ activeLocation, ...props }: InfoBoxProps) => {
       {...props}
     >
       <div className="h-44 w-44 flex-row gap-2 overflow-x-auto overflow-y-hidden rounded-t-md">
-        {activeLocation.photos &&
-          activeLocation.photos.map((photo) => (
+        {activeLocation.place.photos &&
+          activeLocation.place.photos.map((photo) => (
             // eslint-disable-next-line jsx-a11y/img-redundant-alt
             <Image
               key={photo}

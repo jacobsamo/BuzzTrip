@@ -5,7 +5,6 @@ import {
   mapUserSchema,
   userMapsSchema,
 } from "../../zod-schemas";
-import { api } from "../_generated/api";
 import { Id } from "../_generated/dataModel";
 import { authedMutation, authedQuery } from "../helpers";
 import { createMapUser } from "./mapUsers";
@@ -61,8 +60,6 @@ export const getMap = authedQuery({
 //       mapId: args.mapId,
 //     });
 
-
-  
 //   },
 // });
 
@@ -117,7 +114,9 @@ export const createMap = authedMutation({
 
     const mapId = await ctx.db.insert("maps", {
       ...map,
+      title: `${map.title.charAt(0).toUpperCase()} ${map.title.slice(1)}`,
       owner_id: ctx.user._id,
+      mapTypeId: map.mapTypeId ?? "hybrid",
     });
 
     await createMapUser(ctx, {
@@ -144,6 +143,19 @@ export const updateMap = authedMutation({
   args: {
     mapId: zid("maps"),
     map: mapsEditSchema.omit({ _id: true, _creationTime: true }),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.mapId, {
+      ...args.map,
+      updatedAt: new Date().toISOString(),
+    });
+  },
+});
+
+export const partialMapUpdate = authedMutation({
+  args: {
+    mapId: zid("maps"),
+    map: mapsEditSchema.omit({ _id: true, _creationTime: true }).partial(),
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.mapId, {

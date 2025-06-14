@@ -8,13 +8,12 @@
     "lint": "turbo lint && bun sherif",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md,mdx}\"",
     "clean:all": "turbo run clean:all",
-    "update": "bun update --latest && cd ./packages/db && bun update --latest && cd ../tsconfig && bun update --latest && cd ../../apps/api && cd ../web && bun update --latest && cd ../.."
+    "update": "bun update --latest && cd ./packages/tsconfig && bun update --latest && cd ../backend && bun update --latest && cd ../../apps/web && bun update --latest && cd ../.."
   },
   "devDependencies": {
     "@buzztrip/tsconfig": "workspace:*",
-    "@types/react": "^19.1.6",
-    "@types/react-dom": "^19.1.5",
-    "drizzle-orm": "^0.43.1",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
     "prettier": "^3.5.3",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-tailwindcss": "^0.6.12",
@@ -38,9 +37,6 @@
     "workerd"
   ],
   "resolutions": {
-    "drizzle-orm": "^0.43.1",
-    "better-auth": "^1.2.8",
-    "@polar-sh/better-auth": "^1.0.1",
     "@polar-sh/sdk": "^0.33.0",
     "convex": "^1.24.8"
   }
