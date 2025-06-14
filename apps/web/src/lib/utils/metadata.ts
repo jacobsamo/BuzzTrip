@@ -1,37 +1,23 @@
 import { Metadata } from "next";
 
-/**
- * Constructs a metadata object
- * @param {string | undefined} title
- * @param {string | undefined} description
- * @param {string[] | undefined} keywords
- * @param {string | undefined} image
- * @param {string | undefined} url
- * @param {boolean | undefined} noIndex
- * @returns {Metadata} a metadata object
- */
 export function constructMetadata({
   title = "BuzzTrip",
-  description = "Plan the trip you've always dreamed of",
+  description = "Create Custom Maps, anywhere on any device",
   image = "/assets/open-graph.jpg",
-  url = "https://buzztrip.co",
+  video,
+  url,
+  canonicalUrl,
   noIndex = false,
-  keywords = [
-    "travel",
-    "maps",
-    "mapping",
-    "trip",
-    "holiday",
-    "planning",
-    "buzztrip",
-  ],
+  manifest,
 }: {
   title?: string;
   description?: string;
-  keywords?: string[];
-  image?: string;
+  image?: string | null;
+  video?: string | null;
   url?: string;
+  canonicalUrl?: string;
   noIndex?: boolean;
+  manifest?: string | URL | null;
 } = {}): Metadata {
   return {
     title: {
@@ -46,38 +32,62 @@ export function constructMetadata({
       },
     ],
     openGraph: {
-      type: "website",
-      locale: "en_AU",
       title,
       description,
-      images: {
-        url: image || "/assets/open-graph.jpg",
-        alt: title,
-      },
-      url: url,
-      siteName: "BuzzTrip",
+      locale: "en_AU",
+      type: "website",
+      ...(image && {
+        images: image,
+      }),
+      url,
+      ...(video && {
+        videos: video,
+      }),
     },
+    facebook: {
+      appId: "1218637089558551",
+    },
+    keywords: [
+      "travel",
+      "maps",
+      "mapping",
+      "trip",
+      "holiday",
+      "planning",
+      "buzztrip",
+    ],
     twitter: {
-      card: "summary_large_image",
-      title: title,
-      description: description,
-      images: image || "/assets/open-graph.jpg",
-      creator: "@buzztrip",
+      title,
+      description,
+      ...(image && {
+        card: "summary_large_image",
+        images: [image],
+      }),
+      ...(video && {
+        player: video,
+      }),
+      creator: "@buzztripdotco",
     },
     icons: {
       icon: "/favicon.ico",
       shortcut: "/logos/logo_x128.png",
       apple: "/logos/logo_x128.png",
     },
-    metadataBase: new URL(url),
+    metadataBase: new URL("https://buzztrip.co"),
+    ...((url || canonicalUrl) && {
+      alternates: {
+        canonical: url || canonicalUrl,
+      },
+    }),
     ...(noIndex && {
       robots: {
         index: false,
         follow: false,
       },
     }),
-    manifest: "/manifest.webmanifest",
+    ...(manifest && {
+      manifest,
+    }),
     robots: "/robots.txt",
-    keywords: keywords,
   };
 }

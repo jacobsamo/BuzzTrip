@@ -5,11 +5,11 @@ import { ReactScan } from "@/components/react-scan";
 import "@/lib/styles/globals.css";
 import { constructMetadata } from "@/lib/utils/metadata";
 import { ClerkProvider } from "@clerk/nextjs";
-import type { Metadata, Viewport } from "next";
+import type { Viewport } from "next";
 import React from "react";
 import { Monitoring } from "react-scan/monitoring/next";
 
-export const metadata: Metadata = constructMetadata();
+export const metadata = constructMetadata();
 
 export const viewport: Viewport = {
   maximumScale: 1,
