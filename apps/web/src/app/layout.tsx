@@ -33,9 +33,9 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/assets/open-graph.jpg",
-        alt: "BuzzTrip map preview showing custom markers along Australia's east coast with the BuzzTrip logo and tagline: Create Custom Maps Anywhere, Anytime, with Anyone."
+        alt: "BuzzTrip map preview showing custom markers along Australia's east coast with the BuzzTrip logo and tagline: Create Custom Maps Anywhere, Anytime, with Anyone.",
         type: "image/jpg",
-        width: 1200
+        width: 1200,
         height: 630
       }
     ],
