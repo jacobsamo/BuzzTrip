@@ -9,13 +9,15 @@ import React from "react";
 import { Monitoring } from "react-scan/monitoring/next";
 import { baseUrl } from "./sitemap";
 
+const siteDescription = "Create Custom Maps, anywhere on any device";
+
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
     default: "BuzzTrip",
     template: "%s | BuzzTrip",
   },
-  description: "Create Custom Maps, anywhere on any device",
+  description: siteDescription,
   authors: [
     {
       name: "buzztrip",
@@ -24,10 +26,19 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "BuzzTrip",
-    description: "Create Custom Maps, anywhere on any device",
+    siteName: "BuzzTrip",
+    description: siteDescription,
     locale: "en_AU",
     type: "website",
-    images: ["/assets/open-graph.jpg"],
+    images: [
+      {
+        url: "/assets/open-graph.jpg",
+        alt: "BuzzTrip map preview showing custom markers along Australia's east coast with the BuzzTrip logo and tagline: Create Custom Maps Anywhere, Anytime, with Anyone."
+        type: "image/jpg",
+        width: 1200
+        height: 630
+      }
+    ],
     url: baseUrl,
   },
   facebook: {
@@ -44,7 +55,7 @@ export const metadata: Metadata = {
   ],
   twitter: {
     title: "BuzzTrip",
-    description: "Create Custom Maps, anywhere on any device",
+    description: siteDescription,
     card: "summary_large_image",
     images: ["/assets/open-graph.jpg"],
     creator: "@buzztripdotco",
@@ -58,7 +69,10 @@ export const metadata: Metadata = {
     canonical: baseUrl,
   },
   manifest: "/manifest.webmanifest",
-  robots: "/robots.txt",
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export const viewport: Viewport = {
