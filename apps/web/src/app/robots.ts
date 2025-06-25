@@ -1,12 +1,15 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
+import { baseUrl } from "./sitemap";
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: {
-      userAgent: "*",
-      allow: "/",
-      disallow: ["/app"],
-    },
-    sitemap: ["https://buzztrip.co/sitemap.xml"],
+    rules: [
+      {
+        userAgent: "*",
+        disallow: ["/app"],
+      },
+    ],
+    sitemap: `${baseUrl}/sitemap.xml`,
+    host: `${baseUrl}`,
   };
 }
