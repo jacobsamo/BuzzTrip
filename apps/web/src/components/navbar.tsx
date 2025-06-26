@@ -60,7 +60,7 @@ const NavbarAuth = () => (
           className={cn(
             "hidden sm:inline-flex border-primary text-primary hover:bg-primary hover:text-white",
             "text-base sm:text-base md:text-base lg:text-base",
-            "h-8 sm:h-8 md:h-9 lg:h-10",
+            "h-8 sm:h-8 md:h-9 lg:h-10"
           )}
         >
           Sign In
@@ -70,7 +70,7 @@ const NavbarAuth = () => (
         <Button
           className={cn(
             "text-base sm:text-base md:text-base lg:text-base",
-            "h-8 sm:h-8 md:h-9 lg:h-10",
+            "h-8 sm:h-8 md:h-9 lg:h-10"
           )}
         >
           Get Started

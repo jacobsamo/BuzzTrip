@@ -3,12 +3,77 @@ import Navbar from "@/components/navbar";
 import Providers from "@/components/providers";
 import { ReactScan } from "@/components/react-scan";
 import "@/lib/styles/globals.css";
-import { constructMetadata } from "@/lib/utils/metadata";
 import { ClerkProvider } from "@clerk/nextjs";
-import type { Viewport } from "next";
+import type { Metadata, Viewport } from "next";
 import React from "react";
 import { Monitoring } from "react-scan/monitoring/next";
+import { baseUrl } from "./sitemap";
 
+const siteDescription = "Create Custom Maps, anywhere on any device";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
+  title: {
+    default: "BuzzTrip",
+    template: "%s | BuzzTrip",
+  },
+  description: siteDescription,
+  authors: [
+    {
+      name: "buzztrip",
+      url: baseUrl,
+    },
+  ],
+  openGraph: {
+    title: "BuzzTrip",
+    siteName: "BuzzTrip",
+    description: siteDescription,
+    locale: "en_AU",
+    type: "website",
+    images: [
+      {
+        url: "/assets/open-graph.jpg",
+        alt: "BuzzTrip map preview showing custom markers along Australia's east coast with the BuzzTrip logo and tagline: Create Custom Maps Anywhere, Anytime, with Anyone.",
+        type: "image/jpg",
+        width: 1200,
+        height: 630
+      }
+    ],
+    url: baseUrl,
+  },
+  facebook: {
+    appId: "1218637089558551",
+  },
+  keywords: [
+    "travel",
+    "maps",
+    "mapping",
+    "trip",
+    "holiday",
+    "planning",
+    "buzztrip",
+  ],
+  twitter: {
+    title: "BuzzTrip",
+    description: siteDescription,
+    card: "summary_large_image",
+    images: ["/assets/open-graph.jpg"],
+    creator: "@buzztripdotco",
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/logos/logo_x128.png",
+    apple: "/logos/logo_x128.png",
+  },
+  alternates: {
+    canonical: baseUrl,
+  },
+  manifest: "/manifest.webmanifest",
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
 
 export const viewport: Viewport = {
   maximumScale: 1,
@@ -17,8 +82,6 @@ export const viewport: Viewport = {
   userScalable: false,
   width: "device-width",
 };
-
-export const metadata = constructMetadata();
 
 export default function RootLayout({
   children,

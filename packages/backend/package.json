@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "convex dev",
-    "setup": "convex dev --until-success"
+    "setup": "convex dev --until-success",
+    "deploy": "convex deploy"
   },
   "exports": {
     "./api": {
@@ -26,12 +27,12 @@
   "description": "",
   "dependencies": {
     "@better-auth-kit/convex": "^1.2.2",
-    "@clerk/backend": "^2.1.0",
+    "@clerk/backend": "^2.2.0",
     "@convex-dev/geospatial": "^0.1.9",
     "@convex-dev/migrations": "^0.2.9",
-    "convex": "^1.24.8",
-    "convex-helpers": "^0.1.94",
+    "convex": "^1.25.0",
+    "convex-helpers": "^0.1.95",
     "svix": "^1.67.0",
-    "zod": "^3.25.64"
+    "zod": "^3.25.67"
   }
 }

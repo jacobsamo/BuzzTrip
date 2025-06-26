@@ -1,4 +1,5 @@
 import { zid } from "convex-helpers/server/zod";
+import { uppercaseFirstLetter } from "../../helpers";
 import type { UserMap } from "../../types";
 import {
   mapsEditSchema,
@@ -114,7 +115,7 @@ export const createMap = authedMutation({
 
     const mapId = await ctx.db.insert("maps", {
       ...map,
-      title: `${map.title.charAt(0).toUpperCase()} ${map.title.slice(1)}`,
+      title: uppercaseFirstLetter(map.title),
       owner_id: ctx.user._id,
       mapTypeId: map.mapTypeId ?? "hybrid",
     });
@@ -143,6 +144,20 @@ export const updateMap = authedMutation({
   args: {
     mapId: zid("maps"),
     map: mapsEditSchema.omit({ _id: true, _creationTime: true }),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.mapId, {
+      ...args.map,
+      title: uppercaseFirstLetter(args.map.title),
+      updatedAt: new Date().toISOString(),
+    });
+  },
+});
+
+export const partialMapUpdate = authedMutation({
+  args: {
+    mapId: zid("maps"),
+    map: mapsEditSchema.omit({ _id: true, _creationTime: true }).partial(),
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.mapId, {

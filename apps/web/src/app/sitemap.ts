@@ -1,52 +1,38 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
+
+export const baseUrl = "https://buzztrip.co";
+
+type RawRoute = string | { url: string; lastModified?: Date };
+
+const rawRoutes: RawRoute[] = [
+  "",
+  "/legal/privacy",
+  { url: "/legal/privacy", lastModified: new Date("2025-12-08") },
+  { url: "/legal/terms", lastModified: new Date("2025-12-08") },
+  "/about",
+  "/roadmap",
+  "/pricing",
+  "/help",
+  "/contact",
+  "/blog",
+  "/sign-in",
+  "/sign-up",
+];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  return [
-    {
-      url: "https://buzztrip.co/",
-      lastModified: new Date(),
-      priority: 1,
-      
-    },
-    {
-      url: "https://buzztrip.co/legal/privacy",
-      lastModified: new Date("2025-12-08"),
-    },
-    {
-      url: "https://buzztrip.co/legal/terms",
-      lastModified: new Date("2025-12-08"),
-    },
-    {
-      url: "https://buzztrip.co/about",
-      lastModified: new Date(),
-    },
-    {
-      url: "https://buzztrip.co/roadmap",
-      lastModified: new Date(),
-    },
-    {
-      url: "https://buzztrip.co/pricing",
-      lastModified: new Date(),
-    },
-    {
-      url: "https://buzztrip.co/help",
-      lastModified: new Date(),
-    },
-    {
-      url: "https://buzztrip.co/contact",
-      lastModified: new Date(),
-    },
-    {
-      url: "https://buzztrip.co/blog",
-      lastModified: new Date(),
-    },
-    {
-      url: "https://buzztrip.co/sign-in",
-      lastModified: new Date(),
-    },
-    {
-      url: "https://buzztrip.co/sign-up",
-      lastModified: new Date(),
-    },
-  ];
+  // Blog routes to be defined here
+  
+  const routes = rawRoutes.map((route) => {
+    const url = typeof route === "string" ? route : route.url;
+    const lastModified =
+      (typeof route === "string" ? undefined : route.lastModified) ??
+      new Date();
+
+    return {
+      url,
+      lastModified: lastModified.toISOString().split("T")[0],
+    };
+  });
+
+  return [...routes];
 }

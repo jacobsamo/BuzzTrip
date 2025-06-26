@@ -1,7 +1,6 @@
 import { Map_page } from "@/components/layouts/map-view";
 import { MapStoreProvider } from "@/components/providers/map-state-provider";
 import { convexNextjsOptions, getConvexServerSession } from "@/lib/auth";
-import { constructMetadata } from "@/lib/utils/metadata";
 import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
 import { fetchQuery, preloadQuery } from "convex/nextjs";
@@ -22,10 +21,15 @@ export async function generateMetadata({ params }: { params: Params }) {
 
   if (!map) return notFound();
 
-  return constructMetadata({
+  return {
     title: map.title,
-    description: map.description ?? "Plan the trip you've always dreamed of",
-  });
+    ...(map.description && {
+      description: map.description,
+    }),
+    ...(map.image && {
+      image: map.image,
+    }),
+  };
 }
 
 export default async function MapPage({ params }: { params: Params }) {
