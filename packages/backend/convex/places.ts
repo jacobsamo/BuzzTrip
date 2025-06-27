@@ -4,7 +4,14 @@ import { MutationCtx } from "./_generated/server";
 import { geospatial } from "./helpers";
 
 export const createPlace = async (ctx: MutationCtx, place: NewPlace) => {
-  const plusCode = OpenLocationCode.encode(place.lat, place.lng);
+  let plusCode: string | undefined = undefined;
+  try {
+    plusCode = OpenLocationCode.encode(place.lat, place.lng);
+  } catch (error) {
+    console.error(
+      `Failed to generate plus code: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
+  }
 
   const newPlaceId = await ctx.db.insert("places", {
     title: place.title,
@@ -34,7 +41,7 @@ export const createPlace = async (ctx: MutationCtx, place: NewPlace) => {
     },
     {
       placeTypes: place.types ?? null,
-      plusCode: plusCode,
+      plusCode: plusCode ?? null,
       what3words: null,
     }
   );

@@ -148,7 +148,6 @@ const Mapview = () => {
     e.domEvent?.stopPropagation();
     e.stop();
 
-    console.log("Clicked on area:", e);
     const latLng = e.detail.latLng;
     let placeId = e.detail.placeId;
 
@@ -165,7 +164,6 @@ const Mapview = () => {
       } else {
         // No placeId, launch create marker modal
         if (activeLocation) {
-          console.log("activeLocation", activeLocation);
           setActiveState({ event: "markers:create", payload: activeLocation });
         } else {
           setActiveState({
