@@ -1,10 +1,10 @@
 import { zid } from "convex-helpers/server/zod";
 import { z } from "zod";
-import type { CombinedMarker, IconType, NewPlace } from "../../types";
+import type { CombinedMarker, IconType } from "../../types";
 import { combinedMarkersSchema, markersEditSchema } from "../../zod-schemas";
 import { Id } from "../_generated/dataModel";
-import { MutationCtx } from "../_generated/server";
-import { authedMutation, authedQuery, geospatial } from "../helpers";
+import { authedMutation, authedQuery } from "../helpers";
+import { createPlace } from "../places";
 
 export const getMarkersView = authedQuery({
   args: {
@@ -111,40 +111,6 @@ export const createMarker = authedMutation({
     return newMarkerId;
   },
 });
-
-const createPlace = async (ctx: MutationCtx, place: NewPlace) => {
-  const newPlaceId = await ctx.db.insert("places", {
-    title: place.title,
-    description: place.description,
-    lat: place.lat,
-    lng: place.lng,
-    bounds: place.bounds,
-    address: place.address,
-    gm_place_id: place.gm_place_id,
-    mb_place_id: place.mb_place_id,
-    fq_place_id: place.fq_place_id,
-    plus_code: place.plus_code,
-    icon: place.icon as IconType,
-    photos: place.photos,
-    rating: place.rating,
-    types: place.types,
-    website: place.website,
-    phone: place.phone,
-  });
-
-  await geospatial.insert(
-    ctx,
-    newPlaceId,
-    {
-      latitude: place.lat,
-      longitude: place.lng,
-    },
-    {
-      placeTypes: place.types ?? null,
-    }
-  );
-  return newPlaceId;
-};
 
 export const editMarker = authedMutation({
   args: {
