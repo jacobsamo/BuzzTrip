@@ -1,17 +1,20 @@
 "use client";
 import { useMapStore } from "@/components/providers/map-state-provider";
+import { cn } from "@/lib/utils";
+import { Id } from "@buzztrip/backend/dataModel";
 import {
   AdvancedMarker,
   Map as GoogleMap,
   useMap,
   useMapsLibrary,
+  type MapMouseEvent,
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
-import { lazy, memo, useMemo, useState } from "react";
-import ChangeMapStyle from "./change-map-style";
+import { lazy, memo, useEffect, useMemo, useState } from "react";
+import AddMarkerButton from "./actions/add-marker";
+import ChangeMapStyle from "./actions/change-map-style";
 import DisplayMarkerInfo from "./display-marker-info";
 import { AutocompleteCustomInput, detailsRequestCallback } from "./search";
-
 const MarkerPin = lazy(() => import("./marker_pin"));
 
 const Mapview = () => {
@@ -19,17 +22,21 @@ const Mapview = () => {
   const places = useMapsLibrary("places");
   const {
     activeLocation,
+    activeState,
     setActiveLocation,
     markers,
     setSearchValue,
     map,
     isMobile,
+    setActiveState,
   } = useMapStore((state) => state);
 
   if (!map) return null;
 
   // Handle directions for routes
   const routesLibrary = useMapsLibrary("routes");
+  const [placesService, setPlacesService] =
+    useState<google.maps.places.PlacesService>();
   const [directionsService, setDirectionsService] =
     useState<google.maps.DirectionsService>();
   const [directionsRenderer, setDirectionsRenderer] =
@@ -48,6 +55,13 @@ const Mapview = () => {
       zoom: 4,
     };
   }, []);
+
+  useEffect(() => {
+    if (!places || !googleMap) return;
+
+    const service = new places.PlacesService(googleMap);
+    setPlacesService(service);
+  }, [places, googleMap]);
 
   // useEffect(() => {
   //   if (!routesLibrary || !routeStops || !routes || !googleMap) return;
@@ -94,16 +108,92 @@ const Mapview = () => {
   //   };
   // }, [directionsService, directionsRenderer, routes, routeStops]);
 
-  const handleClick = async (e: any) => {
-    if (!places || !googleMap) return;
+  const handlePlaceSearch = (placeId: string) => {
+    if (!placesService) return;
+    const requestOptions: google.maps.places.PlaceDetailsRequest = {
+      placeId: placeId,
+      fields: [
+        "geometry",
+        "name",
+        "formatted_address",
+        "place_id",
+        "photos",
+        "rating",
+        "price_level",
+        "types",
+        "website",
+        "formatted_phone_number",
+        "opening_hours",
+        "reviews",
+      ],
+    };
+
+    placesService.getDetails(requestOptions, (data, status) => {
+      if (status !== google.maps.places.PlacesServiceStatus.OK || !data) {
+        console.error("Error fetching place details:", status);
+        return;
+      }
+      const res = detailsRequestCallback(googleMap!, data, isMobile);
+      if (res) {
+        const newSearchValue =
+          res.placeDetails?.name ?? res.placeDetails?.formatted_address ?? "";
+        setActiveLocation(res.location);
+        setSearchValue(newSearchValue);
+      }
+    });
+  };
+
+  const handleClick = async (e: MapMouseEvent) => {
+    if (!places || !googleMap || !placesService) return;
     e.domEvent?.stopPropagation();
     e.stop();
 
     console.log("Clicked on area:", e);
-    const placesService = new places.PlacesService(googleMap);
     const latLng = e.detail.latLng;
     let placeId = e.detail.placeId;
 
+    if (!latLng) return;
+
+    if (activeState?.event === "add-marker") {
+      // If in add-marker mode, only fetch details if placeId is present
+      if (placeId) {
+        try {
+          handlePlaceSearch(placeId);
+        } catch (error) {
+          console.error("Error fetching place details:", error);
+        }
+      } else {
+        // No placeId, launch create marker modal
+        if (activeLocation) {
+          console.log("activeLocation", activeLocation);
+          setActiveState({ event: "markers:create", payload: activeLocation });
+        } else {
+          setActiveState({
+            event: "markers:create",
+            payload: {
+              title: `${latLng.lat}, ${latLng.lng}`,
+              lat: latLng.lat,
+              lng: latLng.lng,
+              icon: "MapPin",
+              color: "#0b7138",
+              map_id: map._id as Id<"maps">,
+              place: {
+                lat: latLng.lat,
+                lng: latLng.lng,
+                icon: "MapPin",
+                title: `${latLng.lat}, ${latLng.lng}`,
+                rating: 0,
+                bounds: null,
+              },
+            },
+          });
+        }
+        googleMap.setOptions({ draggableCursor: "" });
+      }
+      return;
+    }
+
+    // Not in add-marker mode: do general place search if no placeId
     if (!placeId) {
       const zoom = googleMap.getZoom();
       const radius = () => {
@@ -115,7 +205,7 @@ const Mapview = () => {
       };
 
       try {
-        placeId = await new Promise<string | undefined>((resolve, reject) => {
+        placeId = await new Promise<string | null>((resolve, reject) => {
           placesService.nearbySearch(
             {
               location: latLng,
@@ -131,7 +221,7 @@ const Mapview = () => {
                 reject(new Error("Nearby search failed"));
                 return;
               }
-              resolve(data[0]?.place_id);
+              resolve(data[0]?.place_id ?? null);
             }
           );
         });
@@ -148,47 +238,21 @@ const Mapview = () => {
 
     // Handle Place Details Lookup
     try {
-      const requestOptions: google.maps.places.PlaceDetailsRequest = {
-        placeId: placeId,
-        fields: [
-          "geometry",
-          "name",
-          "formatted_address",
-          "place_id",
-          "photos",
-          "rating",
-          "price_level",
-          "types",
-          "website",
-          "formatted_phone_number",
-          "opening_hours",
-          "reviews",
-        ],
-      };
-
-      placesService.getDetails(requestOptions, (data, status) => {
-        if (status !== google.maps.places.PlacesServiceStatus.OK || !data) {
-          console.error("Error fetching place details:", status);
-          return;
-        }
-        const res = detailsRequestCallback(googleMap!, data, isMobile);
-        if (res) {
-          // Batch state updates together
-          const newSearchValue =
-            res.placeDetails?.name ?? res.placeDetails?.formatted_address ?? "";
-          setActiveLocation(res.location);
-          setSearchValue(newSearchValue);
-        }
-      });
+      handlePlaceSearch(placeId);
     } catch (error) {
       console.error("Error fetching place details:", error);
     }
   };
 
   return (
-    <div className="absolute inset-0 h-screen w-full flex-1 touch-none z-0">
+    <div
+      className={cn("absolute inset-0 h-screen w-full flex-1 touch-none z-0", {
+        "cursor-crosshair": activeState?.event === "add-marker",
+      })}
+    >
       {!isMobile && <AutocompleteCustomInput />}
       <ChangeMapStyle />
+      <AddMarkerButton />
       <GoogleMap
         defaultCenter={mapOptions.center}
         defaultZoom={mapOptions.zoom}

@@ -6,6 +6,7 @@ import {
   iconSchema,
   insertSchema,
 } from "./shared-schemas";
+
 export const placesSchema = defaultSchema(
   z.object({
     title: z.string(),
@@ -17,9 +18,10 @@ export const placesSchema = defaultSchema(
     gm_place_id: z.string().optional(), // google maps place id
     mb_place_id: z.string().optional(), // mapbox place id
     fq_place_id: z.string().optional(), // foursquare place id
-    plus_code: z.string().optional(),
-    icon: iconSchema,
-    photos: z.array(z.string()).nullish(),
+    plus_code: z.string().optional(), // we can generate this / fetch it
+    what3words: z.string().optional(), // we can generate this / fetch it
+    icon: iconSchema, // a icon derivtated from the POI type (if provided)
+    photos: z.array(z.string()).nullish(), // this will be converted later into the photos list
     rating: z.number(),
     types: z.array(z.string()).nullish(),
     website: z.string().optional(),
