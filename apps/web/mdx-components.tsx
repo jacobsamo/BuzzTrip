@@ -1,21 +1,15 @@
+import { slugify } from "@/components/mdx";
 import type { MDXComponents } from "mdx/types";
 import Image, { ImageProps } from "next/image";
 import Link, { LinkProps } from "next/link";
-import React, { ReactNode } from "react";
-
-const getId = (title: ReactNode | string): string =>
-  title!
-    .toString()
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-");
+import { ReactNode } from "react";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     ...components,
     h1: (props) => (
       <h1
-        id={getId(props.children as ReactNode)}
+        id={slugify(props.children as string)}
         className="scroll-m-20 text-xl font-bold"
       >
         {props.children as ReactNode}
@@ -23,7 +17,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     h2: (props) => (
       <h2
-        id={getId(props.children as ReactNode)}
+        id={slugify(props.children as string)}
         className="mt-10 scroll-m-20 text-lg font-bold"
       >
         {props.children as ReactNode}
@@ -31,7 +25,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     h3: (props) => (
       <h3
-        id={getId(props.children as ReactNode)}
+        id={slugify(props.children as string)}
         className="text-md mt-8 scroll-m-20 font-bold"
       >
         {props.children as ReactNode}
@@ -58,9 +52,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     img: (props) => (
       <Image
+        {...(props as ImageProps)}
         sizes="(max-width: 768px) 100vw, 50vw"
         className="h-auto w-full rounded-sm"
-        {...(props as ImageProps)}
         alt={props.alt ?? "Image"}
       />
     ),

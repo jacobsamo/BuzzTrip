@@ -1,10 +1,27 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getBlogPosts } from "@/lib/blog";
 import { Bell, BookOpen } from "lucide-react";
 import { motion } from "motion/react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Blogs",
+  description: "Keep up to date with BuzzTrips latest news and updates.",
+};
 
 export default function BlogPage() {
+  const data = getBlogPosts();
+
+  const posts = data
+  .sort((a, b) => {
+    if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
+      return -1;
+    }
+    return 1;
+  })
+  
   return (
     <div className="min-h-screen bg-white">
       {/* Coming Soon Section */}
