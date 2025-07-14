@@ -22,7 +22,7 @@
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   },
-  "packageManager": "bun@1.2.13",
+  "packageManager": "bun@1.2.18",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -37,7 +37,7 @@
     "workerd"
   ],
   "resolutions": {
-    "@polar-sh/sdk": "^0.33.0",
-    "convex": "^1.24.8"
+    "@polar-sh/sdk": "^0.34.3",
+    "convex": "^1.25.2"
   }
 }
