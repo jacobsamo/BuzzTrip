@@ -166,7 +166,6 @@ export default function MarkerForm() {
         if (activeState.event === "markers:create") {
           // remove collection_ids from data
           delete data.collection_ids;
-          console.log("Data", data);
           const createdMarker = createMarker({
             mapId: map._id as Id<"maps">,
             marker: data,
@@ -344,7 +343,6 @@ export default function MarkerForm() {
                 collections.map((collection, index) => {
                   const isChecked =
                     watch("collection_ids")?.includes(collection._id) ?? false;
-                  console.log(collection, isChecked);
                   return (
                     <Button
                       onClick={() => handleChange(collection._id!)}

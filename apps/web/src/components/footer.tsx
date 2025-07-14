@@ -77,6 +77,14 @@ const Footer = () => {
                   Pricing
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/blog"
+                  className="hover:text-white transition-colors"
+                >
+                  Blog
+                </Link>
+              </li>
               {/* <li>
                   <Link href="#" className="hover:text-white transition-colors">
                     API
