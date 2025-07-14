@@ -26,13 +26,12 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@better-auth-kit/convex": "^1.2.2",
-    "@clerk/backend": "^2.2.0",
+    "@clerk/backend": "^2.4.1",
     "@convex-dev/geospatial": "^0.1.9",
     "@convex-dev/migrations": "^0.2.9",
-    "convex": "^1.25.0",
-    "convex-helpers": "^0.1.95",
-    "svix": "^1.67.0",
+    "convex": "^1.25.2",
+    "convex-helpers": "^0.1.99",
+    "svix": "^1.69.0",
     "zod": "^3.25.67"
   }
 }

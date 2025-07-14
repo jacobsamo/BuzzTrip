@@ -36,6 +36,12 @@ const NavbarLinks = () => (
     >
       About
     </Link>
+    <Link
+      href="/blog"
+      className="text-gray-600 hover:text-primary transition-colors"
+    >
+      Blog
+    </Link>
   </>
 );
 

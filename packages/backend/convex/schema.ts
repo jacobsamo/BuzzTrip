@@ -53,7 +53,6 @@ export default defineSchema({
     .index("places_address_idx", ["address"]),
   places_reviews: defineTable(zodToConvex(placesReviewSchema)),
   place_photos: defineTable(zodToConvex(placePhotoSchema)),
-  // better auth items
   users: defineTable(zodToConvex(userSchema))
     .index("by_email", ["email"])
     .index("by_clerk_id", ["clerkUserId"])

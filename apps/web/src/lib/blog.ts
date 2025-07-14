@@ -1,11 +1,12 @@
-import fs from "node:fs";
-import path from "node:path";
+import fs from "fs";
+import path from "path";
 
 export type BlogMetadata = {
   title: string;
   publishedAt: string;
+  author: string;
   summary: string;
-  image?: string;
+  image: string;
   tag: string;
 };
 
@@ -53,5 +54,10 @@ function getMDXData(dir: string) {
 }
 
 export function getBlogPosts() {
+  // Only run on server side
+  if (typeof window !== "undefined") {
+    throw new Error("getBlogPosts can only be called on the server side");
+  }
+
   return getMDXData(path.join(process.cwd(), "src", "app", "blog", "posts"));
 }

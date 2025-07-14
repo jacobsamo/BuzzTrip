@@ -167,19 +167,6 @@ export const partialMapUpdate = authedMutation({
   },
 });
 
-export const partialMapUpdate = authedMutation({
-  args: {
-    mapId: zid("maps"),
-    map: mapsEditSchema.omit({ _id: true, _creationTime: true }).partial(),
-  },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.mapId, {
-      ...args.map,
-      updatedAt: new Date().toISOString(),
-    });
-  },
-});
-
 export const deleteMap = authedMutation({
   args: {
     mapId: zid("maps"),
