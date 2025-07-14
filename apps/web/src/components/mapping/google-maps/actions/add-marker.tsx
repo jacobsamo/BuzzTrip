@@ -12,7 +12,7 @@ import { MapPin } from "lucide-react";
 import { useHotkeys } from "react-hotkeys-hook";
 
 const AddMarkerButton = () => {
-  const { activeState, setActiveState, isMobile } = useMapStore(
+  const { activeState, setActiveState, isMobile, searchValue } = useMapStore(
     (state) => state
   );
   const googleMap = useMap();
@@ -38,6 +38,7 @@ const AddMarkerButton = () => {
             "top-[68px] left-[360px]": !isMobile,
             "scale-105 border border-black shadow-lg bg-gray-300":
               activeState?.event === "add-marker",
+            "z-0": searchValue && !isMobile,
           })}
           onClick={() => {
             if (!googleMap) return;

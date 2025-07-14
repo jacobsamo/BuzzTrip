@@ -33,6 +33,16 @@ const Mapview = () => {
 
   if (!map) return null;
 
+  const [zoom, setZoom] = useState(4);
+
+  useEffect(() => {
+    if (!googleMap) return;
+    const listener = googleMap.addListener("zoom_changed", () => {
+      setZoom(googleMap.getZoom() ?? 4);
+    });
+    return () => listener.remove();
+  }, [googleMap]);
+
   // Handle directions for routes
   const routesLibrary = useMapsLibrary("routes");
   const [placesService, setPlacesService] =
@@ -143,8 +153,11 @@ const Mapview = () => {
     });
   };
 
+  
+
   const handleClick = async (e: MapMouseEvent) => {
     if (!places || !googleMap || !placesService) return;
+
     e.domEvent?.stopPropagation();
     e.stop();
 
@@ -153,8 +166,12 @@ const Mapview = () => {
 
     if (!latLng) return;
 
-    if (activeState?.event === "add-marker") {
-      // If in add-marker mode, only fetch details if placeId is present
+    const inAddMarkerMode = activeState?.event === "add-marker";
+
+    // ========================
+    // ADD MARKER MODE
+    // ========================
+    if (inAddMarkerMode) {
       if (placeId) {
         try {
           handlePlaceSearch(placeId);
@@ -162,79 +179,67 @@ const Mapview = () => {
           console.error("Error fetching place details:", error);
         }
       } else {
-        // No placeId, launch create marker modal
-        if (activeLocation) {
-          setActiveState({ event: "markers:create", payload: activeLocation });
-        } else {
-          setActiveState({
-            event: "markers:create",
-            payload: {
-              title: `${latLng.lat}, ${latLng.lng}`,
-              lat: latLng.lat,
-              lng: latLng.lng,
-              icon: "MapPin",
-              color: "#0b7138",
-              map_id: map._id as Id<"maps">,
-              place: {
-                lat: latLng.lat,
-                lng: latLng.lng,
-                icon: "MapPin",
-                title: `${latLng.lat}, ${latLng.lng}`,
-                rating: 0,
-                bounds: null,
-              },
-            },
-          });
-        }
+        const payload = activeLocation || {
+          title: `${latLng.lat}, ${latLng.lng}`,
+          lat: latLng.lat,
+          lng: latLng.lng,
+          icon: "MapPin",
+          color: "#0b7138",
+          map_id: map._id as Id<"maps">,
+          place: {
+            lat: latLng.lat,
+            lng: latLng.lng,
+            icon: "MapPin",
+            title: `${latLng.lat}, ${latLng.lng}`,
+            rating: 0,
+            bounds: null,
+          },
+        };
+
+        setActiveState({ event: "markers:create", payload });
         googleMap.setOptions({ draggableCursor: "" });
       }
+
       return;
     }
 
-    // Not in add-marker mode: do general place search if no placeId
     if (!placeId) {
-      const zoom = googleMap.getZoom();
-      const radius = () => {
-        if (!zoom) return 300;
-        if (zoom < 6) return 1000;
-        if (zoom < 8) return 100;
-        if (zoom > 10) return 100;
-        return 300;
-      };
-
       try {
-        placeId = await new Promise<string | null>((resolve, reject) => {
-          placesService.nearbySearch(
-            {
-              location: latLng,
-              radius: radius(),
-              bounds: googleMap.getBounds(),
-            },
-            (data, status) => {
-              if (
-                status !== google.maps.places.PlacesServiceStatus.OK ||
-                !data ||
-                data.length === 0
-              ) {
-                reject(new Error("Nearby search failed"));
-                return;
-              }
-              resolve(data[0]?.place_id ?? null);
+        const geocoder = new google.maps.Geocoder();
+        const response = await new Promise<
+          google.maps.GeocoderResult[] | null
+        >((resolve) => {
+          geocoder.geocode({ location: latLng }, (results, status) => {
+            if (
+              status === google.maps.GeocoderStatus.OK &&
+              Array.isArray(results) &&
+              results.length > 0
+            ) {
+              resolve(results);
+            } else {
+              resolve(null);
             }
-          );
+          });
         });
+        
+        const bestMatch = response?.find(result => {
+          return result.types.includes("locality");
+        });
+
+        if (bestMatch && bestMatch.place_id) {
+          placeId = bestMatch.place_id;
+        }
       } catch (error) {
-        console.error("Error during nearby search:", error);
+        console.error("Error during place lookup:", error);
         return;
       }
     }
 
     if (!placeId) {
-      console.error("No placeId found after search");
+      // Nothing found — do nothing
       return;
     }
 
-    // Handle Place Details Lookup
     try {
       handlePlaceSearch(placeId);
     } catch (error) {
@@ -292,7 +297,12 @@ const Mapview = () => {
                 setActiveLocation(marker);
               }}
             >
-              <MarkerPin color={marker.color} icon={marker.icon!} size={16} />
+              <MarkerPin
+                color={marker.color}
+                icon={marker.icon!}
+                size={zoom > 8 ? 16 : 8} // Smaller when zoomed out
+                showIcon={zoom > 8} // Only show icon when zoomed in
+              />
             </AdvancedMarker>
           ))}
       </GoogleMap>

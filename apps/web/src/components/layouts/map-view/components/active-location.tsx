@@ -11,11 +11,10 @@ import {
 } from "@/components/ui/carousel";
 import { Separator } from "@/components/ui/separator";
 import { getCollectionsForMarker } from "@/lib/utils";
-import { ExternalLink, Globe, Pencil, Phone, Plus, X } from "lucide-react";
+import { ExternalLink, Globe, Pencil, Phone, Plus } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import CloseButton from "./close-button";
-
 
 const ActiveLocation = () => {
   const {

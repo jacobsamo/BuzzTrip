@@ -268,7 +268,7 @@ export const AutocompleteCustomInput = () => {
             )}
           </div>
 
-          <Command.List>
+          <Command.List className="z-50">
             {predictionResults.length != 0 && (
               <Command.Empty>No place found</Command.Empty>
             )}
