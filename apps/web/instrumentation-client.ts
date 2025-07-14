@@ -30,6 +30,7 @@ Sentry.init({
 posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY!, {
   api_host: env.NEXT_PUBLIC_POSTHOG_HOST,
   capture_pageview: "history_change",
+  defaults: "2025-05-24",
 });
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

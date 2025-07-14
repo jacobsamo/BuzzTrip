@@ -7,7 +7,7 @@
     "dev": "next dev --port 5173 --turbopack",
     "dev:secure": "bun dev --experimental-https",
     "scan": "bun dev & bunx react-scan@latest localhost:5173",
-    "build": "next build --debug",
+    "build": "next build",
     "start": "next start --port 5173",
     "lint": "next lint"
   },
