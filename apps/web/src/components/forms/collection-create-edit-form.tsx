@@ -6,8 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
-import { Collection } from "@buzztrip/backend/types";
-import Icon, { otherIconsList } from "@buzztrip/components/icon";
+import { Collection, iconsList } from "@buzztrip/backend/types";
+import Icon from "@buzztrip/components/icon";
 import { useMutation } from "convex/react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -102,24 +102,26 @@ export default function CollectionForm() {
             name="icon"
             render={({ field }) => (
               <div className="flex flex-wrap gap-2">
-                {otherIconsList.map((icon, index) => {
-                  const selectedIcon = watch("icon");
+                {iconsList
+                  .filter((icon) => icon.categories[0] === "other")
+                  .map((icon, index) => {
+                    const selectedIcon = watch("icon");
 
-                  return (
-                    <Button
-                      key={index}
-                      type="button"
-                      variant="ghost"
-                      onClick={() => field.onChange(icon)} // Handle icon selection
-                      className={cn("group text-black", {
-                        "scale-105 border border-gray-500 shadow-lg":
-                          selectedIcon == icon,
-                      })}
-                    >
-                      <Icon name={icon} size={24} />
-                    </Button>
-                  );
-                })}
+                    return (
+                      <Button
+                        key={index}
+                        type="button"
+                        variant="ghost"
+                        onClick={() => field.onChange(icon.id)} // Handle icon selection
+                        className={cn("group text-black", {
+                          "scale-105 border border-gray-500 shadow-lg":
+                            selectedIcon == icon.id,
+                        })}
+                      >
+                        <Icon name={icon.id} size={24} />
+                      </Button>
+                    );
+                  })}
               </div>
             )}
           />

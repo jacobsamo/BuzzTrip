@@ -13,11 +13,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import  { type IconType, iconsList } from "@buzztrip/backend/types";
 import Icon from "@buzztrip/components/icon";
-import type { IconType } from "@buzztrip/backend/types";
-import { iconsList } from "@buzztrip/backend/types/icon";
 import { Check, ChevronLeft, ChevronRight, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
+
+type IconList = {
+  id: IconType;
+  title: string;
+  categories: readonly string[];
+};
 
 interface IconPickerProps {
   value?: IconType;
@@ -34,18 +39,15 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
   const [selectedIcon, setSelectedIcon] = React.useState<IconType>("Map");
 
   // Get current page icons
-  const [currentPageIcons, setCurrentPageIcons] = React.useState<IconType[]>(
+  const [currentPageIcons, setCurrentPageIcons] = React.useState<IconList[]>(
     []
   );
 
   React.useEffect(() => {
     try {
       const startIdx = currentPage * ICONS_PER_PAGE;
-      const endIdx = Math.min(
-        startIdx + ICONS_PER_PAGE - 1,
-        iconsList.length - 1
-      );
-      if (startIdx <= endIdx) {
+      const endIdx = Math.min(startIdx + ICONS_PER_PAGE, iconsList.length);
+      if (startIdx < endIdx) {
         const icons = iconsList.slice(startIdx, endIdx);
         setCurrentPageIcons(icons);
       }
@@ -64,42 +66,28 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
     const query = searchQuery.toLowerCase().trim();
     const queryWords = query.split(/\s+/).filter((word) => word.length > 0);
 
-    // Filter the icons on the current page
-    const searchResults = currentPageIcons.filter((iconName) => {
-      const lowerIconName = iconName.toLowerCase();
+    // Filter the icons on the current page using icon.title
+    const searchResults = currentPageIcons.filter((icon) => {
+      const lowerIconTitle = icon.title.toLowerCase();
 
-      // Option 1: Simple includes check for each word
-      // return queryWords.every(queryWord => lowerIconName.includes(queryWord));
-
-      // Option 2: Check if ANY of the query words are included in the icon name
-      // This might be more suitable for icon names which are often single words or hyphenated
       const anyQueryWordMatches = queryWords.some((queryWord) =>
-        lowerIconName.includes(queryWord)
-      );
-
-      // Option 3: Combine includes and potentially word boundary checks (more like the color example)
-      const allWordsIncluded = queryWords.every((queryWord) =>
-        lowerIconName.includes(queryWord)
+        lowerIconTitle.includes(queryWord)
       );
 
       const wordBoundaryMatch = queryWords.some((queryWord) => {
-        // Escape special regex characters in the query word
         const escapedQueryWord = queryWord.replace(
           /[.*+?^${}()|[\]\\]/g,
           "\\$&"
         );
         const nameRegex = new RegExp(`\\b${escapedQueryWord}\\b`);
-        return nameRegex.test(lowerIconName);
+        return nameRegex.test(lowerIconTitle);
       });
 
-      // Choose the logic that best fits how you want to search for icon names.
-      // For icons, Option 2 or a combination like Option 3 might be good.
-      return anyQueryWordMatches || wordBoundaryMatch; // Example using a combination
+      return anyQueryWordMatches || wordBoundaryMatch;
     });
 
-    console.log("Search results:", searchResults);
     return searchResults;
-  }, [currentPageIcons, searchQuery]); // Dependencies
+  }, [currentPageIcons, searchQuery]);
 
   const handleNextPage = () => {
     if (currentPage < totalPages - 1) {
@@ -142,25 +130,25 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
             ) : (
               <CommandGroup>
                 <div className="grid grid-cols-8 gap-2 p-2">
-                  {filteredIcons.map((iconName) => (
+                  {filteredIcons.map((icon) => (
                     <div
-                      key={iconName}
+                      key={icon.id}
                       role="button"
                       onClick={() => {
-                        onChange?.(iconName);
-                        setSelectedIcon(iconName);
+                        onChange?.(icon.id);
+                        setSelectedIcon(icon.id);
                         setOpen(false);
                       }}
                       className={cn(
                         "flex h-10 w-10 items-center justify-center rounded-md border",
                         "hover:bg-accent hover:text-accent-foreground",
-                        value === iconName && "border-primary bg-primary/10",
+                        value === icon.id && "border-primary bg-primary/10",
                         "relative"
                       )}
-                      title={iconName}
+                      title={icon.title}
                     >
-                      <Icon name={iconName} size={20} />
-                      {value === iconName && (
+                      <Icon name={icon.id} size={20} />
+                      {value === icon.id && (
                         <Check className="text-primary absolute top-1 right-1 h-3 w-3" />
                       )}
                     </div>

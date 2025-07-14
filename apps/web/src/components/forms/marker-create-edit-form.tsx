@@ -1,4 +1,3 @@
-import IconPickerModal from "@/components/modals/icon-picker-modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -29,6 +28,7 @@ import { useEffect, useMemo } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { IconPicker } from "../icon-picker";
 
 const Icon = dynamic(() => import("@buzztrip/components/icon"), { ssr: false });
 
@@ -325,9 +325,13 @@ export default function MarkerForm() {
                             <Icon name={icon} size={24} />
                           </Button>
                         ))}
-                        <IconPickerModal
+                        {/* <IconPickerModal
                           selectedIcon={watch("icon") ?? "MapPin"}
                           setSelectedIcon={field.onChange}
+                        /> */}
+                        <IconPicker
+                          value={watch("icon") ?? "MapPin"}
+                          onChange={field.onChange}
                         />
                       </div>
                     </FormControl>
