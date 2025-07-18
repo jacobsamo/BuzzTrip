@@ -1,7 +1,7 @@
 import type { WebhookEvent } from "@clerk/backend";
 import { httpRouter } from "convex/server";
 import { Webhook } from "svix";
-import { internal, api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import { httpAction } from "./_generated/server";
 
 function ensureEnvironmentVariable(name: string): string {
@@ -22,16 +22,16 @@ const handleClerkWebhook = httpAction(async (ctx, request) => {
     });
   }
   switch (event.type) {
-    case "user.created": // intentional fallthrough
-    case "user.updated": {
-      const existingUser = await ctx.runQuery(api.users.getUser, {
-        subject: event.data.id,
+    case "user.created": {
+      console.log("creating user", event.data.id);
+      await ctx.runMutation(internal.users.createUser, {
+        data: event.data,
       });
-      if (existingUser && event.type === "user.created") {
-        console.warn("Overwriting user", event.data.id, "with", event.data);
-      }
-      console.log("creating/updating user", event.data.id);
-      await ctx.runMutation(internal.users.updateOrCreateUser, {
+      break;
+    }
+    case "user.updated": {
+      console.log("updating user", event.data.id);
+      await ctx.runMutation(internal.users.updateUser, {
         data: event.data,
       });
       break;

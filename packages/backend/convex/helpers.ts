@@ -8,6 +8,7 @@ import {
   type QueryCtx,
   mutation,
   query,
+  internalMutation
 } from "./_generated/server";
 
 export const geospatial = new GeospatialIndex(components.geospatial);
@@ -63,3 +64,4 @@ export const authedQuery = zCustomQuery(query, {
 
 export const zodQuery = zCustomQuery(query, NoOp);
 export const zodMutation = zCustomMutation(mutation, NoOp);
+export const zodInternalMutation = zCustomMutation(internalMutation, NoOp);
