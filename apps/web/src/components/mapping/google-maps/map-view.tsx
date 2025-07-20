@@ -1,7 +1,6 @@
 "use client";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { cn } from "@/lib/utils";
-import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
 import { IconType } from "@buzztrip/backend/types";
 import {
@@ -11,7 +10,6 @@ import {
   useMapsLibrary,
   type MapMouseEvent,
 } from "@vis.gl/react-google-maps";
-import { useMutation } from "convex/react";
 import { env } from "env";
 import { lazy, memo, useEffect, useMemo, useState } from "react";
 import AddMarkerButton from "./actions/add-marker";
@@ -33,8 +31,6 @@ const Mapview = () => {
     isMobile,
     setActiveState,
   } = useMapStore((state) => state);
-
-  const updateMap = useMutation(api.maps.index.updateMap);
 
   if (!map) return null;
 
@@ -63,14 +59,14 @@ const Mapview = () => {
   const mapOptions = useMemo(() => {
     return {
       center: {
-        lat: map.lat ?? 0,
-        lng: map.lng ?? 180,
+        lat: map.lat ?? 20,
+        lng: map.lng ?? 0,
       },
       bounds: map.bounds ?? {
-        north: 90,
-        south: -90,
-        east: 180,
-        west: -180,
+        north: 75,
+        south: -60,
+        west: -150,
+        east: 150,
       },
       zoom: 4,
     };
@@ -255,30 +251,37 @@ const Mapview = () => {
     }
   };
 
-  useEffect(() => {
-    if (!googleMap || !map || !map.lat || !map.lng || !map.bounds) return;
-    // update the map if the window is closed and not lat, lng or bounds are set
-    const updatedMap = async () => {
-      const center = googleMap.getCenter();
-      const bounds = googleMap.getBounds();
-      if (!center || !bounds) return;
-      const lat = center.lat();
-      const lng = center.lng();
-      const boundsObj = bounds.toJSON();
-      await updateMap({
-        mapId: map._id as Id<"maps">,
-        map: {
-          lat: lat,
-          lng: lng,
-          bounds: boundsObj,
-          location_name: `${lat}, ${lng}`,
-        },
-      });
-    };
-    // listen to window close event
-    window.addEventListener("beforeunload", updatedMap);
+  const updateMapSync = () => {
+    if (!googleMap || !map) return;
+    const center = googleMap.getCenter();
+    const bounds = googleMap.getBounds();
+    if (!center || !bounds) return;
+    const lat = center.lat();
+    const lng = center.lng();
+    const boundsObj = bounds.toJSON();
 
-    return () => window.removeEventListener("beforeunload", updatedMap);
+    // If you have an HTTP endpoint for updating the map, use sendBeacon:
+    const url = `/api/map/${map._id}/update-map-location`; // You need to implement this endpoint
+    const payload = JSON.stringify({
+      lat,
+      lng,
+      bounds: boundsObj,
+      location_name: `${lat}, ${lng}`,
+    });
+    navigator.sendBeacon(url, payload);
+  };
+
+  useEffect(() => {
+    if (!googleMap || !map || map.lat || map.lng || map.bounds) return;
+
+    const handleRouteChangeStart = async () => {
+      await updateMapSync();
+    };
+
+    window.addEventListener("beforeunload", handleRouteChangeStart);
+    return () => {
+      window.removeEventListener("beforeunload", handleRouteChangeStart);
+    };
   }, [googleMap, map]);
 
   return (
