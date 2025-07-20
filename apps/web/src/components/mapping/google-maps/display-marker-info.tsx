@@ -1,6 +1,6 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
-import { CombinedMarker } from "@buzztrip/backend/types";
+import { CombinedMarker, IconType } from "@buzztrip/backend/types";
 import {
   AdvancedMarker,
   useAdvancedMarkerRef,
@@ -30,7 +30,7 @@ const DisplayMarkerInfo = ({ location }: DisplayMarkerInfoProps) => {
       <div className="group relative flex flex-col items-center">
         {/* Pin */}
         <div className="absolute bottom-[-4px] flex size-8 items-center justify-center rounded-full bg-green-700 shadow-lg z-20">
-          <MarkerPin color={location.color} icon={location.icon} size={28} />
+          <MarkerPin color={location.color} icon={location.icon as IconType} size={28} />
         </div>
 
         {/* Info Card (always visible) */}

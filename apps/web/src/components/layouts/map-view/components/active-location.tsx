@@ -15,6 +15,7 @@ import { ExternalLink, Globe, Pencil, Phone, Plus } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import CloseButton from "./close-button";
+import { IconType } from "@buzztrip/backend/types";
 
 const ActiveLocation = () => {
   const {
@@ -77,7 +78,7 @@ const ActiveLocation = () => {
         </Carousel>
       ) : (
         <div className="h-32 bg-gray-100 flex items-center justify-center">
-          <MarkerPin color={activeLocation.color} icon={activeLocation.icon} />
+          <MarkerPin color={activeLocation.color} icon={activeLocation.icon as IconType} />
         </div>
       )}
 
@@ -88,7 +89,7 @@ const ActiveLocation = () => {
           <div className="mt-1">
             <MarkerPin
               color={activeLocation.color}
-              icon={activeLocation.icon}
+              icon={activeLocation.icon as IconType}
             />
           </div>
           <div className="flex-1">

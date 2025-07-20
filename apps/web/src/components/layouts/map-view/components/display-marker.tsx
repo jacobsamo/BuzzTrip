@@ -4,7 +4,7 @@ import {
   SidebarMenuAction,
   SidebarMenuSubButton,
 } from "@/components/ui/sidebar";
-import { CombinedMarker } from "@buzztrip/backend/types";
+import { CombinedMarker, IconType } from "@buzztrip/backend/types";
 import { useMap } from "@vis.gl/react-google-maps";
 import { Pencil } from "lucide-react";
 
@@ -31,7 +31,7 @@ const DisplayMarker = ({ marker }: DisplayMarkerProps) => {
     >
       <MarkerPin
         color={marker.color}
-        icon={marker.icon ?? "MapPin"}
+        icon={(marker.icon ?? "MapPin") as IconType}
         size={16}
       />
       <span className="wrap ml-2 text-center text-sm">{marker.title}</span>

@@ -8,23 +8,11 @@ export const resend: Resend = new Resend(components.resend, {
   testMode: false,
 });
 
-export const sendTestEmail = internalMutation({
-  handler: async (ctx) => {
-    await resend.sendEmail(ctx, {
-      from: "Me <support@buzztrip.co>",
-      to: "Resend <jacob35422@gmail.com>",
-      subject: "Hi there",
-      html: "This is a test email",
-    });
-  },
-});
-
 export const sendWelcomeEmail = zodInternalMutation({
   args: {
     firstName: z.string().optional(),
     email: z.string(),
   },
-
   handler: async (ctx, { firstName, email }) => {
     await resend.sendEmail(ctx, {
       from: "Jacob Samorowski <info@buzztrip.co>",

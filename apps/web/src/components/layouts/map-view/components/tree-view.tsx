@@ -67,7 +67,7 @@ const generateTree = (
         name: collection.title,
         children: markersForCollection.map((marker) => marker._id),
         isFolder: true,
-        icon: collection.icon,
+        icon: collection.icon as IconType,
         payload: collection,
       };
       acc[collection._id] = collectionItem;
@@ -80,7 +80,7 @@ const generateTree = (
     (acc, marker) => {
       const markerItem: Item = {
         name: marker.title,
-        icon: marker.icon,
+        icon: marker.icon as IconType,
         color: marker.color,
         payload: marker,
       };

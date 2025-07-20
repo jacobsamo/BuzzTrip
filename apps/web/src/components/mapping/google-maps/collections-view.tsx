@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Collection, CombinedMarker } from "@buzztrip/backend/types";
+import { Collection, CombinedMarker, IconType } from "@buzztrip/backend/types";
 import Icon from "@buzztrip/components/icon";
 import {
   ChevronDown,
@@ -49,7 +49,7 @@ const CollectionsView = ({ collection, markers }: CollectionsViewProps) => {
           ) : (
             <ChevronRight className="mr-1 h-4 w-4" />
           )}
-          <Icon name={collection.icon ?? "MapPin"} />
+          <Icon name={(collection.icon ?? "MapPin") as IconType} />
 
           <span>{collection.title}</span>
         </CollapsibleTrigger>
@@ -77,7 +77,7 @@ const CollectionsView = ({ collection, markers }: CollectionsViewProps) => {
               className="flex items-center justify-between py-1"
             >
               <div className="flex items-center">
-                <MarkerPin color={marker.color} icon={marker.icon ?? "MapPin"} />
+                <MarkerPin color={marker.color} icon={(marker.icon ?? "MapPin") as IconType} />
                 <span>{marker.title}</span>
               </div>
               <OpenMarkerButton marker={marker} mode="edit" />

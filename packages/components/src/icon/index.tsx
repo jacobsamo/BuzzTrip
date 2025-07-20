@@ -14,10 +14,10 @@ export interface IconProps {
   size?: number;
 }
 
-const LazyIcon = ({ name }: { name: string }) =>
-  React.lazy(() =>
-    import("@phosphor-icons/react").then((mod) => ({ default: mod[name as keyof typeof mod] }))
-  );
+// const LazyIcon = ({ name }: { name: string }) =>
+//   React.lazy(() =>
+//     import("@phosphor-icons/react").then((mod) => ({ default: mod[name as keyof typeof mod] }))
+//   );
 
 // export const Icon = ({
 //   name = "MapPin",

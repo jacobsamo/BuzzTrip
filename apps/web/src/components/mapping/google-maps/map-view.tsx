@@ -1,7 +1,9 @@
 "use client";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { cn } from "@/lib/utils";
+import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
+import { IconType } from "@buzztrip/backend/types";
 import {
   AdvancedMarker,
   Map as GoogleMap,
@@ -9,6 +11,7 @@ import {
   useMapsLibrary,
   type MapMouseEvent,
 } from "@vis.gl/react-google-maps";
+import { useMutation } from "convex/react";
 import { env } from "env";
 import { lazy, memo, useEffect, useMemo, useState } from "react";
 import AddMarkerButton from "./actions/add-marker";
@@ -30,6 +33,8 @@ const Mapview = () => {
     isMobile,
     setActiveState,
   } = useMapStore((state) => state);
+
+  const updateMap = useMutation(api.maps.index.updateMap);
 
   if (!map) return null;
 
@@ -58,10 +63,15 @@ const Mapview = () => {
   const mapOptions = useMemo(() => {
     return {
       center: {
-        lat: map.lat ?? -25.2744,
-        lng: map.lng ?? 133.7751,
+        lat: map.lat ?? 0,
+        lng: map.lng ?? 180,
       },
-      bounds: map.bounds ?? null,
+      bounds: map.bounds ?? {
+        north: 90,
+        south: -90,
+        east: 180,
+        west: -180,
+      },
       zoom: 4,
     };
   }, []);
@@ -153,8 +163,6 @@ const Mapview = () => {
     });
   };
 
-  
-
   const handleClick = async (e: MapMouseEvent) => {
     if (!places || !googleMap || !placesService) return;
 
@@ -206,23 +214,23 @@ const Mapview = () => {
     if (!placeId) {
       try {
         const geocoder = new google.maps.Geocoder();
-        const response = await new Promise<
-          google.maps.GeocoderResult[] | null
-        >((resolve) => {
-          geocoder.geocode({ location: latLng }, (results, status) => {
-            if (
-              status === google.maps.GeocoderStatus.OK &&
-              Array.isArray(results) &&
-              results.length > 0
-            ) {
-              resolve(results);
-            } else {
-              resolve(null);
-            }
-          });
-        });
-        
-        const bestMatch = response?.find(result => {
+        const response = await new Promise<google.maps.GeocoderResult[] | null>(
+          (resolve) => {
+            geocoder.geocode({ location: latLng }, (results, status) => {
+              if (
+                status === google.maps.GeocoderStatus.OK &&
+                Array.isArray(results) &&
+                results.length > 0
+              ) {
+                resolve(results);
+              } else {
+                resolve(null);
+              }
+            });
+          }
+        );
+
+        const bestMatch = response?.find((result) => {
           return result.types.includes("locality");
         });
 
@@ -246,6 +254,32 @@ const Mapview = () => {
       console.error("Error fetching place details:", error);
     }
   };
+
+  useEffect(() => {
+    if (!googleMap || !map || !map.lat || !map.lng || !map.bounds) return;
+    // update the map if the window is closed and not lat, lng or bounds are set
+    const updatedMap = async () => {
+      const center = googleMap.getCenter();
+      const bounds = googleMap.getBounds();
+      if (!center || !bounds) return;
+      const lat = center.lat();
+      const lng = center.lng();
+      const boundsObj = bounds.toJSON();
+      await updateMap({
+        mapId: map._id as Id<"maps">,
+        map: {
+          lat: lat,
+          lng: lng,
+          bounds: boundsObj,
+          location_name: `${lat}, ${lng}`,
+        },
+      });
+    };
+    // listen to window close event
+    window.addEventListener("beforeunload", updatedMap);
+
+    return () => window.removeEventListener("beforeunload", updatedMap);
+  }, [googleMap, map]);
 
   return (
     <div
@@ -299,7 +333,7 @@ const Mapview = () => {
             >
               <MarkerPin
                 color={marker.color}
-                icon={marker.icon!}
+                icon={marker.icon as IconType}
                 size={zoom > 8 ? 16 : 8} // Smaller when zoomed out
                 showIcon={zoom > 8} // Only show icon when zoomed in
               />

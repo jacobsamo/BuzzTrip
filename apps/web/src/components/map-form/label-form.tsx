@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Label } from "@buzztrip/backend/types";
+import { IconType, Label } from "@buzztrip/backend/types";
 import { labelsEditSchema } from "@buzztrip/backend/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash2 } from "lucide-react";
@@ -126,7 +126,7 @@ const LabelForm = ({ label }: LabelFormProps) => {
                     <FormControl>
                       <div className="flex flex-wrap gap-2">
                         <IconPicker
-                          value={selectedIcon}
+                          value={selectedIcon as IconType}
                           onChange={field.onChange}
                         />
                       </div>

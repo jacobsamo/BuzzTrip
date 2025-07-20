@@ -308,7 +308,10 @@ export default function MarkerForm() {
                                 "scale-105 border border-gray-500 text-black shadow-lg",
                             })}
                           >
-                            <Icon name={selectedIcon ?? "MapPin"} size={24} />
+                            <Icon
+                              name={(selectedIcon ?? "MapPin") as IconType}
+                              size={24}
+                            />
                           </div>
                         )}
                         {popularIconsList.map((icon, index) => (
@@ -330,7 +333,7 @@ export default function MarkerForm() {
                           setSelectedIcon={field.onChange}
                         /> */}
                         <IconPicker
-                          value={watch("icon") ?? "MapPin"}
+                          value={(watch("icon") ?? "MapPin") as IconType}
                           onChange={field.onChange}
                         />
                       </div>
