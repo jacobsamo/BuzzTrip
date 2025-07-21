@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { HslColor, HsvaColor, hsvaToHex, HsvColor } from "@uiw/color-convert";
 import Colorful from "@uiw/react-color-colorful";
 import {
   Check,
@@ -27,7 +26,7 @@ import {
   Hash,
   Palette,
 } from "lucide-react";
-import React, { useState } from "react";
+import React from "react";
 
 type Color = {
   hex: string;
@@ -224,7 +223,7 @@ const Picker = ({
           color={selectedColor.hex}
           disableAlpha={true}
           onChange={(color) => {
-            handleHexInput(color.hex)
+            handleHexInput(color.hex);
           }}
         />
       </div>
@@ -283,19 +282,20 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
     if (!searchQuery) return colors;
 
     const query = searchQuery.toLowerCase().trim(); // Trim whitespace
-    const queryWords = query.split(/\s+/).filter(word => word.length > 0); // Split into words
+    const queryWords = query.split(/\s+/).filter((word) => word.length > 0); // Split into words
 
-    return colors.filter(color => {
+    return colors.filter((color) => {
       const lowerName = color.name.toLowerCase();
       const lowerHex = color.hex.toLowerCase();
 
       // Check if ALL query words are present in either name or hex
-      const allQueryWordsMatch = queryWords.every(queryWord =>
-        lowerName.includes(queryWord) || lowerHex.includes(queryWord)
+      const allQueryWordsMatch = queryWords.every(
+        (queryWord) =>
+          lowerName.includes(queryWord) || lowerHex.includes(queryWord)
       );
 
       // Optional: Add a check for matching at word boundaries for better relevance
-      const wordBoundaryMatch = queryWords.some(queryWord => {
+      const wordBoundaryMatch = queryWords.some((queryWord) => {
         const nameRegex = new RegExp(`\\b${queryWord}\\b`); // Word boundary regex
         const hexRegex = new RegExp(`\\b${queryWord}\\b`);
         return nameRegex.test(lowerName) || hexRegex.test(lowerHex);
@@ -348,17 +348,18 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger className={cn("aspect-square", className)}>
-        <div
-          className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus:ring-ring flex size-10 items-center justify-center rounded-md border focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          aria-label={`Selected color: ${selectedColor.name} (${selectedColor.hex})`}
-        >
-          {selectedColor ? (
-            <DisplayColor color={selectedColor} size="full" />
-          ) : (
-            <ChevronsUpDown className="h-5 w-5 opacity-50" />
-          )}
-        </div>
+      <PopoverTrigger
+        className={cn(
+          "border-input bg-background ring-offset-background placeholder:text-muted-foreground flex size-10 items-center justify-center rounded-md border focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+          className
+        )}
+        aria-label={`Selected color: ${selectedColor.name} (${selectedColor.hex})`}
+      >
+        {selectedColor ? (
+          <DisplayColor color={selectedColor} size="full" />
+        ) : (
+          <ChevronsUpDown className="h-5 w-5 opacity-50" />
+        )}
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" align="start">
         <Tabs defaultValue="palette" className="w-full">

@@ -80,9 +80,26 @@ export const createStore = (initState: InitState) =>
         }));
       },
       setActiveState: (state: ActiveState | null) => {
+        const currentState = get().activeState;
+        const prevState = get().prevState;
+
+        if (
+          (prevState?.event === "markers:create" ||
+            prevState?.event === "markers:update") &&
+          currentState?.event === "collections:create"
+        ) {
+          set(() => ({
+            activeState: prevState,
+            prevState: currentState,
+            drawerState: { snap: 0.9, dismissible: false },
+          }));
+          return;
+        }
+
         if (!state) {
           set(() => ({
             activeState: state,
+            prevState: currentState,
             drawerState: { snap: 0.2, dismissible: true },
           }));
           return;
@@ -91,6 +108,7 @@ export const createStore = (initState: InitState) =>
         if (state.event === "add-marker") {
           set(() => ({
             activeState: state,
+            prevState: currentState,
             drawerState: { snap: 0.2, dismissible: true },
           }));
           return;
@@ -98,6 +116,7 @@ export const createStore = (initState: InitState) =>
 
         set(() => ({
           activeState: state,
+          prevState: currentState,
           drawerState: { snap: 0.9, dismissible: false },
         }));
       },

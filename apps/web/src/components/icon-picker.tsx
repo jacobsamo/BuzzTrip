@@ -13,7 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import  { type IconType, iconsList } from "@buzztrip/backend/types";
+import { type IconType, iconsList } from "@buzztrip/backend/types";
 import Icon from "@buzztrip/components/icon";
 import { Check, ChevronLeft, ChevronRight, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
@@ -108,14 +108,17 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger className={cn("aspect-square", className)}>
-        <div className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus:ring-ring flex h-10 w-10 items-center justify-center rounded-md border focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50">
-          {selectedIcon ? (
-            <Icon name={selectedIcon} size={20} />
-          ) : (
-            <ChevronsUpDown className="h-5 w-5 opacity-50" />
-          )}
-        </div>
+      <PopoverTrigger
+        className={cn(
+          "border-input bg-background ring-offset-background placeholder:text-muted-foreground focus:ring-ring flex h-10 w-10 items-center justify-center rounded-md border focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+          className
+        )}
+      >
+        {selectedIcon ? (
+          <Icon name={selectedIcon} size={20} />
+        ) : (
+          <ChevronsUpDown className="h-5 w-5 opacity-50" />
+        )}
       </PopoverTrigger>
       <PopoverContent className="w-[360px] p-0" align="start">
         <Command>

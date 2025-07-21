@@ -12,24 +12,14 @@ import ActiveLocation from "./active-location";
 import MarkersCollectionTabs from "./markers-collections";
 import OpenCollectionModal from "@/components/modals/open-collection-modal";
 import CloseButton from "./close-button";
+import CollectionForm from "@/components/forms/collection-create-edit-form";
+import MarkerForm from "@/components/forms/marker-create-edit-form";
 
-const MarkerForm = dynamic(
-  () => import("../../../forms/marker-create-edit-form"),
-  {
-    ssr: false,
-  }
-);
-const CollectionForm = dynamic(
-  () => import("../../../forms/collection-create-edit-form"),
-  { ssr: false }
-);
 
 export default function MapDrawer() {
   const {
     activeState,
     activeLocation,
-    setActiveState,
-    map,
     searchActive,
     drawerState,
     setDrawerState,

@@ -251,36 +251,28 @@ const Mapview = () => {
     }
   };
 
-  const updateMapSync = () => {
-    if (!googleMap || !map) return;
-    const center = googleMap.getCenter();
-    const bounds = googleMap.getBounds();
-    if (!center || !bounds) return;
-    const lat = center.lat();
-    const lng = center.lng();
-    const boundsObj = bounds.toJSON();
-
-    // If you have an HTTP endpoint for updating the map, use sendBeacon:
-    const url = `/api/map/${map._id}/update-map-location`; // You need to implement this endpoint
-    const payload = JSON.stringify({
-      lat,
-      lng,
-      bounds: boundsObj,
-      location_name: `${lat}, ${lng}`,
-    });
-    navigator.sendBeacon(url, payload);
-  };
-
   useEffect(() => {
     if (!googleMap || !map || map.lat || map.lng || map.bounds) return;
 
-    const handleRouteChangeStart = async () => {
-      await updateMapSync();
+    const handlePageUnload = async () => {
+      const center = googleMap.getCenter();
+      const bounds = googleMap.getBounds();
+      if (!center || !bounds) return;
+
+      navigator.sendBeacon(
+        `/api/map/${map._id}/update-map-location`,
+        JSON.stringify({
+          lat: center.lat(),
+          lng: center.lng(),
+          bounds: bounds.toJSON(),
+          location_name: `${center.lat()}, ${center.lng()}`,
+        })
+      );
     };
 
-    window.addEventListener("beforeunload", handleRouteChangeStart);
+    window.addEventListener("beforeunload", handlePageUnload);
     return () => {
-      window.removeEventListener("beforeunload", handleRouteChangeStart);
+      window.removeEventListener("beforeunload", handlePageUnload);
     };
   }, [googleMap, map]);
 

@@ -51,6 +51,7 @@ export type StoreState = {
   isMobile: boolean;
   activeLocation: CombinedMarker | null; // mainly for internal use
   activeState: ActiveState | null;
+  prevState: ActiveState | null;
   drawerState: DrawerState;
   searchValue: string | null;
   searchActive: boolean;
@@ -101,6 +102,7 @@ export const defaultState: Omit<StoreState, "map"> = {
   isMobile: false,
   activeLocation: null,
   activeState: null,
+  prevState: null,
   drawerState: {
     snap: 0.2,
     dismissible: true,
