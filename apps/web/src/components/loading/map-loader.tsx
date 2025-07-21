@@ -39,6 +39,18 @@ const MapLoader = () => {
       </div>
 
       <div id="mobile-view" className="md:hidden">
+        <Link
+          href="/app"
+          prefetch={true}
+          className={buttonVariants({
+            variant: "outline",
+            size: "icon",
+            className: "absolute top-2 left-2 z-10",
+          })}
+        >
+          <ChevronLeft />
+        </Link>
+
         <div className="fixed h-1/2 bottom-0 right-0 left-0 z-50 mx-auto flex w-full flex-col rounded-t-[10px] border bg-background p-2 pb-6 overflow-clip">
           <div
             id="drawer-handle"
