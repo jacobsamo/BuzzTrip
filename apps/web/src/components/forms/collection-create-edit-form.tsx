@@ -97,7 +97,7 @@ export default function CollectionForm() {
           <Label htmlFor="title">Title</Label>
           <Input placeholder="Title" {...register("title")} />
 
-          <Controller
+          {/* <Controller
             control={control}
             name="icon"
             render={({ field }) => (
@@ -124,7 +124,7 @@ export default function CollectionForm() {
                   })}
               </div>
             )}
-          />
+          /> */}
 
           <Label htmlFor="description">Description</Label>
           <Textarea placeholder="Description" {...register("description")} />

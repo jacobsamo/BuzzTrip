@@ -13,7 +13,7 @@ import MapSidebar from "./components/map-sidebar";
 
 export function Map_page() {
   const setIsMobile = useMapStore((store) => store.setMobile);
-  const isMobileDevice = useMediaQuery("only screen and (max-width : 769px)");
+  const isMobileDevice = useMediaQuery("only screen and (max-width : 768px)");
 
   useEffect(() => {
     setIsMobile(isMobileDevice);
