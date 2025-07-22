@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Command,
   CommandEmpty,
@@ -43,13 +42,14 @@ export function IconPicker({
   const [currentPage, setCurrentPage] = React.useState(0);
   const ICONS_PER_PAGE = 24; // 8 columns x 3 rows
   const totalPages = Math.ceil(iconsList.length / ICONS_PER_PAGE);
-  const [selectedIcon, setSelectedIcon] = React.useState<IconType>(value ?? "Map");
-
-  // Get current page icons
+  const [selectedIcon, setSelectedIcon] = React.useState<IconType>(
+    value ?? "Map"
+  );
   const [currentPageIcons, setCurrentPageIcons] = React.useState<IconList[]>(
     []
   );
 
+  // Get the each pages icons
   React.useEffect(() => {
     try {
       const startIdx = currentPage * ICONS_PER_PAGE;
@@ -64,37 +64,23 @@ export function IconPicker({
     }
   }, [currentPage, iconsList]);
 
-  const filteredIcons = React.useMemo(() => {
-    if (!searchQuery) {
-      // If no search query, return the icons for the current page
-      return currentPageIcons;
-    }
+  // Filter icons by search query
+  const filteredIcons = React.use(
+    React.useMemo(async () => {
+      if (!searchQuery) {
+        return currentPageIcons;
+      }
 
-    const query = searchQuery.toLowerCase().trim();
-    const queryWords = query.split(/\s+/).filter((word) => word.length > 0);
+      const query = searchQuery.toLowerCase().trim();
 
-    // Filter the icons on the current page using icon.title
-    const searchResults = currentPageIcons.filter((icon) => {
-      const lowerIconTitle = icon.title.toLowerCase();
-
-      const anyQueryWordMatches = queryWords.some((queryWord) =>
-        lowerIconTitle.includes(queryWord)
-      );
-
-      const wordBoundaryMatch = queryWords.some((queryWord) => {
-        const escapedQueryWord = queryWord.replace(
-          /[.*+?^${}()|[\]\\]/g,
-          "\\$&"
-        );
-        const nameRegex = new RegExp(`\\b${escapedQueryWord}\\b`);
-        return nameRegex.test(lowerIconTitle);
+      const Fuse = await (await import("fuse.js")).default;
+      const fuse = new Fuse<IconList>(iconsList, {
+        keys: ["title", "categories"],
       });
 
-      return anyQueryWordMatches || wordBoundaryMatch;
-    });
-
-    return searchResults;
-  }, [currentPageIcons, searchQuery]);
+      return fuse.search(query).map((sr) => sr.item);
+    }, [currentPageIcons, searchQuery])
+  );
 
   const handleNextPage = () => {
     if (currentPage < totalPages - 1) {
@@ -108,10 +94,15 @@ export function IconPicker({
     }
   };
 
-  // Reset page when search query changes
   React.useEffect(() => {
-    setCurrentPage(0);
+    setCurrentPage(0); // Reset page when search query changes
   }, [searchQuery]);
+
+  const handleIconChange = (icon: IconList) => {
+    onChange?.(icon.id);
+    setSelectedIcon(icon.id);
+    setOpen(false);
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -145,11 +136,7 @@ export function IconPicker({
                     <div
                       key={icon.id}
                       role="button"
-                      onClick={() => {
-                        onChange?.(icon.id);
-                        setSelectedIcon(icon.id);
-                        setOpen(false);
-                      }}
+                      onClick={() => handleIconChange(icon)}
                       className={cn(
                         "flex h-10 w-10 items-center justify-center rounded-md border",
                         "hover:bg-accent hover:text-accent-foreground",

@@ -85,11 +85,6 @@ const Footer = () => {
                   Blog
                 </Link>
               </li>
-              {/* <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    API
-                  </Link>
-                </li> */}
             </ul>
           </motion.div>
 

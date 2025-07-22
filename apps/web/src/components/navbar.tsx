@@ -45,7 +45,7 @@ const NavbarLinks = () => (
   </>
 );
 
-const NavbarAuth = () => (
+const NavbarAuth = ({ isOpen }: { isOpen: boolean }) => (
   <>
     <Authenticated>
       <Link
@@ -66,7 +66,10 @@ const NavbarAuth = () => (
           className={cn(
             "hidden sm:inline-flex border-primary text-primary hover:bg-primary hover:text-white",
             "text-base sm:text-base md:text-base lg:text-base",
-            "h-8 sm:h-8 md:h-9 lg:h-10"
+            "h-8 sm:h-8 md:h-9 lg:h-10",
+            {
+              "inline-flex": isOpen,
+            }
           )}
         >
           Sign In
@@ -127,12 +130,12 @@ const Navbar = () => {
           <NavbarLinks />
         </nav>
         <div className="hidden md:flex items-center space-x-4">
-          <NavbarAuth />
+          <NavbarAuth isOpen={false} />
         </div>
         {/* Mobile: show auth buttons always, then hamburger */}
         {isMobile && (
           <div className="flex items-center gap-2">
-            <NavbarAuth />
+            <NavbarAuth isOpen={false} />
             <button
               type="button"
               className="flex flex-col items-end justify-center gap-1 z-50 ml-2 cursor-pointer"
@@ -172,7 +175,7 @@ const Navbar = () => {
               <NavbarLinks />
             </nav>
             <div className="flex flex-col gap-4 mt-8 w-full max-w-xs">
-              <NavbarAuth />
+              <NavbarAuth isOpen={isOpen} />
             </div>
           </motion.div>
         )}

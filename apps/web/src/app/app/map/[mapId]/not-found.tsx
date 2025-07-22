@@ -15,7 +15,7 @@ export default async function NotFound() {
     },
     category: "request",
   });
-  Sentry.captureMessage("User attempted to access a map that does not exist", {
+  Sentry.logger.warn("User attempted to access a map that does not exist", {
     level: "warning",
     user: session?.user?._id
       ? {

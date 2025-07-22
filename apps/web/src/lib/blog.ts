@@ -59,5 +59,12 @@ export function getBlogPosts() {
     throw new Error("getBlogPosts can only be called on the server side");
   }
 
-  return getMDXData(path.join(process.cwd(), "src", "app", "blog", "posts"));
+  return getMDXData(
+    path.join(process.cwd(), "src", "app", "blog", "posts")
+  ).sort((a, b) => {
+    if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
+      return -1;
+    }
+    return 1;
+  });
 }

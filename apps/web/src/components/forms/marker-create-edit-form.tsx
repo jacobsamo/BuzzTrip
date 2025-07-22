@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { colors } from "@/lib/data";
+import { popularColors } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
@@ -262,7 +262,7 @@ export default function MarkerForm() {
                     <FormLabel>Color</FormLabel>
                     <FormControl>
                       <div className="inline-flex items-center gap-2">
-                        {colors.map((color, index) => (
+                        {popularColors.map((color, index) => (
                           <Button
                             key={index}
                             type="button"
@@ -390,9 +390,14 @@ export default function MarkerForm() {
               </ScrollArea>
             </div>
 
-            <div className={cn("inline-flex items-center justify-between w-11/12  absolute bottom-2 mt-4 ", {
-              "justify-end": activeState.event === "markers:create",
-            })}>
+            <div
+              className={cn(
+                "inline-flex items-center justify-between w-11/12  absolute bottom-2 mt-4 ",
+                {
+                  "justify-end": activeState.event === "markers:create",
+                }
+              )}
+            >
               {activeState.event === "markers:update" && marker && (
                 <Button
                   aria-label="delete marker"
