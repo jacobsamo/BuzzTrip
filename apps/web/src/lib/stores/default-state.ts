@@ -22,7 +22,6 @@ type EventPayloadMap = {
   "collections:update": NewCollection;
   "markers:create": CombinedMarker;
   "markers:update": CombinedMarker;
-  "add-marker": null;
 };
 
 export type ActiveState = {
@@ -37,7 +36,10 @@ export type DrawerState = {
   dismissible: boolean; // whether the user can close to a smaller snap point
 };
 
+export type UIState = "searching" | "add-marker" | "paths" | "default";
+
 export type StoreState = {
+  // data
   map: Map;
   mapUsers: MapUser[] | null;
   collections: Collection[] | null;
@@ -47,22 +49,15 @@ export type StoreState = {
   routes: Route[] | null;
   routeStops: RouteStop[] | null;
 
-  // Modals
+  // uiState
   isMobile: boolean;
   activeLocation: CombinedMarker | null; // mainly for internal use
   activeState: ActiveState | null;
   prevState: ActiveState | null;
+  uiState: UIState;
   drawerState: DrawerState;
   searchValue: string | null;
   searchActive: boolean;
-
-  // collectionsOpen: boolean;
-  // snap: number | string | null;
-  // markerOpen: {
-  //   open: boolean;
-  //   marker: CombinedMarker | null;
-  //   mode: "create" | "edit" | null;
-  // };
 };
 
 export type StoreActions = {
@@ -78,18 +73,11 @@ export type StoreActions = {
   setDrawerState: (state: DrawerState) => void;
   setSearchValue: (value: string | null) => void;
   setSearchActive: (active: boolean) => void;
-
-  // setActiveLocation: (location: CombinedMarker | null) => void;
-  // setCollectionsOpen: (open: boolean) => void;
-  // setSnap: (snap: number | string | null) => void;
-  // setMarkerOpen: (
-  //   open: boolean,
-  //   marker: CombinedMarker | null,
-  //   mode: "create" | "edit" | null
-  // ) => void;
+  setUiState: (uiState: UIState) => void;
 };
 
 export const defaultState: Omit<StoreState, "map"> = {
+  // data
   collectionLinks: null,
   collections: null,
   mapUsers: null,
@@ -98,24 +86,16 @@ export const defaultState: Omit<StoreState, "map"> = {
   routeStops: null,
   labels: null,
 
-  // Modals
+  // states
   isMobile: false,
   activeLocation: null,
   activeState: null,
   prevState: null,
+  uiState: "default",
   drawerState: {
     snap: 0.2,
     dismissible: true,
   },
   searchValue: null,
   searchActive: false,
-
-  // activeLocation: null,
-  // collectionsOpen: false,
-  // snap: 0.1,
-  // markerOpen: {
-  //   open: false,
-  //   marker: null,
-  //   mode: null,
-  // },
 };

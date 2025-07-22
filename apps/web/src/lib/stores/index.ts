@@ -6,6 +6,7 @@ import {
   defaultState,
   DrawerState,
   StoreActions,
+  UIState,
   type StoreState,
 } from "./default-state";
 
@@ -101,15 +102,7 @@ export const createStore = (initState: InitState) =>
             activeState: state,
             prevState: currentState,
             drawerState: { snap: 0.2, dismissible: true },
-          }));
-          return;
-        }
-
-        if (state.event === "add-marker") {
-          set(() => ({
-            activeState: state,
-            prevState: currentState,
-            drawerState: { snap: 0.2, dismissible: true },
+            uiState: "default",
           }));
           return;
         }
@@ -142,7 +135,9 @@ export const createStore = (initState: InitState) =>
       setSearchActive: (active: boolean) =>
         set(() => ({
           searchActive: active,
-          // drawerState: { snap: 0.9, dismissible: true },
         })),
+      setUiState: (uiState: UIState) => {
+        set(() => ({ uiState: uiState }));
+      },
     };
   });

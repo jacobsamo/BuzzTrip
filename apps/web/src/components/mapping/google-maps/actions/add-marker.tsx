@@ -12,7 +12,7 @@ import { MapPin } from "lucide-react";
 import { useHotkeys } from "react-hotkeys-hook";
 
 const AddMarkerButton = () => {
-  const { activeState, setActiveState, isMobile, searchValue } = useMapStore(
+  const { isMobile, searchValue, uiState, setUiState } = useMapStore(
     (state) => state
   );
   const googleMap = useMap();
@@ -20,11 +20,11 @@ const AddMarkerButton = () => {
   const handleClose = () => {
     if (!googleMap) return;
     googleMap.setOptions({ draggableCursor: "" });
-    setActiveState(null);
+    setUiState("default");
   };
 
   useHotkeys("esc", () => handleClose(), {
-    enabled: activeState?.event === "add-marker",
+    enabled: uiState === "add-marker",
   });
 
   return (
@@ -37,17 +37,17 @@ const AddMarkerButton = () => {
             "right-2 top-2": isMobile,
             "top-[68px] left-[360px]": !isMobile,
             "scale-105 border border-black shadow-lg bg-gray-300":
-              activeState?.event === "add-marker",
+              uiState === "add-marker",
             "z-0": searchValue && !isMobile,
           })}
           onClick={() => {
             if (!googleMap) return;
-            if (activeState?.event === "add-marker") {
+            if (uiState === "add-marker") {
               handleClose();
               return;
             }
             googleMap.setOptions({ draggableCursor: "crosshair" });
-            setActiveState({ event: "add-marker", payload: null });
+            setUiState("add-marker");
           }}
         >
           <MapPin />

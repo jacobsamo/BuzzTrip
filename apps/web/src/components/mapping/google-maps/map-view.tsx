@@ -30,6 +30,8 @@ const Mapview = () => {
     map,
     isMobile,
     setActiveState,
+    uiState,
+    setUiState
   } = useMapStore((state) => state);
 
   if (!map) return null;
@@ -177,7 +179,7 @@ const Mapview = () => {
 
     if (!latLng) return;
 
-    const inAddMarkerMode = activeState?.event === "add-marker";
+    const inAddMarkerMode = uiState === "add-marker";
 
     // ========================
     // ADD MARKER MODE
@@ -286,7 +288,7 @@ const Mapview = () => {
   return (
     <div
       className={cn("absolute inset-0 h-screen w-full flex-1 touch-none z-0", {
-        "cursor-crosshair": activeState?.event === "add-marker",
+        "cursor-crosshair": uiState === "add-marker",
       })}
     >
       {!isMobile && <AutocompleteCustomInput />}
