@@ -1,4 +1,4 @@
-import MarkerPin from "@/components/mapping/google-maps/marker_pin";
+import MarkerPin from "@/components/mapping/google-maps-old/marker_pin";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import {
   SidebarMenuAction,
@@ -13,7 +13,7 @@ interface DisplayMarkerProps {
 }
 
 const DisplayMarker = ({ marker }: DisplayMarkerProps) => {
-  const {setActiveState, setActiveLocation} = useMapStore((store) => store);
+  const { setActiveState, setActiveLocation } = useMapStore((store) => store);
   const map = useMap();
 
   const onMarkerClick = (marker: CombinedMarker) => {

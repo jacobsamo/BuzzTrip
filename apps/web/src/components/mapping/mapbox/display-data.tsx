@@ -1,17 +1,13 @@
 "use client";
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { Marker, useMap } from "react-map-gl/mapbox";
-import MarkerPin from "../google-maps/marker_pin";
 import { IconType } from "@buzztrip/backend/types";
+import { Marker, useMap } from "react-map-gl/mapbox";
+import MarkerPin from "../google-maps-old/marker_pin";
 
 const DisplayMapData = () => {
   const { current: map } = useMap();
-  const {
-    markers,
-    searchValue,
-    setSearchValue,
-    setActiveLocation
-  } = useMapStore((store) => store);
+  const { markers, searchValue, setSearchValue, setActiveLocation } =
+    useMapStore((store) => store);
 
   return (
     <>
@@ -27,7 +23,11 @@ const DisplayMapData = () => {
               setActiveLocation(marker);
             }}
           >
-            <MarkerPin color={marker.color} icon={marker.icon as IconType} size={16} />
+            <MarkerPin
+              color={marker.color}
+              icon={marker.icon as IconType}
+              size={16}
+            />
           </Marker>
         ))}
     </>

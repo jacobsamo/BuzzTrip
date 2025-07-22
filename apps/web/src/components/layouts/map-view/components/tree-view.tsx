@@ -1,6 +1,6 @@
 "use client";
 
-import MarkerPin from "@/components/mapping/google-maps/marker_pin";
+import MarkerPin from "@/components/mapping/google-maps-old/marker_pin";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Tree, TreeItem, TreeItemLabel } from "@/components/ui/tree";
 import { getMarkersForCollection } from "@/lib/utils";

@@ -11,8 +11,6 @@ import { useMap } from "@vis.gl/react-google-maps";
 import { MapPin } from "lucide-react";
 import { useHotkeys } from "react-hotkeys-hook";
 
-
-
 const AddMarkerButton = () => {
   const { isMobile, searchValue, uiState, setUiState } = useMapStore(
     (state) => state

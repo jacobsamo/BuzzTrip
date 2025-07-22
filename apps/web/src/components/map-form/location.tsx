@@ -1,5 +1,5 @@
 "use client";
-import { AutocompleteCustomInput } from "@/components/mapping/google-maps/search-new";
+import { AutocompleteCustomInput } from "@/components/mapping/google-maps-old/search-new";
 import {
   AdvancedMarker,
   APIProvider,
@@ -7,7 +7,7 @@ import {
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
 import { useMemo, useState } from "react";
-import MarkerPin from "../mapping/google-maps/marker_pin";
+import MarkerPin from "../mapping/google-maps-old/marker_pin";
 import { useMapFormContext } from "./provider";
 
 const MapLocationForm = () => {
@@ -66,14 +66,14 @@ const MapLocationForm = () => {
 
               // Batch setValue calls to minimize re-renders
 
-              setValue("lat", details?.location.lat ?? undefined, {
+              (setValue("lat", details?.location.lat ?? undefined, {
                 shouldDirty: true,
                 shouldTouch: true,
               }),
                 setValue("lng", details?.location.lng ?? undefined, {
                   shouldDirty: true,
                   shouldTouch: true,
-                });
+                }));
               setValue("bounds", details?.bounds.toJSON() ?? undefined, {
                 shouldDirty: true,
                 shouldTouch: true,

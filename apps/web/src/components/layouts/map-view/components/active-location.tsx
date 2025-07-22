@@ -1,4 +1,4 @@
-import MarkerPin from "@/components/mapping/google-maps/marker_pin";
+import MarkerPin from "@/components/mapping/google-maps-old/marker_pin";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/carousel";
 import { Separator } from "@/components/ui/separator";
 import { getCollectionsForMarker } from "@/lib/utils";
+import { IconType } from "@buzztrip/backend/types";
 import { ExternalLink, Globe, Pencil, Phone, Plus } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import CloseButton from "./close-button";
-import { IconType } from "@buzztrip/backend/types";
 
 const ActiveLocation = () => {
   const {
@@ -78,7 +78,10 @@ const ActiveLocation = () => {
         </Carousel>
       ) : (
         <div className="h-32 bg-gray-100 flex items-center justify-center">
-          <MarkerPin color={activeLocation.color} icon={activeLocation.icon as IconType} />
+          <MarkerPin
+            color={activeLocation.color}
+            icon={activeLocation.icon as IconType}
+          />
         </div>
       )}
 

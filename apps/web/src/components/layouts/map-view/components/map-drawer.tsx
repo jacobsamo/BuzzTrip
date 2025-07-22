@@ -1,20 +1,16 @@
 "use client";
-import { AutocompleteCustomInput } from "@/components/mapping/google-maps/search";
+import CollectionForm from "@/components/forms/collection-create-edit-form";
+import MarkerForm from "@/components/forms/marker-create-edit-form";
+import { AutocompleteCustomInput } from "@/components/mapping/google-maps-old/search";
+import OpenCollectionModal from "@/components/modals/open-collection-modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { X } from "lucide-react";
-import dynamic from "next/dynamic";
 import { useMemo } from "react";
 import { Drawer } from "vaul";
 import ActiveLocation from "./active-location";
-import MarkersCollectionTabs from "./markers-collections";
-import OpenCollectionModal from "@/components/modals/open-collection-modal";
 import CloseButton from "./close-button";
-import CollectionForm from "@/components/forms/collection-create-edit-form";
-import MarkerForm from "@/components/forms/marker-create-edit-form";
-
+import MarkersCollectionTabs from "./markers-collections";
 
 export default function MapDrawer() {
   const {
@@ -78,23 +74,22 @@ export default function MapDrawer() {
               <div className="mt-16">
                 {!searchActive && (
                   <>
-                  <MarkersCollectionTabs />
-                  <div className="flex items-center justify-center gap-2 mt-5">
-
-                  <OpenCollectionModal />
-                  </div>
+                    <MarkersCollectionTabs />
+                    <div className="flex items-center justify-center gap-2 mt-5">
+                      <OpenCollectionModal />
+                    </div>
                   </>
                 )}
               </div>
             </>
           )}
-          {activeLocation && !activeState && (!markerFormOpen || !collectionFormOpen) && (
-            <ActiveLocation />
-          )}
+          {activeLocation &&
+            !activeState &&
+            (!markerFormOpen || !collectionFormOpen) && <ActiveLocation />}
 
           {activeState && (markerFormOpen || collectionFormOpen) && (
             <div>
-            <CloseButton />
+              <CloseButton />
               {markerFormOpen && (
                 <ScrollArea>
                   <MarkerForm />

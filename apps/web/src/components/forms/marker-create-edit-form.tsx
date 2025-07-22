@@ -30,7 +30,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { ColorPicker } from "../color-picker";
 import { IconPicker } from "../icon-picker";
-import MarkerPin from "../mapping/google-maps/marker_pin";
+import MarkerPin from "../mapping/google-maps-old/marker_pin";
 import OpenCollectionModal from "../modals/open-collection-modal";
 import { Checkbox } from "../ui/checkbox";
 import { DialogHeader } from "../ui/dialog";
