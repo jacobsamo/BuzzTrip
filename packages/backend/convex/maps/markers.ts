@@ -119,8 +119,8 @@ export const editMarker = authedMutation({
     marker: markersEditSchema
       .omit({ _id: true, _creationTime: true })
       .partial(),
-    collectionIds_to_add: zid("collections").array().nullable(),
-    collectionIds_to_remove: zid("collections").array().nullable(),
+    collectionIds_to_add: zid("collections").array().nullish(),
+    collectionIds_to_remove: zid("collections").array().nullish(),
   },
   handler: async (ctx, args) => {
     let collectionLinkCreatedIds: string[] | null = null;
@@ -155,7 +155,7 @@ export const editMarker = authedMutation({
 
     await ctx.db.patch(args.marker_id, {
       ...args.marker,
-      icon: args.marker.icon as IconType,
+      ...(args.marker.icon ? { icon: args.marker.icon as IconType } : {}),
       updatedAt: new Date().toISOString(),
     });
 

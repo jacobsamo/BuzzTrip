@@ -11,6 +11,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  type PopoverTriggerProps,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { type IconType, iconsList } from "@buzztrip/backend/types";
@@ -24,19 +25,25 @@ type IconList = {
   categories: readonly string[];
 };
 
-interface IconPickerProps {
+interface IconPickerProps
+  extends Omit<PopoverTriggerProps, "value" | "onChange"> {
   value?: IconType;
   onChange?: (icon: IconType) => void;
   className?: string;
 }
 
-export function IconPicker({ value, onChange, className }: IconPickerProps) {
+export function IconPicker({
+  value,
+  onChange,
+  className,
+  ...props
+}: IconPickerProps) {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [currentPage, setCurrentPage] = React.useState(0);
   const ICONS_PER_PAGE = 24; // 8 columns x 3 rows
   const totalPages = Math.ceil(iconsList.length / ICONS_PER_PAGE);
-  const [selectedIcon, setSelectedIcon] = React.useState<IconType>("Map");
+  const [selectedIcon, setSelectedIcon] = React.useState<IconType>(value ?? "Map");
 
   // Get current page icons
   const [currentPageIcons, setCurrentPageIcons] = React.useState<IconList[]>(
@@ -109,6 +116,7 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
+        {...props}
         className={cn(
           "border-input bg-background ring-offset-background placeholder:text-muted-foreground focus:ring-ring flex h-10 w-10 items-center justify-center rounded-md border focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
           className

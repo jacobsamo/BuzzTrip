@@ -153,6 +153,13 @@ const Mapview = () => {
       if (res) {
         const newSearchValue =
           res.placeDetails?.name ?? res.placeDetails?.formatted_address ?? "";
+        if (
+          activeLocation &&
+          (activeLocation.lat === res.location.lat ||
+            activeLocation.lng === res.location.lng)
+        )
+          return;
+
         setActiveLocation(res.location);
         setSearchValue(newSearchValue);
       }

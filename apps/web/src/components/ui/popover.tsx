@@ -11,9 +11,11 @@ function Popover({
   return <PopoverPrimitive.Root data-slot="popover" {...props} />;
 }
 
-function PopoverTrigger({
-  ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
+export interface PopoverTriggerProps extends React.ComponentProps<
+  typeof PopoverPrimitive.Trigger
+> {};
+
+function PopoverTrigger({ ...props }: PopoverTriggerProps) {
   return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />;
 }
 

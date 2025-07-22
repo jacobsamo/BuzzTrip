@@ -14,6 +14,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  PopoverTriggerProps,
 } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
@@ -33,10 +34,9 @@ type Color = {
   name: string;
 };
 
-interface ColorPickerProps {
+interface ColorPickerProps extends Omit<PopoverTriggerProps, "value" | "onChange"> {
   value?: Color;
   onChange?: (color: Color) => void;
-  className?: string;
 }
 
 // Expanded color palette with commonly used colors
@@ -255,7 +255,7 @@ const Picker = ({
   );
 };
 
-export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
+export function ColorPicker({ value, onChange, className, ...props }: ColorPickerProps) {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [currentPage, setCurrentPage] = React.useState(0);
@@ -349,6 +349,7 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
+        {...props}
         className={cn(
           "border-input bg-background ring-offset-background placeholder:text-muted-foreground flex size-10 items-center justify-center rounded-md border focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
           className
