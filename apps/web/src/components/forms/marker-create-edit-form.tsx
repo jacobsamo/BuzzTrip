@@ -1,5 +1,11 @@
+import { ColorPicker } from "@/components/color-picker";
+import { IconPicker } from "@/components/icon-picker";
+import MarkerPin from "@/components/marker-pin";
+import OpenCollectionModal from "@/components/modals/open-collection-modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DialogHeader } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -10,6 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { popularColors } from "@/lib/data";
@@ -28,13 +35,6 @@ import { useEffect, useMemo } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { ColorPicker } from "../color-picker";
-import { IconPicker } from "../icon-picker";
-import MarkerPin from "../mapping/google-maps-old/marker_pin";
-import OpenCollectionModal from "../modals/open-collection-modal";
-import { Checkbox } from "../ui/checkbox";
-import { DialogHeader } from "../ui/dialog";
-import { Label } from "../ui/label";
 
 const Icon = dynamic(() => import("@buzztrip/components/icon"), { ssr: false });
 

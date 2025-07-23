@@ -12,11 +12,11 @@ import {
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
 import { memo, useEffect, useMemo, useState } from "react";
+import MarkerPin from "@/components/marker-pin";
 import AddMarkerButton from "./actions/add-marker";
 import ChangeMapStyle from "./actions/change-map-styles";
 import { detailsRequestCallback } from "./helpers";
 import DisplayMarkerInfo from "./marker-info-box";
-import MarkerPin from "./marker-pin";
 import { Search, SearchInput, SearchResults } from "./search";
 
 const GoogleMapsMapView = () => {

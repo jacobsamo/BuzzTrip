@@ -1,12 +1,16 @@
 "use client";
 import CollectionForm from "@/components/forms/collection-create-edit-form";
 import MarkerForm from "@/components/forms/marker-create-edit-form";
-import { AutocompleteCustomInput } from "@/components/mapping/google-maps-old/search";
+import {
+  Search,
+  SearchInput,
+  SearchResults,
+} from "@/components/mapping/google-maps/search";
 import OpenCollectionModal from "@/components/modals/open-collection-modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Drawer } from "vaul";
 import ActiveLocation from "./active-location";
 import CloseButton from "./close-button";
@@ -19,7 +23,14 @@ export default function MapDrawer() {
     searchActive,
     drawerState,
     setDrawerState,
+    searchValue,
+    setSearchValue,
+    setActiveLocation,
+    setSearchActive,
+    isMobile
   } = useMapStore((state) => state);
+  const inputRef = useRef<HTMLInputElement>(null);
+   const [pendingFocus, setPendingFocus] = useState(false);
 
   const markerFormOpen = useMemo(() => {
     return (
@@ -34,6 +45,34 @@ export default function MapDrawer() {
       activeState?.event === "collections:update"
     );
   }, [activeState]);
+
+   const handleInputInteraction = (e?: React.SyntheticEvent) => {
+    if (!searchActive) {
+      if (
+        isMobile &&
+        inputRef.current &&
+        document.activeElement === inputRef.current
+      ) {
+        inputRef.current.blur(); // Prevent keyboard from launching immediately
+      }
+      setDrawerState({ snap: 0.9, dismissible: true });
+      setSearchActive(true);
+      setPendingFocus(true);
+    } else {
+      inputRef.current?.focus({ preventScroll: true });
+    }
+  };
+
+  useEffect(() => {
+    if (pendingFocus && searchActive) {
+      const focusAfter = isMobile ? 500 : 150;
+      const timeout = setTimeout(() => {
+        inputRef.current?.focus({ preventScroll: true });
+        setPendingFocus(false);
+      }, focusAfter);
+      return () => clearTimeout(timeout);
+    }
+  }, [pendingFocus, searchActive, isMobile]);
 
   return (
     <Drawer.Root
@@ -70,8 +109,18 @@ export default function MapDrawer() {
 
           {!activeLocation && !markerFormOpen && !collectionFormOpen && (
             <>
-              <AutocompleteCustomInput />
-              <div className="mt-16">
+              <Search
+                value={searchValue ?? ""}
+                onValueChange={setSearchValue}
+                isMobile={true}
+                onSelect={(pred, details) => {
+                  if (details?.location) setActiveLocation(details.location);
+                }}
+              >
+                <SearchInput onClick={handleInputInteraction} />
+                <SearchResults />
+              </Search>
+              <div className="mt-4">
                 {!searchActive && (
                   <>
                     <MarkersCollectionTabs />

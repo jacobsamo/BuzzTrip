@@ -20,7 +20,7 @@ import { Pencil, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import MarkerPin from "./marker-pin";
+import MarkerPin from "@/components/marker-pin";
 
 const DisplayMarkerInfo = () => {
   const [markerRef, marker] = useAdvancedMarkerRef();

@@ -2,7 +2,7 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { IconType } from "@buzztrip/backend/types";
 import { Marker, useMap } from "react-map-gl/mapbox";
-import MarkerPin from "../google-maps-old/marker_pin";
+import MarkerPin from "@/components/marker-pin";
 
 const DisplayMapData = () => {
   const { current: map } = useMap();

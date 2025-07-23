@@ -1,4 +1,4 @@
-import MarkerPin from "@/components/mapping/google-maps-old/marker_pin";
+import MarkerPin from "@/components/marker-pin";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

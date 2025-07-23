@@ -1,5 +1,9 @@
 "use client";
-import { AutocompleteCustomInput } from "@/components/mapping/google-maps-old/search-new";
+import {
+  Search,
+  SearchInput,
+  SearchResults,
+} from "@/components/mapping/google-maps/search";
 import {
   AdvancedMarker,
   APIProvider,
@@ -7,7 +11,7 @@ import {
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
 import { useMemo, useState } from "react";
-import MarkerPin from "../mapping/google-maps-old/marker_pin";
+import MarkerPin from "@/components/marker-pin";
 import { useMapFormContext } from "./provider";
 
 const MapLocationForm = () => {
@@ -45,17 +49,10 @@ const MapLocationForm = () => {
     >
       <div className="space-y-1">
         <div className="relative">
-          <AutocompleteCustomInput
-            value={searchValue}
+          <Search
+            value={searchValue ?? ""}
             onValueChange={setSearchValue}
             locationTypes={["(regions)"]}
-            // autoFocus={true} // we might want to add autofocus for desktop
-            // limit={3}
-            classNames={{
-              scrollArea: "max-h-20", // Custom height
-              predictions: "max-h-20", // Custom max height for predictions
-              container: "w-full", // Custom width
-            }}
             onSelect={(pred, details) => {
               const locationName =
                 details?.placeDetails.name ??
@@ -65,7 +62,6 @@ const MapLocationForm = () => {
               setSearchValue(locationName);
 
               // Batch setValue calls to minimize re-renders
-
               (setValue("lat", details?.location.lat ?? undefined, {
                 shouldDirty: true,
                 shouldTouch: true,
@@ -83,7 +79,10 @@ const MapLocationForm = () => {
                 shouldTouch: true,
               });
             }}
-          />
+          >
+            <SearchInput />
+            <SearchResults className="max-h-30" />
+          </Search>
         </div>
 
         {/* Map Preview Container */}
