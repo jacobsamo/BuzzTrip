@@ -19,12 +19,14 @@ import {
   route_stopsSchema,
   routesSchema,
 } from "../zod-schemas/maps-schema";
+import { pathsSchema } from "../zod-schemas";
 
 export default defineSchema({
   // maps
   maps: defineTable(zodToConvex(mapsSchema)).index("by_visibility", [
     "visibility",
   ]),
+  paths: defineTable(zodToConvex(pathsSchema)),
   map_users: defineTable(zodToConvex(mapUserSchema))
     .index("by_map_id", ["map_id"])
     .index("by_user_id", ["user_id"]),
