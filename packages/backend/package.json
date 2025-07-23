@@ -31,7 +31,7 @@
     "@convex-dev/migrations": "^0.2.9",
     "@convex-dev/resend": "^0.1.4",
     "convex": "^1.25.4",
-    "convex-helpers": "^0.1.99",
+    "convex-helpers": "0.1.100-alpha.0",
     "open-location-code-typescript": "^1.5.0",
     "svix": "^1.69.0",
     "zod": "^3.25.67"
