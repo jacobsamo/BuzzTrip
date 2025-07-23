@@ -1,5 +1,5 @@
 "use client";
-// import MapView from "@/components/mapping/google-maps-old/map-view";
+import GoogleMapsMapView from "@/components/mapping/google-maps";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { buttonVariants } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -10,7 +10,6 @@ import { useEffect } from "react";
 import MainModal from "./components/main-modal";
 import MapDrawer from "./components/map-drawer";
 import MapSidebar from "./components/map-sidebar";
-import GoogleMapsMapView from "@/components/mapping/google-maps"
 
 export function Map_page() {
   const setIsMobile = useMapStore((store) => store.setMobile);
@@ -44,7 +43,6 @@ export function Map_page() {
         {/* === Layer 2: The Map (fills entire container) === */}
         <div className="absolute inset-0 z-0">
           <GoogleMapsMapView />
-          {/* <MapView /> */}
         </div>
 
         {/* === Layer 1: UI Overlay === */}
