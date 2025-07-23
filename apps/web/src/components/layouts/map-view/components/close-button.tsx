@@ -7,7 +7,7 @@ const CloseButton = () => {
 
   return (
     <Button
-      className="absolute z-30 right-1 top-1 size-8 p-0 rounded-md bg-white hover:bg-gray-100 border border-gray-300 shadow"
+      className="absolute z-30 right-4 top-4 size-8 p-0 rounded-md bg-white hover:bg-gray-100 border border-gray-300 shadow"
       variant="secondary"
       size="icon"
       onClick={(e) => {

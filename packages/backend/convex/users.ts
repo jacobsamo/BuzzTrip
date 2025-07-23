@@ -1,15 +1,11 @@
 import { z } from "zod";
 import { refinedUserSchema } from "../zod-schemas";
-import {
-  internalMutation,
-  internalQuery,
-  query,
-  QueryCtx,
-} from "./_generated/server";
+import { internalMutation, query, QueryCtx } from "./_generated/server";
 import { authedQuery } from "./helpers";
 
 import { UserJSON } from "@clerk/backend";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 import { Doc, Id } from "./_generated/dataModel";
 
 export const searchUsers = authedQuery({
@@ -31,9 +27,10 @@ export const searchUsers = authedQuery({
   },
 });
 
-type UserLoginStatus = {message: "No JWT Token", user: null} |
-  {message: "No Clerk User", user: null} |
-  {message: "Logged In", user: Doc<"users">}
+type UserLoginStatus =
+  | { message: "No JWT Token"; user: null }
+  | { message: "No Clerk User"; user: null }
+  | { message: "Logged In"; user: Doc<"users"> };
 
 /**
  * Whether the current user is fully logged in, including having their information
@@ -41,26 +38,20 @@ type UserLoginStatus = {message: "No JWT Token", user: null} |
  *
  * Like all Convex queries, errors on expired Clerk token.
  */
-export const userLoginStatus = query(
-  async (
-    ctx
-  ): Promise<
-    UserLoginStatus
-  > => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      // no JWT token, user hasn't completed login flow yet
-      return {message: "No JWT Token", user: null};
-    }
-    const user = await getCurrentUser(ctx);
-    if (user === null) {
-      // If Clerk has not told us about this user we're still waiting for the
-      // webhook notification.
-      return {message: "No Clerk User", user: null};
-    }
-    return {message: "Logged In", user}; 
+export const userLoginStatus = query(async (ctx): Promise<UserLoginStatus> => {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    // no JWT token, user hasn't completed login flow yet
+    return { message: "No JWT Token", user: null };
   }
-);
+  const user = await getCurrentUser(ctx);
+  if (user === null) {
+    // If Clerk has not told us about this user we're still waiting for the
+    // webhook notification.
+    return { message: "No Clerk User", user: null };
+  }
+  return { message: "Logged In", user };
+});
 
 /** The current user, containing user preferences and Clerk user info. */
 export const currentUser = query((ctx: QueryCtx) => getCurrentUser(ctx));
@@ -73,37 +64,58 @@ export const getUser = query({
   },
 });
 
-/** Create a new Clerk user or update existing Clerk user data. */
-export const updateOrCreateUser = internalMutation({
+/**
+ * Helper to extract user fields from Clerk data.
+ */
+function extractUserFields(data: UserJSON) {
+  const userEmailAddress =
+    data.email_addresses.find(
+      (email) => email.id === data.primary_email_address_id
+    ) || data.email_addresses[0];
+
+  if (!userEmailAddress) {
+    throw new Error("No email address found for user");
+  }
+
+  return {
+    clerkUserId: data.id,
+    name: `${data.first_name} ${data.last_name}`,
+    first_name: data.first_name ?? undefined,
+    email: userEmailAddress.email_address,
+    last_name: data.last_name ?? undefined,
+    username: data.username ?? undefined,
+    image: data.image_url,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+/** Create a new Clerk user. */
+export const createUser = internalMutation({
   args: { data: v.any() }, // no runtime validation, trust Clerk
   async handler(ctx, { data }: { data: UserJSON }) {
     const userRecord = await userQuery(ctx, data.id);
-    const userEmailAddress = data.email_addresses.find(email => email.id === data.primary_email_address_id) || data.email_addresses[0];
-    if (!userEmailAddress) {
-      console.error("No email address found for user", {
-        data,
-        userRecord,
-        userEmailAddress,
-      })
-      return;
+    if (userRecord !== null) {
+      throw new Error("User already exists");
     }
+    const user = extractUserFields(data);
+    await ctx.db.insert("users", user);
+    await ctx.runMutation(internal.emails.sendWelcomeEmail, {
+      firstName: user.first_name,
+      email: user.email,
+    });
+  },
+});
 
-    const user = {
-      clerkUserId: data.id,
-      name: `${data.first_name} ${data.last_name}`,
-      first_name: data.first_name ?? undefined,
-      email: userEmailAddress.email_address,
-      last_name: data.last_name ?? undefined,
-      username: data.username ?? undefined,
-      image: data.image_url,
-      updatedAt: new Date().toISOString(),
-    };
-
+/** Update an existing Clerk user. */
+export const updateUser = internalMutation({
+  args: { data: v.any() }, // no runtime validation, trust Clerk
+  async handler(ctx, { data }: { data: UserJSON }) {
+    const userRecord = await userQuery(ctx, data.id);
     if (userRecord === null) {
-      await ctx.db.insert("users", user);
-    } else {
-      await ctx.db.patch(userRecord._id, { ...user });
+      throw new Error("User does not exist");
     }
+    const user = extractUserFields(data);
+    await ctx.db.patch(userRecord._id, { ...user });
   },
 });
 

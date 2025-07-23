@@ -26,10 +26,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@clerk/backend": "^2.4.1",
+    "@clerk/backend": "^2.5.0",
     "@convex-dev/geospatial": "^0.1.9",
     "@convex-dev/migrations": "^0.2.9",
-    "convex": "^1.25.2",
+    "@convex-dev/resend": "^0.1.4",
+    "convex": "^1.25.4",
     "convex-helpers": "^0.1.99",
     "open-location-code-typescript": "^1.5.0",
     "svix": "^1.69.0",

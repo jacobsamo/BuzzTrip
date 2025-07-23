@@ -1,20 +1,8 @@
 import BlogCard from "@/components/blog-card";
 import { getBlogPosts } from "@/lib/blog";
 
-// export const metadata: Metadata = {
-//   title: "Blogs",
-//   description: "Keep up to date with BuzzTrips latest news and updates.",
-// };
-
 export default function BlogPage() {
-  const data = getBlogPosts();
-
-  const posts = data.sort((a, b) => {
-    if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
-      return -1;
-    }
-    return 1;
-  });
+  const posts = getBlogPosts();
 
   return (
     <main>

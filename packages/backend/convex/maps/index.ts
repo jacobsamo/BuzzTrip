@@ -137,18 +137,19 @@ export const createMap = authedMutation({
         ),
       ]);
     }
+    return mapId;
   },
 });
 
 export const updateMap = authedMutation({
   args: {
     mapId: zid("maps"),
-    map: mapsEditSchema.omit({ _id: true, _creationTime: true }),
+    map: mapsEditSchema.omit({ _id: true, _creationTime: true }).partial(),
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.mapId, {
       ...args.map,
-      title: uppercaseFirstLetter(args.map.title),
+      ...(args.map.title ? { title: uppercaseFirstLetter(args.map.title) } : {}),
       updatedAt: new Date().toISOString(),
     });
   },

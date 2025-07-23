@@ -1,0 +1,77 @@
+---
+title: "BuzzTrip 1.1 – Laying the Groundwork for What’s Next"
+publishedAt: "2025-07-22"
+author: "jacobsamo"
+summary: "Squashing bugs, improving performance, and enhancing user experience in BuzzTrip."
+image: "/assets/blog/buzztrip-1.1-laying-groundwork.jpg"
+tag: "Update"
+---
+In any app, squashing bugs, boosting performance, and enhancing the user experience is essential. Over the past week, we’ve been hard at work making BuzzTrip smoother, faster, and easier to use. In this post, we’ll walk you through some of the recent improvements and the full changelog.
+
+## Learnings
+
+With each release, we discover new things. Here are a few key takeaways from this one:
+
+### `navigator.sendBeacon`
+When a map has no saved location, we still want it to open in the user’s last view. The tricky part? You can’t trigger async functions during page unload.
+
+That’s when we discovered [`navigator.sendBeacon`](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon). It allows us to send a small, reliable POST request to the server *before* the page unloads — perfect for persisting the last known map view without interrupting the user experience.
+
+We built a dedicated API endpoint to handle this, and it’s already paying off.
+
+### Loading States
+Creating seamless loading states that match the final UI is harder than it sounds. We’ve now added a `loading.tsx` file for maps with a clean skeleton screen, ensuring maps appear instantly with a polished loading experience.
+
+It’s a small detail, but it makes the maps loads feel more responsive.
+
+### Marker Improvements
+We revamped the marker creation and editing experience. The marker form got a complete UI upgrade (inspired by Excalidraw), and we added quick actions directly to the marker card on the map — letting you instantly change the icon, color, or delete/edit a marker in just a tap.
+
+### Click-to-Search Area
+In Google Maps, you can click on place names to refine your view. While we can’t replicate this exactly, we’ve built a similar feature: clicking anywhere on the map will now trigger a localized area search.
+
+It’s not 100% Google, but it’s close — and makes finding what you're after much easier.
+
+---
+
+## Changelog
+
+Here’s everything that’s landed in this release:
+
+- Improved area search accuracy
+- Marker pins now show only color when zoomed out and icons when zoomed in
+- Fixed "Add Marker" button showing during search on desktop
+- Sent welcome emails to new users
+- Separated Clerk webhook handling for user creation and updates
+- Added Resend for email delivery
+- Fixed build errors related to icons
+- Default map center now shows the world view if no location is set
+- Map lat/lng and bounds are now saved on page close if not already set
+- Automatically redirect to newly created map
+- Created `navigator.sendBeacon` endpoint to persist map state
+- Revamped marker form UI (Excalidraw-inspired)
+- Added collection creation inside marker modal
+- Improved collection selection experience
+- Added `prevState` for smooth marker/collection transitions
+- Implemented global `loading.tsx` for skeleton loading on pages
+- Added back button during loading states
+- Quick actions added to marker cards: color, icon, edit, delete
+- Improved color and icon picker search
+- Added blog pages to sitemap
+- Moved color data to `data.ts`, types to `@/types`
+- Updated `CreateCollectionForm` to use the new `Form` component
+- Introduced `uiState` to better manage UI transitions
+- Added new reusable Search component
+- Refactored map-related components
+- Archived legacy code into `google-maps-old` directory
+- Fixed infinite re-render when clicking markers
+- Resolved page reload issue caused by incorrect use of `React.use()`
+- Updated package dependencies
+- Improved mobile search UI
+- Resolved build errors
+- Moved `marker-pin` to `/components` directory
+- Removed deprecated Google Maps code
+
+---
+
+Thanks for following along — we can’t wait to see what you build next with BuzzTrip 🚀

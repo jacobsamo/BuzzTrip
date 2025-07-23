@@ -1,5 +1,5 @@
 "use client";
-import MapView from "@/components/mapping/google-maps/map-view";
+import GoogleMapsMapView from "@/components/mapping/google-maps";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { buttonVariants } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -13,7 +13,7 @@ import MapSidebar from "./components/map-sidebar";
 
 export function Map_page() {
   const setIsMobile = useMapStore((store) => store.setMobile);
-  const isMobileDevice = useMediaQuery("only screen and (max-width : 769px)");
+  const isMobileDevice = useMediaQuery("only screen and (max-width : 768px)");
 
   useEffect(() => {
     setIsMobile(isMobileDevice);
@@ -42,7 +42,7 @@ export function Map_page() {
       <div className="relative h-screen w-full overflow-hidden">
         {/* === Layer 2: The Map (fills entire container) === */}
         <div className="absolute inset-0 z-0">
-          <MapView />
+          <GoogleMapsMapView />
         </div>
 
         {/* === Layer 1: UI Overlay === */}

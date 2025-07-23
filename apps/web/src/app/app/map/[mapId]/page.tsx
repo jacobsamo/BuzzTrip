@@ -4,20 +4,29 @@ import { convexNextjsOptions, getConvexServerSession } from "@/lib/auth";
 import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
 import { fetchQuery, preloadQuery } from "convex/nextjs";
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-type Params = Promise<{ map_id: string }>;
+type Params = Promise<{ mapId: string }>;
 
-export async function generateMetadata({ params }: { params: Params }) {
-  const { map_id } = await params;
+const getMap = async (mapId: string) => {
   const options = await convexNextjsOptions();
-  const map = await fetchQuery(
+  return fetchQuery(
     api.maps.index.getMap,
     {
-      mapId: map_id as Id<"maps">,
+      mapId: mapId as Id<"maps">,
     },
     options
   );
+};
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Params;
+}): Promise<Metadata> {
+  const { mapId } = await params;
+  const map = await getMap(mapId);
 
   if (!map) return notFound();
 
@@ -33,28 +42,25 @@ export async function generateMetadata({ params }: { params: Params }) {
 }
 
 export default async function MapPage({ params }: { params: Params }) {
-  const { map_id } = await params;
+  const { mapId } = await params;
   const options = await convexNextjsOptions();
   const session = await getConvexServerSession();
 
-  if (!session || session.message !== "Logged In" || !map_id) {
+  if (!session || session.message !== "Logged In" || !mapId) {
     return notFound();
   }
 
-  const map = await fetchQuery(
-    api.maps.index.getMap,
-    {
-      mapId: map_id as Id<"maps">,
-    },
-    options
-  );
-  const fetchedMapUsers = await fetchQuery(
-    api.maps.mapUsers.getMapUsers,
-    {
-      mapId: map_id as Id<"maps">,
-    },
-    options
-  );
+  // TODO figure out how caches work in nextjs and fetch this from cache
+  const [map, fetchedMapUsers] = await Promise.all([
+    getMap(mapId),
+    fetchQuery(
+      api.maps.mapUsers.getMapUsers,
+      {
+        mapId: mapId as Id<"maps">,
+      },
+      options
+    ),
+  ]);
 
   if (
     (fetchedMapUsers &&
@@ -71,7 +77,7 @@ export default async function MapPage({ params }: { params: Params }) {
       preloadQuery(
         api.maps.markers.getMarkersView,
         {
-          map_id: map._id,
+          mapId: map._id,
         },
         options
       ),

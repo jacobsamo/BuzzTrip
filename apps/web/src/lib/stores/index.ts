@@ -6,6 +6,7 @@ import {
   defaultState,
   DrawerState,
   StoreActions,
+  UIState,
   type StoreState,
 } from "./default-state";
 
@@ -80,24 +81,35 @@ export const createStore = (initState: InitState) =>
         }));
       },
       setActiveState: (state: ActiveState | null) => {
-        if (!state) {
+        const currentState = get().activeState;
+        const prevState = get().prevState;
+
+        if (
+          (prevState?.event === "markers:create" ||
+            prevState?.event === "markers:update") &&
+          currentState?.event === "collections:create"
+        ) {
           set(() => ({
-            activeState: state,
-            drawerState: { snap: 0.2, dismissible: true },
+            activeState: prevState,
+            prevState: currentState,
+            drawerState: { snap: 0.9, dismissible: false },
           }));
           return;
         }
 
-        if (state.event === "add-marker") {
+        if (!state) {
           set(() => ({
             activeState: state,
+            prevState: currentState,
             drawerState: { snap: 0.2, dismissible: true },
+            uiState: "default",
           }));
           return;
         }
 
         set(() => ({
           activeState: state,
+          prevState: currentState,
           drawerState: { snap: 0.9, dismissible: false },
         }));
       },
@@ -123,7 +135,9 @@ export const createStore = (initState: InitState) =>
       setSearchActive: (active: boolean) =>
         set(() => ({
           searchActive: active,
-          // drawerState: { snap: 0.9, dismissible: true },
         })),
+      setUiState: (uiState: UIState) => {
+        set(() => ({ uiState: uiState }));
+      },
     };
   });

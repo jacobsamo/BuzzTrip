@@ -57,21 +57,30 @@ import {
   Compass,
   Folder,
   Bed,
-} from "@phosphor-icons/react/dist/ssr";
+} from "@phosphor-icons/react/ssr";
+
 
 import type {
-  AccommodationIcon,
-  ActivitiesIcon,
-  TransportIcon,
-  FoodIcon,
-  PlacesIcon,
-  OtherIcon,
   IconType,
   PopularIcon,
 } from "@buzztrip/backend/types";
 
 
-export const transport: Record<TransportIcon, Icon> = {
+
+/**
+ * A list of the most popular icons, derived from the icons object.
+ */
+export const popular: Record<PopularIcon, Icon> = {
+  Bed: Bed,
+  Car: Car,
+  Camping: Tent,
+  Hiking: PersonSimpleHike,
+  Biking: PersonSimpleBike,
+  House: HouseLine,
+};
+
+export const Icons: Record<IconType, Icon> = {
+  // transport
   Train: Train,
   Car: Car,
   Taxi: Taxi,
@@ -80,9 +89,7 @@ export const transport: Record<TransportIcon, Icon> = {
   Motorbike: Motorcycle,
   Bicyle: Bicycle,
   Bus: Bus,
-};
-
-export const accommodation: Record<AccommodationIcon, Icon> = {
+  // accommodation
   Hotel: BuildingApartment,
   Motel: Garage,
   House: HouseLine,
@@ -90,9 +97,7 @@ export const accommodation: Record<AccommodationIcon, Icon> = {
   Cabin: Tipi,
   Camping: Tent,
   Bed: Bed,
-};
-
-export const activities: Record<ActivitiesIcon, Icon> = {
+  // activities
   Hiking: PersonSimpleHike,
   Walking: PersonSimpleWalk,
   Biking: PersonSimpleBike,
@@ -113,20 +118,7 @@ export const activities: Record<ActivitiesIcon, Icon> = {
   // Kayaking: {},
   // Diving: {},
   Fishing: FishSimple,
-};
-
-export const food: Record<FoodIcon, Icon> = {
-  Pizza: Pizza,
-  Burger: Hamburger,
-  Sandwich: Bread,
-  IceCream: IceCream,
-  // Pasta: {},
-  // Ramen: {},
-  // Sushi: {},
-  // Taco: {},
-};
-
-export const places: Record<PlacesIcon, Icon> = {
+  // places
   Beach: Island,
   Mountain: Mountains,
   Park: Park,
@@ -138,33 +130,19 @@ export const places: Record<PlacesIcon, Icon> = {
   Bar: BeerStein,
   Cafe: Coffee,
   Church: Church,
-};
-
-export const other: Record<OtherIcon, Icon> = {
+  // food
+  Pizza: Pizza,
+  Burger: Hamburger,
+  Sandwich: Bread,
+  IceCream: IceCream,
+  // Pasta: {},
+  // Ramen: {},
+  // Sushi: {},
+  // Taco: {},
+  // misc
   Folder: Folder,
   MapPin: MapPin,
   Compass: Compass,
   Map: MapTrifold,
   MapPinLine: MapPinLine,
-};
-
-/**
- * A list of the most popular icons, derived from the icons object.
- */
-export const popular: Record<PopularIcon, Icon> = {
-  Bed: Bed,
-  Car: Car,
-  Camping: Tent,
-  Hiking: PersonSimpleHike,
-  Biking: PersonSimpleBike,
-  House: HouseLine,
-};
-
-export const Icons: Record<IconType, Icon> = {
-  ...transport,
-  ...accommodation,
-  ...activities,
-  ...places,
-  ...food,
-  ...other,
 };

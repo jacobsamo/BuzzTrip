@@ -33,6 +33,7 @@ import {
   MapFormProvider,
   RefinedUserWithPermission,
 } from "../map-form/provider";
+import { useRouter } from "next/navigation";
 
 export interface CreateMapModalProps {
   trigger?: React.ReactNode;
@@ -100,6 +101,7 @@ export default function CreateMapModal({ trigger }: CreateMapModalProps) {
 function MapForm({
   setOpen,
 }: CreateMapModalProps & { setOpen: (open: boolean) => void }) {
+  const router = useRouter();
   const [users, setUsers] = useState<RefinedUserWithPermission[] | null>(null);
   const createMap = useMutation(api.maps.index.createMap);
 
@@ -134,6 +136,8 @@ function MapForm({
         loading: "Creating map...",
         success: async (res) => {
           setOpen(false);
+          // TODO: show a indicator that the user is being redirected to the map
+          router.push(`/app/map/${res}`);
           return "Map created successfully!";
         },
         error: "Failed to create map",

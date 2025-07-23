@@ -8,6 +8,7 @@ interface MarkerPinProps extends Omit<IconProps, "name" | "color"> {
   backgroundColor?: string;
   icon?: IconType;
   color?: string | null;
+  showIcon?: boolean;
 }
 
 const MarkerPin = ({
@@ -15,14 +16,15 @@ const MarkerPin = ({
   icon = "MapPin",
   color = null,
   size,
+  showIcon = true,
   ...props
 }: MarkerPinProps) => {
   return (
     <div
-      className="h-fit w-fit rounded-full p-1"
+      className="group size-fit rounded-full p-1 border border-white transition duration-300 ease-in-out transform hover:scale-110"
       style={{ backgroundColor: color ?? backgroundColor }}
     >
-      <Icon name={icon} color="#fff" size={size} {...props} />
+      {showIcon && <Icon name={icon} color="#fff" size={size} {...props} />}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { iconsList } from "../types";
+import { IconType } from "../types";
 
 export const defaultFields = {
   _id: z.string(),
@@ -48,7 +48,7 @@ export const latlng = z.object({
   lng: z.number(),
 });
 
-export const iconSchema = z.enum(iconsList);
+export const iconSchema = z.union([z.custom<IconType>(), z.string()]);
 
 export const boundsSchema = z.union([bounds, latlng]);
 
