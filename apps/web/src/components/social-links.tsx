@@ -26,6 +26,13 @@ const links = [
     href: "https://links.buzztrip.co/instagram",
     color: "hover:text-blue-500",
   },
+  // TODO: add in icon for TikTok and add link in dub.co
+  //   {
+  //   icon: <Tiktok className="size-6 text-black" />,
+  //   label: "TikTok",
+  //   href: "https://links.buzztrip.co/tiktok",
+  //   color: "hover:text-blue-500",
+  // },
   {
     icon: <GitHub className="size-6 text-black" />,
     label: "GitHub",

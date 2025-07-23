@@ -39,7 +39,7 @@ export const createCollection = authedMutation({
   handler: async (ctx, args) => {
     return await ctx.db.insert("collections", {
       ...args,
-      icon: args.icon as IconType,
+      ...(args.icon ? { icon: args.icon as IconType } : {}),
       created_by: ctx.user._id,
     });
   },
@@ -53,6 +53,9 @@ export const editCollection = authedMutation({
   handler: async (ctx, args) => {
     await ctx.db.patch(args.collectionId, {
       ...args.collection,
+      ...(args.collection.icon
+        ? { icon: args.collection.icon as IconType }
+        : {}),
       updatedAt: new Date().toISOString(),
     });
 

@@ -2,6 +2,7 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { cn } from "@/lib/utils";
 import { Id } from "@buzztrip/backend/dataModel";
+import { IconType } from "@buzztrip/backend/types";
 import {
   AdvancedMarker,
   Map as GoogleMap,
@@ -10,30 +11,35 @@ import {
   type MapMouseEvent,
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
-import { lazy, memo, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
+import MarkerPin from "@/components/marker-pin";
 import AddMarkerButton from "./actions/add-marker";
-import ChangeMapStyle from "./actions/change-map-style";
-import DisplayMarkerInfo from "./display-marker-info";
-import { AutocompleteCustomInput, detailsRequestCallback } from "./search";
-const MarkerPin = lazy(() => import("./marker_pin"));
+import ChangeMapStyle from "./actions/change-map-styles";
+import { detailsRequestCallback } from "./helpers";
+import DisplayMarkerInfo from "./marker-info-box";
+import { Search, SearchInput, SearchResults } from "./search";
 
-const Mapview = () => {
+const GoogleMapsMapView = () => {
   const googleMap = useMap();
-  const places = useMapsLibrary("places");
+
   const {
+    searchValue,
+    setSearchValue,
+    setSearchActive,
     activeLocation,
     activeState,
     setActiveLocation,
     markers,
-    setSearchValue,
     map,
     isMobile,
     setActiveState,
+    uiState,
+    setUiState,
   } = useMapStore((state) => state);
 
   if (!map) return null;
 
-  // Handle directions for routes
+  const places = useMapsLibrary("places");
   const routesLibrary = useMapsLibrary("routes");
   const [placesService, setPlacesService] =
     useState<google.maps.places.PlacesService>();
@@ -44,18 +50,25 @@ const Mapview = () => {
   const [googleRoutes, setGoogleRoutes] = useState<
     google.maps.DirectionsRoute[]
   >([]);
+  const [zoom, setZoom] = useState(4); // used to control marker size
 
   const mapOptions = useMemo(() => {
     return {
       center: {
-        lat: map.lat ?? -25.2744,
-        lng: map.lng ?? 133.7751,
+        lat: map.lat ?? 20,
+        lng: map.lng ?? 0,
       },
-      bounds: map.bounds ?? null,
+      bounds: map.bounds ?? {
+        north: 75,
+        south: -60,
+        west: -150,
+        east: 150,
+      },
       zoom: 4,
     };
   }, []);
 
+  // init all services needed on load
   useEffect(() => {
     if (!places || !googleMap) return;
 
@@ -63,50 +76,31 @@ const Mapview = () => {
     setPlacesService(service);
   }, [places, googleMap]);
 
-  // useEffect(() => {
-  //   if (!routesLibrary || !routeStops || !routes || !googleMap) return;
-  //   setDirectionsService(new routesLibrary.DirectionsService());
-  //   setDirectionsRenderer(
-  //     new routesLibrary.DirectionsRenderer({ map: googleMap })
-  //   );
-  // }, [routesLibrary, googleMap]);
+  // handle window unload
+  useEffect(() => {
+    if (!googleMap || !map || map.lat || map.lng || map.bounds) return;
 
-  // useEffect(() => {
-  //   if (!directionsService || !directionsRenderer || !routeStops || !routes)
-  //     return;
+    const handlePageUnload = async () => {
+      const center = googleMap.getCenter();
+      const bounds = googleMap.getBounds();
+      if (!center || !bounds) return;
 
-  //   routes.forEach((route) => {
-  //     const stops = routeStops
-  //       .filter((stop) => stop.route_id === route.route_id)
-  //       .sort((a, b) => a.stop_order - b.stop_order);
-  //     const start = stops[0];
-  //     const end = stops[stops.length - 1];
-  //     const mid = stops.slice(1, stops.length - 1);
+      navigator.sendBeacon(
+        `/api/map/${map._id}/update-map-location`,
+        JSON.stringify({
+          lat: center.lat(),
+          lng: center.lng(),
+          bounds: bounds.toJSON(),
+          location_name: `${center.lat()}, ${center.lng()}`,
+        })
+      );
+    };
 
-  //     if (!stops || !start || !end) return;
-
-  //     directionsService
-  //       .route({
-  //         origin: { lat: start.lat, lng: start.lng },
-  //         destination: { lat: end.lat, lng: end.lng },
-  //         waypoints: mid.map((stop) => ({
-  //           location: { lat: stop.lat, lng: stop.lng },
-  //           stopover: true,
-  //         })),
-  //         travelMode: getGoogleMapsTravelMode(route.travel_type),
-  //         provideRouteAlternatives: false,
-  //       })
-  //       .then((response) => {
-  //         directionsRenderer.setDirections(response);
-  //         setGoogleRoutes(response.routes);
-  //       });
-  //   });
-
-  //   return () => {
-  //     directionsRenderer.setMap(null);
-  //     setGoogleRoutes([]);
-  //   };
-  // }, [directionsService, directionsRenderer, routes, routeStops]);
+    window.addEventListener("beforeunload", handlePageUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handlePageUnload);
+    };
+  }, [googleMap, map]);
 
   const handlePlaceSearch = (placeId: string) => {
     if (!placesService) return;
@@ -137,6 +131,15 @@ const Mapview = () => {
       if (res) {
         const newSearchValue =
           res.placeDetails?.name ?? res.placeDetails?.formatted_address ?? "";
+
+        // Fixed: Use && instead of || to check if BOTH lat AND lng match
+        if (
+          activeLocation &&
+          activeLocation.lat === res.location.lat &&
+          activeLocation.lng === res.location.lng
+        )
+          return;
+
         setActiveLocation(res.location);
         setSearchValue(newSearchValue);
       }
@@ -145,6 +148,7 @@ const Mapview = () => {
 
   const handleClick = async (e: MapMouseEvent) => {
     if (!places || !googleMap || !placesService) return;
+
     e.domEvent?.stopPropagation();
     e.stop();
 
@@ -153,8 +157,8 @@ const Mapview = () => {
 
     if (!latLng) return;
 
-    if (activeState?.event === "add-marker") {
-      // If in add-marker mode, only fetch details if placeId is present
+    // add-marker mode
+    if (uiState === "add-marker") {
       if (placeId) {
         try {
           handlePlaceSearch(placeId);
@@ -162,79 +166,67 @@ const Mapview = () => {
           console.error("Error fetching place details:", error);
         }
       } else {
-        // No placeId, launch create marker modal
-        if (activeLocation) {
-          setActiveState({ event: "markers:create", payload: activeLocation });
-        } else {
-          setActiveState({
-            event: "markers:create",
-            payload: {
-              title: `${latLng.lat}, ${latLng.lng}`,
-              lat: latLng.lat,
-              lng: latLng.lng,
-              icon: "MapPin",
-              color: "#0b7138",
-              map_id: map._id as Id<"maps">,
-              place: {
-                lat: latLng.lat,
-                lng: latLng.lng,
-                icon: "MapPin",
-                title: `${latLng.lat}, ${latLng.lng}`,
-                rating: 0,
-                bounds: null,
-              },
-            },
-          });
-        }
+        const payload = activeLocation || {
+          title: `${latLng.lat}, ${latLng.lng}`,
+          lat: latLng.lat,
+          lng: latLng.lng,
+          icon: "MapPin",
+          color: "#0b7138",
+          map_id: map._id as Id<"maps">,
+          place: {
+            lat: latLng.lat,
+            lng: latLng.lng,
+            icon: "MapPin",
+            title: `${latLng.lat}, ${latLng.lng}`,
+            rating: 0,
+            bounds: null,
+          },
+        };
+
+        setActiveState({ event: "markers:create", payload });
         googleMap.setOptions({ draggableCursor: "" });
       }
+
       return;
     }
 
-    // Not in add-marker mode: do general place search if no placeId
     if (!placeId) {
-      const zoom = googleMap.getZoom();
-      const radius = () => {
-        if (!zoom) return 300;
-        if (zoom < 6) return 1000;
-        if (zoom < 8) return 100;
-        if (zoom > 10) return 100;
-        return 300;
-      };
-
       try {
-        placeId = await new Promise<string | null>((resolve, reject) => {
-          placesService.nearbySearch(
-            {
-              location: latLng,
-              radius: radius(),
-              bounds: googleMap.getBounds(),
-            },
-            (data, status) => {
+        const geocoder = new google.maps.Geocoder();
+        const response = await new Promise<google.maps.GeocoderResult[] | null>(
+          (resolve) => {
+            geocoder.geocode({ location: latLng }, (results, status) => {
               if (
-                status !== google.maps.places.PlacesServiceStatus.OK ||
-                !data ||
-                data.length === 0
+                status === google.maps.GeocoderStatus.OK &&
+                Array.isArray(results) &&
+                results.length > 0
               ) {
-                reject(new Error("Nearby search failed"));
-                return;
+                resolve(results);
+              } else {
+                resolve(null);
               }
-              resolve(data[0]?.place_id ?? null);
-            }
-          );
+            });
+          }
+        );
+
+        const bestMatch = response?.find((result) => {
+          return result.types.includes("locality");
         });
+
+        if (bestMatch && bestMatch.place_id) {
+          placeId = bestMatch.place_id;
+        }
       } catch (error) {
-        console.error("Error during nearby search:", error);
+        console.error("Error during place lookup:", error);
         return;
       }
     }
 
     if (!placeId) {
-      console.error("No placeId found after search");
+      // Nothing found — do nothing
       return;
     }
 
-    // Handle Place Details Lookup
     try {
       handlePlaceSearch(placeId);
     } catch (error) {
@@ -245,10 +237,28 @@ const Mapview = () => {
   return (
     <div
       className={cn("absolute inset-0 h-screen w-full flex-1 touch-none z-0", {
-        "cursor-crosshair": activeState?.event === "add-marker",
+        "cursor-crosshair": uiState === "add-marker",
       })}
     >
-      {!isMobile && <AutocompleteCustomInput />}
+      {!isMobile && (
+        <div className="fixed left-0 right-0 top-6 sm:top-4 z-10 mx-auto w-[95%] md:left-[calc(var(--sidebar-width)_+_2rem)] md:right-4 md:mx-0 md:max-w-[30rem]">
+          <Search
+            value={searchValue ?? ""}
+            onValueChange={setSearchValue}
+            isMobile={isMobile}
+            className="flex h-full w-full flex-col overflow-hidden rounded-lg bg-white text-slate-950"
+            onSelect={(pred, details) => {
+              if (details?.location) setActiveLocation(details.location);
+            }}
+          >
+            <SearchInput
+              placeholder="Where do you want to go?"
+              autoFocus={false} // Prevent immediate keyboard on mobile
+            />
+            <SearchResults className="z-50" />
+          </Search>
+        </div>
+      )}
       <ChangeMapStyle />
       <AddMarkerButton />
       <GoogleMap
@@ -264,6 +274,7 @@ const Mapview = () => {
             : undefined
         }
         mapTypeId={map.mapTypeId?.toLowerCase() ?? "hybrid"}
+        onZoomChanged={(z) => setZoom(z.detail.zoom)}
         mapId={env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID}
         disableDefaultUI={true}
         onClick={(e) => handleClick(e)}
@@ -271,13 +282,8 @@ const Mapview = () => {
         reuseMaps
       >
         {activeLocation && (
-          // !markers?.some(
-          //   (marker) =>
-          //     marker.lat === activeLocation.lat &&
-          //     marker.lng === activeLocation.lng
-          // ) &&
           <>
-            <DisplayMarkerInfo location={activeLocation} />
+            <DisplayMarkerInfo />
           </>
         )}
 
@@ -292,7 +298,12 @@ const Mapview = () => {
                 setActiveLocation(marker);
               }}
             >
-              <MarkerPin color={marker.color} icon={marker.icon!} size={16} />
+              <MarkerPin
+                color={marker.color}
+                icon={marker.icon as IconType}
+                size={zoom > 8 ? 16 : 8} // Smaller when zoomed out
+                showIcon={zoom > 8} // Only show icon when zoomed in
+              />
             </AdvancedMarker>
           ))}
       </GoogleMap>
@@ -300,4 +311,4 @@ const Mapview = () => {
   );
 };
 
-export default memo(Mapview);
+export default memo(GoogleMapsMapView);

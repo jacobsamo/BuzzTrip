@@ -1,6 +1,11 @@
-import IconPickerModal from "@/components/modals/icon-picker-modal";
+import { ColorPicker } from "@/components/color-picker";
+import { IconPicker } from "@/components/icon-picker";
+import MarkerPin from "@/components/marker-pin";
+import OpenCollectionModal from "@/components/modals/open-collection-modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DialogHeader } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -11,9 +16,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { colors } from "@/lib/data";
+import { popularColors } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
@@ -22,7 +28,7 @@ import { combinedMarkersSchema } from "@buzztrip/backend/zod-schemas";
 import { popularIconsList } from "@buzztrip/components/icon";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
-import { Circle, CircleCheck } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import dynamic from "next/dynamic";
 import * as React from "react";
 import { useEffect, useMemo } from "react";
@@ -216,55 +222,72 @@ export default function MarkerForm() {
       );
     };
 
+    const selectedColor = watch("color") ?? "#fff";
+    const selectedIcon = watch("icon") ?? "MapPin";
+
     return (
       <div className="p-2 z-10">
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <FormField
-              control={control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Roadtrip" />
-                  </FormControl>
-                  <FormDescription />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <DialogHeader className="flex flex-row items-start justify-center py-2">
+              <MarkerPin
+                color={selectedColor}
+                icon={selectedIcon as IconType}
+                size={28}
+              />
+
+              <FormField
+                control={control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormControl>
+                      <Input {...field} placeholder="Roadtrip" />
+                    </FormControl>
+                    <FormDescription />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </DialogHeader>
 
             <FormField
               control={control}
               name="color"
               render={({ field }) => {
-                const selectedColor = watch("color");
+                let name = selectedColor;
 
                 return (
                   <FormItem>
                     <FormLabel>Color</FormLabel>
                     <FormControl>
-                      <div className="flex flex-wrap gap-2">
-                        {colors.map((color, index) => (
-                          <button
-                            onClick={() => field.onChange(color.hex)}
+                      <div className="inline-flex items-center gap-2">
+                        {popularColors.map((color, index) => (
+                          <Button
                             key={index}
+                            type="button"
+                            variant="ghost"
+                            onClick={() => field.onChange(color.hex)} // Handle icon selection
                             className={cn(
-                              "group h-8 w-8 scale-100 rounded-md",
+                              "border-input bg-background flex size-8 items-center justify-center rounded-md border",
                               {
-                                "h-9 w-9 scale-110 border border-gray-500 shadow-lg":
+                                "scale-105 shadow-lg ring ring-black ring-offset-1":
                                   selectedColor == color.hex,
                               }
                             )}
                             style={{ backgroundColor: color.hex }}
-                            type="button"
-                          ></button>
+                          ></Button>
                         ))}
-                        <Input
-                          type="color"
-                          value={field.value ?? "#000"}
-                          onChange={field.onChange}
+
+                        <span className="h-full w-[2px] rounded-md bg-gray-200"></span>
+
+                        <ColorPicker
+                          value={{ hex: selectedColor, name: name }}
+                          onChange={(val) => {
+                            field.onChange(val.hex);
+                            name = val.name;
+                          }}
+                          className="size-8"
                         />
                       </div>
                     </FormControl>
@@ -274,6 +297,49 @@ export default function MarkerForm() {
                 );
               }}
             />
+            <FormField
+              control={control}
+              name="icon"
+              render={({ field }) => {
+                return (
+                  <FormItem>
+                    <FormLabel>Icon</FormLabel>
+                    <FormControl>
+                      <div className="inline-flex items-center gap-2">
+                        {popularIconsList.map((icon, index) => (
+                          <Button
+                            key={index}
+                            type="button"
+                            variant="ghost"
+                            onClick={() => field.onChange(icon)} // Handle icon selection
+                            className={cn(
+                              "border-input bg-background flex size-8 items-center justify-center rounded-md border",
+                              {
+                                "scale-105 shadow-lg ring ring-black ring-offset-1":
+                                  selectedIcon == icon,
+                              }
+                            )}
+                          >
+                            <Icon name={icon} size={24} />
+                          </Button>
+                        ))}
+
+                        <span className="h-full w-[2px] rounded-md bg-gray-200"></span>
+
+                        <IconPicker
+                          value={(selectedIcon ?? "MapPin") as IconType}
+                          onChange={field.onChange}
+                          className="size-8"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormDescription />
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
+            />
+
             <FormField
               control={control}
               name="note"
@@ -289,94 +355,49 @@ export default function MarkerForm() {
               )}
             />
 
-            <FormField
-              control={control}
-              name="icon"
-              render={({ field }) => {
-                const selectedIcon = watch("icon");
-
-                return (
-                  <FormItem>
-                    <FormLabel>Icon</FormLabel>
-                    <FormControl>
-                      <div className="flex flex-wrap gap-2">
-                        {!popularIconsList.includes(selectedIcon as any) && (
-                          <div
-                            className={buttonVariants({
-                              variant: "ghost",
-                              className:
-                                "scale-105 border border-gray-500 text-black shadow-lg",
-                            })}
-                          >
-                            <Icon name={selectedIcon ?? "MapPin"} size={24} />
-                          </div>
-                        )}
-                        {popularIconsList.map((icon, index) => (
-                          <Button
-                            key={index}
-                            type="button"
-                            variant="ghost"
-                            onClick={() => field.onChange(icon)} // Handle icon selection
-                            className={cn("group text-black", {
-                              "scale-105 border border-gray-500 shadow-lg":
-                                selectedIcon == icon,
-                            })}
-                          >
-                            <Icon name={icon} size={24} />
-                          </Button>
-                        ))}
-                        <IconPickerModal
-                          selectedIcon={watch("icon") ?? "MapPin"}
-                          setSelectedIcon={field.onChange}
+            <div className="space-y-2">
+              <div className="inline-flex items-center justify-between w-full">
+                <Label className="text-sm font-medium">Collections </Label>
+                <OpenCollectionModal />
+              </div>
+              <ScrollArea className="space-y-4 h-36 w-full">
+                {collections &&
+                  collections.map((collection, index) => {
+                    const isChecked =
+                      watch("collection_ids")?.includes(collection._id) ??
+                      false;
+                    return (
+                      <div
+                        key={collection._id}
+                        className="flex items-center gap-2"
+                      >
+                        <Checkbox
+                          id={collection._id}
+                          checked={isChecked}
+                          onCheckedChange={() => handleChange(collection._id!)}
+                          className="rounded-full w-4 h-4"
                         />
+                        <Icon name={collection.icon as IconType} size={20} />
+                        <Label
+                          htmlFor={collection._id}
+                          className="text-sm cursor-pointer flex-1"
+                        >
+                          {collection.title}
+                        </Label>
                       </div>
-                    </FormControl>
-                    <FormDescription />
-                    <FormMessage />
-                  </FormItem>
-                );
-              }}
-            />
+                    );
+                  })}
+              </ScrollArea>
+            </div>
 
-            <ScrollArea className="h-36 w-full">
-              {collections &&
-                collections.map((collection, index) => {
-                  const isChecked =
-                    watch("collection_ids")?.includes(collection._id) ?? false;
-                  return (
-                    <Button
-                      onClick={() => handleChange(collection._id!)}
-                      key={index}
-                      className={cn(
-                        "group h-fit w-full flex-row items-start justify-start gap-2",
-                        {
-                          "scale-105 border border-gray-500 shadow-lg":
-                            isChecked,
-                        }
-                      )}
-                      type="button"
-                      variant="ghost"
-                    >
-                      {isChecked ? <CircleCheck /> : <Circle />}
-                      <Icon name={collection.icon as IconType} size={32} />
-                      <div className="flex-col">
-                        <h2>{collection.title}</h2>
-                        {/* <p>
-                                Markers:
-                                {typeof collectionsMarkerCount == "object" &&
-                                  collectionsMarkerCount.find(
-                                    (col) =>
-                                      collection.collection_id ==
-                                      col.collection_id
-                                  )?.markerCount}
-                              </p> */}
-                      </div>
-                    </Button>
-                  );
-                })}
-            </ScrollArea>
-
-            <div className="absolute bottom-2 right-2 mt-4 inline-flex items-center justify-end gap-2">
+            <div
+              className={cn(
+                "inline-flex items-center justify-between w-11/12  absolute bottom-2 mt-4 ",
+                {
+                  "justify-end": activeState.event === "markers:create",
+                }
+              )}
+            >
               {activeState.event === "markers:update" && marker && (
                 <Button
                   aria-label="delete marker"
@@ -384,12 +405,13 @@ export default function MarkerForm() {
                   type="button"
                   onClick={() => handleDelete()}
                 >
-                  Delete
+                  <Trash2 className="w-3 h-3 mr-1" />
+                  Delete Marker
                 </Button>
               )}
               <Button aria-label="Create Marker" type="submit">
                 {activeState.event === "markers:create"
-                  ? "Create"
+                  ? "Add Marker"
                   : "Save changes"}
               </Button>
             </div>

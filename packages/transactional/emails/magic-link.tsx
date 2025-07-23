@@ -47,7 +47,7 @@ const MagicLinkVerificationEmail = ({
                 <Text className="text-[14px] text-gray-600 mb-[8px]">
                   Your verification code:
                 </Text>
-                <Heading className="text-[32px] font-bold tracking-[4px] text-blue-600 my-[8px]">
+                <Heading className="text-[32px] font-bold tracking-[4px] text-[#2C7873] my-[8px]">
                   {token}
                 </Heading>
                 <Text className="text-[14px] text-gray-500">

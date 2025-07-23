@@ -8,15 +8,15 @@ import { createPlace } from "../places";
 
 export const getMarkersView = authedQuery({
   args: {
-    map_id: zid("maps"),
+    mapId: zid("maps"),
     markerId: z.optional(zid("markers")),
   },
   returns: combinedMarkersSchema.array().nullable(),
-  handler: async (ctx, { map_id, markerId }) => {
+  handler: async (ctx, { mapId, markerId }) => {
     // Build the initial query on the markers table
     let markersQuery = ctx.db
       .query("markers")
-      .withIndex("by_map_id", (q) => q.eq("map_id", map_id));
+      .withIndex("by_map_id", (q) => q.eq("map_id", mapId));
 
     // If markerId is provided, add an additional filter
     if (markerId) {
@@ -119,8 +119,8 @@ export const editMarker = authedMutation({
     marker: markersEditSchema
       .omit({ _id: true, _creationTime: true })
       .partial(),
-    collectionIds_to_add: zid("collections").array().nullable(),
-    collectionIds_to_remove: zid("collections").array().nullable(),
+    collectionIds_to_add: zid("collections").array().nullish(),
+    collectionIds_to_remove: zid("collections").array().nullish(),
   },
   handler: async (ctx, args) => {
     let collectionLinkCreatedIds: string[] | null = null;
@@ -155,7 +155,7 @@ export const editMarker = authedMutation({
 
     await ctx.db.patch(args.marker_id, {
       ...args.marker,
-      icon: args.marker.icon as IconType,
+      ...(args.marker.icon ? { icon: args.marker.icon as IconType } : {}),
       updatedAt: new Date().toISOString(),
     });
 

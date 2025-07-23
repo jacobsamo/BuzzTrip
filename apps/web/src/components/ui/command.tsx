@@ -53,7 +53,7 @@ function CommandDialog({
   );
 }
 
-interface CommandInputProps
+export interface CommandInputProps
   extends React.ComponentProps<typeof CommandPrimitive.Input> {
   before?: React.ReactNode;
   after?: React.ReactNode;

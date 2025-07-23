@@ -173,19 +173,31 @@ function Iframe({ src, ...props }: IframeProps) {
 function Paragraph(
   props: React.PropsWithChildren<React.HTMLAttributes<HTMLParagraphElement>>
 ) {
-  return <p className="my-5 leading-relaxed text-gray-800">{props.children}</p>;
+  return (
+    <p className="my-5 leading-relaxed text-gray-800" {...props}>
+      {props.children}
+    </p>
+  );
 }
 
 function UnorderedList(
   props: React.PropsWithChildren<React.HTMLAttributes<HTMLUListElement>>
 ) {
-  return <ul className="list-disc pl-6">{props.children}</ul>;
+  return (
+    <ul className="list-disc pl-6" {...props}>
+      {props.children}
+    </ul>
+  );
 }
 
 function OrderedList(
   props: React.PropsWithChildren<React.HTMLAttributes<HTMLOListElement>>
 ) {
-  return <ol className="list-decimal pl-6">{props.children}</ol>;
+  return (
+    <ol className="list-decimal pl-6" {...props}>
+      {props.children}
+    </ol>
+  );
 }
 
 const components = {
