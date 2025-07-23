@@ -20,6 +20,7 @@ import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import type { Color } from "@/types";
 import Colorful from "@uiw/react-color-colorful";
+import { Command as CommandPrimitive } from "cmdk";
 import {
   Check,
   ChevronLeft,
@@ -230,26 +231,26 @@ export function ColorPicker({
                   <CommandGroup>
                     <div className="grid grid-cols-8 gap-2 p-3">
                       {currentPageColors.map((color) => (
-                        <Button
+                        <CommandPrimitive.Item
                           key={color.hex}
-                          variant="ghost"
+                          value={color.name}
                           className={cn(
-                            "h-12 w-12 p-1 relative hover:bg-accent",
-                            value?.hex === color.hex && "ring-2 ring-primary"
+                            "size-8 relative group rounded-md border-2 border-transparent transition-all duration-200",
+                            value?.hex === color.hex &&
+                              "ring-2 ring-offset-1 ring-primary",
+                            {
+                              "border-gray-400 shadow-lg": selectedColor.hex === color.hex,
+                            }
                           )}
-                          onClick={() => handleColorSelect(color)}
+                          onSelect={() => handleColorSelect(color)}
                           title={`${color.name} (${color.hex})`}
-                          aria-label={`Select color ${color.name} (${color.hex})`}
+                          style={{ backgroundColor: color.hex }}
+                          aria-label={`Color ${color.name} (${color.hex})`}
                         >
-                          <DisplayColor
-                            color={color}
-                            selected={value?.hex === color.hex}
-                            size="md"
-                          />
                           {value?.hex === color.hex && (
                             <Check className="absolute -top-1 -right-1 h-4 w-4 text-primary bg-white rounded-full" />
                           )}
-                        </Button>
+                        </CommandPrimitive.Item>
                       ))}
                     </div>
 
