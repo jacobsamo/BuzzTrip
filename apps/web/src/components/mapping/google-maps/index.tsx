@@ -18,9 +18,11 @@ import ChangeMapStyle from "./actions/change-map-styles";
 import { detailsRequestCallback } from "./helpers";
 import DisplayMarkerInfo from "./marker-info-box";
 import { Search, SearchInput, SearchResults } from "./search";
+import { useDrawingManager } from "./drawing/use-drawing-manager";
 
 const GoogleMapsMapView = () => {
   const googleMap = useMap();
+  const drawingManager = useDrawingManager();
 
   const {
     searchValue,

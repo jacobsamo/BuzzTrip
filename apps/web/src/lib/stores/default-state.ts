@@ -12,8 +12,9 @@ import type {
 } from "@buzztrip/backend/types";
 
 const eventType = [
-  ...createAction("collections", ["create", "update"]),
-  ...createAction("markers", ["create", "update"]),
+  ...createAction("collections", ["create", "update", "delete"]),
+  ...createAction("markers", ["create", "update", "delete"]),
+  ...createAction("paths", ["create", "update", "delete"]),
 ] as const;
 type EventType = (typeof eventType)[number];
 
@@ -22,6 +23,8 @@ type EventPayloadMap = {
   "collections:update": NewCollection;
   "markers:create": CombinedMarker;
   "markers:update": CombinedMarker;
+  "paths:create": {};
+  "paths:update": {};
 };
 
 export type ActiveState = {
