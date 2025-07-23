@@ -22,6 +22,7 @@ type EventPayloadMap = {
   "collections:update": NewCollection;
   "markers:create": CombinedMarker;
   "markers:update": CombinedMarker;
+  "add-marker": null;
 };
 
 export type ActiveState = {

@@ -107,6 +107,14 @@ export const createStore = (initState: InitState) =>
           return;
         }
 
+        if (state.event === "add-marker") {
+          set(() => ({
+            activeState: state,
+            drawerState: { snap: 0.2, dismissible: true },
+          }));
+          return;
+        }
+
         set(() => ({
           activeState: state,
           prevState: currentState,
