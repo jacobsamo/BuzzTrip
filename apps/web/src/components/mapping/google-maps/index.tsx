@@ -6,7 +6,6 @@ import { Id } from "@buzztrip/backend/dataModel";
 import { IconType } from "@buzztrip/backend/types";
 import {
   AdvancedMarker,
-  APIProvider,
   Map as GoogleMap,
   useMap,
   useMapsLibrary,
@@ -16,6 +15,7 @@ import { env } from "env";
 import { memo, useEffect, useMemo, useState } from "react";
 import AddMarkerButton from "./actions/add-marker";
 import ChangeMapStyle from "./actions/change-map-styles";
+import DrawingTest from "./drawing";
 import { detailsRequestCallback } from "./helpers";
 import DisplayMarkerInfo from "./marker-info-box";
 import { Search, SearchInput, SearchResults } from "./search";
@@ -69,8 +69,8 @@ const GoogleMapsMapView = () => {
 
   console.log("Google", {
     googleMap,
-    map: google.maps.Map
-  })
+    map: google.maps.Map,
+  });
 
   // init all services needed on load
   useEffect(() => {
@@ -239,24 +239,33 @@ const GoogleMapsMapView = () => {
   };
 
   return (
-    <APIProvider
-      apiKey={env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
-      libraries={["places", "marker", "routes"]}
-      onError={(error) => {
-        console.error("Google Maps API Error:", error);
-      }}
-      onLoad={() => {
-        console.log("Google Maps API Loaded Successfully");
-      }}
+    <div
+      className={cn("absolute inset-0 h-screen w-full flex-1 touch-none z-0", {
+        "cursor-crosshair": uiState === "add-marker",
+      })}
     >
-      <div
-        className={cn(
-          "absolute inset-0 h-screen w-full flex-1 touch-none z-0",
-          {
-            "cursor-crosshair": uiState === "add-marker",
-          }
-        )}
+      <GoogleMap
+        id="google-map-container"
+        defaultCenter={mapOptions.center}
+        defaultZoom={mapOptions.zoom}
+        defaultBounds={
+          mapOptions.bounds &&
+          "north" in mapOptions.bounds &&
+          "south" in mapOptions.bounds &&
+          "east" in mapOptions.bounds &&
+          "west" in mapOptions.bounds
+            ? mapOptions.bounds
+            : undefined
+        }
+        mapTypeId={map.mapTypeId?.toLowerCase() ?? "hybrid"}
+        onZoomChanged={(z) => setZoom(z.detail.zoom)}
+        mapId={env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID}
+        disableDefaultUI={true}
+        onClick={(e) => handleClick(e)}
+        gestureHandling="greedy"
+        reuseMaps
       >
+        <ChangeMapStyle />
         {!isMobile && (
           <div className="fixed left-0 right-0 top-6 sm:top-4 z-10 mx-auto w-[95%] md:left-[calc(var(--sidebar-width)_+_2rem)] md:right-4 md:mx-0 md:max-w-[30rem]">
             <Search
@@ -276,58 +285,36 @@ const GoogleMapsMapView = () => {
             </Search>
           </div>
         )}
-        <ChangeMapStyle />
         {uiState !== "paths" && <AddMarkerButton />}
-        {/* <DrawingTest /> */}
-        <GoogleMap
-          id="google-maps-map"
-          defaultCenter={mapOptions.center}
-          defaultZoom={mapOptions.zoom}
-          defaultBounds={
-            mapOptions.bounds &&
-            "north" in mapOptions.bounds &&
-            "south" in mapOptions.bounds &&
-            "east" in mapOptions.bounds &&
-            "west" in mapOptions.bounds
-              ? mapOptions.bounds
-              : undefined
-          }
-          mapTypeId={map.mapTypeId?.toLowerCase() ?? "hybrid"}
-          onZoomChanged={(z) => setZoom(z.detail.zoom)}
-          mapId={env.NEXT_PUBLIC_GOOGLE_MAPS_MAPID}
-          disableDefaultUI={true}
-          onClick={(e) => handleClick(e)}
-          gestureHandling="greedy"
-          reuseMaps
-        >
-          {activeLocation && (
-            <>
-              <DisplayMarkerInfo />
-            </>
-          )}
+        <DrawingTest />
 
-          {markers &&
-            markers.map((marker) => (
-              <AdvancedMarker
-                key={marker._id}
-                position={{ lat: marker.lat, lng: marker.lng }}
-                title={marker.title}
-                onClick={() => {
-                  googleMap!.panTo({ lat: marker.lat, lng: marker.lng });
-                  setActiveLocation(marker);
-                }}
-              >
-                <MarkerPin
-                  color={marker.color}
-                  icon={marker.icon as IconType}
-                  size={zoom > 8 ? 16 : 8} // Smaller when zoomed out
-                  showIcon={zoom > 8} // Only show icon when zoomed in
-                />
-              </AdvancedMarker>
-            ))}
-        </GoogleMap>
-      </div>
-    </APIProvider>
+        {activeLocation && (
+          <>
+            <DisplayMarkerInfo />
+          </>
+        )}
+
+        {markers &&
+          markers.map((marker) => (
+            <AdvancedMarker
+              key={marker._id}
+              position={{ lat: marker.lat, lng: marker.lng }}
+              title={marker.title}
+              onClick={() => {
+                googleMap!.panTo({ lat: marker.lat, lng: marker.lng });
+                setActiveLocation(marker);
+              }}
+            >
+              <MarkerPin
+                color={marker.color}
+                icon={marker.icon as IconType}
+                size={zoom > 8 ? 16 : 8} // Smaller when zoomed out
+                showIcon={zoom > 8} // Only show icon when zoomed in
+              />
+            </AdvancedMarker>
+          ))}
+      </GoogleMap>
+    </div>
   );
 };
 

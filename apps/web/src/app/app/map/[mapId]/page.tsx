@@ -72,7 +72,7 @@ export default async function MapPage({ params }: { params: Params }) {
   }
 
   // preload on server to avoid any lag on the client
-  const [markers, collections, collectionLinks, labels, mapUsers] =
+  const [markers, collections, paths, collectionLinks, labels, mapUsers] =
     await Promise.all([
       preloadQuery(
         api.maps.markers.getMarkersView,
@@ -83,6 +83,13 @@ export default async function MapPage({ params }: { params: Params }) {
       ),
       preloadQuery(
         api.maps.collections.getCollectionsForMap,
+        {
+          mapId: map._id,
+        },
+        options
+      ),
+        preloadQuery(
+        api.maps.paths.getPathsForMap,
         {
           mapId: map._id,
         },
@@ -125,6 +132,7 @@ export default async function MapPage({ params }: { params: Params }) {
         collectionLinks,
         labels,
         mapUsers,
+        paths,
       }}
     >
       <Map_page />

@@ -7,6 +7,7 @@ import type {
   Map,
   MapUser,
   NewCollection,
+  Path,
   Route,
   RouteStop,
 } from "@buzztrip/backend/types";
@@ -51,6 +52,7 @@ export type StoreState = {
   labels: Label[] | null;
   routes: Route[] | null;
   routeStops: RouteStop[] | null;
+  paths: Path[] | null;
 
   // uiState
   isMobile: boolean;
@@ -88,6 +90,7 @@ export const defaultState: Omit<StoreState, "map"> = {
   routes: null,
   routeStops: null,
   labels: null,
+  paths: null,
 
   // states
   isMobile: false,

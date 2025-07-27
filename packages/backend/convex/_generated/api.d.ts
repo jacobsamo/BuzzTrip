@@ -16,6 +16,7 @@ import type * as maps_index from "../maps/index.js";
 import type * as maps_labels from "../maps/labels.js";
 import type * as maps_mapUsers from "../maps/mapUsers.js";
 import type * as maps_markers from "../maps/markers.js";
+import type * as maps_paths from "../maps/paths.js";
 import type * as migrations from "../migrations.js";
 import type * as places from "../places.js";
 import type * as users from "../users.js";
@@ -43,6 +44,7 @@ declare const fullApi: ApiFromModules<{
   "maps/labels": typeof maps_labels;
   "maps/mapUsers": typeof maps_mapUsers;
   "maps/markers": typeof maps_markers;
+  "maps/paths": typeof maps_paths;
   migrations: typeof migrations;
   places: typeof places;
   users: typeof users;

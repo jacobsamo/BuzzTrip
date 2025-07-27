@@ -5,15 +5,19 @@ import {
   collection_linksSchema,
   collectionsEditSchema,
   collectionsSchema,
+  combinedMapUser,
   combinedMarkersSchema,
   labelsEditSchema,
   labelsSchema,
   mapsEditSchema,
   mapsSchema,
+  mapTypeIdEnum,
   mapUserEditSchema,
   mapUserSchema,
   markersEditSchema,
   markersSchema,
+  pathsEditSchema,
+  pathsSchema,
   permissionEnumSchema,
   placesEditSchema,
   placesSchema,
@@ -27,8 +31,6 @@ import {
   travelTypeEnumSchema,
   userMapsSchema,
   userSchema,
-  combinedMapUser,
-  mapTypeIdEnum
 } from "../zod-schemas";
 
 export * from "./icons";
@@ -79,4 +81,7 @@ export type PermissionEnum = z.infer<typeof permissionEnumSchema>;
 
 export type TravelTypeEnum = z.infer<typeof travelTypeEnumSchema>;
 
-export type MapTypeId = z.infer<typeof mapTypeIdEnum>
+export type MapTypeId = z.infer<typeof mapTypeIdEnum>;
+
+export type Path = z.infer<typeof pathsSchema>;
+export type NewPath = z.infer<typeof pathsEditSchema>;

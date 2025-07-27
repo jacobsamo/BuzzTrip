@@ -22,7 +22,7 @@ import {
   TerraDrawRectangleMode,
   TerraDrawSelectMode,
 } from "terra-draw";
-import { TerraDrawGoogleMapsAdapter } from "terra-draw-google-maps-adapter";
+import { TerraDrawGoogleMapsAdapter } from "./terra-draw-google-maps-adapter";
 
 type DrawingMode = "select" | "polygon" | "linestring" | "circle" | "rectangle";
 
@@ -35,7 +35,7 @@ const DrawingTest = () => {
     null
   );
   const adapterRef = useRef<TerraDrawGoogleMapsAdapter | null>(null);
-  const [mode, setMode] = useState<DrawingMode>("select"); // Start with select mode
+  const [mode, setMode] = useState<DrawingMode>("select");
   const [isReady, setIsReady] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
   const initTimeoutRef = useRef<NodeJS.Timeout>(null);
@@ -47,7 +47,7 @@ const DrawingTest = () => {
     console.log("state", {
       uiState,
       map: map,
-    })
+    });
     if (!map || uiState !== "paths") return;
     console.log("Map is ready, initializing Terra Draw...");
 
@@ -76,6 +76,10 @@ const DrawingTest = () => {
 
       try {
         console.log("Map is ready, creating Terra Draw adapter...");
+        const mapDiv = map.getDiv();
+        if (mapDiv.id.length === 0) {
+          mapDiv.id = "google-map-container";
+        }
 
         const adapter = new TerraDrawGoogleMapsAdapter({
           lib: google.maps,
@@ -185,9 +189,6 @@ const DrawingTest = () => {
           console.log("Features selected:", ids);
         });
 
-        // draw.on("deselect", (ids) => {
-        //   console.log("Features deselected:", ids);
-        // });
 
         setTerraDrawInstance(draw);
         console.log("Starting Terra Draw...");
@@ -203,7 +204,7 @@ const DrawingTest = () => {
 
     // Start the initialization process
     initializeTerraDrawWhenReady();
-
+    
     return () => {
       console.log("Cleaning up Terra Draw...");
       if (initTimeoutRef.current) {
@@ -221,22 +222,22 @@ const DrawingTest = () => {
       setIsReady(false);
       setIsInitializing(false);
     };
-  }, [map, uiState, mode]); // Only re-run when map or uiState changes
+  }, [map, uiState]); // Removed 'mode' from dependencies to prevent re-initialization
 
   // Cleanup when switching away from paths
-  useEffect(() => {
-    if (uiState !== "paths" && terraDrawInstance) {
-      console.log("Switching away from paths, cleaning up Terra Draw...");
-      try {
-        terraDrawInstance.stop();
-      } catch (error) {
-        console.error("Error stopping Terra Draw:", error);
-      }
-      setTerraDrawInstance(null);
-      setIsReady(false);
-      setIsInitializing(false);
-    }
-  }, [uiState, terraDrawInstance]);
+  // useEffect(() => {
+  //   if (uiState !== "paths" && terraDrawInstance) {
+  //     console.log("Switching away from paths, cleaning up Terra Draw...");
+  //     try {
+  //       terraDrawInstance.stop();
+  //     } catch (error) {
+  //       console.error("Error stopping Terra Draw:", error);
+  //     }
+  //     setTerraDrawInstance(null);
+  //     setIsReady(false);
+  //     setIsInitializing(false);
+  //   }
+  // }, [uiState, terraDrawInstance]);
 
   const setDrawingMode = useCallback(
     (newMode: DrawingMode | null) => {
@@ -295,7 +296,7 @@ const DrawingTest = () => {
         }
       )}
     >
-          <Button
+      <Button
         variant="outline"
         size="icon"
         className={cn(" z-50", {
