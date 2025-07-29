@@ -1,10 +1,15 @@
 import { zid } from "convex-helpers/server/zod";
 import * as z from "zod";
-import { defaultSchema, insertSchema, latlng } from "./shared-schemas";
+import { defaultSchema, insertSchema } from "./shared-schemas";
 
 // --- Constants ---
 const pathTypes = ["circle", "rectangle", "polygon", "line"] as const;
 export const pathTypeEnum = z.enum(pathTypes);
+
+const strictPosition = z.union([
+  z.tuple([z.number(), z.number()]),
+  z.tuple([z.number(), z.number(), z.number()]),
+]);
 
 // --- Measurements ---
 const baseMeasurements = z.object({
@@ -42,6 +47,12 @@ const stylesSchema = z.object({
   fillOpacity: z.number().optional(),
 });
 
+const pointsSchema = z.union([
+  strictPosition,
+  strictPosition.array(),
+  strictPosition.array().array(),
+]);
+
 // --- Main Schema ---
 export const pathsSchema = defaultSchema(
   z.object({
@@ -49,9 +60,9 @@ export const pathsSchema = defaultSchema(
     pathType: pathTypeEnum,
     title: z.string(),
     notes: z.string().optional(),
-    location: latlng.array(),
+    points: pointsSchema,
     measurements: measurementsSchema,
-    styles: stylesSchema,
+    styles: stylesSchema.optional(),
     createdBy: zid("users"),
     updatedAt: z.string().datetime().optional(), // allow optional for updates
   })
@@ -59,3 +70,4 @@ export const pathsSchema = defaultSchema(
 
 // --- Edit Schema ---
 export const pathsEditSchema = insertSchema(pathsSchema);
+// Position | Position[] | Position[][]

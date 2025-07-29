@@ -67,11 +67,6 @@ const GoogleMapsMapView = () => {
     };
   }, []);
 
-  console.log("Google", {
-    googleMap,
-    map: google.maps.Map,
-  });
-
   // init all services needed on load
   useEffect(() => {
     if (!places || !googleMap) return;

@@ -1,5 +1,6 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
+import { geoJsonToPaths } from "@/lib/geojson";
 import { cn } from "@/lib/utils";
 import * as turf from "@turf/turf";
 import { useMap } from "@vis.gl/react-google-maps";
@@ -27,10 +28,10 @@ import { TerraDrawGoogleMapsAdapter } from "./terra-draw-google-maps-adapter";
 type DrawingMode = "select" | "polygon" | "linestring" | "circle" | "rectangle";
 
 const DrawingTest = () => {
-  const { isMobile, searchValue, uiState, setUiState } = useMapStore(
+  const { isMobile, searchValue, uiState, setUiState, map } = useMapStore(
     (state) => state
   );
-  const map = useMap();
+  const googleMap = useMap();
   const [terraDrawInstance, setTerraDrawInstance] = useState<TerraDraw | null>(
     null
   );
@@ -40,15 +41,11 @@ const DrawingTest = () => {
   const [isInitializing, setIsInitializing] = useState(false);
   const initTimeoutRef = useRef<NodeJS.Timeout>(null);
 
-  if (!map) return null;
+  if (!googleMap) return null;
 
   useEffect(() => {
     // Only initialize when we actually need drawing (paths UI is active)
-    console.log("state", {
-      uiState,
-      map: map,
-    });
-    if (!map || uiState !== "paths") return;
+    if (!googleMap || uiState !== "paths") return;
     console.log("Map is ready, initializing Terra Draw...");
 
     // Prevent multiple initializations
@@ -68,7 +65,7 @@ const DrawingTest = () => {
     // Wait for map to be fully ready
     const initializeTerraDrawWhenReady = () => {
       // Check if map is fully loaded
-      if (!map.getCenter() || !map.getZoom()) {
+      if (!googleMap.getCenter() || !googleMap.getZoom()) {
         console.log("Map not fully loaded, retrying in 100ms...");
         setTimeout(initializeTerraDrawWhenReady, 100);
         return;
@@ -76,14 +73,14 @@ const DrawingTest = () => {
 
       try {
         console.log("Map is ready, creating Terra Draw adapter...");
-        const mapDiv = map.getDiv();
+        const mapDiv = googleMap.getDiv();
         if (mapDiv.id.length === 0) {
           mapDiv.id = "google-map-container";
         }
 
         const adapter = new TerraDrawGoogleMapsAdapter({
           lib: google.maps,
-          map,
+          map: googleMap,
           coordinatePrecision: 6,
         });
 
@@ -153,7 +150,10 @@ const DrawingTest = () => {
           if (!draw) return;
 
           console.log("Drawing finished:", id);
-          const feature = draw.getSnapshot().find((f) => f.id === id);
+          const features = draw.getSnapshot();
+          const feature = features.find((f) => f.id === id);
+          console.log("Features", features);
+
           if (feature) {
             console.log("Feature created:", feature);
 
@@ -164,6 +164,8 @@ const DrawingTest = () => {
                   const area = turf.area(feature);
                   const areaInKm2 = (area / 1000000).toFixed(2);
                   console.log(`Polygon area: ${areaInKm2} km²`);
+                  const convertToPaths = geoJsonToPaths([feature], map._id);
+                  console.log("Converted paths:", convertToPaths);
                 } catch (error) {
                   console.error("Error calculating area:", error);
                 }
@@ -189,7 +191,6 @@ const DrawingTest = () => {
           console.log("Features selected:", ids);
         });
 
-
         setTerraDrawInstance(draw);
         console.log("Starting Terra Draw...");
         draw.start();
@@ -204,7 +205,7 @@ const DrawingTest = () => {
 
     // Start the initialization process
     initializeTerraDrawWhenReady();
-    
+
     return () => {
       console.log("Cleaning up Terra Draw...");
       if (initTimeoutRef.current) {
@@ -222,7 +223,7 @@ const DrawingTest = () => {
       setIsReady(false);
       setIsInitializing(false);
     };
-  }, [map, uiState]); // Removed 'mode' from dependencies to prevent re-initialization
+  }, [googleMap, uiState]); // Removed 'mode' from dependencies to prevent re-initialization
 
   // Cleanup when switching away from paths
   // useEffect(() => {
