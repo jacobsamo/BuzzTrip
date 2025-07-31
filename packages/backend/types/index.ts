@@ -28,6 +28,7 @@ import {
   routesEditSchema,
   routesSchema,
   shareMapUserSchema,
+  stylesSchema,
   travelTypeEnumSchema,
   userMapsSchema,
   userSchema,
@@ -85,3 +86,5 @@ export type MapTypeId = z.infer<typeof mapTypeIdEnum>;
 
 export type Path = z.infer<typeof pathsSchema>;
 export type NewPath = z.infer<typeof pathsEditSchema>;
+
+export type PathStyle = z.infer<typeof stylesSchema>;

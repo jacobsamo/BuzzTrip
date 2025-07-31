@@ -1,5 +1,6 @@
 import CollectionForm from "@/components/forms/collection-create-edit-form";
 import MarkerForm from "@/components/forms/marker-create-edit-form";
+import PathsForm from "@/components/forms/paths-create-edit-form";
 import {
   Dialog,
   DialogContent,
@@ -41,6 +42,9 @@ const MainModalContent = () => {
     case "collections:create":
     case "collections:update":
       return <CollectionForm />;
+    case "paths:create":
+    case "paths:update":
+      return <PathsForm />;
     default:
       return null;
   }
@@ -59,7 +63,9 @@ export default function MainModal() {
       activeState.event === "markers:create" ||
       activeState.event === "markers:update" ||
       activeState.event === "collections:create" ||
-      activeState.event === "collections:update"
+      activeState.event === "collections:update" || 
+      activeState.event === "paths:create" ||
+      activeState.event === "paths:update"
     );
   }, [activeState]);
 

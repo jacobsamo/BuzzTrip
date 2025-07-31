@@ -1,35 +1,13 @@
+import {
+  circleMeasurements,
+  lineMeasurements,
+  measurementsSchema,
+  polygonMeasurements,
+  rectangleMeasurements,
+} from "@buzztrip/backend/zod-schemas";
 import * as turf from "@turf/turf";
 import { Feature, LineString, Point, Polygon } from "geojson";
 import * as z from "zod";
-
-// Updated measurement schemas with correct units and types
-const baseMeasurements = z.object({
-  perimeter: z.number(), // in meters
-  area: z.number().optional(), // in square meters
-});
-
-const circleMeasurements = baseMeasurements.extend({
-  radius: z.number(), // in meters
-  diameter: z.number(), // in meters
-});
-
-const rectangleMeasurements = baseMeasurements.extend({
-  width: z.number(), // in meters
-  height: z.number(), // in meters
-});
-
-const lineMeasurements = z.object({
-  length: z.number(), // in meters (lines don't have area or perimeter, just length)
-});
-
-const polygonMeasurements = baseMeasurements;
-
-export const measurementsSchema = z.union([
-  circleMeasurements,
-  rectangleMeasurements,
-  polygonMeasurements,
-  lineMeasurements,
-]);
 
 export type CircleMeasurements = z.infer<typeof circleMeasurements>;
 export type RectangleMeasurements = z.infer<typeof rectangleMeasurements>;
@@ -115,7 +93,8 @@ export const calculateLineMeasurements = (
   const length = turf.length(lineString, { units: "meters" });
 
   return {
-    length,
+    perimeter: length,
+    area: undefined, // Lines do not have area
   };
 };
 

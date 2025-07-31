@@ -25,7 +25,7 @@ export const pathsToGeoJson = (paths: Path[]): GeoJSONStoreFeatures[] => {
     const properties: DefinedProperties = {
       id: path._id,
       title: path.title,
-      notes: path.notes || null,
+      note: path.note || null,
       measurements: path.measurements,
       styles: path.styles || null,
       createdBy: path.createdBy,
@@ -156,22 +156,23 @@ export const pathsToGeoJson = (paths: Path[]): GeoJSONStoreFeatures[] => {
 export const geoJsonToPaths = (
   features: GeoJSONStoreFeatures[],
   mapId: string
-): Partial<NewPath>[] => {
+): NewPath[] => {
   return features.map((feature) => {
     const mode = feature.properties?.["mode"] as DrawingMode;
     const pathType = mode === "linestring" ? "line" : mode;
+    let calculatedMeasurements: NewPath["measurements"] = {
+      perimeter: 0,
+    }
 
-    let path: Partial<NewPath> = {
-      title: (feature.properties?.["title"] as string) || "Untitled",
-      notes: (feature.properties?.["notes"] as string) || undefined,
+    let path: NewPath = {
+      title: (feature.properties?.["title"] as string) || "",
+      note: (feature.properties?.["notes"] as string) || undefined,
       styles: (feature.properties?.["styles"] as any) || undefined,
-      //   createdBy: createdBy,
       mapId: mapId as Id<"maps">,
       pathType: pathType as any,
+      measurements: calculatedMeasurements,
+      points: [], // temporarily empty, will be filled below
     };
-
-    // Calculate measurements based on the geometry and path type
-    let calculatedMeasurements;
 
     try {
       calculatedMeasurements = calculateMeasurementsFromGeoJSON(

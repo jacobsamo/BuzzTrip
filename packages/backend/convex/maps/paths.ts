@@ -1,6 +1,6 @@
 import { zid } from "convex-helpers/server/zod";
-import { pathsSchema } from "../../zod-schemas";
-import { authedQuery } from "../helpers";
+import { pathsSchema, pathsEditSchema } from "../../zod-schemas";
+import { authedMutation, authedQuery } from "../helpers";
 
 export const getPathsForMap = authedQuery({
   args: {
@@ -15,8 +15,39 @@ export const getPathsForMap = authedQuery({
   },
 });
 
-// export const createPath = authedMutation({})
+export const createPath = authedMutation({
+  args: pathsEditSchema.omit({
+    createdBy: true,
+  }),
+  handler: async (ctx, args) => {
+        return await ctx.db.insert("paths", {
+      ...args,
+      createdBy: ctx.user._id,
+    });
+  }
+})
 
-// export const editPath = authedMutation({})
+export const editPath = authedMutation({
+    args: {
+    pathId: zid("paths"),
+    path: pathsEditSchema.omit({ _id: true, _creationTime: true }),
+  },
+    handler: async (ctx, args) => {
+    await ctx.db.patch(args.pathId, {
+      ...args.path,
+      updatedAt: new Date().toISOString(),
+    });
 
-// export const deletePath = authedMutation({})
+    return args.pathId;
+  }
+})
+
+export const deletePath = authedMutation({
+  args: {
+    pathId: zid("paths")
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.pathId);
+    return args.pathId;
+  }
+})

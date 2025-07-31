@@ -6,32 +6,32 @@ import { defaultSchema, insertSchema } from "./shared-schemas";
 const pathTypes = ["circle", "rectangle", "polygon", "line"] as const;
 export const pathTypeEnum = z.enum(pathTypes);
 
-const strictPosition = z.union([
+export const strictPosition = z.union([
   z.tuple([z.number(), z.number()]),
   z.tuple([z.number(), z.number(), z.number()]),
 ]);
 
 // --- Measurements ---
-const baseMeasurements = z.object({
+export const baseMeasurements = z.object({
   perimeter: z.number(),
   area: z.number().optional(),
 });
 
-const circleMeasurements = baseMeasurements.extend({
+export const circleMeasurements = baseMeasurements.extend({
   radius: z.number(),
   diameter: z.number(),
 });
 
-const rectangleMeasurements = baseMeasurements.extend({
+export const rectangleMeasurements = baseMeasurements.extend({
   width: z.number(),
   height: z.number(),
 });
 
-const lineMeasurements = baseMeasurements;
+export const lineMeasurements = baseMeasurements;
 
-const polygonMeasurements = baseMeasurements;
+export const polygonMeasurements = baseMeasurements;
 
-const measurementsSchema = z.union([
+export const measurementsSchema = z.union([
   circleMeasurements,
   rectangleMeasurements,
   polygonMeasurements,
@@ -39,7 +39,7 @@ const measurementsSchema = z.union([
 ]);
 
 // --- Styles ---
-const stylesSchema = z.object({
+export const stylesSchema = z.object({
   strokeColor: z.string(),
   strokeOpacity: z.number().optional(),
   strokeWidth: z.number().optional(),
@@ -59,7 +59,7 @@ export const pathsSchema = defaultSchema(
     mapId: zid("maps"),
     pathType: pathTypeEnum,
     title: z.string(),
-    notes: z.string().optional(),
+    note: z.string().optional(),
     points: pointsSchema,
     measurements: measurementsSchema,
     styles: stylesSchema.optional(),
@@ -69,5 +69,7 @@ export const pathsSchema = defaultSchema(
 );
 
 // --- Edit Schema ---
-export const pathsEditSchema = insertSchema(pathsSchema);
+export const pathsEditSchema = insertSchema(pathsSchema).extend({
+  createdBy: zid("users").optional(),
+});;
 // Position | Position[] | Position[][]

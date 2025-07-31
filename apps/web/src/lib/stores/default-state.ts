@@ -7,6 +7,7 @@ import type {
   Map,
   MapUser,
   NewCollection,
+  NewPath,
   Path,
   Route,
   RouteStop,
@@ -24,8 +25,8 @@ type EventPayloadMap = {
   "collections:update": NewCollection;
   "markers:create": CombinedMarker;
   "markers:update": CombinedMarker;
-  "paths:create": {};
-  "paths:update": {};
+  "paths:create": NewPath;
+  "paths:update": NewPath;
 };
 
 export type ActiveState = {

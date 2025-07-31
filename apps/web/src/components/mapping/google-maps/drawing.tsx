@@ -1,8 +1,9 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@/components/ui/button";
-import { geoJsonToPaths } from "@/lib/geojson";
+import { geoJsonToPaths, pathsToGeoJson } from "@/lib/geojson";
 import { cn } from "@/lib/utils";
-import * as turf from "@turf/turf";
+import { PathStyle } from "@buzztrip/backend/types";
+import { stylesSchema } from "@buzztrip/backend/zod-schemas";
 import { useMap } from "@vis.gl/react-google-maps";
 import {
   ChevronLeft,
@@ -16,6 +17,8 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  GeoJSONStoreFeatures,
+  HexColor,
   TerraDraw,
   TerraDrawCircleMode,
   TerraDrawLineStringMode,
@@ -27,10 +30,37 @@ import { TerraDrawGoogleMapsAdapter } from "./terra-draw-google-maps-adapter";
 
 type DrawingMode = "select" | "polygon" | "linestring" | "circle" | "rectangle";
 
+const fallbackStyle = {
+  strokeColor: "#000000",
+  strokeOpacity: 1,
+  strokeWidth: 2,
+  fillColor: "#FFFFFF",
+  fillOpacity: 0.5,
+};
+
+const ensureValidStyleOnFeature = (
+  feature: GeoJSONStoreFeatures
+): PathStyle => {
+  const parsed = stylesSchema.safeParse(feature.properties.styles);
+  if (parsed.success) {
+    return parsed.data;
+  } else {
+    console.warn("Invalid style found, using fallback:", parsed.error);
+    feature.properties.styles = fallbackStyle;
+    return fallbackStyle;
+  }
+};
+
 const DrawingTest = () => {
-  const { isMobile, searchValue, uiState, setUiState, map } = useMapStore(
-    (state) => state
-  );
+  const {
+    isMobile,
+    searchValue,
+    uiState,
+    setUiState,
+    map,
+    paths,
+    setActiveState,
+  } = useMapStore((state) => state);
   const googleMap = useMap();
   const [terraDrawInstance, setTerraDrawInstance] = useState<TerraDraw | null>(
     null
@@ -45,11 +75,10 @@ const DrawingTest = () => {
 
   useEffect(() => {
     // Only initialize when we actually need drawing (paths UI is active)
-    if (!googleMap || uiState !== "paths") return;
     console.log("Map is ready, initializing Terra Draw...");
 
     // Prevent multiple initializations
-    if (isInitializing || terraDrawInstance) return;
+    if (isInitializing || terraDrawInstance || !document) return;
 
     console.log("Starting Terra Draw initialization...");
     setIsInitializing(true);
@@ -65,16 +94,37 @@ const DrawingTest = () => {
     // Wait for map to be fully ready
     const initializeTerraDrawWhenReady = () => {
       // Check if map is fully loaded
-      if (!googleMap.getCenter() || !googleMap.getZoom()) {
-        console.log("Map not fully loaded, retrying in 100ms...");
+      if (
+        typeof window === "undefined" ||
+        !document ||
+        !googleMap.getCenter() ||
+        !googleMap.getZoom()
+      ) {
+        console.log("Map or window not ready, retrying...");
         setTimeout(initializeTerraDrawWhenReady, 100);
         return;
+      }
+
+      const mapDiv = googleMap.getDiv();
+      if (!mapDiv) {
+        console.log("Map div not ready, retrying...");
+        setTimeout(initializeTerraDrawWhenReady, 100);
+        return;
+      }
+
+      if (!mapDiv.id) {
+        mapDiv.id = "google-map-container";
       }
 
       try {
         console.log("Map is ready, creating Terra Draw adapter...");
         const mapDiv = googleMap.getDiv();
-        if (mapDiv.id.length === 0) {
+        if (!mapDiv) {
+          console.log("Map div not ready yet, retrying in 100ms...");
+          setTimeout(initializeTerraDrawWhenReady, 100);
+          return;
+        }
+        if (!mapDiv.id) {
           mapDiv.id = "google-map-container";
         }
 
@@ -89,35 +139,101 @@ const DrawingTest = () => {
 
         // Simplified modes with minimal styling for faster initialization
         const modes = [
-          new TerraDrawSelectMode(),
+          new TerraDrawSelectMode({
+            flags: {
+              // Polygon
+              polygon: {
+                feature: {
+                  draggable: true,
+                  coordinates: {
+                    midpoints: true,
+                    draggable: true,
+                    deletable: true,
+                  },
+                },
+              },
+              // Line
+              linestring: {
+                feature: {
+                  draggable: true,
+                  coordinates: {
+                    midpoints: true,
+                    draggable: true,
+                    deletable: true,
+                  },
+                },
+              },
+              // Circle
+              circle: {
+                feature: {
+                  draggable: true,
+                  coordinates: {
+                    midpoints: true,
+                    draggable: true,
+                    deletable: true,
+                  },
+                },
+              },
+              // Rectangle
+              rectangle: {
+                feature: {
+                  draggable: true,
+                  coordinates: {
+                    midpoints: true,
+                    draggable: true,
+                    deletable: true,
+                  },
+                },
+              },
+            },
+          }),
           new TerraDrawPolygonMode({
             styles: {
-              fillColor: "#3b82f6",
-              fillOpacity: 0.2,
-              outlineColor: "#1d4ed8",
-              outlineWidth: 2,
+              fillColor: (feature) =>
+                (ensureValidStyleOnFeature(feature).fillColor ??
+                  fallbackStyle.fillColor) as HexColor,
+              fillOpacity: (feature) =>
+                ensureValidStyleOnFeature(feature).fillOpacity ??
+                fallbackStyle.fillOpacity,
+              outlineColor: (feature) =>
+                (ensureValidStyleOnFeature(feature).strokeColor ??
+                  fallbackStyle.strokeColor) as HexColor,
             },
           }),
           new TerraDrawLineStringMode({
             styles: {
-              lineStringColor: "#7c3aed",
-              lineStringWidth: 3,
+              lineStringColor: (feature) =>
+                (ensureValidStyleOnFeature(feature).fillColor ??
+                  fallbackStyle.fillColor) as HexColor,
+              lineStringWidth: (feature) =>
+                ensureValidStyleOnFeature(feature).fillOpacity ??
+                fallbackStyle.fillOpacity,
             },
           }),
           new TerraDrawCircleMode({
             styles: {
-              fillColor: "#f97316",
-              fillOpacity: 0.2,
-              outlineColor: "#ea580c",
-              outlineWidth: 2,
+              fillColor: (feature) =>
+                (ensureValidStyleOnFeature(feature).fillColor ??
+                  fallbackStyle.fillColor) as HexColor,
+              fillOpacity: (feature) =>
+                ensureValidStyleOnFeature(feature).fillOpacity ??
+                fallbackStyle.fillOpacity,
+              outlineColor: (feature) =>
+                (ensureValidStyleOnFeature(feature).strokeColor ??
+                  fallbackStyle.strokeColor) as HexColor,
             },
           }),
           new TerraDrawRectangleMode({
             styles: {
-              fillColor: "#dc2626",
-              fillOpacity: 0.2,
-              outlineColor: "#b91c1c",
-              outlineWidth: 2,
+              fillColor: (feature) =>
+                (ensureValidStyleOnFeature(feature).fillColor ??
+                  fallbackStyle.fillColor) as HexColor,
+              fillOpacity: (feature) =>
+                ensureValidStyleOnFeature(feature).fillOpacity ??
+                fallbackStyle.fillOpacity,
+              outlineColor: (feature) =>
+                (ensureValidStyleOnFeature(feature).strokeColor ??
+                  fallbackStyle.strokeColor) as HexColor,
             },
           }),
         ];
@@ -149,43 +265,33 @@ const DrawingTest = () => {
         draw.on("finish", (id, context) => {
           if (!draw) return;
 
-          console.log("Drawing finished:", id);
+          console.log("Drawing finished:", {
+            id,
+            context,
+          });
           const features = draw.getSnapshot();
           const feature = features.find((f) => f.id === id);
-          console.log("Features", features);
 
-          if (feature) {
+          if (feature && context.action === "draw") {
             console.log("Feature created:", feature);
 
-            // Calculate measurements (moved to async to not block UI)
-            setTimeout(() => {
-              if (feature.geometry.type === "Polygon") {
-                try {
-                  const area = turf.area(feature);
-                  const areaInKm2 = (area / 1000000).toFixed(2);
-                  console.log(`Polygon area: ${areaInKm2} km²`);
-                  const convertToPaths = geoJsonToPaths([feature], map._id);
-                  console.log("Converted paths:", convertToPaths);
-                } catch (error) {
-                  console.error("Error calculating area:", error);
-                }
-              }
-
-              if (feature.geometry.type === "LineString") {
-                try {
-                  const length = turf.length(feature, { units: "kilometers" });
-                  console.log(`Line length: ${length.toFixed(2)} km`);
-                } catch (error) {
-                  console.error("Error calculating length:", error);
-                }
-              }
-            }, 0);
+            const path = geoJsonToPaths([feature], map._id);
+            if (!path || path.length === 0 || !path[0]) {
+              console.error("No valid path created from feature");
+              return;
+            }
+            setActiveState({
+              event: "paths:create",
+              payload: {
+                ...path[0],
+              },
+            });
           }
         });
 
-        draw.on("change", (ids) => {
-          console.log("Features changed:", ids);
-        });
+        // draw.on("change", (ids) => {
+        //   console.log("Features changed:", ids);
+        // });
 
         draw.on("select", (ids) => {
           console.log("Features selected:", ids);
@@ -223,22 +329,18 @@ const DrawingTest = () => {
       setIsReady(false);
       setIsInitializing(false);
     };
-  }, [googleMap, uiState]); // Removed 'mode' from dependencies to prevent re-initialization
+  }, [googleMap, uiState]);
 
-  // Cleanup when switching away from paths
-  // useEffect(() => {
-  //   if (uiState !== "paths" && terraDrawInstance) {
-  //     console.log("Switching away from paths, cleaning up Terra Draw...");
-  //     try {
-  //       terraDrawInstance.stop();
-  //     } catch (error) {
-  //       console.error("Error stopping Terra Draw:", error);
-  //     }
-  //     setTerraDrawInstance(null);
-  //     setIsReady(false);
-  //     setIsInitializing(false);
-  //   }
-  // }, [uiState, terraDrawInstance]);
+  useEffect(() => {
+    if (paths && terraDrawInstance) {
+      const geoJsonPaths = pathsToGeoJson(paths);
+      console.log("terra draw points", {
+        paths,
+        geoJsonPaths,
+      });
+      terraDrawInstance.addFeatures(geoJsonPaths);
+    }
+  }, [paths, terraDrawInstance]);
 
   const setDrawingMode = useCallback(
     (newMode: DrawingMode | null) => {
