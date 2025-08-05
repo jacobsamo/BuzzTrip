@@ -1,5 +1,6 @@
 import { Id } from "@buzztrip/backend/dataModel";
 import type { CombinedMarker, Map } from "@buzztrip/backend/types";
+import { TerraDraw } from "terra-draw";
 import { createStore as createZustandStore } from "zustand/vanilla";
 import {
   ActiveState,
@@ -139,5 +140,7 @@ export const createStore = (initState: InitState) =>
       setUiState: (uiState: UIState) => {
         set(() => ({ uiState: uiState }));
       },
+      setTerraDrawInstance: (instance: TerraDraw | null) =>
+        set(() => ({ terraDrawInstance: instance })),
     };
   });

@@ -1,4 +1,5 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
+import { fallbackStyle } from "@/components/show-path-icon";
 import { Button } from "@/components/ui/button";
 import { geoJsonToPaths, pathsToGeoJson } from "@/lib/geojson";
 import { cn } from "@/lib/utils";
@@ -13,7 +14,6 @@ import {
   MousePointer2,
   RectangleHorizontal,
   Triangle,
-  X,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -28,15 +28,13 @@ import {
 } from "terra-draw";
 import { TerraDrawGoogleMapsAdapter } from "./terra-draw-google-maps-adapter";
 
-type DrawingMode = "select" | "polygon" | "linestring" | "circle" | "rectangle";
-
-const fallbackStyle = {
-  strokeColor: "#000000",
-  strokeOpacity: 1,
-  strokeWidth: 2,
-  fillColor: "#FFFFFF",
-  fillOpacity: 0.5,
-};
+type DrawingMode =
+  | "static"
+  | "select"
+  | "polygon"
+  | "linestring"
+  | "circle"
+  | "rectangle";
 
 const ensureValidStyleOnFeature = (
   feature: GeoJSONStoreFeatures
@@ -45,7 +43,6 @@ const ensureValidStyleOnFeature = (
   if (parsed.success) {
     return parsed.data;
   } else {
-    console.warn("Invalid style found, using fallback:", parsed.error);
     feature.properties.styles = fallbackStyle;
     return fallbackStyle;
   }
@@ -60,27 +57,63 @@ const DrawingTest = () => {
     map,
     paths,
     setActiveState,
+    terraDrawInstance,
+    setTerraDrawInstance,
   } = useMapStore((state) => state);
   const googleMap = useMap();
-  const [terraDrawInstance, setTerraDrawInstance] = useState<TerraDraw | null>(
-    null
-  );
   const adapterRef = useRef<TerraDrawGoogleMapsAdapter | null>(null);
-  const [mode, setMode] = useState<DrawingMode>("select");
+  const [mode, setMode] = useState<DrawingMode>("static");
   const [isReady, setIsReady] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
   const initTimeoutRef = useRef<NodeJS.Timeout>(null);
+  const pathsLoadedRef = useRef(false);
 
-  if (!googleMap) return null;
-
+  // First useEffect: Check if Google Map is ready
   useEffect(() => {
-    // Only initialize when we actually need drawing (paths UI is active)
+    if (!googleMap) return;
+
+    const checkMapReady = () => {
+      try {
+        // More comprehensive readiness checks
+        const hasCenter =
+          googleMap.getCenter() !== null && googleMap.getCenter() !== undefined;
+        const hasZoom = typeof googleMap.getZoom() === "number";
+        const hasDiv = googleMap.getDiv() !== null;
+        const hasBounds =
+          googleMap.getBounds() !== null && googleMap.getBounds() !== undefined;
+
+        // Check if Google Maps API is fully loaded
+        const hasGoogleMapsLib =
+          typeof window !== "undefined" &&
+          window.google &&
+          window.google.maps &&
+          window.google.maps.OverlayView;
+
+        if (hasCenter && hasZoom && hasDiv && hasBounds && hasGoogleMapsLib) {
+          console.log("Google Map is fully ready");
+          setMapReady(true);
+          return;
+        }
+      } catch (error) {
+        console.log("Map not ready yet, will retry...", error);
+      }
+
+      // Retry after a short delay
+      setTimeout(checkMapReady, 100);
+    };
+
+    // Start checking map readiness
+    checkMapReady();
+  }, [googleMap]);
+
+  // Second useEffect: Initialize Terra Draw when map is ready
+  useEffect(() => {
+    if (!mapReady || !googleMap || isInitializing || terraDrawInstance) {
+      return;
+    }
+
     console.log("Map is ready, initializing Terra Draw...");
-
-    // Prevent multiple initializations
-    if (isInitializing || terraDrawInstance || !document) return;
-
-    console.log("Starting Terra Draw initialization...");
     setIsInitializing(true);
 
     // Add a timeout to detect if initialization is stuck
@@ -91,45 +124,22 @@ const DrawingTest = () => {
 
     let draw: TerraDraw | null = null;
 
-    // Wait for map to be fully ready
-    const initializeTerraDrawWhenReady = () => {
-      // Check if map is fully loaded
-      if (
-        typeof window === "undefined" ||
-        !document ||
-        !googleMap.getCenter() ||
-        !googleMap.getZoom()
-      ) {
-        console.log("Map or window not ready, retrying...");
-        setTimeout(initializeTerraDrawWhenReady, 100);
-        return;
-      }
-
-      const mapDiv = googleMap.getDiv();
-      if (!mapDiv) {
-        console.log("Map div not ready, retrying...");
-        setTimeout(initializeTerraDrawWhenReady, 100);
-        return;
-      }
-
-      if (!mapDiv.id) {
-        mapDiv.id = "google-map-container";
-      }
-
+    const initializeTerraDrawNow = async () => {
       try {
-        console.log("Map is ready, creating Terra Draw adapter...");
         const mapDiv = googleMap.getDiv();
         if (!mapDiv) {
-          console.log("Map div not ready yet, retrying in 100ms...");
-          setTimeout(initializeTerraDrawWhenReady, 100);
-          return;
-        }
-        if (!mapDiv.id) {
-          mapDiv.id = "google-map-container";
+          throw new Error("Map div not available");
         }
 
+        // Ensure map div has an ID
+        if (!mapDiv.id) {
+          mapDiv.id = "google-map-map";
+          console.log("Set map div ID:", mapDiv.id);
+        }
+
+        console.log("Creating Terra Draw adapter...");
         const adapter = new TerraDrawGoogleMapsAdapter({
-          lib: google.maps,
+          lib: window.google.maps,
           map: googleMap,
           coordinatePrecision: 6,
         });
@@ -137,11 +147,10 @@ const DrawingTest = () => {
         adapterRef.current = adapter;
         console.log("Adapter created, setting up modes...");
 
-        // Simplified modes with minimal styling for faster initialization
+        // Create modes
         const modes = [
           new TerraDrawSelectMode({
             flags: {
-              // Polygon
               polygon: {
                 feature: {
                   draggable: true,
@@ -152,7 +161,6 @@ const DrawingTest = () => {
                   },
                 },
               },
-              // Line
               linestring: {
                 feature: {
                   draggable: true,
@@ -163,7 +171,6 @@ const DrawingTest = () => {
                   },
                 },
               },
-              // Circle
               circle: {
                 feature: {
                   draggable: true,
@@ -174,7 +181,6 @@ const DrawingTest = () => {
                   },
                 },
               },
-              // Rectangle
               rectangle: {
                 feature: {
                   draggable: true,
@@ -206,8 +212,8 @@ const DrawingTest = () => {
                 (ensureValidStyleOnFeature(feature).fillColor ??
                   fallbackStyle.fillColor) as HexColor,
               lineStringWidth: (feature) =>
-                ensureValidStyleOnFeature(feature).fillOpacity ??
-                fallbackStyle.fillOpacity,
+                ensureValidStyleOnFeature(feature).strokeWidth ??
+                fallbackStyle.strokeWidth,
             },
           }),
           new TerraDrawCircleMode({
@@ -243,12 +249,8 @@ const DrawingTest = () => {
           adapter,
           modes,
         });
-        draw.start();
-        console.log(
-          "Terra Draw instance created, setting up event listeners..."
-        );
 
-        // Set up event listeners
+        // Set up event listeners before starting
         draw.on("ready", () => {
           if (!draw) return;
 
@@ -256,8 +258,6 @@ const DrawingTest = () => {
           if (initTimeoutRef.current) {
             clearTimeout(initTimeoutRef.current);
           }
-          draw.setMode("select");
-          setMode("select");
           setIsReady(true);
           setIsInitializing(false);
         });
@@ -265,10 +265,7 @@ const DrawingTest = () => {
         draw.on("finish", (id, context) => {
           if (!draw) return;
 
-          console.log("Drawing finished:", {
-            id,
-            context,
-          });
+          console.log("Drawing finished:", { id, context });
           const features = draw.getSnapshot();
           const feature = features.find((f) => f.id === id);
 
@@ -289,17 +286,12 @@ const DrawingTest = () => {
           }
         });
 
-        // draw.on("change", (ids) => {
-        //   console.log("Features changed:", ids);
-        // });
-
         draw.on("select", (ids) => {
           console.log("Features selected:", ids);
         });
-
-        setTerraDrawInstance(draw);
         console.log("Starting Terra Draw...");
         draw.start();
+        setTerraDrawInstance(draw);
       } catch (error) {
         console.error("Error initializing Terra Draw:", error);
         setIsInitializing(false);
@@ -309,8 +301,8 @@ const DrawingTest = () => {
       }
     };
 
-    // Start the initialization process
-    initializeTerraDrawWhenReady();
+    // Initialize immediately since we know the map is ready
+    initializeTerraDrawNow();
 
     return () => {
       console.log("Cleaning up Terra Draw...");
@@ -328,19 +320,24 @@ const DrawingTest = () => {
       adapterRef.current = null;
       setIsReady(false);
       setIsInitializing(false);
+      pathsLoadedRef.current = false;
     };
-  }, [googleMap, uiState]);
+  }, [mapReady, googleMap]); // Only depend on mapReady, not uiState
 
+  // Third useEffect: Load existing paths when Terra Draw is ready
   useEffect(() => {
-    if (paths && terraDrawInstance) {
-      const geoJsonPaths = pathsToGeoJson(paths);
-      console.log("terra draw points", {
-        paths,
-        geoJsonPaths,
-      });
-      terraDrawInstance.addFeatures(geoJsonPaths);
+    if (paths && terraDrawInstance && isReady && !pathsLoadedRef.current) {
+      console.log("Loading existing paths into Terra Draw...");
+      try {
+        const geoJsonPaths = pathsToGeoJson(paths);
+
+        terraDrawInstance.addFeatures(geoJsonPaths);
+        pathsLoadedRef.current = true;
+      } catch (error) {
+        console.error("Error loading paths:", error);
+      }
     }
-  }, [paths, terraDrawInstance]);
+  }, [paths, terraDrawInstance, isReady]);
 
   const setDrawingMode = useCallback(
     (newMode: DrawingMode | null) => {
@@ -361,16 +358,41 @@ const DrawingTest = () => {
     [terraDrawInstance, isReady]
   );
 
-  const clearDrawings = useCallback(() => {
-    if (!terraDrawInstance || !isReady) return;
-
-    try {
-      terraDrawInstance.clear();
-      console.log("All drawings cleared");
-    } catch (error) {
-      console.error("Error clearing drawings:", error);
+  useEffect(() => {
+    if (uiState === "paths") {
+      setDrawingMode("select");
     }
-  }, [terraDrawInstance, isReady]);
+
+    if (uiState !== "paths" && mode !== "static") {
+      setDrawingMode("static");
+    }
+  }, [uiState]);
+
+  // Show loading state while initializing
+  if (isInitializing && uiState === "paths") {
+    return (
+      <div
+        className={cn(
+          "fixed flex flex-col md:flex-row gap-2 items-center justify-start z-50",
+          {
+            "right-2 top-2 flex-col": isMobile,
+            "top-[68px] left-[400px] flex-row": !isMobile,
+          }
+        )}
+      >
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setUiState("default")}
+        >
+          <ChevronLeft />
+        </Button>
+        <div className="px-4 py-2 bg-gray-100 rounded-md text-sm">
+          Loading drawing tools...
+        </div>
+      </div>
+    );
+  }
 
   if (uiState !== "paths") {
     return (
@@ -395,7 +417,7 @@ const DrawingTest = () => {
         "fixed flex flex-col md:flex-row gap-2 items-center justify-start z-50",
         {
           "right-2 top-2 flex-col": isMobile,
-          "top-[68px] left-[400px] flex-row": !isMobile,
+          "top-[68px] left-[360px] flex-row": !isMobile,
         }
       )}
     >
@@ -409,6 +431,7 @@ const DrawingTest = () => {
       >
         <ChevronLeft />
       </Button>
+
       {/* Select Mode */}
       <Button
         variant="outline"
@@ -487,18 +510,6 @@ const DrawingTest = () => {
         title="Draw circles"
       >
         <Circle />
-      </Button>
-
-      {/* Clear button */}
-      <Button
-        variant="destructive"
-        size="icon"
-        className="z-50"
-        onClick={clearDrawings}
-        disabled={!isReady}
-        title="Clear all drawings"
-      >
-        <X />
       </Button>
     </div>
   );

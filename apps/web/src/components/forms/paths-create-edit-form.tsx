@@ -32,6 +32,7 @@ import {
   PolygonIcon,
   RectangleIcon,
 } from "../icons/paths";
+import { ShowPathIcon, fallbackStyle } from "../show-path-icon";
 
 const editSchema = z.object({
   ...pathsEditSchema.shape,
@@ -68,7 +69,7 @@ const generateTitle = (paths: Path[] | null, pathType: Path["pathType"]) => {
 };
 
 const PathsForm = () => {
-  const { map, activeState, paths, setActiveState } = useMapStore(
+  const { map, activeState, paths, setActiveState, terraDrawInstance } = useMapStore(
     (store) => store
   );
   if (
@@ -92,8 +93,12 @@ const PathsForm = () => {
       resolver: zodResolver(editSchema),
       defaultValues: {
         ...path,
-        title: path.title ?? title,
+        title: title,
         mapId: map._id as Id<"maps">,
+        styles: {
+          ...fallbackStyle,
+          ...path.styles
+        }
       },
     });
 
@@ -199,35 +204,19 @@ const PathsForm = () => {
     const selectedFillColor = watch("styles.fillColor") ?? "";
     const selectedFillOpacity = watch("styles.fillOpacity") ?? 1;
 
-    const ShowIcon = () => {
-      const props = {
-        styles: {
-          strokeColor: selectedColor,
-          strokeOpacity: selectedStrokeOpacity,
-          fillColor: selectedFillColor,
-          fillOpacity: selectedFillOpacity,
-        },
-      };
-      switch (path.pathType) {
-        case "circle":
-          return <CircleIcon {...props} />;
-        case "rectangle":
-          return <RectangleIcon {...props} />;
-        case "polygon":
-          return <PolygonIcon {...props} />;
-        case "line":
-          return <LineIcon {...props} />;
-        default:
-          return <PolygonIcon {...props} />;
-      }
-    };
 
     return (
       <div className="p-2 z-10">
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <DialogHeader className="flex flex-row items-start justify-center py-2">
-              <ShowIcon />
+              <ShowPathIcon pathType={path.pathType} styles={{
+                strokeColor: selectedColor,
+                strokeOpacity: selectedStrokeOpacity,
+                strokeWidth: selectedStrokeWidth,
+                fillColor: selectedFillColor,
+                fillOpacity: selectedFillOpacity
+              }} />
 
               <FormField
                 control={control}
@@ -235,7 +224,7 @@ const PathsForm = () => {
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormControl>
-                      <Input {...field} placeholder="Roadtrip" />
+                      <Input {...field} />
                     </FormControl>
                     <FormDescription />
                     <FormMessage />
@@ -291,7 +280,7 @@ const PathsForm = () => {
               }}
             />
 
-            {}
+            { }
             <FormField
               control={control}
               name="styles.fillColor"
@@ -313,7 +302,7 @@ const PathsForm = () => {
                               "border-input bg-background flex size-8 items-center justify-center rounded-md border",
                               {
                                 "scale-105 shadow-lg ring ring-black ring-offset-1":
-                                  selectedColor == color.hex,
+                                  selectedFillColor == color.hex,
                               }
                             )}
                             style={{ backgroundColor: color.hex }}
@@ -323,7 +312,7 @@ const PathsForm = () => {
                         <span className="h-full w-[2px] rounded-md bg-gray-200"></span>
 
                         <ColorPicker
-                          value={{ hex: selectedColor, name: name }}
+                          value={{ hex: selectedFillColor, name: name }}
                           onChange={(val) => {
                             field.onChange(val.hex);
                             name = val.name;

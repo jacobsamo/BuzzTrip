@@ -12,6 +12,7 @@ import type {
   Route,
   RouteStop,
 } from "@buzztrip/backend/types";
+import { TerraDraw } from "terra-draw";
 
 const eventType = [
   ...createAction("collections", ["create", "update", "delete"]),
@@ -64,6 +65,7 @@ export type StoreState = {
   drawerState: DrawerState;
   searchValue: string | null;
   searchActive: boolean;
+  terraDrawInstance: TerraDraw | null;
 };
 
 export type StoreActions = {
@@ -80,6 +82,7 @@ export type StoreActions = {
   setSearchValue: (value: string | null) => void;
   setSearchActive: (active: boolean) => void;
   setUiState: (uiState: UIState) => void;
+  setTerraDrawInstance: (instance: TerraDraw | null) => void;
 };
 
 export const defaultState: Omit<StoreState, "map"> = {
@@ -105,4 +108,5 @@ export const defaultState: Omit<StoreState, "map"> = {
   },
   searchValue: null,
   searchActive: false,
+  terraDrawInstance: null,
 };
