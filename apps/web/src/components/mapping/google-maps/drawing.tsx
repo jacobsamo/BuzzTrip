@@ -3,7 +3,7 @@ import { fallbackStyle } from "@/components/show-path-icon";
 import { Button } from "@/components/ui/button";
 import { geoJsonToPaths, pathsToGeoJson } from "@/lib/geojson";
 import { cn } from "@/lib/utils";
-import { PathStyle } from "@buzztrip/backend/types";
+import { PathStyle, Path} from "@buzztrip/backend/types";
 import { stylesSchema } from "@buzztrip/backend/zod-schemas";
 import { useMap } from "@vis.gl/react-google-maps";
 import {
@@ -54,6 +54,7 @@ const DrawingTest = () => {
     searchValue,
     uiState,
     setUiState,
+    activeState,
     map,
     paths,
     setActiveState,
@@ -286,9 +287,16 @@ const DrawingTest = () => {
           }
         });
 
-        draw.on("select", (ids) => {
-          console.log("Features selected:", ids);
-        });
+        draw.on('select', (id) => {
+  if (activeState?.event !== "paths:update") {
+    const features = draw?.getSnapshot()
+    const feature = features?.find(f => f.properties._id === id)
+    const path: Path = {
+      ...feature?.properties as Path
+    }
+    setActiveState({event: "paths:update", payload: path});
+  }
+});
         console.log("Starting Terra Draw...");
         draw.start();
         setTerraDrawInstance(draw);
@@ -347,7 +355,7 @@ const DrawingTest = () => {
       }
 
       try {
-        const targetMode = newMode === null ? "select" : newMode;
+        const targetMode = newMode ?? "select";
         console.log("Setting mode to:", targetMode);
         terraDrawInstance.setMode(targetMode);
         setMode(targetMode as DrawingMode);
@@ -367,6 +375,14 @@ const DrawingTest = () => {
       setDrawingMode("static");
     }
   }, [uiState]);
+
+  const getFeature = (pathId: string) => {}
+
+
+  useEffect(() => {
+    if (activeState?.event === "path:update") {
+    }
+  }, [activeState]);
 
   // Show loading state while initializing
   if (isInitializing && uiState === "paths") {

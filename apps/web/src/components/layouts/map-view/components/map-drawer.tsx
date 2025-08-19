@@ -15,6 +15,7 @@ import { Drawer } from "vaul";
 import ActiveLocation from "./active-location";
 import CloseButton from "./close-button";
 import MarkersCollectionTabs from "./markers-collections";
+import PathsForm from "@/components/forms/paths-create-edit-form";
 
 export default function MapDrawer() {
   const {
@@ -45,6 +46,14 @@ export default function MapDrawer() {
       activeState?.event === "collections:update"
     );
   }, [activeState]);
+
+  const pathFormOpen = useMemo(() => {
+      return (
+        activeState?.event === "paths:create" ||
+               activeState?.event === "paths:update"
+      );
+  }, [activeState]);
+
 
    const handleInputInteraction = (e?: React.SyntheticEvent) => {
     if (!searchActive) {
@@ -107,7 +116,7 @@ export default function MapDrawer() {
         >
           <Drawer.Handle />
 
-          {!activeLocation && !markerFormOpen && !collectionFormOpen && (
+          {!activeLocation && !markerFormOpen && !collectionFormOpen && !pathFormOpen && (
             <>
               <Search
                 value={searchValue ?? ""}
@@ -134,11 +143,16 @@ export default function MapDrawer() {
           )}
           {activeLocation &&
             !activeState &&
-            (!markerFormOpen || !collectionFormOpen) && <ActiveLocation />}
+            (!markerFormOpen || !collectionFormOpen || !pathFormOpen) && <ActiveLocation />}
 
-          {activeState && (markerFormOpen || collectionFormOpen) && (
+          {activeState && (markerFormOpen || collectionFormOpen || pathFormOpen) && (
             <div>
               <CloseButton />
+              {pathFormOpen && (
+                <ScrollArea>
+                  <PathsForm />
+                </ScrollArea>
+              )}
               {markerFormOpen && (
                 <ScrollArea>
                   <MarkerForm />

@@ -3,7 +3,7 @@ import * as z from "zod";
 import { defaultSchema, insertSchema } from "./shared-schemas";
 
 // --- Constants ---
-const pathTypes = ["circle", "rectangle", "polygon", "line"] as const;
+const pathTypes = ["text", "circle", "rectangle", "polygon", "line"] as const;
 export const pathTypeEnum = z.enum(pathTypes);
 
 export const strictPosition = z.union([
@@ -61,7 +61,7 @@ export const pathsSchema = defaultSchema(
     title: z.string(),
     note: z.string().optional(),
     points: pointsSchema,
-    measurements: measurementsSchema,
+    measurements: measurementsSchema.optional(),
     styles: stylesSchema.optional(),
     createdBy: zid("users"),
     updatedAt: z.string().datetime().optional(), // allow optional for updates

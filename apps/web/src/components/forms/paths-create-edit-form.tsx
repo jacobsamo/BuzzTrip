@@ -124,55 +124,42 @@ const PathsForm = () => {
     const onSubmit: SubmitHandler<z.infer<typeof editSchema>> = async (
       data
     ) => {
+      console.log("saving path", data)
       try {
         setIsLoading(true);
-        const cols = data.collection_ids ?? null;
 
         if (activeState.event === "paths:update" && path) {
           const pathId = path!._id!;
-          const selectedCollections = cols ?? [];
-
-          // Collections to add are those in the selected list but not in the current list
-          const collectionsToAdd = selectedCollections.filter(
-            (collectionId) => !inCollections!.includes(collectionId)
-          );
-
-          // Collections to remove are those in the current list but not in the selected list
-          const collectionsToRemove = inCollections!.filter(
-            (collectionId) => !selectedCollections.includes(collectionId)
-          );
-
-          delete data.collection_ids;
           delete data._id;
           delete data._creationTime;
 
-          const updatedMarker = updatePath({
+          const updatedPath = updatePath({
             pathId: pathId as Id<"paths">,
-            path,
+            path: data,
           });
 
-          toast.promise(updatedMarker, {
-            loading: "Updating marker...",
+          toast.promise(updatedPath, {
+            loading: "Updating path...",
             success: async (res) => {
-              return "Marker updated successfully!";
+              return "Path updated successfully!";
             },
-            error: "Failed to update marker",
+            error: "Failed to update path",
           });
         }
 
         if (activeState.event === "paths:create") {
           // remove collection_ids from data
           delete data.collection_ids;
-          const createdMarker = createPath({
+          const createdPath = createPath({
             ...data,
             mapId: map._id as Id<"maps">,
             // collectionIds: cols,
           });
 
-          toast.promise(createdMarker, {
-            loading: "Creating marker...",
-            success: "Marker created successfully!",
-            error: "Failed to create marker",
+          toast.promise(createdPath, {
+            loading: "Creating path...",
+            success: "Path created successfully!",
+            error: "Failed to create path",
           });
         }
 
@@ -184,17 +171,17 @@ const PathsForm = () => {
     };
 
     const handleDelete = () => {
-      const deletedMarker = deletePath({
+      const deletedPath = deletePath({
         pathId: path!._id as Id<"paths">,
       });
 
-      toast.promise(deletedMarker, {
-        loading: "Deleting marker...",
+      toast.promise(deletedPath, {
+        loading: "Deleting path...",
         success: () => {
           clearForm();
-          return "Marker deleted successfully";
+          return "Path deleted successfully";
         },
-        error: "Failed to delete marker",
+        error: "Failed to delete path",
       });
     };
 
@@ -343,63 +330,30 @@ const PathsForm = () => {
               )}
             />
 
-            {/* <div className="space-y-2">
-              <div className="inline-flex items-center justify-between w-full">
-                <Label className="text-sm font-medium">Collections </Label>
-                <OpenCollectionModal />
-              </div>
-              <ScrollArea className="space-y-4 h-36 w-full">
-                {collections &&
-                  collections.map((collection, index) => {
-                    const isChecked =
-                      watch("collection_ids")?.includes(collection._id) ??
-                      false;
-                    return (
-                      <div
-                        key={collection._id}
-                        className="flex items-center gap-2"
-                      >
-                        <Checkbox
-                          id={collection._id}
-                          checked={isChecked}
-                          onCheckedChange={() => handleChange(collection._id!)}
-                          className="rounded-full w-4 h-4"
-                        />
-                        <Icon name={collection.icon as IconType} size={20} />
-                        <Label
-                          htmlFor={collection._id}
-                          className="text-sm cursor-pointer flex-1"
-                        >
-                          {collection.title}
-                        </Label>
-                      </div>
-                    );
-                  })}
-              </ScrollArea>
-            </div> */}
-
             <div
               className={cn(
                 "inline-flex items-center justify-between w-11/12  absolute bottom-2 mt-4 ",
                 {
                   "justify-end": activeState.event === "paths:create",
+                  "relative gap-2": activeState.event === "paths:update"
                 }
               )}
             >
               {activeState.event === "paths:update" && path && (
                 <Button
-                  aria-label="delete marker"
+                  aria-label="delete path"
                   variant="destructive"
                   type="button"
                   onClick={() => handleDelete()}
+                  disabled={isLoading}
                 >
                   <Trash2 className="w-3 h-3 mr-1" />
-                  Delete Marker
+                  Delete Path
                 </Button>
               )}
-              <Button aria-label="Create Marker" type="submit">
+              <Button aria-label="Create Path" type="submit" disabled={isLoading}>
                 {activeState.event === "paths:create"
-                  ? "Add Marker"
+                  ? "Add Path"
                   : "Save changes"}
               </Button>
             </div>
