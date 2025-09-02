@@ -3,7 +3,7 @@ import { fallbackStyle } from "@/components/show-path-icon";
 import { Button } from "@/components/ui/button";
 import { geoJsonToPaths, pathsToGeoJson } from "@/lib/geojson";
 import { cn } from "@/lib/utils";
-import { PathStyle, Path} from "@buzztrip/backend/types";
+import { Path, PathStyle } from "@buzztrip/backend/types";
 import { stylesSchema } from "@buzztrip/backend/zod-schemas";
 import { useMap } from "@vis.gl/react-google-maps";
 import {
@@ -21,6 +21,7 @@ import {
   HexColor,
   TerraDraw,
   TerraDrawCircleMode,
+  TerraDrawExtend,
   TerraDrawLineStringMode,
   TerraDrawPolygonMode,
   TerraDrawRectangleMode,
@@ -36,6 +37,8 @@ type DrawingMode =
   | "circle"
   | "rectangle";
 
+type FeatureId = TerraDrawExtend.FeatureId;
+
 const ensureValidStyleOnFeature = (
   feature: GeoJSONStoreFeatures
 ): PathStyle => {
@@ -47,7 +50,6 @@ const ensureValidStyleOnFeature = (
     return fallbackStyle;
   }
 };
-
 const DrawingTest = () => {
   const {
     isMobile,
@@ -68,6 +70,7 @@ const DrawingTest = () => {
   const [isInitializing, setIsInitializing] = useState(false);
   const [mapReady, setMapReady] = useState(false);
   const initTimeoutRef = useRef<NodeJS.Timeout>(null);
+  const prevPathRef = useRef<Path[] | null>(null);
   const pathsLoadedRef = useRef(false);
 
   // First useEffect: Check if Google Map is ready
@@ -287,16 +290,16 @@ const DrawingTest = () => {
           }
         });
 
-        draw.on('select', (id) => {
-  if (activeState?.event !== "paths:update") {
-    const features = draw?.getSnapshot()
-    const feature = features?.find(f => f.properties._id === id)
-    const path: Path = {
-      ...feature?.properties as Path
-    }
-    setActiveState({event: "paths:update", payload: path});
-  }
-});
+        draw.on("select", (id) => {
+          if (activeState?.event !== "paths:update") {
+            const features = draw?.getSnapshot();
+            const feature = features?.find((f) => f.properties._id === id);
+            const path: Path = {
+              ...(feature?.properties as Path),
+            };
+            setActiveState({ event: "paths:update", payload: path });
+          }
+        });
         console.log("Starting Terra Draw...");
         draw.start();
         setTerraDrawInstance(draw);
@@ -332,19 +335,105 @@ const DrawingTest = () => {
     };
   }, [mapReady, googleMap]); // Only depend on mapReady, not uiState
 
-  // Third useEffect: Load existing paths when Terra Draw is ready
-  useEffect(() => {
-    if (paths && terraDrawInstance && isReady && !pathsLoadedRef.current) {
-      console.log("Loading existing paths into Terra Draw...");
-      try {
-        const geoJsonPaths = pathsToGeoJson(paths);
+  /* Handle diffing the changes for paths */
+  const diffPaths = (prevPaths: Path[], newPaths: Path[]) => {
+    const deleted: Path[] = [];
+    const changed: Path[] = [];
+    const added: Path[] = [];
 
-        terraDrawInstance.addFeatures(geoJsonPaths);
-        pathsLoadedRef.current = true;
-      } catch (error) {
-        console.error("Error loading paths:", error);
+    const newMap = new Map(newPaths.map((p) => [p._id, p]));
+    const prevMap = new Map(prevPaths.map((p) => [p._id, p]));
+
+    // check for deleted + changed
+    for (const prev of prevPaths) {
+      const current = newMap.get(prev._id);
+
+      if (!current) {
+        deleted.push(prev);
+      } else if (JSON.stringify(prev) !== JSON.stringify(current)) {
+        changed.push(current);
       }
     }
+
+    // check for added
+    for (const curr of newPaths) {
+      if (!prevMap.has(curr._id)) {
+        added.push(curr);
+      }
+    }
+
+    return { deleted, changed, added };
+  };
+
+  // handle syncing to / from the store
+  useEffect(() => {
+    if (!paths || !terraDrawInstance || !isReady) return;
+
+    const prevPaths = prevPathRef.current;
+    const snapShot = terraDrawInstance.getSnapshot();
+    const featureIdMap = new Map(
+      snapShot.map((f) => [f.properties.path_id, f.id])
+    );
+
+    // --- First load ---
+    if (!prevPaths) {
+      const geoJson = pathsToGeoJson(paths);
+      terraDrawInstance.addFeatures(geoJson);
+
+      prevPathRef.current = paths;
+      return;
+    }
+
+    // --- Subsequent updates ---
+    const { deleted, changed, added } = diffPaths(prevPaths, paths);
+    console.log("Diff", {
+      featureIdMap,
+      deleted,
+      changed,
+      added,
+      prevPaths,
+    });
+
+    // handle deleted
+    if (deleted.length > 0) {
+      const featureIds = deleted
+        .map((p) => featureIdMap.get(p._id))
+        .filter(Boolean) as FeatureId[];
+
+      terraDrawInstance.removeFeatures(featureIds);
+    }
+
+    // handle changed
+    if (changed.length > 0) {
+      const toRemove = changed
+        .map((p) => featureIdMap.get(p._id))
+        .filter(Boolean) as FeatureId[];
+      terraDrawInstance.removeFeatures(toRemove);
+
+      const newGeoJson = pathsToGeoJson(changed);
+      terraDrawInstance.addFeatures(newGeoJson);
+    }
+
+    // handle added
+    if (added.length > 0) {
+      const undefinedItem = featureIdMap.get(undefined);
+      if (!undefinedItem) {
+        console.log("No feature found", undefinedItem, featureIdMap);
+        return;
+      }
+      terraDrawInstance.removeFeatures([undefinedItem]);
+
+      const newGeoJson = pathsToGeoJson(added);
+      console.log("Removed item new geoJson", {
+        added,
+        newGeoJson,
+        undefinedItem,
+      });
+      terraDrawInstance.addFeatures(newGeoJson);
+    }
+
+    // update ref for next run
+    prevPathRef.current = paths;
   }, [paths, terraDrawInstance, isReady]);
 
   const setDrawingMode = useCallback(
@@ -376,14 +465,6 @@ const DrawingTest = () => {
     }
   }, [uiState]);
 
-  const getFeature = (pathId: string) => {}
-
-
-  useEffect(() => {
-    if (activeState?.event === "path:update") {
-    }
-  }, [activeState]);
-
   // Show loading state while initializing
   if (isInitializing && uiState === "paths") {
     return (
@@ -396,11 +477,7 @@ const DrawingTest = () => {
           }
         )}
       >
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setUiState("default")}
-        >
+        <Button variant="outline" onClick={() => setUiState("default")}>
           <ChevronLeft />
         </Button>
         <div className="px-4 py-2 bg-gray-100 rounded-md text-sm">
@@ -413,7 +490,7 @@ const DrawingTest = () => {
   if (uiState !== "paths") {
     return (
       <Button
-        variant="outline"
+        size="icon"
         size="icon"
         className={cn("fixed z-50", {
           "right-2 top-2": isMobile,

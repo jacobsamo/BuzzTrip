@@ -80,12 +80,13 @@ export const MapStoreProvider = ({
       storeRef.current.setState({
         markers: markers ?? null,
         collections: collections ?? null,
+        paths: paths ?? null,
         collectionLinks: collectionLinks ?? null,
         labels: labels ?? null,
         mapUsers: mapUsers ?? null,
       });
     }
-  }, [markers, collections, collectionLinks, labels, mapUsers]);
+  }, [markers, collections, collectionLinks, labels, mapUsers, paths]);
 
   return (
     <MapStoreContext.Provider value={storeRef.current}>

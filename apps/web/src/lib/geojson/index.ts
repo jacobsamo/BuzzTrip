@@ -23,7 +23,7 @@ type DrawingMode = "polygon" | "circle" | "rectangle" | "linestring";
 export const pathsToGeoJson = (paths: Path[]): GeoJSONStoreFeatures[] => {
   return paths.map((path) => {
     const properties: DefinedProperties = {
-      id: path._id,
+      path_id: path._id,
       title: path.title,
       note: path.note || null,
       measurements: path.measurements,
@@ -162,7 +162,7 @@ export const geoJsonToPaths = (
     const pathType = mode === "linestring" ? "line" : mode;
     let calculatedMeasurements: NewPath["measurements"] = {
       perimeter: 0,
-    }
+    };
 
     let path: NewPath = {
       title: (feature.properties?.["title"] as string) || "",

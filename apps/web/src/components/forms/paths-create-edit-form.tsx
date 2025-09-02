@@ -26,18 +26,10 @@ import React, { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import {
-  CircleIcon,
-  LineIcon,
-  PolygonIcon,
-  RectangleIcon,
-} from "../icons/paths";
 import { ShowPathIcon, fallbackStyle } from "../show-path-icon";
 
-const editSchema = z.object({
-  ...pathsEditSchema.shape,
-  collection_ids: z.array(z.string()).nullish(),
-});
+const editSchema = pathsEditSchema;
+type EditSchema = z.infer<typeof editSchema>;
 
 const generateTitle = (paths: Path[] | null, pathType: Path["pathType"]) => {
   if (!paths || paths.length === 0) return `${upperCaseFirstLetter(pathType)}1`;
@@ -69,9 +61,8 @@ const generateTitle = (paths: Path[] | null, pathType: Path["pathType"]) => {
 };
 
 const PathsForm = () => {
-  const { map, activeState, paths, setActiveState, terraDrawInstance } = useMapStore(
-    (store) => store
-  );
+  const { map, activeState, paths, setActiveState, terraDrawInstance } =
+    useMapStore((store) => store);
   if (
     activeState &&
     (activeState.event === "paths:create" ||
@@ -89,7 +80,7 @@ const PathsForm = () => {
     );
     const [isLoading, setIsLoading] = React.useState(false);
 
-    const form = useForm<z.infer<typeof editSchema>>({
+    const form = useForm<EditSchema>({
       resolver: zodResolver(editSchema),
       defaultValues: {
         ...path,
@@ -97,8 +88,8 @@ const PathsForm = () => {
         mapId: map._id as Id<"maps">,
         styles: {
           ...fallbackStyle,
-          ...path.styles
-        }
+          ...path.styles,
+        },
       },
     });
 
@@ -121,10 +112,8 @@ const PathsForm = () => {
       setActiveState(null);
     };
 
-    const onSubmit: SubmitHandler<z.infer<typeof editSchema>> = async (
-      data
-    ) => {
-      console.log("saving path", data)
+    const onSubmit: SubmitHandler<EditSchema> = async (data) => {
+      console.log("saving path", data);
       try {
         setIsLoading(true);
 
@@ -149,7 +138,6 @@ const PathsForm = () => {
 
         if (activeState.event === "paths:create") {
           // remove collection_ids from data
-          delete data.collection_ids;
           const createdPath = createPath({
             ...data,
             mapId: map._id as Id<"maps">,
@@ -191,19 +179,21 @@ const PathsForm = () => {
     const selectedFillColor = watch("styles.fillColor") ?? "";
     const selectedFillOpacity = watch("styles.fillOpacity") ?? 1;
 
-
     return (
       <div className="p-2 z-10">
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <DialogHeader className="flex flex-row items-start justify-center py-2">
-              <ShowPathIcon pathType={path.pathType} styles={{
-                strokeColor: selectedColor,
-                strokeOpacity: selectedStrokeOpacity,
-                strokeWidth: selectedStrokeWidth,
-                fillColor: selectedFillColor,
-                fillOpacity: selectedFillOpacity
-              }} />
+              <ShowPathIcon
+                pathType={path.pathType}
+                styles={{
+                  strokeColor: selectedColor,
+                  strokeOpacity: selectedStrokeOpacity,
+                  strokeWidth: selectedStrokeWidth,
+                  fillColor: selectedFillColor,
+                  fillOpacity: selectedFillOpacity,
+                }}
+              />
 
               <FormField
                 control={control}
@@ -267,7 +257,7 @@ const PathsForm = () => {
               }}
             />
 
-            { }
+            {}
             <FormField
               control={control}
               name="styles.fillColor"
@@ -335,7 +325,7 @@ const PathsForm = () => {
                 "inline-flex items-center justify-between w-11/12  absolute bottom-2 mt-4 ",
                 {
                   "justify-end": activeState.event === "paths:create",
-                  "relative gap-2": activeState.event === "paths:update"
+                  "relative gap-2": activeState.event === "paths:update",
                 }
               )}
             >
@@ -351,7 +341,11 @@ const PathsForm = () => {
                   Delete Path
                 </Button>
               )}
-              <Button aria-label="Create Path" type="submit" disabled={isLoading}>
+              <Button
+                aria-label="Create Path"
+                type="submit"
+                disabled={isLoading}
+              >
                 {activeState.event === "paths:create"
                   ? "Add Path"
                   : "Save changes"}
