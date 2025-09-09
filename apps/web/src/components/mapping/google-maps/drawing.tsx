@@ -145,7 +145,7 @@ const DrawingTest = () => {
         const adapter = new TerraDrawGoogleMapsAdapter({
           lib: window.google.maps,
           map: googleMap,
-          coordinatePrecision: 6,
+          coordinatePrecision: 20,
         });
 
         adapterRef.current = adapter;
@@ -378,7 +378,8 @@ const DrawingTest = () => {
     // --- First load ---
     if (!prevPaths) {
       const geoJson = pathsToGeoJson(paths);
-      terraDrawInstance.addFeatures(geoJson);
+      const validation = terraDrawInstance.addFeatures(geoJson);
+      console.log("Validation return", validation);
 
       prevPathRef.current = paths;
       return;
@@ -490,7 +491,6 @@ const DrawingTest = () => {
   if (uiState !== "paths") {
     return (
       <Button
-        size="icon"
         size="icon"
         className={cn("fixed z-50", {
           "right-2 top-2": isMobile,

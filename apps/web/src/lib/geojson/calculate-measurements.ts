@@ -1,19 +1,12 @@
 import {
-  circleMeasurements,
-  lineMeasurements,
-  measurementsSchema,
-  polygonMeasurements,
-  rectangleMeasurements,
-} from "@buzztrip/backend/zod-schemas";
+  CircleMeasurements,
+  LineMeasurements,
+  Measurements,
+  PolygonMeasurements,
+  RectangleMeasurements,
+} from "@buzztrip/backend/types";
 import * as turf from "@turf/turf";
 import { Feature, LineString, Point, Polygon } from "geojson";
-import * as z from "zod";
-
-export type CircleMeasurements = z.infer<typeof circleMeasurements>;
-export type RectangleMeasurements = z.infer<typeof rectangleMeasurements>;
-export type LineMeasurements = z.infer<typeof lineMeasurements>;
-export type PolygonMeasurements = z.infer<typeof polygonMeasurements>;
-export type Measurements = z.infer<typeof measurementsSchema>;
 
 // Helper function to calculate circle measurements
 export const calculateCircleMeasurements = (

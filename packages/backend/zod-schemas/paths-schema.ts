@@ -6,6 +6,13 @@ import { defaultSchema, insertSchema } from "./shared-schemas";
 const pathTypes = ["text", "circle", "rectangle", "polygon", "line"] as const;
 export const pathTypeEnum = z.enum(pathTypes);
 
+/**
+ * We are reimplementing a strict postion schema.
+ * A postion is a set of cordinates which can either be `[x, y]` or `[x, y, z]`
+ * ```ts
+ * type Position = [x: number, y: number] | [x: number, y: number, z: number]
+ * ```
+ */
 export const strictPosition = z.union([
   z.tuple([z.number(), z.number()]),
   z.tuple([z.number(), z.number(), z.number()]),
@@ -47,6 +54,12 @@ export const stylesSchema = z.object({
   fillOpacity: z.number().optional(),
 });
 
+/**
+ * Depending on the shape we can have different lots of points
+ * 1. a single point this is just a position
+ * 2 a line this is a position[]
+ * 3. a polygon this can be a position[][]
+ */
 const pointsSchema = z.union([
   strictPosition,
   strictPosition.array(),
@@ -71,5 +84,5 @@ export const pathsSchema = defaultSchema(
 // --- Edit Schema ---
 export const pathsEditSchema = insertSchema(pathsSchema).extend({
   createdBy: zid("users").optional(),
-});;
+});
 // Position | Position[] | Position[][]

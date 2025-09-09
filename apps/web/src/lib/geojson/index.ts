@@ -1,7 +1,7 @@
 import { Id } from "@buzztrip/backend/dataModel";
-import { NewPath, Path } from "@buzztrip/backend/types";
+import { Measurements, NewPath, Path } from "@buzztrip/backend/types";
 import * as turf from "@turf/turf";
-import { Feature, LineString, Point, Polygon } from "geojson";
+import { Feature, LineString, Point, Polygon, Position } from "geojson";
 import { calculateMeasurementsFromGeoJSON } from "./calculate-measurements";
 
 // Types from your existing code
@@ -26,7 +26,7 @@ export const pathsToGeoJson = (paths: Path[]): GeoJSONStoreFeatures[] => {
       path_id: path._id,
       title: path.title,
       note: path.note || null,
-      measurements: path.measurements,
+      measurements: path.measurements ?? null,
       styles: path.styles || null,
       createdBy: path.createdBy,
       mapId: path.mapId,
@@ -37,27 +37,26 @@ export const pathsToGeoJson = (paths: Path[]): GeoJSONStoreFeatures[] => {
       case "polygon": {
         // Handle polygon coordinates using Turf
         try {
-          let coordinates: number[][][] = [];
+          let coordinates: Position[][] = [];
 
           if (
             Array.isArray(path.points[0]) &&
             Array.isArray(path.points[0][0])
           ) {
             // Already in the correct format for polygon coordinates
-            coordinates = path.points as number[][][];
+            coordinates = path.points as Position[][];
           } else {
             // Single ring polygon
-            coordinates = [path.points as number[][]];
+            coordinates = path.points as Position[][];
           }
 
           // Validate and create polygon using Turf
           const polygon = turf.polygon(coordinates);
 
           return {
-            type: "Feature",
-            geometry: polygon.geometry,
+            ...polygon,
             properties,
-          } as Feature<Polygon, DefinedProperties>;
+          };
         } catch (error) {
           console.error("Invalid polygon coordinates:", error);
           throw new Error("Invalid polygon coordinates");
@@ -67,14 +66,12 @@ export const pathsToGeoJson = (paths: Path[]): GeoJSONStoreFeatures[] => {
       case "line": {
         // Handle line coordinates using Turf
         try {
-          const coordinates = path.points as number[][];
-          const lineString = turf.lineString(coordinates);
+          const lineString = turf.lineString(path.points as Position[]);
 
           return {
-            type: "Feature",
-            geometry: lineString.geometry,
+            ...lineString,
             properties,
-          } as Feature<LineString, DefinedProperties>;
+          };
         } catch (error) {
           console.error("Invalid line coordinates:", error);
           throw new Error("Invalid line coordinates");
@@ -84,22 +81,22 @@ export const pathsToGeoJson = (paths: Path[]): GeoJSONStoreFeatures[] => {
       case "circle": {
         // Convert circle to polygon using Turf's circle function
         try {
-          const center = path.points as [number, number];
+          // when we save a circle we save the center as the path.points
+          const center = path.points as Position;
           const radius = (path.measurements as any).radius;
 
           // Turf.circle creates a polygon approximation of a circle
           // radius should be in kilometers for turf.circle
           const radiusInKm = radius / 1000; // Convert meters to kilometers
           const circlePolygon = turf.circle(center, radiusInKm, {
-            steps: 32, // Number of sides for the polygon approximation
+            // steps: 6, // Number of sides for the polygon approximation
             units: "kilometers",
           });
 
           return {
-            type: "Feature",
-            geometry: circlePolygon.geometry,
+            ...circlePolygon,
             properties,
-          } as Feature<Polygon, DefinedProperties>;
+          };
         } catch (error) {
           console.error("Invalid circle parameters:", error);
           throw new Error("Invalid circle parameters");
@@ -137,10 +134,9 @@ export const pathsToGeoJson = (paths: Path[]): GeoJSONStoreFeatures[] => {
           const rectanglePolygon = turf.polygon([rectangleCoords]);
 
           return {
-            type: "Feature",
-            geometry: rectanglePolygon.geometry,
+            ...rectanglePolygon,
             properties,
-          } as Feature<Polygon, DefinedProperties>;
+          };
         } catch (error) {
           console.error("Invalid rectangle coordinates:", error);
           throw new Error("Invalid rectangle coordinates");
@@ -160,7 +156,7 @@ export const geoJsonToPaths = (
   return features.map((feature) => {
     const mode = feature.properties?.["mode"] as DrawingMode;
     const pathType = mode === "linestring" ? "line" : mode;
-    let calculatedMeasurements: NewPath["measurements"] = {
+    let calculatedMeasurements: Measurements = {
       perimeter: 0,
     };
 
