@@ -25,6 +25,7 @@ import { mapsEditSchema } from "@buzztrip/backend/zod-schemas";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { useMutation } from "convex/react";
 import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -33,7 +34,6 @@ import {
   MapFormProvider,
   RefinedUserWithPermission,
 } from "../map-form/provider";
-import { useRouter } from "next/navigation";
 
 export interface CreateMapModalProps {
   trigger?: React.ReactNode;
