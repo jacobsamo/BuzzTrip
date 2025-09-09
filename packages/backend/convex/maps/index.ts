@@ -1,4 +1,5 @@
 import { zid } from "convex-helpers/server/zod";
+import { z } from "zod";
 import { uppercaseFirstLetter } from "../../helpers";
 import type { UserMap } from "../../types";
 import {
@@ -7,6 +8,7 @@ import {
   userMapsSchema,
 } from "../../zod-schemas";
 import { Id } from "../_generated/dataModel";
+import { MutationCtx } from "../_generated/server";
 import { authedMutation, authedQuery } from "../helpers";
 import { createMapUser } from "./mapUsers";
 // Get methods
@@ -98,47 +100,56 @@ export const getUserMaps = authedQuery({
   },
 });
 
+const createMapSchema = z.object({
+  userId: zid("users"),
+  users: mapUserSchema
+    .pick({
+      user_id: true,
+      permission: true,
+    })
+    .array()
+    .optional(),
+  map: mapsEditSchema,
+});
+
+export const createMapFunction = async (
+  ctx: MutationCtx,
+  args: z.infer<typeof createMapSchema>
+) => {
+  const { users, map } = args;
+
+  const mapId = await ctx.db.insert("maps", {
+    ...map,
+    title: uppercaseFirstLetter(map.title),
+    owner_id: args.userId,
+    mapTypeId: map.mapTypeId ?? "hybrid",
+  });
+
+  await createMapUser(ctx, {
+    user_id: args.userId,
+    permission: "owner",
+    map_id: mapId,
+  });
+
+  if (users) {
+    await Promise.all([
+      users.map((user) =>
+        createMapUser(ctx, {
+          user_id: user.user_id,
+          permission: user.permission,
+          map_id: mapId,
+        })
+      ),
+    ]);
+  }
+  return mapId;
+};
+
 // // Mutations
 export const createMap = authedMutation({
-  args: {
-    users: mapUserSchema
-      .pick({
-        user_id: true,
-        permission: true,
-      })
-      .array()
-      .optional(),
-    map: mapsEditSchema,
-  },
-  handler: async (ctx, args) => {
-    const { users, map } = args;
-
-    const mapId = await ctx.db.insert("maps", {
-      ...map,
-      title: uppercaseFirstLetter(map.title),
-      owner_id: ctx.user._id,
-      mapTypeId: map.mapTypeId ?? "hybrid",
-    });
-
-    await createMapUser(ctx, {
-      user_id: ctx.user._id,
-      permission: "owner",
-      map_id: mapId,
-    });
-
-    if (users) {
-      await Promise.all([
-        users.map((user) =>
-          createMapUser(ctx, {
-            user_id: user.user_id,
-            permission: user.permission,
-            map_id: mapId,
-          })
-        ),
-      ]);
-    }
-    return mapId;
-  },
+  args: createMapSchema.omit({ userId: true }),
+  handler: async (ctx, args) =>
+    await createMapFunction(ctx, { ...args, userId: ctx.user._id }),
 });
 
 export const updateMap = authedMutation({
@@ -149,7 +160,9 @@ export const updateMap = authedMutation({
   handler: async (ctx, args) => {
     await ctx.db.patch(args.mapId, {
       ...args.map,
-      ...(args.map.title ? { title: uppercaseFirstLetter(args.map.title) } : {}),
+      ...(args.map.title
+        ? { title: uppercaseFirstLetter(args.map.title) }
+        : {}),
       updatedAt: new Date().toISOString(),
     });
   },
