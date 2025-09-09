@@ -10,6 +10,7 @@ import {
 import { Id } from "../_generated/dataModel";
 import { MutationCtx } from "../_generated/server";
 import { authedMutation, authedQuery } from "../helpers";
+import { createCollectionFunction } from "./collections";
 import { createMapUser } from "./mapUsers";
 // Get methods
 
@@ -90,12 +91,6 @@ export const getUserMaps = authedQuery({
         } as UserMap;
       })
     );
-
-    console.log("getUserMaps", {
-      userId: args.userId,
-      mapUsers: mapUsers.length,
-      combinedMaps: combinedMaps.length,
-    });
     return combinedMaps;
   },
 });
@@ -112,37 +107,59 @@ const createMapSchema = z.object({
   map: mapsEditSchema,
 });
 
+/**
+ * This function creates a map and all the associated data needed
+ * @param {MutationCtx} ctx - the convex mutation context
+ * @param {z.infer<typeof createMapSchema>} args - the args for the mutation
+ * @returns {Promise<Id<"maps">>} - the id of the created map
+ */
 export const createMapFunction = async (
   ctx: MutationCtx,
   args: z.infer<typeof createMapSchema>
 ) => {
-  const { users, map } = args;
+  try {
+    const { users, map } = args;
 
-  const mapId = await ctx.db.insert("maps", {
-    ...map,
-    title: uppercaseFirstLetter(map.title),
-    owner_id: args.userId,
-    mapTypeId: map.mapTypeId ?? "hybrid",
-  });
+    const mapId = await ctx.db.insert("maps", {
+      ...map,
+      title: uppercaseFirstLetter(map.title),
+      owner_id: args.userId,
+      mapTypeId: map.mapTypeId ?? "hybrid",
+    });
 
-  await createMapUser(ctx, {
-    user_id: args.userId,
-    permission: "owner",
-    map_id: mapId,
-  });
-
-  if (users) {
-    await Promise.all([
-      users.map((user) =>
+    const userPromise =
+      users?.map((user) =>
         createMapUser(ctx, {
           user_id: user.user_id,
           permission: user.permission,
           map_id: mapId,
         })
-      ),
+      ) ?? [];
+
+    await Promise.all([
+      ...userPromise,
+      // we always want to create the owner
+      createMapUser(ctx, {
+        user_id: args.userId,
+        permission: "owner",
+        map_id: mapId,
+      }),
+      // create a default collection for the map
+      createCollectionFunction(ctx, {
+        collection: {
+          map_id: mapId,
+          title: "Default Collection",
+          icon: "Folder",
+        },
+        userId: args.userId,
+      }),
     ]);
+
+    return mapId;
+  } catch (error) {
+    console.error(error);
+    throw error;
   }
-  return mapId;
 };
 
 // // Mutations
