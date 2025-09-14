@@ -81,48 +81,42 @@ export const createStore = (initState: InitState) =>
           searchActive: false,
         }));
       },
-      setActiveState: (state: ActiveState | null) => {
-        const currentState = get().activeState;
-        const prevState = get().prevState;
+      setActiveState: (next: ActiveState) => {
+        const current = get().activeState;
+        const prev = get().prevState;
 
-        if (
-          (prevState?.event === "markers:create" ||
-            prevState?.event === "markers:update") &&
-          currentState?.event === "collections:create"
-        ) {
-          set(() => ({
-            activeState: prevState,
-            prevState: currentState,
-            drawerState: { snap: 0.9, dismissible: false },
-          }));
-          return;
-        }
+        const isPrevMarker =
+          prev?.event === "markers:create" || prev?.event === "markers:update";
+        const isCurrentCollections = current?.event === "collections:create";
 
-        if (!state) {
-          set(() => ({
-            activeState: state,
-            prevState: currentState,
-            drawerState: { snap: 0.2, dismissible: true },
-            uiState: "default",
-          }));
-          return;
-        }
-
-        if (state.event === "add-marker") {
-          set(() => ({
-            activeState: state,
-            drawerState: { snap: 0.2, dismissible: true },
-          }));
-          return;
-        }
+        const effectiveNext =
+          isPrevMarker && isCurrentCollections ? prev : next;
+        console.log("setactiveSate items", {
+          activeState: effectiveNext,
+          prevState: current,
+          drawerState:
+            effectiveNext?.event === "paths:update"
+              ? { snap: 0.9, dismissible: false }
+              : effectiveNext
+                ? { snap: 0.9, dismissible: false }
+                : { snap: 0.2, dismissible: true },
+          uiState:
+            effectiveNext?.event === "paths:update" ? "paths" : "default",
+        });
 
         set(() => ({
-          activeState: state,
-          prevState: currentState,
-          drawerState: { snap: 0.9, dismissible: false },
+          activeState: effectiveNext,
+          prevState: current,
+          drawerState:
+            effectiveNext?.event === "paths:update"
+              ? { snap: 0.9, dismissible: false }
+              : effectiveNext
+                ? { snap: 0.9, dismissible: false }
+                : { snap: 0.2, dismissible: true },
+          uiState:
+            effectiveNext?.event === "paths:update" ? "paths" : "default",
         }));
       },
-
       setDrawerState: (state: DrawerState) => {
         set(() => ({ drawerState: state }));
       },

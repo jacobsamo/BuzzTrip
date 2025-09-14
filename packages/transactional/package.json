@@ -10,11 +10,11 @@
     "export": "email export"
   },
   "devDependencies": {
-    "react-email": "4.2.9",
+    "react-email": "4.2.11",
     "@buzztrip/tsconfig": "workspace:*"
   },
   "dependencies": {
-    "@react-email/components": "0.5.2",
+    "@react-email/components": "0.5.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "resend": "^6.0.3"

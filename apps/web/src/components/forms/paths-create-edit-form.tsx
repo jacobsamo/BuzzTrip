@@ -26,6 +26,7 @@ import React, { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import CloseButton from "../layouts/map-view/components/close-button";
 import { ShowPathIcon, fallbackStyle } from "../show-path-icon";
 
 const editSchema = pathsEditSchema;
@@ -208,6 +209,8 @@ const PathsForm = () => {
                   </FormItem>
                 )}
               />
+
+              {activeState.event === "paths:update" && <CloseButton />}
             </DialogHeader>
 
             <FormField

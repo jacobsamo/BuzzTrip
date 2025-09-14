@@ -4,7 +4,6 @@ export const popularColors: Color[] = [
   { name: "dark blue", hex: "#FF5252" },
   { name: "dark green", hex: "#0B7138" },
   { name: "cyan", hex: "#0097A7" },
-  { name: "pink", hex: "#FE5354" },
   { name: "purple", hex: "#7E57C2" },
   { name: "orange", hex: "#E65200" },
 ];

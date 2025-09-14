@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { geoJsonToPaths, pathsToGeoJson } from "@/lib/geojson";
 import { cn } from "@/lib/utils";
 import { Path, PathStyle } from "@buzztrip/backend/types";
-import { stylesSchema } from "@buzztrip/backend/zod-schemas";
+import { pathsSchema, stylesSchema } from "@buzztrip/backend/zod-schemas";
 import { useMap } from "@vis.gl/react-google-maps";
 import {
   ChevronLeft,
@@ -28,6 +28,7 @@ import {
   TerraDrawSelectMode,
 } from "terra-draw";
 import { TerraDrawGoogleMapsAdapter } from "./terra-draw-google-maps-adapter";
+import { ShowPathIcon } from "@/components/show-path-icon";
 
 type DrawingMode =
   | "static"
@@ -71,7 +72,10 @@ const DrawingTest = () => {
   const [mapReady, setMapReady] = useState(false);
   const initTimeoutRef = useRef<NodeJS.Timeout>(null);
   const prevPathRef = useRef<Path[] | null>(null);
+  /** this can only be used to get values can't be used to set values */
+  const featureIdMap = useRef(new Map());
   const pathsLoadedRef = useRef(false);
+  const isProgrammaticSelectRef = useRef(false);
 
   // First useEffect: Check if Google Map is ready
   useEffect(() => {
@@ -290,15 +294,31 @@ const DrawingTest = () => {
           }
         });
 
-        draw.on("select", (id) => {
-          if (activeState?.event !== "paths:update") {
-            const features = draw?.getSnapshot();
-            const feature = features?.find((f) => f.properties._id === id);
-            const path: Path = {
-              ...(feature?.properties as Path),
-            };
-            setActiveState({ event: "paths:update", payload: path });
+        draw.on("select", (terraId) => {
+          // Ignore the echo from our programmatic selection
+          if (isProgrammaticSelectRef.current) {
+            isProgrammaticSelectRef.current = false;
+            return;
           }
+
+          // Resolve to our domain id
+          const feature = draw?.getSnapshot().find((f) => f.id === terraId);
+          if (!feature) return;
+
+          const domainId = feature.properties?._id;
+          if (!domainId) return;
+
+          // Only update state if it's a change
+          if (
+            activeState &&
+            activeState.event === "paths:update" &&
+            activeState.payload?._id === domainId
+          ) {
+            return;
+          }
+
+          const path = pathsSchema.parse(feature.properties);
+          setActiveState({ event: "paths:update", payload: path });
         });
         console.log("Starting Terra Draw...");
         draw.start();
@@ -334,6 +354,23 @@ const DrawingTest = () => {
       pathsLoadedRef.current = false;
     };
   }, [mapReady, googleMap]); // Only depend on mapReady, not uiState
+
+  // when you want to select based on state:
+  useEffect(() => {
+    if (!terraDrawInstance || activeState?.event !== "paths:update") return;
+
+    const featureId = featureIdMap.current.get(activeState.payload._id);
+    if (!featureId) return;
+
+    // mark as programmatic to avoid echo
+    isProgrammaticSelectRef.current = true;
+    try {
+      terraDrawInstance.selectFeature(featureId);
+    } finally {
+      // let Terra Draw emit 'select', we will ignore once
+      // clear in the handler
+    }
+  }, [activeState, terraDrawInstance]);
 
   /* Handle diffing the changes for paths */
   const diffPaths = (prevPaths: Path[], newPaths: Path[]) => {
@@ -371,8 +408,8 @@ const DrawingTest = () => {
 
     const prevPaths = prevPathRef.current;
     const snapShot = terraDrawInstance.getSnapshot();
-    const featureIdMap = new Map(
-      snapShot.map((f) => [f.properties.path_id, f.id])
+    featureIdMap.current = new Map(
+      snapShot.map((f) => [f.properties._id, f.id])
     );
 
     // --- First load ---
@@ -398,7 +435,7 @@ const DrawingTest = () => {
     // handle deleted
     if (deleted.length > 0) {
       const featureIds = deleted
-        .map((p) => featureIdMap.get(p._id))
+        .map((p) => featureIdMap.current.get(p._id))
         .filter(Boolean) as FeatureId[];
 
       terraDrawInstance.removeFeatures(featureIds);
@@ -407,7 +444,7 @@ const DrawingTest = () => {
     // handle changed
     if (changed.length > 0) {
       const toRemove = changed
-        .map((p) => featureIdMap.get(p._id))
+        .map((p) => featureIdMap.current.get(p._id))
         .filter(Boolean) as FeatureId[];
       terraDrawInstance.removeFeatures(toRemove);
 
@@ -417,7 +454,7 @@ const DrawingTest = () => {
 
     // handle added
     if (added.length > 0) {
-      const undefinedItem = featureIdMap.get(undefined);
+      const undefinedItem = featureIdMap.current.get(undefined);
       if (!undefinedItem) {
         console.log("No feature found", undefinedItem, featureIdMap);
         return;
@@ -492,6 +529,7 @@ const DrawingTest = () => {
     return (
       <Button
         size="icon"
+        variant="secondary"
         className={cn("fixed z-50", {
           "right-2 top-2": isMobile,
           "top-[68px] left-[400px]": !isMobile,
@@ -554,7 +592,7 @@ const DrawingTest = () => {
         disabled={!isReady}
         title="Draw lines"
       >
-        <Minus />
+          <ShowPathIcon pathType="line" />
       </Button>
 
       {/* Polygon Mode */}
@@ -570,7 +608,8 @@ const DrawingTest = () => {
         disabled={!isReady}
         title="Draw polygons"
       >
-        <Triangle />
+              <ShowPathIcon pathType="polygon" />
+
       </Button>
 
       {/* Rectangle Mode */}
@@ -586,7 +625,7 @@ const DrawingTest = () => {
         disabled={!isReady}
         title="Draw rectangles"
       >
-        <RectangleHorizontal />
+          <ShowPathIcon pathType="rectangle" />
       </Button>
 
       {/* Circle Mode */}
@@ -602,7 +641,7 @@ const DrawingTest = () => {
         disabled={!isReady}
         title="Draw circles"
       >
-        <Circle />
+          <ShowPathIcon pathType="circle" />
       </Button>
     </div>
   );

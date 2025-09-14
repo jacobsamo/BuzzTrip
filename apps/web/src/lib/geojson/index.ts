@@ -23,13 +23,7 @@ type DrawingMode = "polygon" | "circle" | "rectangle" | "linestring";
 export const pathsToGeoJson = (paths: Path[]): GeoJSONStoreFeatures[] => {
   return paths.map((path) => {
     const properties: DefinedProperties = {
-      path_id: path._id,
-      title: path.title,
-      note: path.note || null,
-      measurements: path.measurements ?? null,
-      styles: path.styles || null,
-      createdBy: path.createdBy,
-      mapId: path.mapId,
+      ...path,
       mode: path.pathType === "line" ? "linestring" : path.pathType,
     };
 
@@ -37,17 +31,17 @@ export const pathsToGeoJson = (paths: Path[]): GeoJSONStoreFeatures[] => {
       case "polygon": {
         // Handle polygon coordinates using Turf
         try {
-          let coordinates: Position[][] = [];
+          let coordinates: number[][][] = [];
 
           if (
             Array.isArray(path.points[0]) &&
             Array.isArray(path.points[0][0])
           ) {
             // Already in the correct format for polygon coordinates
-            coordinates = path.points as Position[][];
+            coordinates = path.points as number[][][];
           } else {
             // Single ring polygon
-            coordinates = path.points as Position[][];
+            coordinates = [path.points as number[][]];
           }
 
           // Validate and create polygon using Turf
