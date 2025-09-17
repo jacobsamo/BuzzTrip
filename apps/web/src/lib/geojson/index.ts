@@ -155,6 +155,7 @@ export const geoJsonToPaths = (
     };
 
     let path: NewPath = {
+      ...feature.properties,
       title: (feature.properties?.["title"] as string) || "",
       note: (feature.properties?.["notes"] as string) || undefined,
       styles: (feature.properties?.["styles"] as any) || undefined,

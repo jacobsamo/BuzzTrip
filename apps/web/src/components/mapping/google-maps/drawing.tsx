@@ -1,20 +1,12 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { fallbackStyle } from "@/components/show-path-icon";
+import { fallbackStyle, ShowPathIcon } from "@/components/show-path-icon";
 import { Button } from "@/components/ui/button";
 import { geoJsonToPaths, pathsToGeoJson } from "@/lib/geojson";
 import { cn } from "@/lib/utils";
 import { Path, PathStyle } from "@buzztrip/backend/types";
 import { pathsSchema, stylesSchema } from "@buzztrip/backend/zod-schemas";
 import { useMap } from "@vis.gl/react-google-maps";
-import {
-  ChevronLeft,
-  Circle,
-  LineSquiggle,
-  Minus,
-  MousePointer2,
-  RectangleHorizontal,
-  Triangle,
-} from "lucide-react";
+import { ChevronLeft, LineSquiggle, MousePointer2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   GeoJSONStoreFeatures,
@@ -28,7 +20,7 @@ import {
   TerraDrawSelectMode,
 } from "terra-draw";
 import { TerraDrawGoogleMapsAdapter } from "./terra-draw-google-maps-adapter";
-import { ShowPathIcon } from "@/components/show-path-icon";
+import { consoleLoggingIntegration } from "@sentry/nextjs";
 
 type DrawingMode =
   | "static"
@@ -276,21 +268,40 @@ const DrawingTest = () => {
           console.log("Drawing finished:", { id, context });
           const features = draw.getSnapshot();
           const feature = features.find((f) => f.id === id);
+          if (feature) {
+            const paths = geoJsonToPaths([feature], map._id);
 
-          if (feature && context.action === "draw") {
-            console.log("Feature created:", feature);
-
-            const path = geoJsonToPaths([feature], map._id);
-            if (!path || path.length === 0 || !path[0]) {
+            if (!paths || paths.length === 0 || !paths[0]) {
               console.error("No valid path created from feature");
               return;
             }
-            setActiveState({
-              event: "paths:create",
-              payload: {
-                ...path[0],
-              },
-            });
+
+            if (context.action === "draw") {
+              console.log("Feature created:", feature);
+
+              setActiveState({
+                event: "paths:create",
+                payload: {
+                  ...paths[0],
+                },
+              });
+            }
+
+            if (
+              [
+                "dragCoordinateResize",
+                "dragCoordinate",
+                "dragFeature",
+              ].includes(context.action)
+            ) {
+              console.log('Updating the path', paths[0]);
+              setActiveState({
+                event: "paths:update",
+                payload: {
+                  ...paths[0],
+                },
+              });
+            }
           }
         });
 
@@ -592,7 +603,7 @@ const DrawingTest = () => {
         disabled={!isReady}
         title="Draw lines"
       >
-          <ShowPathIcon pathType="line" />
+        <ShowPathIcon pathType="line" />
       </Button>
 
       {/* Polygon Mode */}
@@ -608,8 +619,7 @@ const DrawingTest = () => {
         disabled={!isReady}
         title="Draw polygons"
       >
-              <ShowPathIcon pathType="polygon" />
-
+        <ShowPathIcon pathType="polygon" />
       </Button>
 
       {/* Rectangle Mode */}
@@ -625,7 +635,7 @@ const DrawingTest = () => {
         disabled={!isReady}
         title="Draw rectangles"
       >
-          <ShowPathIcon pathType="rectangle" />
+        <ShowPathIcon pathType="rectangle" />
       </Button>
 
       {/* Circle Mode */}
@@ -641,7 +651,7 @@ const DrawingTest = () => {
         disabled={!isReady}
         title="Draw circles"
       >
-          <ShowPathIcon pathType="circle" />
+        <ShowPathIcon pathType="circle" />
       </Button>
     </div>
   );
