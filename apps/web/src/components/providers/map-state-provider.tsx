@@ -27,6 +27,7 @@ type MapStoreProviderPreloadedQueries = {
   >;
   labels: Preloaded<typeof api.maps.labels.getMapLabels>;
   mapUsers: Preloaded<typeof api.maps.mapUsers.getMapUsers>;
+  paths: Preloaded<typeof api.maps.paths.getPathsForMap>;
   // routes: Preloaded<typeof api.maps.routes.getRoutesForMap>;
   // routeStops: Preloaded<typeof api.maps.routes.getRouteStopsForMap>;
 };
@@ -47,6 +48,7 @@ export const MapStoreProvider = ({
   const collectionLinks = usePreloadedQuery(preloadedQueries.collectionLinks);
   const labels = usePreloadedQuery(preloadedQueries.labels);
   const mapUsers = usePreloadedQuery(preloadedQueries.mapUsers);
+  const paths = usePreloadedQuery(preloadedQueries.paths);
   // const routes = useQuery(api.maps.routes.getRoutesForMap , {
   //   map_id: initialState.map._id as Id<"maps">,
   // })
@@ -60,6 +62,7 @@ export const MapStoreProvider = ({
       ...initialState,
       markers: markers ?? null,
       collections: collections ?? null,
+      paths: paths ?? null,
       collectionLinks: collectionLinks ?? null,
       labels: labels ?? null,
       mapUsers: mapUsers ?? null,
@@ -77,12 +80,13 @@ export const MapStoreProvider = ({
       storeRef.current.setState({
         markers: markers ?? null,
         collections: collections ?? null,
+        paths: paths ?? null,
         collectionLinks: collectionLinks ?? null,
         labels: labels ?? null,
         mapUsers: mapUsers ?? null,
       });
     }
-  }, [markers, collections, collectionLinks, labels, mapUsers]);
+  }, [markers, collections, collectionLinks, labels, mapUsers, paths]);
 
   return (
     <MapStoreContext.Provider value={storeRef.current}>

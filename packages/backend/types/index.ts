@@ -1,22 +1,31 @@
 import { z } from "zod";
 import {
   boundsSchema,
+  circleMeasurements,
   collection_linksEditSchema,
   collection_linksSchema,
   collectionsEditSchema,
   collectionsSchema,
+  combinedMapUser,
   combinedMarkersSchema,
   labelsEditSchema,
   labelsSchema,
+  lineMeasurements,
   mapsEditSchema,
   mapsSchema,
+  mapTypeIdEnum,
   mapUserEditSchema,
   mapUserSchema,
   markersEditSchema,
   markersSchema,
+  measurementsSchema,
+  pathsEditSchema,
+  pathsSchema,
   permissionEnumSchema,
   placesEditSchema,
   placesSchema,
+  polygonMeasurements,
+  rectangleMeasurements,
   refinedUserSchema,
   reviewsSchema,
   route_stopsEditSchema,
@@ -24,11 +33,10 @@ import {
   routesEditSchema,
   routesSchema,
   shareMapUserSchema,
+  stylesSchema,
   travelTypeEnumSchema,
   userMapsSchema,
   userSchema,
-  combinedMapUser,
-  mapTypeIdEnum
 } from "../zod-schemas";
 
 export * from "./icons";
@@ -79,4 +87,15 @@ export type PermissionEnum = z.infer<typeof permissionEnumSchema>;
 
 export type TravelTypeEnum = z.infer<typeof travelTypeEnumSchema>;
 
-export type MapTypeId = z.infer<typeof mapTypeIdEnum>
+export type MapTypeId = z.infer<typeof mapTypeIdEnum>;
+
+export type Path = z.infer<typeof pathsSchema>;
+export type NewPath = z.infer<typeof pathsEditSchema>;
+
+export type Measurements = z.infer<typeof measurementsSchema>;
+export type CircleMeasurements = z.infer<typeof circleMeasurements>;
+export type RectangleMeasurements = z.infer<typeof rectangleMeasurements>;
+export type LineMeasurements = z.infer<typeof lineMeasurements>;
+export type PolygonMeasurements = z.infer<typeof polygonMeasurements>;
+
+export type PathStyle = z.infer<typeof stylesSchema>;

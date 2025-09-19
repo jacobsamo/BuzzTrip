@@ -1,14 +1,13 @@
 import { zodToConvex } from "convex-helpers/server/zod";
 import { defineSchema, defineTable } from "convex/server";
-import {
-  userSchema,
-} from "../zod-schemas/auth-schema";
+import { userSchema } from "../zod-schemas/auth-schema";
 import {
   placePhotoSchema,
   placesSchema as places,
   placesReviewSchema,
 } from "../zod-schemas/places-schema";
 
+import { pathsSchema } from "../zod-schemas";
 import {
   collection_linksSchema,
   collectionsSchema,
@@ -19,14 +18,13 @@ import {
   route_stopsSchema,
   routesSchema,
 } from "../zod-schemas/maps-schema";
-import { pathsSchema } from "../zod-schemas";
 
 export default defineSchema({
   // maps
   maps: defineTable(zodToConvex(mapsSchema)).index("by_visibility", [
     "visibility",
   ]),
-  paths: defineTable(zodToConvex(pathsSchema)),
+  paths: defineTable(zodToConvex(pathsSchema)).index("byMapId", ["mapId"]),
   map_users: defineTable(zodToConvex(mapUserSchema))
     .index("by_map_id", ["map_id"])
     .index("by_user_id", ["user_id"]),

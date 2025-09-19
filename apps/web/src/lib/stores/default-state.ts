@@ -7,13 +7,17 @@ import type {
   Map,
   MapUser,
   NewCollection,
+  NewPath,
+  Path,
   Route,
   RouteStop,
 } from "@buzztrip/backend/types";
+import { TerraDraw } from "terra-draw";
 
 const eventType = [
-  ...createAction("collections", ["create", "update"]),
-  ...createAction("markers", ["create", "update"]),
+  ...createAction("collections", ["create", "update", "delete"]),
+  ...createAction("markers", ["create", "update", "delete"]),
+  ...createAction("paths", ["create", "update", "delete"]),
 ] as const;
 type EventType = (typeof eventType)[number];
 
@@ -22,7 +26,8 @@ type EventPayloadMap = {
   "collections:update": NewCollection;
   "markers:create": CombinedMarker;
   "markers:update": CombinedMarker;
-  "add-marker": null;
+  "paths:create": NewPath;
+  "paths:update": NewPath;
 };
 
 export type ActiveState = {
@@ -49,6 +54,7 @@ export type StoreState = {
   labels: Label[] | null;
   routes: Route[] | null;
   routeStops: RouteStop[] | null;
+  paths: Path[] | null;
 
   // uiState
   isMobile: boolean;
@@ -59,6 +65,7 @@ export type StoreState = {
   drawerState: DrawerState;
   searchValue: string | null;
   searchActive: boolean;
+  terraDrawInstance: TerraDraw | null;
 };
 
 export type StoreActions = {
@@ -75,6 +82,7 @@ export type StoreActions = {
   setSearchValue: (value: string | null) => void;
   setSearchActive: (active: boolean) => void;
   setUiState: (uiState: UIState) => void;
+  setTerraDrawInstance: (instance: TerraDraw | null) => void;
 };
 
 export const defaultState: Omit<StoreState, "map"> = {
@@ -86,6 +94,7 @@ export const defaultState: Omit<StoreState, "map"> = {
   routes: null,
   routeStops: null,
   labels: null,
+  paths: null,
 
   // states
   isMobile: false,
@@ -99,4 +108,5 @@ export const defaultState: Omit<StoreState, "map"> = {
   },
   searchValue: null,
   searchActive: false,
+  terraDrawInstance: null,
 };

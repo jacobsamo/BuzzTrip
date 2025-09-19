@@ -6,6 +6,8 @@ import {
   collectionsSchema,
 } from "../../zod-schemas";
 import { authedMutation, authedQuery } from "../helpers";
+import { MutationCtx } from "../_generated/server";
+import {z} from "zod";
 
 export const getCollectionsForMap = authedQuery({
   args: {
@@ -33,16 +35,27 @@ export const getCollectionLinksForMap = authedQuery({
   },
 });
 
+const createCollectionPropsSchema = z.object({
+  userId: zid("users"),
+  collection: collectionsEditSchema,
+});
+
+export const createCollectionFunction = async (
+  ctx: MutationCtx,
+  args: z.infer<typeof createCollectionPropsSchema>
+) => {
+  return  await ctx.db.insert("collections", {
+      ...args.collection,
+      ...(args.collection.icon ? { icon: args.collection.icon as IconType } : {}),
+      created_by: args.userId,
+    })
+}
+
+
 // Mutations for collections
 export const createCollection = authedMutation({
   args: collectionsEditSchema,
-  handler: async (ctx, args) => {
-    return await ctx.db.insert("collections", {
-      ...args,
-      ...(args.icon ? { icon: args.icon as IconType } : {}),
-      created_by: ctx.user._id,
-    });
-  },
+  handler: async (ctx, args) => await createCollectionFunction(ctx, {collection: args, userId: ctx.user._id})
 });
 
 export const editCollection = authedMutation({

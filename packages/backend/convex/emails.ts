@@ -1,7 +1,6 @@
 import { Resend } from "@convex-dev/resend";
 import z from "zod";
 import { components } from "./_generated/api";
-import { internalMutation } from "./_generated/server";
 import { zodInternalMutation } from "./helpers";
 
 export const resend: Resend = new Resend(components.resend, {

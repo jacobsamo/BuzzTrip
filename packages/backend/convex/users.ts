@@ -1,12 +1,12 @@
-import { z } from "zod";
-import { refinedUserSchema } from "../zod-schemas";
-import { internalMutation, query, QueryCtx } from "./_generated/server";
-import { authedQuery } from "./helpers";
-
 import { UserJSON } from "@clerk/backend";
 import { v } from "convex/values";
+import { z } from "zod";
+import { refinedUserSchema } from "../zod-schemas";
 import { internal } from "./_generated/api";
 import { Doc, Id } from "./_generated/dataModel";
+import { internalMutation, query, QueryCtx } from "./_generated/server";
+import { authedQuery } from "./helpers";
+import { createMapFunction } from "./maps";
 
 export const searchUsers = authedQuery({
   args: {
@@ -97,12 +97,23 @@ export const createUser = internalMutation({
     if (userRecord !== null) {
       throw new Error("User already exists");
     }
+
     const user = extractUserFields(data);
-    await ctx.db.insert("users", user);
-    await ctx.runMutation(internal.emails.sendWelcomeEmail, {
-      firstName: user.first_name,
-      email: user.email,
-    });
+    const userId = await ctx.db.insert("users", user);
+    await Promise.all([
+      ctx.runMutation(internal.emails.sendWelcomeEmail, {
+        firstName: user.first_name,
+        email: user.email,
+      }),
+      createMapFunction(ctx, {
+        userId: userId,
+        map: {
+          title: "Main map",
+          description: "The starting point to the next adventure!",
+          visibility: "private",
+        },
+      }),
+    ]);
   },
 });
 

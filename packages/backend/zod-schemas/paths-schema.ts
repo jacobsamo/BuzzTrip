@@ -1,32 +1,44 @@
 import { zid } from "convex-helpers/server/zod";
 import * as z from "zod";
-import { defaultSchema, insertSchema, latlng } from "./shared-schemas";
+import { defaultSchema, insertSchema } from "./shared-schemas";
 
 // --- Constants ---
-const pathTypes = ["circle", "rectangle", "polygon", "line"] as const;
+const pathTypes = ["text", "circle", "rectangle", "polygon", "line"] as const;
 export const pathTypeEnum = z.enum(pathTypes);
 
+/**
+ * We are reimplementing a strict postion schema.
+ * A postion is a set of cordinates which can either be `[x, y]` or `[x, y, z]`
+ * ```ts
+ * type Position = [x: number, y: number] | [x: number, y: number, z: number]
+ * ```
+ */
+export const strictPosition = z.union([
+  z.tuple([z.number(), z.number()]),
+  z.tuple([z.number(), z.number(), z.number()]),
+]);
+
 // --- Measurements ---
-const baseMeasurements = z.object({
+export const baseMeasurements = z.object({
   perimeter: z.number(),
   area: z.number().optional(),
 });
 
-const circleMeasurements = baseMeasurements.extend({
+export const circleMeasurements = baseMeasurements.extend({
   radius: z.number(),
   diameter: z.number(),
 });
 
-const rectangleMeasurements = baseMeasurements.extend({
+export const rectangleMeasurements = baseMeasurements.extend({
   width: z.number(),
   height: z.number(),
 });
 
-const lineMeasurements = baseMeasurements;
+export const lineMeasurements = baseMeasurements;
 
-const polygonMeasurements = baseMeasurements;
+export const polygonMeasurements = baseMeasurements;
 
-const measurementsSchema = z.union([
+export const measurementsSchema = z.union([
   circleMeasurements,
   rectangleMeasurements,
   polygonMeasurements,
@@ -34,7 +46,7 @@ const measurementsSchema = z.union([
 ]);
 
 // --- Styles ---
-const stylesSchema = z.object({
+export const stylesSchema = z.object({
   strokeColor: z.string(),
   strokeOpacity: z.number().optional(),
   strokeWidth: z.number().optional(),
@@ -42,20 +54,35 @@ const stylesSchema = z.object({
   fillOpacity: z.number().optional(),
 });
 
+/**
+ * Depending on the shape we can have different lots of points
+ * 1. a single point this is just a position
+ * 2 a line this is a position[]
+ * 3. a polygon this can be a position[][]
+ */
+const pointsSchema = z.union([
+  strictPosition,
+  strictPosition.array(),
+  strictPosition.array().array(),
+]);
+
 // --- Main Schema ---
 export const pathsSchema = defaultSchema(
   z.object({
     mapId: zid("maps"),
     pathType: pathTypeEnum,
     title: z.string(),
-    notes: z.string().optional(),
-    location: latlng.array(),
-    measurements: measurementsSchema,
-    styles: stylesSchema,
+    note: z.string().optional(),
+    points: pointsSchema,
+    measurements: measurementsSchema.optional(),
+    styles: stylesSchema.optional(),
     createdBy: zid("users"),
     updatedAt: z.string().datetime().optional(), // allow optional for updates
   })
 );
 
 // --- Edit Schema ---
-export const pathsEditSchema = insertSchema(pathsSchema);
+export const pathsEditSchema = insertSchema(pathsSchema).extend({
+  createdBy: zid("users").optional(),
+});
+// Position | Position[] | Position[][]
