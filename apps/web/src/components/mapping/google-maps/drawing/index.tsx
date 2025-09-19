@@ -2,9 +2,9 @@ import { useMapStore } from "@/components/providers/map-state-provider";
 import { fallbackStyle, ShowPathIcon } from "@/components/show-path-icon";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { geoJsonToPaths, pathsToGeoJson } from "@/lib/geojson";
+import { geoJsonToPaths } from "@/lib/geojson";
 import { cn } from "@/lib/utils";
-import { Path, PathStyle } from "@buzztrip/backend/types";
+import { PathStyle } from "@buzztrip/backend/types";
 import { pathsSchema, stylesSchema } from "@buzztrip/backend/zod-schemas";
 import { useMap } from "@vis.gl/react-google-maps";
 import { ChevronLeft, LineSquiggle, MousePointer2 } from "lucide-react";
@@ -14,24 +14,17 @@ import {
   HexColor,
   TerraDraw,
   TerraDrawCircleMode,
-  TerraDrawExtend,
   TerraDrawLineStringMode,
   TerraDrawPolygonMode,
   TerraDrawRectangleMode,
   TerraDrawSelectMode,
 } from "terra-draw";
 import { TerraDrawGoogleMapsAdapter } from "./terra-draw-google-maps-adapter";
+import { useTerraDrawSync, type DrawingMode } from "./use-terra-draw-sync";
 
-type DrawingMode =
-  | "static"
-  | "select"
-  | "polygon"
-  | "linestring"
-  | "circle"
-  | "rectangle";
-
-type FeatureId = TerraDrawExtend.FeatureId;
-
+/**
+ * Ensures styles on the feature properties are valid
+ */
 const ensureValidStyleOnFeature = (
   feature: GeoJSONStoreFeatures
 ): PathStyle => {
@@ -43,6 +36,7 @@ const ensureValidStyleOnFeature = (
     return fallbackStyle;
   }
 };
+
 const Drawing = () => {
   const {
     isMobile,
@@ -50,6 +44,7 @@ const Drawing = () => {
     uiState,
     setUiState,
     activeState,
+    prevState,
     map,
     paths,
     setActiveState,
@@ -63,9 +58,6 @@ const Drawing = () => {
   const [isInitializing, setIsInitializing] = useState(false);
   const [mapReady, setMapReady] = useState(false);
   const initTimeoutRef = useRef<NodeJS.Timeout>(null);
-  const prevPathRef = useRef<Path[] | null>(null);
-  /** this can only be used to get values can't be used to set values */
-  const featureIdMap = useRef(new Map());
   const pathsLoadedRef = useRef(false);
   const isProgrammaticSelectRef = useRef(false);
 
@@ -390,6 +382,18 @@ const Drawing = () => {
     [terraDrawInstance, isReady]
   );
 
+  // Use the Terra Draw sync hook to handle state synchronization
+  const { featureIdMap } = useTerraDrawSync({
+    terraDrawInstance,
+    isReady,
+    paths,
+    activeState,
+    prevState,
+    uiState,
+    mode,
+    setDrawingMode,
+  });
+
   // when you want to select based on state:
   useEffect(() => {
     if (!terraDrawInstance || activeState?.event !== "paths:update") return;
@@ -442,110 +446,6 @@ const Drawing = () => {
       }
     }
   }, [activeState, terraDrawInstance, mode, setDrawingMode]);
-
-  /* Handle diffing the changes for paths */
-  const diffPaths = (prevPaths: Path[], newPaths: Path[]) => {
-    const deleted: Path[] = [];
-    const changed: Path[] = [];
-    const added: Path[] = [];
-
-    const newMap = new Map(newPaths.map((p) => [p._id, p]));
-    const prevMap = new Map(prevPaths.map((p) => [p._id, p]));
-
-    // check for deleted + changed
-    for (const prev of prevPaths) {
-      const current = newMap.get(prev._id);
-
-      if (!current) {
-        deleted.push(prev);
-      } else if (JSON.stringify(prev) !== JSON.stringify(current)) {
-        changed.push(current);
-      }
-    }
-
-    // check for added
-    for (const curr of newPaths) {
-      if (!prevMap.has(curr._id)) {
-        added.push(curr);
-      }
-    }
-
-    return { deleted, changed, added };
-  };
-
-  // handle syncing to / from the store
-  useEffect(() => {
-    if (!paths || !terraDrawInstance || !isReady) return;
-
-    const prevPaths = prevPathRef.current;
-    const snapShot = terraDrawInstance.getSnapshot();
-    featureIdMap.current = new Map(
-      snapShot.map((f) => [f.properties._id, f.id])
-    );
-
-    // --- First load ---
-    if (!prevPaths) {
-      const geoJson = pathsToGeoJson(paths);
-      const validation = terraDrawInstance.addFeatures(geoJson);
-      console.log("Validation return", validation);
-
-      prevPathRef.current = paths;
-      return;
-    }
-
-    // --- Subsequent updates ---
-    const { deleted, changed, added } = diffPaths(prevPaths, paths);
-    console.log("Diff", {
-      featureIdMap,
-      deleted,
-      changed,
-      added,
-      prevPaths,
-    });
-
-    // handle deleted
-    if (deleted.length > 0) {
-      const featureIds = deleted
-        .map((p) => featureIdMap.current.get(p._id))
-        .filter(Boolean) as FeatureId[];
-
-      terraDrawInstance.removeFeatures(featureIds);
-    }
-
-    // handle changed
-    if (changed.length > 0) {
-      const toRemove = changed
-        .map((p) => featureIdMap.current.get(p._id))
-        .filter(Boolean) as FeatureId[];
-      terraDrawInstance.removeFeatures(toRemove);
-
-      const newGeoJson = pathsToGeoJson(changed);
-      terraDrawInstance.addFeatures(newGeoJson);
-    }
-
-    // handle added
-    if (added.length > 0) {
-      const undefinedItem = featureIdMap.current.get(undefined);
-      if (!undefinedItem) {
-        console.log("No feature found", undefinedItem, featureIdMap);
-        return;
-      }
-      terraDrawInstance.removeFeatures([undefinedItem]);
-
-      const newGeoJson = pathsToGeoJson(added);
-      console.log("Removed item new geoJson", {
-        added,
-        newGeoJson,
-        undefinedItem,
-      });
-      terraDrawInstance.addFeatures(newGeoJson);
-    }
-
-    // update ref for next run
-    prevPathRef.current = paths;
-  }, [paths, terraDrawInstance, isReady]);
-
-
 
   useEffect(() => {
     if (uiState === "paths") {

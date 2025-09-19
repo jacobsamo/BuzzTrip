@@ -91,22 +91,19 @@ export const createStore = (initState: InitState) =>
 
         const effectiveNext =
           isPrevMarker && isCurrentCollections ? prev : next;
-        console.log("setactiveSate items", {
-          activeState: effectiveNext,
-          prevState: current,
-          drawerState:
-            effectiveNext?.event === "paths:update"
-              ? { snap: 0.9, dismissible: false }
-              : effectiveNext
-                ? { snap: 0.9, dismissible: false }
-                : { snap: 0.2, dismissible: true },
-          uiState:
-            effectiveNext?.event === "paths:update" ? "paths" : "default",
-        });
-
+        const newPrevState =
+          current &&
+          (current.event === "paths:update" || current.event === "paths:create")
+            ? null
+            : current;
         set(() => ({
           activeState: effectiveNext,
-          prevState: current,
+          prevState:
+            current &&
+            (current.event === "paths:update" ||
+              current.event === "paths:create")
+              ? null
+              : current,
           drawerState:
             effectiveNext?.event === "paths:update"
               ? { snap: 0.9, dismissible: false }
