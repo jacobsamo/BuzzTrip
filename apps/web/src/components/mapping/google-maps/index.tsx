@@ -1,4 +1,5 @@
 "use client";
+import MarkerPin from "@/components/marker-pin";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { cn } from "@/lib/utils";
 import { Id } from "@buzztrip/backend/dataModel";
@@ -12,29 +13,27 @@ import {
 } from "@vis.gl/react-google-maps";
 import { env } from "env";
 import { memo, useEffect, useMemo, useState } from "react";
-import MarkerPin from "@/components/marker-pin";
 import AddMarkerButton from "./actions/add-marker";
 import ChangeMapStyle from "./actions/change-map-styles";
+import Drawing from "./drawing";
 import { detailsRequestCallback } from "./helpers";
 import DisplayMarkerInfo from "./marker-info-box";
 import { Search, SearchInput, SearchResults } from "./search";
 
 const GoogleMapsMapView = () => {
   const googleMap = useMap();
+  // const drawingManager = useDrawingManager();
 
   const {
     searchValue,
     setSearchValue,
-    setSearchActive,
     activeLocation,
-    activeState,
     setActiveLocation,
     markers,
     map,
     isMobile,
     setActiveState,
     uiState,
-    setUiState,
   } = useMapStore((state) => state);
 
   if (!map) return null;
@@ -240,28 +239,8 @@ const GoogleMapsMapView = () => {
         "cursor-crosshair": uiState === "add-marker",
       })}
     >
-      {!isMobile && (
-        <div className="fixed left-0 right-0 top-6 sm:top-4 z-10 mx-auto w-[95%] md:left-[calc(var(--sidebar-width)_+_2rem)] md:right-4 md:mx-0 md:max-w-[30rem]">
-          <Search
-            value={searchValue ?? ""}
-            onValueChange={setSearchValue}
-            isMobile={isMobile}
-            className="flex h-full w-full flex-col overflow-hidden rounded-lg bg-white text-slate-950"
-            onSelect={(pred, details) => {
-              if (details?.location) setActiveLocation(details.location);
-            }}
-          >
-            <SearchInput
-              placeholder="Where do you want to go?"
-              autoFocus={false} // Prevent immediate keyboard on mobile
-            />
-            <SearchResults className="z-50" />
-          </Search>
-        </div>
-      )}
-      <ChangeMapStyle />
-      <AddMarkerButton />
       <GoogleMap
+        id="google-map-container"
         defaultCenter={mapOptions.center}
         defaultZoom={mapOptions.zoom}
         defaultBounds={
@@ -281,6 +260,29 @@ const GoogleMapsMapView = () => {
         gestureHandling="greedy"
         reuseMaps
       >
+        <ChangeMapStyle />
+        {!isMobile && (
+          <div className="fixed left-0 right-0 top-6 sm:top-4 z-10 mx-auto w-[95%] md:left-[calc(var(--sidebar-width)_+_2rem)] md:right-4 md:mx-0 md:max-w-[30rem]">
+            <Search
+              value={searchValue ?? ""}
+              onValueChange={setSearchValue}
+              isMobile={isMobile}
+              className="flex h-full w-full flex-col overflow-hidden rounded-lg bg-white text-slate-950"
+              onSelect={(pred, details) => {
+                if (details?.location) setActiveLocation(details.location);
+              }}
+            >
+              <SearchInput
+                placeholder="Where do you want to go?"
+                autoFocus={false} // Prevent immediate keyboard on mobile
+              />
+              <SearchResults className="z-50" />
+            </Search>
+          </div>
+        )}
+        {uiState !== "paths" && <AddMarkerButton />}
+        <Drawing />
+
         {activeLocation && (
           <>
             <DisplayMarkerInfo />

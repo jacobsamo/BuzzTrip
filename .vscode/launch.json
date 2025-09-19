@@ -23,17 +23,25 @@
             "name": "Next.js: debug full stack",
             "type": "node",
             "request": "launch",
-            "cwd": "${workspaceFolder}/apps/web",
-            "program": "${workspaceFolder}/node_modules/.bin/next",
+            "program": "${workspaceFolder}/node_modules/next/dist/bin/next",
             "runtimeArgs": ["--inspect"],
             "skipFiles": ["<node_internals>/**"],
             "serverReadyAction": {
-                "action": "debugWithEdge",
-                "killOnServerStop": true,
-                "pattern": "- Local:.+(https?://.+)",
-                "uriFormat": "%s",
-                "webRoot": "${workspaceFolder}"
+              "action": "debugWithChrome",
+              "killOnServerStop": true,
+              "pattern": "- Local:.+(https?://.+)",
+              "uriFormat": "%s",
+                 "webRoot": "${workspaceFolder}/apps/web"
             }
-        }
+          },
+          {
+            "name": "Attach to Next.js (apps/web)",
+            "type": "node",
+            "request": "attach",
+            "port": 5173,
+            "cwd": "${workspaceFolder}/apps/web",
+            "restart": true,
+            "skipFiles": ["<node_internals>/**", "**/next/dist/**"]
+          }
     ]
   }

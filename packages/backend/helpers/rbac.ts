@@ -11,6 +11,7 @@ const entityTypes = [
   "collection_links",
   "routes",
   "route_stops",
+  "paths"
 ] as const;
 
 type EntityType = (typeof entityTypes)[number];
@@ -33,6 +34,7 @@ const editorEntityPermissions: EntityPermission[] = [
   ...createAction("collection_links", ["create", "update", "delete"]),
   ...createAction("routes", ["create", "update", "delete"]),
   ...createAction("route_stops", ["create", "update", "delete"]),
+  ...createAction("paths", ["create", "update", "delete"]),
 ];
 
 // Permissions assigned to each role

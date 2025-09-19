@@ -1,11 +1,11 @@
 import { cn } from "@/lib/utils";
 import { Mail } from "lucide-react";
 import Link from "next/link";
-import XformerlyTwitter from "./icons/X";
-import Bluesky from "./icons/blue-sky";
-import GitHub from "./icons/github";
-import Instagram from "./icons/instagram";
-import LinkedIn from "./icons/linkedIn";
+import XformerlyTwitter from "./icons/social/X";
+import Bluesky from "./icons/social/blue-sky";
+import GitHub from "./icons/social/github";
+import Instagram from "./icons/social/instagram";
+import LinkedIn from "./icons/social/linkedIn";
 
 const links = [
   {

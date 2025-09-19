@@ -1,12 +1,13 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { useEffect, useState } from "react";
 import DisplayMarker from "./display-marker";
 import CollectionTree from "./tree-view";
+import DisplayPath from "./display-path";
 
 const MarkersCollectionTabs = () => {
-  const { markers, collections } = useMapStore((state) => state);
+  const { markers, collections, paths } = useMapStore((state) => state);
   const [defaultTab, setDefaultTab] = useState("collections");
 
   useEffect(() => {
@@ -42,6 +43,8 @@ const MarkersCollectionTabs = () => {
             ) : (
               <p>No Markers</p>
             )}
+            {paths &&
+              paths.map((path) => <DisplayPath path={path} key={path._id} />)}
           </ScrollArea>
         </TabsContent>
       </Tabs>

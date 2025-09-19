@@ -22,6 +22,7 @@ import React from "react";
 import ActiveLocation from "./active-location";
 import MarkersCollectionTabs from "./markers-collections";
 import { buttonVariants } from "@/components/ui/button";
+import PathsForm from "@/components/forms/paths-create-edit-form";
 // import DisplayActiveState from "./display-active-state";
 // import shallow from 'zustand/shallow'
 
@@ -30,12 +31,25 @@ const MapSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
     (state) => state
   );
 
+      const pathEditFormOpen = React.useMemo(() => {
+      return activeState?.event === "paths:update" 
+  }, [activeState]);
+
+
+  const sidebarTitle = React.useMemo(() => {
+    let title = map.title
+    if (activeLocation) title = activeLocation.title
+    if (pathEditFormOpen) title = `Editing ${activeState?.payload?.title}`
+      return title
+    }, [activeLocation, activeState]);
+
+
   return (
     <Sidebar variant="floating" {...props}>
       <SidebarHeader className="inline-flex items-center gap-2 p-2">
         <SidebarMenu className="flex flex-row items-center gap-2">
           <SidebarMenuItem>
-            {!activeLocation && (
+            {!pathEditFormOpen && !activeLocation && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <SidebarMenuButton asChild>
@@ -51,13 +65,15 @@ const MapSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
             )}
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <h1 className="text-xl font-medium text-gray-900">{activeLocation ? activeLocation.title : map!.title}</h1>
+            <h1 className="text-xl font-medium text-gray-900">{sidebarTitle}</h1>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent className="p-2">
-        {!activeLocation && <MarkersCollectionTabs />}
-        {activeLocation && <ActiveLocation />}
+        {!pathEditFormOpen && !activeLocation && <MarkersCollectionTabs />}
+        {!pathEditFormOpen && activeLocation && <ActiveLocation />}
+        {pathEditFormOpen && <PathsForm />}
+        
       </SidebarContent>
 
       <SidebarFooter>
