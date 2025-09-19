@@ -81,7 +81,7 @@ export const createStore = (initState: InitState) =>
           searchActive: false,
         }));
       },
-      setActiveState: (next: ActiveState) => {
+      setActiveState: (next: ActiveState | null) => {
         const current = get().activeState;
         const prev = get().prevState;
 
@@ -91,19 +91,9 @@ export const createStore = (initState: InitState) =>
 
         const effectiveNext =
           isPrevMarker && isCurrentCollections ? prev : next;
-        const newPrevState =
-          current &&
-          (current.event === "paths:update" || current.event === "paths:create")
-            ? null
-            : current;
         set(() => ({
           activeState: effectiveNext,
-          prevState:
-            current &&
-            (current.event === "paths:update" ||
-              current.event === "paths:create")
-              ? null
-              : current,
+          prevState: current,
           drawerState:
             effectiveNext?.event === "paths:update"
               ? { snap: 0.9, dismissible: false }
