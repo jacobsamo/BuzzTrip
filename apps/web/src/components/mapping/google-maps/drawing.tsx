@@ -1,6 +1,7 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { fallbackStyle, ShowPathIcon } from "@/components/show-path-icon";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { geoJsonToPaths, pathsToGeoJson } from "@/lib/geojson";
 import { cn } from "@/lib/utils";
 import { Path, PathStyle } from "@buzztrip/backend/types";
@@ -20,7 +21,6 @@ import {
   TerraDrawSelectMode,
 } from "terra-draw";
 import { TerraDrawGoogleMapsAdapter } from "./terra-draw-google-maps-adapter";
-import { consoleLoggingIntegration } from "@sentry/nextjs";
 
 type DrawingMode =
   | "static"
@@ -43,7 +43,7 @@ const ensureValidStyleOnFeature = (
     return fallbackStyle;
   }
 };
-const DrawingTest = () => {
+const Drawing = () => {
   const {
     isMobile,
     searchValue,
@@ -294,12 +294,17 @@ const DrawingTest = () => {
                 "dragFeature",
               ].includes(context.action)
             ) {
-              console.log('Updating the path', paths[0]);
+              console.log("Updating the path", paths[0]);
+
+              // Ensure we have the correct _id from the original feature properties
+              const updatedPath = {
+                ...paths[0],
+                _id: feature.properties._id as string, // Preserve the original path ID
+              };
+
               setActiveState({
                 event: "paths:update",
-                payload: {
-                  ...paths[0],
-                },
+                payload: updatedPath,
               });
             }
           }
@@ -319,15 +324,15 @@ const DrawingTest = () => {
           const domainId = feature.properties?._id;
           if (!domainId) return;
 
-          // Only update state if it's a change
-          if (
-            activeState &&
-            activeState.event === "paths:update" &&
-            activeState.payload?._id === domainId
-          ) {
-            return;
-          }
+          console.log("Feature selected by user:", {
+            terraId,
+            domainId,
+            currentActiveState: activeState?.event,
+            currentPathId: activeState?.payload?._id,
+          });
 
+          // Always update state when a feature is selected by user interaction
+          // This ensures the form opens and gets the latest path data
           const path = pathsSchema.parse(feature.properties);
           setActiveState({ event: "paths:update", payload: path });
         });
@@ -366,22 +371,77 @@ const DrawingTest = () => {
     };
   }, [mapReady, googleMap]); // Only depend on mapReady, not uiState
 
+  const setDrawingMode = useCallback(
+    (newMode: DrawingMode | null) => {
+      if (!terraDrawInstance || !isReady) {
+        console.warn("Terra Draw not ready");
+        return;
+      }
+
+      try {
+        const targetMode = newMode ?? "select";
+        console.log("Setting mode to:", targetMode);
+        terraDrawInstance.setMode(targetMode);
+        setMode(targetMode as DrawingMode);
+      } catch (error) {
+        console.error("Error setting drawing mode:", error);
+      }
+    },
+    [terraDrawInstance, isReady]
+  );
+
   // when you want to select based on state:
   useEffect(() => {
     if (!terraDrawInstance || activeState?.event !== "paths:update") return;
 
-    const featureId = featureIdMap.current.get(activeState.payload._id);
-    if (!featureId) return;
-
-    // mark as programmatic to avoid echo
-    isProgrammaticSelectRef.current = true;
-    try {
-      terraDrawInstance.selectFeature(featureId);
-    } finally {
-      // let Terra Draw emit 'select', we will ignore once
-      // clear in the handler
+    // Ensure we're in select mode for selection to work
+    if (mode !== "select") {
+      console.log("Setting mode to select for feature selection");
+      setDrawingMode("select");
+      // Give a small delay to ensure mode is set before selecting
+      setTimeout(() => {
+        selectFeature();
+      }, 100);
+      return;
     }
-  }, [activeState, terraDrawInstance]);
+
+    selectFeature();
+
+    function selectFeature() {
+      if (!terraDrawInstance || !activeState?.payload) return;
+      // Get the most up-to-date featureIdMap from the current snapshot
+      const snapShot = terraDrawInstance.getSnapshot();
+      const currentFeatureIdMap = new Map(
+        snapShot.map((f) => [f.properties._id, f.id])
+      );
+
+      const featureId = currentFeatureIdMap.get(activeState.payload._id);
+      if (!featureId) {
+        console.warn("Feature not found for selection:", {
+          pathId: activeState.payload._id,
+          availableFeatures: Array.from(currentFeatureIdMap.keys()),
+          snapshot: snapShot.map((f) => ({ id: f.id, _id: f.properties._id })),
+        });
+        return;
+      }
+
+      console.log("Selecting feature:", {
+        pathId: activeState.payload._id,
+        featureId: featureId,
+        pathTitle: activeState.payload.title,
+        currentMode: mode,
+      });
+
+      // mark as programmatic to avoid echo
+      isProgrammaticSelectRef.current = true;
+      try {
+        terraDrawInstance.selectFeature(featureId);
+      } finally {
+        // let Terra Draw emit 'select', we will ignore once
+        // clear in the handler
+      }
+    }
+  }, [activeState, terraDrawInstance, mode, setDrawingMode]);
 
   /* Handle diffing the changes for paths */
   const diffPaths = (prevPaths: Path[], newPaths: Path[]) => {
@@ -485,24 +545,7 @@ const DrawingTest = () => {
     prevPathRef.current = paths;
   }, [paths, terraDrawInstance, isReady]);
 
-  const setDrawingMode = useCallback(
-    (newMode: DrawingMode | null) => {
-      if (!terraDrawInstance || !isReady) {
-        console.warn("Terra Draw not ready");
-        return;
-      }
 
-      try {
-        const targetMode = newMode ?? "select";
-        console.log("Setting mode to:", targetMode);
-        terraDrawInstance.setMode(targetMode);
-        setMode(targetMode as DrawingMode);
-      } catch (error) {
-        console.error("Error setting drawing mode:", error);
-      }
-    },
-    [terraDrawInstance, isReady]
-  );
 
   useEffect(() => {
     if (uiState === "paths") {
@@ -529,9 +572,10 @@ const DrawingTest = () => {
         <Button variant="outline" onClick={() => setUiState("default")}>
           <ChevronLeft />
         </Button>
-        <div className="px-4 py-2 bg-gray-100 rounded-md text-sm">
-          Loading drawing tools...
-        </div>
+        <Skeleton className={buttonVariants()} />
+        <Skeleton className={buttonVariants()} />
+        <Skeleton className={buttonVariants()} />
+        <Skeleton className={buttonVariants()} />
       </div>
     );
   }
@@ -566,7 +610,7 @@ const DrawingTest = () => {
       <Button
         variant="outline"
         size="icon"
-        className={cn(" z-50", {
+        className={cn("z-50", {
           "z-0": searchValue && !isMobile,
         })}
         onClick={() => setUiState("default")}
@@ -657,4 +701,4 @@ const DrawingTest = () => {
   );
 };
 
-export default DrawingTest;
+export default Drawing;

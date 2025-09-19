@@ -15,7 +15,7 @@ import { env } from "env";
 import { memo, useEffect, useMemo, useState } from "react";
 import AddMarkerButton from "./actions/add-marker";
 import ChangeMapStyle from "./actions/change-map-styles";
-import DrawingTest from "./drawing";
+import Drawing from "./drawing";
 import { detailsRequestCallback } from "./helpers";
 import DisplayMarkerInfo from "./marker-info-box";
 import { Search, SearchInput, SearchResults } from "./search";
@@ -281,7 +281,7 @@ const GoogleMapsMapView = () => {
           </div>
         )}
         {uiState !== "paths" && <AddMarkerButton />}
-        <DrawingTest />
+        <Drawing />
 
         {activeLocation && (
           <>

@@ -108,6 +108,28 @@ const PathsForm = () => {
       console.log("Errors: ", errors);
     }, [errors]);
 
+    // Update form values when activeState.payload changes (e.g., when path points are modified)
+    useEffect(() => {
+      if (activeState && activeState.payload) {
+        const updatedPath = activeState.payload;
+        const title =
+          updatedPath.title.length > 0
+            ? updatedPath.title
+            : generateTitle(paths, updatedPath.pathType);
+
+        // Update form values with the new path data
+        setValue("title", title);
+        setValue("note", updatedPath.note || "");
+        setValue("points", updatedPath.points);
+        setValue("pathType", updatedPath.pathType);
+        setValue("measurements", updatedPath.measurements);
+        setValue("styles", {
+          ...fallbackStyle,
+          ...updatedPath.styles,
+        });
+      }
+    }, [activeState?.payload, setValue, paths]);
+
     const clearForm = () => {
       reset();
       setActiveState(null);
