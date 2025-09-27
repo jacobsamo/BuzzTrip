@@ -1,11 +1,10 @@
 "use client";
 
-import { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ThemeProvider } from "next-themes";
+import { ReactNode } from "react";
 import ConvexClientProvider from "./convex-client-provider";
-import PostHogProvider from "./posthog-provider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,13 +27,11 @@ export default function Providers({ children }: ProvidersProps) {
         enableSystem
         disableTransitionOnChange
       >
-        <PostHogProvider>
-          <ConvexClientProvider>
-            {children}
-            <ReactQueryDevtools initialIsOpen={false} />
-          </ConvexClientProvider>
-        </PostHogProvider>
+        <ConvexClientProvider>
+          {children}
+          <ReactQueryDevtools initialIsOpen={false} />
+        </ConvexClientProvider>
       </ThemeProvider>
     </QueryClientProvider>
-  );
+  );  
 }

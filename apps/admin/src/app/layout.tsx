@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import Providers from "@/components/providers";
+import { AdminLayout } from "@/components/admin-layout";
 import "../../env";
 
 const inter = Inter({
@@ -25,7 +26,9 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
         <body className={`${inter.variable} font-sans antialiased`}>
           <Providers>
-            {children}
+            <AdminLayout>
+              {children}
+            </AdminLayout>
           </Providers>
         </body>
       </html>

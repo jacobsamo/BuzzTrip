@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as admin from "../admin.js";
 import type * as emails from "../emails.js";
 import type * as helpers from "../helpers.js";
 import type * as http from "../http.js";
@@ -36,6 +37,7 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  admin: typeof admin;
   emails: typeof emails;
   helpers: typeof helpers;
   http: typeof http;
