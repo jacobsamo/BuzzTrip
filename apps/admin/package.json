@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "clean:all": "rm -rf node_modules/ && rm -rf .next",
-    "dev": "next dev --port 5174 --turbopack",
+    "dev": "next dev --port 5176 --turbopack",
     "build": "next build",
     "start": "next start --port 5174",
     "lint": "next lint"

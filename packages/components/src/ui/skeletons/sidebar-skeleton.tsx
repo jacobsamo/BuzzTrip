@@ -1,4 +1,4 @@
-import { Skeleton } from "./skeleton";
+import { Skeleton } from "../skeleton";
 import React from "react";
 
 const SidebarSkeleton = ({ children }: { children?: React.ReactNode }) => {
