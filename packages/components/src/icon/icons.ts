@@ -57,7 +57,7 @@ import {
   Compass,
   Folder,
   Bed,
-} from "@phosphor-icons/react/ssr";
+} from "@phosphor-icons/react";
 
 
 import type {

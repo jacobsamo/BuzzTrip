@@ -1,5 +1,5 @@
 "use client";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@buzztrip/components/ui";
 import { cn } from "@/lib/utils";
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { useMediaQuery } from "@uidotdev/usehooks";

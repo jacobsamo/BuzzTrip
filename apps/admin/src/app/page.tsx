@@ -3,6 +3,20 @@
 import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
 import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { Card, CardContent, CardHeader, CardTitle } from "@buzztrip/components";
+import {
+  Button,
+  Input,
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  Alert,
+  AlertDescription,
+  Badge,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from "@buzztrip/components/ui";
 
 export default function AdminDashboard() {
   return (
@@ -21,9 +35,9 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent className="flex justify-center">
               <SignInButton mode="modal">
-                <button className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90">
+                <Button>
                   Sign in to Admin Portal
-                </button>
+                </Button>
               </SignInButton>
             </CardContent>
           </Card>
@@ -88,9 +102,12 @@ function AdminContent() {
         </Card>
       </div>
 
-      <div className="text-sm text-muted-foreground">
-        Admin portal is now successfully connected to Clerk and Convex!
-      </div>
+      <Alert>
+        <AlertDescription>
+          Admin portal is now successfully connected to Clerk and Convex!
+          <Badge className="ml-2" variant="secondary">✅ Component Library Working</Badge>
+        </AlertDescription>
+      </Alert>
     </div>
   );
 }
