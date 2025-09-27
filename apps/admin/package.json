@@ -1,0 +1,45 @@
+{
+  "name": "@buzztrip/admin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "clean:all": "rm -rf node_modules/ && rm -rf .next",
+    "dev": "next dev --port 5174 --turbopack",
+    "build": "next build",
+    "start": "next start --port 5174",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@buzztrip/backend": "workspace:*",
+    "@buzztrip/components": "workspace:*",
+    "@clerk/nextjs": "^6.32.0",
+    "@clerk/backend": "^1.26.0",
+    "@convex-dev/react-query": "^0.0.0-alpha.11",
+    "@tanstack/react-query": "^5.87.4",
+    "@tanstack/react-query-devtools": "^5.87.4",
+    "@tanstack/react-table": "^8.20.5",
+    "@t3-oss/env-nextjs": "^0.13.8",
+    "convex": "^1.27.0",
+    "lucide-react": "^0.544.0",
+    "next": "^15.5.4",
+    "next-themes": "^0.4.6",
+    "posthog-js": "^1.265.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "recharts": "^3.2.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@buzztrip/tsconfig": "workspace:*",
+    "@tanstack/eslint-plugin-query": "^5.86.0",
+    "@types/node": "^24.3.3",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@tailwindcss/postcss": "^4.1.13",
+    "eslint": "^9.35.0",
+    "eslint-config-next": "^15.5.4",
+    "@eslint/eslintrc": "^3.3.1",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.9.2"
+  }
+}
