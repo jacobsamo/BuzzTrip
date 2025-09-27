@@ -1,12 +1,11 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { clerkClient, clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-const isPublicRoute = createRouteMatcher([
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-]);
+// Define admin email addresses as fallback
+const adminEmails = ["jacob35422@gmail.com"];
 
-const isAdminRoute = createRouteMatcher([
+// Routes that require admin access
+const isProtectedRoute = createRouteMatcher([
   "/",
   "/dashboard(.*)",
   "/users(.*)",
@@ -15,42 +14,48 @@ const isAdminRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  const { userId, sessionClaims } = await auth();
+  if (isProtectedRoute(req)) {
+    const { userId, sessionClaims } = await auth();
 
-  // If it's a public route, allow access
-  if (isPublicRoute(req)) {
-    return NextResponse.next();
-  }
+    // If not authenticated, protect will redirect to sign-in
+    if (!userId) {
+      await auth.protect();
+    }
 
-  // If user is not authenticated, redirect to sign-in
-  if (!userId) {
-    return NextResponse.redirect(new URL("/sign-in", req.url));
-  }
+    const client = await clerkClient()
+    const user = await client.users.getUser(userId!)
 
-  // For admin routes, check if user is an admin
-  if (isAdminRoute(req)) {
-    const userEmail = sessionClaims?.email as string;
+    // Check admin access
+    const userRole = user?.publicMetadata?.role;
+    const userEmail = user.emailAddresses[0]?.emailAddress;
 
-    // Define admin users (you can also use Clerk's metadata or roles)
-    const adminEmails = [
-      "admin@buzztrip.co",
-      // Add more admin emails as needed
-    ];
+    // Debug logging
+    console.log("Middleware Debug:", {
+      userId,
+      userEmail,
+      userRole,
+      publicMetadata: sessionClaims?.publicMetadata,
+      hasAdminRole: userRole === "admin",
+      isFallbackAdmin: userEmail && adminEmails.includes(userEmail),
+    });
 
-    if (!adminEmails.includes(userEmail)) {
-      // Redirect non-admin users to an unauthorized page or home
+    const hasAdminRole = userRole === "admin";
+    const isFallbackAdmin = userEmail && adminEmails.includes(userEmail);
+
+    if (!hasAdminRole && !isFallbackAdmin) {
+      console.log("Access denied for user:", userEmail || userId);
       return NextResponse.redirect(new URL("/unauthorized", req.url));
     }
-  }
 
-  return NextResponse.next();
+    console.log("Access granted for user:", userEmail || userId);
+  }
 });
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files
+    // Include all routes except Next.js internals and static files
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
+    // Include all API routes
     "/(api|trpc)(.*)",
   ],
 };
