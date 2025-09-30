@@ -1,9 +1,21 @@
 import { Roles } from "@/types/globals";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
+
+// Define admin email addresses as fallback (same as middleware)
+const adminEmails = ["jacob35422@gmail.com"];
 
 export const checkRole = async (role: Roles): Promise<boolean> => {
-  const { sessionClaims } = await auth();
-  return sessionClaims?.metadata?.role === role;
+  const { userId } = await auth();
+  if (!userId) return false;
+
+  try {
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    return user?.publicMetadata?.role === role;
+  } catch (error) {
+    console.error("Error checking role:", error);
+    return false;
+  }
 };
 
 export const isAdmin = async (): Promise<boolean> => {
@@ -12,24 +24,31 @@ export const isAdmin = async (): Promise<boolean> => {
 
 export const requireAdmin = async (): Promise<void> => {
   const hasAdminRole = await isAdmin();
-  if (!hasAdminRole) {
+  const isFallbackAdminCheck = await isFallbackAdmin();
+
+  if (!hasAdminRole && !isFallbackAdminCheck) {
     throw new Error("Admin access required");
   }
 };
 
 // Helper to get user email for fallback authentication
 export const getUserEmail = async (): Promise<string | null> => {
-  const { sessionClaims } = await auth();
-  return (sessionClaims?.email as string) || null;
+  const { userId } = await auth();
+  if (!userId) return null;
+
+  try {
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    return user.emailAddresses[0]?.emailAddress || null;
+  } catch (error) {
+    console.error("Error getting user email:", error);
+    return null;
+  }
 };
 
 // Fallback admin check using email (for initial setup before roles are configured)
 export const isFallbackAdmin = async (): Promise<boolean> => {
   const email = await getUserEmail();
-  const adminEmails = [
-    "admin@buzztrip.co",
-    // Add more admin emails as needed for initial setup
-  ];
   return email ? adminEmails.includes(email) : false;
 };
 
