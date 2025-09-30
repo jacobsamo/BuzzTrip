@@ -1,6 +1,6 @@
 "use server";
 
-import { clerkClient } from "@clerk/nextjs/server";
+import { clerkClient, type User } from "@clerk/nextjs/server";
 import { requireAdmin } from "@/utils/roles";
 import { Roles } from "@/types/globals";
 
@@ -145,7 +145,7 @@ export async function searchUsers(query: string, limit: number = 10) {
     });
 
     // If no email matches, search by name
-    let nameResults: { data: never[]; totalCount: number } = { data: [], totalCount: 0 };
+    let nameResults: { data: unknown[], totalCount: number } = { data: [], totalCount: 0 };
     if (emailResults.data.length === 0) {
       nameResults = await client.users.getUserList({
         query: query,
@@ -153,7 +153,8 @@ export async function searchUsers(query: string, limit: number = 10) {
       });
     }
 
-    const users: AdminUser[] = [...emailResults.data, ...nameResults.data].map((user) => ({
+    const combinedResults = [...emailResults.data, ...nameResults.data] as User[];
+    const users: AdminUser[] = combinedResults.map((user: User) => ({
       id: user.id,
       email: user.emailAddresses[0]?.emailAddress || "",
       firstName: user.firstName,
@@ -172,6 +173,35 @@ export async function searchUsers(query: string, limit: number = 10) {
   } catch (error) {
     console.error("Error searching users:", error);
     throw new Error("Failed to search users");
+  }
+}
+
+/**
+ * Get a single user by ID
+ */
+export async function getUserById(userId: string) {
+  await requireAdmin();
+
+  try {
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+
+    const adminUser: AdminUser = {
+      id: user.id,
+      email: user.emailAddresses[0]?.emailAddress || "",
+      firstName: user.firstName,
+      lastName: user.lastName,
+      imageUrl: user.imageUrl,
+      createdAt: user.createdAt,
+      lastSignInAt: user.lastSignInAt,
+      role: (user.publicMetadata?.role as Roles) || null,
+      banned: user.banned,
+    };
+
+    return adminUser;
+  } catch (error) {
+    console.error("Error fetching user by ID:", error);
+    throw new Error("Failed to fetch user");
   }
 }
 

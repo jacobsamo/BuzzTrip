@@ -37,6 +37,43 @@ export function useDashboardOverview() {
 }
 
 /**
+ * Hook to get detailed maps data for management table
+ */
+export function useDetailedMaps() {
+  return useQuery(api.admin.getDetailedMaps);
+}
+
+/**
+ * Hook to get users from Convex (faster than Clerk)
+ */
+export function useConvexUsers() {
+  return useQuery(api.admin.getUsers);
+}
+
+/**
+ * Hook to get a single user by ID from Convex
+ */
+export function useConvexUserById(id: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return useQuery(api.admin.getUserById, { id: id as any });
+}
+
+/**
+ * Hook to get a single map by ID from Convex
+ */
+export function useConvexMapById(id: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return useQuery(api.admin.getMapById, { id: id as any });
+}
+
+/**
+ * Hook to get detailed map items analytics
+ */
+export function useMapItemsAnalytics() {
+  return useQuery(api.admin.getMapItemsAnalytics);
+}
+
+/**
  * Hook to get all admin data at once with loading states
  */
 export function useAdminDashboard() {

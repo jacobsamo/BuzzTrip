@@ -10,8 +10,10 @@ node_modules
 .env.local*
 .dev.vars*
 
-.claude
+.claude/settings.local.json
 .specstory
+.playwright-mcp
+
 
 # Testing
 coverage
