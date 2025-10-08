@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
+import "./env";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  transpilePackages: ["@buzztrip/backend", "@buzztrip/components"],
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
+  },
 };
 
 export default nextConfig;
