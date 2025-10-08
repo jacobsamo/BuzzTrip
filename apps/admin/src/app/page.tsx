@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { api } from "@buzztrip/backend/convex/_generated/api";
+import { api } from "@buzztrip/backend/api";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { MapsChart } from "@/components/charts/maps-chart";
 import { MarkersChart } from "@/components/charts/markers-chart";

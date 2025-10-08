@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { api } from "@buzztrip/backend/convex/_generated/api";
-import { Id } from "@buzztrip/backend/convex/_generated/dataModel";
+import { api } from "@buzztrip/backend/api";
+import { Id } from "@buzztrip/backend/dataModel";
 import { notFound } from "next/navigation";
 import {
   Card,
@@ -48,11 +48,11 @@ export default function MapDetailPage({ params }: { params: { id: string } }) {
     year: "numeric",
   });
 
-  const updatedDate = new Date(map.updated_at).toLocaleDateString("en-US", {
+  const updatedDate = map.updatedAt ? new Date(map.updatedAt).toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
     year: "numeric",
-  });
+  }) : "N/A";
 
   const visibilityVariant =
     map.visibility === "public"

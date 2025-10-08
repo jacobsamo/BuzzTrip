@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { api } from "@buzztrip/backend/convex/_generated/api";
+import { api } from "@buzztrip/backend/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@buzztrip/components/ui";
 import { UsersTable } from "@/components/tables/users-table";
 

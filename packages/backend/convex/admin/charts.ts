@@ -32,7 +32,7 @@ export const getMapsCreatedByMonth = query({
     maps.forEach(map => {
       const date = new Date(map._creationTime);
       const key = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-      if (key in monthCounts) {
+      if (monthCounts[key] !== undefined) {
         monthCounts[key]++;
       }
     });
@@ -72,7 +72,7 @@ export const getMarkersCreatedByMonth = query({
     markers.forEach(marker => {
       const date = new Date(marker._creationTime);
       const key = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-      if (key in monthCounts) {
+      if (monthCounts[key] !== undefined) {
         monthCounts[key]++;
       }
     });

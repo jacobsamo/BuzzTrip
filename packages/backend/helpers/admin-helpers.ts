@@ -2,13 +2,18 @@ import { QueryCtx } from "../convex/_generated/server";
 
 /**
  * Check if the current user has admin role in Clerk metadata
+ *
+ * Note: Requires Clerk JWT template to include publicMetadata claim:
+ * In Clerk Dashboard > JWT Templates > convex > Claims, add:
+ * "public_metadata": {{user.public_metadata}}
  */
 export async function isUserAdmin(ctx: QueryCtx): Promise<boolean> {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) return false;
 
-  const metadata = identity.publicMetadata as { role?: string };
-  return metadata?.role === "admin";
+  // Access publicMetadata from JWT claims (requires JWT template configuration)
+  const publicMetadata = (identity as any).public_metadata as { role?: string } | undefined;
+  return publicMetadata?.role === "admin";
 }
 
 /**

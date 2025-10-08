@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { type NextjsOptions } from "convex/nextjs";
-import { env } from "../env";
+import { env } from "../../env";
 
 /**
  * Get Clerk JWT token for Convex authentication

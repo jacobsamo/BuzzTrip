@@ -1,8 +1,8 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { api } from "@buzztrip/backend/convex/_generated/api";
-import { Id } from "@buzztrip/backend/convex/_generated/dataModel";
+import { api } from "@buzztrip/backend/api";
+import { Id } from "@buzztrip/backend/dataModel";
 import { notFound } from "next/navigation";
 import {
   Card,

@@ -37,7 +37,7 @@ type MapWithStats = {
   markersCount: number;
   collaboratorsCount: number;
   location?: string;
-  updated_at: number;
+  updatedAt?: string;
 };
 
 export function MapsTable({ data }: { data: MapWithStats[] }) {
