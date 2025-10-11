@@ -7,16 +7,17 @@
     "clean:all": "rm -rf node_modules/",
     "build:email": "email build",
     "dev:email": "email dev --port 3001",
-    "export": "email export"
+    "export": "email export",
+    "update": "bun update --latest"
   },
   "devDependencies": {
-    "react-email": "4.2.11",
-    "@buzztrip/tsconfig": "workspace:*"
+    "@buzztrip/tsconfig": "workspace:*",
+    "react-email": "4.2.11"
   },
   "dependencies": {
     "@react-email/components": "0.5.3",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "resend": "^6.0.3"
   }
 }

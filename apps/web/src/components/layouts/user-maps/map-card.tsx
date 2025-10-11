@@ -1,13 +1,13 @@
 "use client";
 import EditMapModal from "@/components/modals/edit_map_modal";
-import { Button } from "@/components/ui/button";
+import { Button } from "@buzztrip/ui/components/button";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@buzztrip/ui/components/card";
 import { UserMap } from "@buzztrip/backend/types";
 import { formatDistanceToNow } from "date-fns";
 import { Calendar, Edit2, MapIcon, User } from "lucide-react";

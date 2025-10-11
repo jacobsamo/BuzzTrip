@@ -1,8 +1,0 @@
-{
-  "extends": "@buzztrip/tsconfig/base.json",
-  "compilerOptions": {
-    "jsx": "react"
-  },
-  "include": ["."],
-  "exclude": ["dist", "build", "node_modules"]
-}

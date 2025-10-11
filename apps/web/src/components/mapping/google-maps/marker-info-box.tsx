@@ -1,13 +1,13 @@
 import { ColorPicker } from "@/components/color-picker";
 import { IconPicker } from "@/components/icon-picker";
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { Button } from "@/components/ui/button";
+import { Button } from "@buzztrip/ui/components/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@buzztrip/ui/components/tooltip";
 import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
 import { IconType } from "@buzztrip/backend/types";
@@ -141,7 +141,7 @@ const DisplayMarkerInfo = () => {
                       <TooltipTrigger asChild>
                         <IconPicker
                           className="size-6"
-                          onClick={(e) => {
+                          onClick={(e: React.MouseEvent) => {
                             e.stopPropagation();
                           }}
                           value={activeLocation.icon as IconType}
@@ -157,7 +157,7 @@ const DisplayMarkerInfo = () => {
                       <TooltipTrigger asChild>
                         <ColorPicker
                           className="size-6"
-                          onClick={(e) => {
+                          onClick={(e: React.MouseEvent) => {
                             e.stopPropagation();
                           }}
                           value={{

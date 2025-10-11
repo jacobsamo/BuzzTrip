@@ -1,15 +1,15 @@
 import MarkerPin from "@/components/marker-pin";
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@buzztrip/ui/components/badge";
+import { Button } from "@buzztrip/ui/components/button";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Separator } from "@/components/ui/separator";
+} from "@buzztrip/ui/components/carousel";
+import { Separator } from "@buzztrip/ui/components/separator";
 import { getCollectionsForMarker } from "@/lib/utils";
 import { IconType } from "@buzztrip/backend/types";
 import { ExternalLink, Globe, Pencil, Phone, Plus } from "lucide-react";

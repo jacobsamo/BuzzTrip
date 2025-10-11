@@ -2,12 +2,12 @@ import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
 import Providers from "@/components/providers";
 import { ReactScan } from "@/components/react-scan";
-import "@/lib/styles/globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata, Viewport } from "next";
 import React from "react";
 import { Monitoring } from "react-scan/monitoring/next";
 import { baseUrl } from "./sitemap";
+import "@buzztrip/ui/globals.css";
 
 const siteDescription = "Create Custom Maps, anywhere on any device";
 
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
         alt: "BuzzTrip map preview showing custom markers along Australia's east coast with the BuzzTrip logo and tagline: Create Custom Maps Anywhere, Anytime, with Anyone.",
         type: "image/jpg",
         width: 1200,
-        height: 630
-      }
+        height: 630,
+      },
     ],
     url: baseUrl,
   },

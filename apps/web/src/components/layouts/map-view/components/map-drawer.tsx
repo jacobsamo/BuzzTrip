@@ -8,7 +8,7 @@ import {
 } from "@/components/mapping/google-maps/search";
 import OpenCollectionModal from "@/components/modals/open-collection-modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@buzztrip/ui/components/scroll-area";
 import { cn } from "@/lib/utils";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Drawer } from "vaul";

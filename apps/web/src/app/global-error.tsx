@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@buzztrip/ui/components/button";
 import * as Sentry from "@sentry/nextjs";
 import posthog from "posthog-js";
 import { useEffect } from "react";

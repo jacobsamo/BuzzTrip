@@ -1,5 +1,5 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { Button } from "@/components/ui/button";
+import { Button } from "@buzztrip/ui/components/button";
 import { X } from "lucide-react";
 
 const CloseButton = () => {

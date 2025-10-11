@@ -2,7 +2,7 @@
 
 import MarkerPin from "@/components/marker-pin";
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { Tree, TreeItem, TreeItemLabel } from "@/components/ui/tree";
+import { Tree, TreeItem, TreeItemLabel } from "@buzztrip/ui/components/tree";
 import { getMarkersForCollection } from "@/lib/utils";
 import { Id } from "@buzztrip/backend/dataModel";
 import {

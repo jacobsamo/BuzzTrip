@@ -1,4 +1,4 @@
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@buzztrip/ui/components/button";
 import { ArrowRight, Check } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";

@@ -8,6 +8,10 @@
  * @module
  */
 
+import type * as admin_charts from "../admin/charts.js";
+import type * as admin_maps from "../admin/maps.js";
+import type * as admin_stats from "../admin/stats.js";
+import type * as admin_users from "../admin/users.js";
 import type * as emails from "../emails.js";
 import type * as helpers from "../helpers.js";
 import type * as http from "../http.js";
@@ -36,6 +40,10 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  "admin/charts": typeof admin_charts;
+  "admin/maps": typeof admin_maps;
+  "admin/stats": typeof admin_stats;
+  "admin/users": typeof admin_users;
   emails: typeof emails;
   helpers: typeof helpers;
   http: typeof http;

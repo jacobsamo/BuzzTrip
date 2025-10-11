@@ -1,11 +1,11 @@
 // a button to add a place anywhere on the map
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { Button } from "@/components/ui/button";
+import { Button } from "@buzztrip/ui/components/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@buzztrip/ui/components/tooltip";
 import { cn } from "@/lib/utils";
 import { useMap } from "@vis.gl/react-google-maps";
 import { MapPin } from "lucide-react";

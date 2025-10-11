@@ -3,9 +3,9 @@ import { IconPicker } from "@/components/icon-picker";
 import MarkerPin from "@/components/marker-pin";
 import OpenCollectionModal from "@/components/modals/open-collection-modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { DialogHeader } from "@/components/ui/dialog";
+import { Button } from "@buzztrip/ui/components/button";
+import { Checkbox } from "@buzztrip/ui/components/checkbox";
+import { DialogHeader } from "@buzztrip/ui/components/dialog";
 import {
   Form,
   FormControl,
@@ -14,18 +14,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Textarea } from "@/components/ui/textarea";
+} from "@buzztrip/ui/components/form";
+import { Input } from "@buzztrip/ui/components/input";
+import { Label } from "@buzztrip/ui/components/label";
+import { ScrollArea } from "@buzztrip/ui/components/scroll-area";
+import { Textarea } from "@buzztrip/ui/components/textarea";
 import { popularColors } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
 import type { IconType } from "@buzztrip/backend/types";
 import { combinedMarkersSchema } from "@buzztrip/backend/zod-schemas";
-import { popularIconsList } from "@buzztrip/components/icon";
+import { popularIconsList } from "@buzztrip/ui/components/icon";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
 import { Trash2 } from "lucide-react";
@@ -36,7 +36,9 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const Icon = dynamic(() => import("@buzztrip/components/icon"), { ssr: false });
+const Icon = dynamic(() => import("@buzztrip/ui/components/icon"), {
+  ssr: false,
+});
 
 const editSchema = z.object({
   ...combinedMarkersSchema.shape,

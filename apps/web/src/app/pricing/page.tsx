@@ -1,8 +1,8 @@
 "use client";
 import GeneralCTA from "@/components/cta";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@buzztrip/ui/components/badge";
+import { Button } from "@buzztrip/ui/components/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@buzztrip/ui/components/card";
 import { Building, Check, Crown, Heart, MapPin, X } from "lucide-react";
 import { motion } from "motion/react";
 
