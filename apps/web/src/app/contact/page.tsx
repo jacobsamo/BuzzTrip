@@ -1,7 +1,7 @@
 "use client";
 import { sendContactEmail } from "@/actions/send-contact-email";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@buzztrip/ui/components/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@buzztrip/ui/components/card";
 import {
   Form,
   FormControl,
@@ -9,9 +9,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+} from "@buzztrip/ui/components/form";
+import { Input } from "@buzztrip/ui/components/input";
+import { Textarea } from "@buzztrip/ui/components/textarea";
 import { contactSchema } from "@/types/scheams";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Clock, Loader2, Mail, MapPin, MessageCircle } from "lucide-react";

@@ -5,9 +5,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+} from "@buzztrip/ui/components/form";
+import { Input } from "@buzztrip/ui/components/input";
+import { Textarea } from "@buzztrip/ui/components/textarea";
 import { mapsEditSchema } from "@buzztrip/backend/zod-schemas";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";

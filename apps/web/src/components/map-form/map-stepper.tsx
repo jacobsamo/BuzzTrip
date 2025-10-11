@@ -6,12 +6,12 @@ import {
   StepperSeparator,
   StepperTitle,
   StepperTrigger,
-} from "@/components/ui/stepper";
+} from "@buzztrip/ui/components/stepper";
 import dynamic from "next/dynamic";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "../ui/button";
+import { Button } from "@buzztrip/ui/components/button";
 import MapDetailsForm from "./details";
 import MapShareForm from "./share";
 import { useMapFormContext } from "./provider";

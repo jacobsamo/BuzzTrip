@@ -3,9 +3,9 @@ import { IconPicker } from "@/components/icon-picker";
 import MarkerPin from "@/components/marker-pin";
 import OpenCollectionModal from "@/components/modals/open-collection-modal";
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { DialogHeader } from "@/components/ui/dialog";
+import { Button } from "@buzztrip/ui/components/button";
+import { Checkbox } from "@buzztrip/ui/components/checkbox";
+import { DialogHeader } from "@buzztrip/ui/components/dialog";
 import {
   Form,
   FormControl,
@@ -14,11 +14,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Textarea } from "@/components/ui/textarea";
+} from "@buzztrip/ui/components/form";
+import { Input } from "@buzztrip/ui/components/input";
+import { Label } from "@buzztrip/ui/components/label";
+import { ScrollArea } from "@buzztrip/ui/components/scroll-area";
+import { Textarea } from "@buzztrip/ui/components/textarea";
 import { popularColors } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { api } from "@buzztrip/backend/api";

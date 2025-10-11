@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@buzztrip/ui/components/button";
 import { IconType, Label } from "@buzztrip/backend/types";
 import { labelsEditSchema } from "@buzztrip/backend/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import { ColorPicker } from "../color-picker";
 import { IconPicker } from "../icon-picker";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent } from "@buzztrip/ui/components/card";
 import {
   Form,
   FormControl,
@@ -16,9 +16,9 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
+} from "@buzztrip/ui/components/form";
+import { Input } from "@buzztrip/ui/components/input";
+import { Textarea } from "@buzztrip/ui/components/textarea";
 import { useMapFormContext } from "./provider";
 
 interface LabelFormProps {

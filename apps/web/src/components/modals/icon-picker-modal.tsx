@@ -4,12 +4,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from "@buzztrip/ui/components/dialog";
+import { ScrollArea } from "@buzztrip/ui/components/scroll-area";
 import { cn } from "@/lib/utils";
 import { iconsList, type IconType } from "@buzztrip/backend/types";
 import Icon, { popularIconsList } from "@buzztrip/ui/components/icon";
-import { Button } from "../ui/button";
+import { Button } from "@buzztrip/ui/components/button";
 
 interface IconPickerModalProps {
   selectedIcon: IconType;

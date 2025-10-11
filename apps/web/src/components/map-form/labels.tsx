@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@buzztrip/ui/components/button";
 import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
 import { useQuery } from "convex/react";
 import { Plus } from "lucide-react";
-import { Label } from "../ui/label";
-import { ScrollArea } from "../ui/scroll-area";
+import { Label } from "@buzztrip/ui/components/label";
+import { ScrollArea } from "@buzztrip/ui/components/scroll-area";
 import LabelForm from "./label-form";
 import { useMapFormContext } from "./provider";
 import { generateId } from "@buzztrip/backend/generateId";

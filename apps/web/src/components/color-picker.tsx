@@ -1,21 +1,20 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@buzztrip/ui/components/button";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandList,
-} from "@/components/ui/command";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@buzztrip/ui/components/command";
+import { Input } from "@buzztrip/ui/components/input";
+import { Label } from "@buzztrip/ui/components/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  PopoverTriggerProps,
-} from "@/components/ui/popover";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from "@buzztrip/ui/components/popover";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@buzztrip/ui/components/tabs";
 import { colors } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import type { Color } from "@/types";
@@ -32,7 +31,7 @@ import {
 import React from "react";
 
 interface ColorPickerProps
-  extends Omit<PopoverTriggerProps, "value" | "onChange"> {
+  extends Omit<React.ComponentProps<typeof PopoverTrigger>, "value" | "onChange"> {
   value?: Color;
   onChange?: (color: Color) => void;
 }

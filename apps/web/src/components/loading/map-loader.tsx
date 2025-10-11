@@ -1,8 +1,8 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@buzztrip/ui/components/skeleton";
 import { ChevronLeft, SearchIcon } from "lucide-react";
 import Link from "next/link";
-import { buttonVariants } from "../ui/button";
-import TabsSkelton from "../ui/skeletons/tabs-skeleton";
+import { buttonVariants } from "@buzztrip/ui/components/button";
+import TabsSkelton from "@buzztrip/ui/components/skeletons/tabs-skeleton";
 
 const SearchBarSkeleton = () => {
   return (

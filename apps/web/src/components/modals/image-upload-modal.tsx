@@ -5,12 +5,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@buzztrip/ui/components/dialog";
 import { FileUploadOptions, useFileUpload } from "@/hooks/use-file-upload";
 import { AlertCircleIcon, ImageUpIcon, XIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Button } from "../ui/button";
+import { Button } from "@buzztrip/ui/components/button";
 
 interface ImageUploadModalProps {
   trigger?: React.ReactNode;

@@ -10,18 +10,18 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
+} from "@buzztrip/ui/components/sidebar";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@buzztrip/ui/components/tooltip";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import ActiveLocation from "./active-location";
 import MarkersCollectionTabs from "./markers-collections";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@buzztrip/ui/components/button";
 import PathsForm from "@/components/forms/paths-create-edit-form";
 // import DisplayActiveState from "./display-active-state";
 // import shallow from 'zustand/shallow'

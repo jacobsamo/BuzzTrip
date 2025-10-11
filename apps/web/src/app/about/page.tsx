@@ -1,8 +1,8 @@
 "use client";
 import GeneralCTA from "@/components/cta";
 import SocialLinks from "@/components/social-links";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@buzztrip/ui/components/badge";
+import { Card, CardContent } from "@buzztrip/ui/components/card";
 import { Globe, Heart, Users, Zap } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
