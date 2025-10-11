@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@buzztrip/ui/components/button";
 import {
   Command,
   CommandEmpty,
@@ -6,15 +6,15 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from "@buzztrip/ui/components/command";
+import { ScrollArea } from "@buzztrip/ui/components/scroll-area";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@buzztrip/ui/components/select";
 import { cn } from "@/lib/utils";
 import { api } from "@buzztrip/backend/api";
 import { PermissionEnum } from "@buzztrip/backend/types";
@@ -25,8 +25,8 @@ import { useQuery as useConvexQuery } from "convex/react";
 import { Check, UserPlus, X } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Label } from "../ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@buzztrip/ui/components/avatar";
+import { Label } from "@buzztrip/ui/components/label";
 import { useMapFormContext } from "./provider";
 
 const MapShareForm = () => {
@@ -50,32 +50,30 @@ const MapShareForm = () => {
   return (
     <div className="space-y-12">
       <Command loop className="h-1/2 w-full">
-        <CommandInput
-          value={searchValue ?? ""}
-          onValueChange={(value) => {
-            setSearchValue(value);
-            setCommandOpen(value.length > 0);
-          }}
-          // className="w-full"
-          autoFocus={true}
-          placeholder="Search by name or email..."
-          id="search"
-          after={
-            searchValue ? (
-              <button
-                aria-label="clear search results"
-                onClick={() => {
-                  setSearchValue("");
-                  setCommandOpen(false);
-                }}
-              >
-                <X className="h-5 w-5" />
-              </button>
-            ) : (
-              <></>
-            )
-          }
-        />
+        <div className="relative flex items-center">
+          <CommandInput
+            value={searchValue ?? ""}
+            onValueChange={(value) => {
+              setSearchValue(value);
+              setCommandOpen(value.length > 0);
+            }}
+            autoFocus={true}
+            placeholder="Search by name or email..."
+            id="search"
+          />
+          {searchValue && (
+            <button
+              aria-label="clear search results"
+              onClick={() => {
+                setSearchValue("");
+                setCommandOpen(false);
+              }}
+              className="absolute right-3"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          )}
+        </div>
 
         {commandOpen && (
           <CommandList className="max-h-[200px]">

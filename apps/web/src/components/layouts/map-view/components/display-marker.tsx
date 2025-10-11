@@ -3,7 +3,7 @@ import { useMapStore } from "@/components/providers/map-state-provider";
 import {
   SidebarMenuAction,
   SidebarMenuSubButton,
-} from "@/components/ui/sidebar";
+} from "@buzztrip/ui/components/sidebar";
 import { CombinedMarker, IconType } from "@buzztrip/backend/types";
 import { useMap } from "@vis.gl/react-google-maps";
 import { Pencil } from "lucide-react";

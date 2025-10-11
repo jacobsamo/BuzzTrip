@@ -5,13 +5,12 @@ import {
   CommandGroup,
   CommandInput,
   CommandList,
-} from "@/components/ui/command";
+} from "@buzztrip/ui/components/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  type PopoverTriggerProps,
-} from "@/components/ui/popover";
+} from "@buzztrip/ui/components/popover";
 import { cn } from "@/lib/utils";
 import { type IconType, iconsList } from "@buzztrip/backend/types";
 import Icon from "@buzztrip/ui/components/icon";
@@ -26,7 +25,7 @@ type IconList = {
 };
 
 interface IconPickerProps
-  extends Omit<PopoverTriggerProps, "value" | "onChange"> {
+  extends Omit<React.ComponentProps<typeof PopoverTrigger>, "value" | "onChange"> {
   value?: IconType;
   onChange?: (icon: IconType) => void;
   className?: string;

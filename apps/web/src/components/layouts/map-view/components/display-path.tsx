@@ -3,7 +3,7 @@ import { ShowPathIcon } from "@/components/show-path-icon";
 import {
   SidebarMenuAction,
   SidebarMenuSubButton,
-} from "@/components/ui/sidebar";
+} from "@buzztrip/ui/components/sidebar";
 import { Path } from "@buzztrip/backend/types";
 import { useMap } from "@vis.gl/react-google-maps";
 import { Pencil } from "lucide-react";

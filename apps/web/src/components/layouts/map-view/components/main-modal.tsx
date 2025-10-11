@@ -6,7 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@buzztrip/ui/components/dialog";
 import { useCallback, useMemo } from "react";
 import { useMapStore } from "../../../providers/map-state-provider";
 

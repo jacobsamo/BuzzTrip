@@ -1,6 +1,6 @@
 "use client";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@buzztrip/ui/components/badge";
+import { Button } from "@buzztrip/ui/components/button";
 import { Book, HelpCircle, Mail, MessageCircle } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";

@@ -1,14 +1,14 @@
 "use client";
 import MapModal from "@/components/modals/create_map_modal";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@buzztrip/ui/components/button";
+import { Input } from "@buzztrip/ui/components/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@buzztrip/ui/components/select";
 import { api } from "@buzztrip/backend/api";
 import { Preloaded, usePreloadedQuery } from "convex/react";
 import { MapIcon, Plus } from "lucide-react";

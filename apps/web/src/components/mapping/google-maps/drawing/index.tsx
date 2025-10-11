@@ -1,7 +1,7 @@
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { fallbackStyle, ShowPathIcon } from "@/components/show-path-icon";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button, buttonVariants } from "@buzztrip/ui/components/button";
+import { Skeleton } from "@buzztrip/ui/components/skeleton";
 import { geoJsonToPaths } from "@/lib/geojson";
 import { cn } from "@/lib/utils";
 import { PathStyle } from "@buzztrip/backend/types";

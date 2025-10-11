@@ -1,8 +1,8 @@
 "use client";
 import GoogleMapsMapView from "@/components/mapping/google-maps";
 import { useMapStore } from "@/components/providers/map-state-provider";
-import { buttonVariants } from "@/components/ui/button";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { buttonVariants } from "@buzztrip/ui/components/button";
+import { SidebarProvider, SidebarTrigger } from "@buzztrip/ui/components/sidebar";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";

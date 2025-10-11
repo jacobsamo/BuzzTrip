@@ -1,8 +1,8 @@
 import { FileText, Loader2, MapPin, Save, Tag, Users } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { Button } from "../ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { Button } from "@buzztrip/ui/components/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@buzztrip/ui/components/tabs";
 import MapDetailsForm from "./details";
 import MapLabelsForm from "./labels";
 import MapLocationForm from "./location";

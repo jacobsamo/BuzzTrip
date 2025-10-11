@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@buzztrip/ui/components/button";
 import { Collection } from "@buzztrip/backend/types";
 import { Edit2, Plus } from "lucide-react";
 import { useMapStore } from "../providers/map-state-provider";

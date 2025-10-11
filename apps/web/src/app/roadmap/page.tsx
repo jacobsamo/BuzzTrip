@@ -1,7 +1,7 @@
 "use client";
 import DevelopmentCTA from "@/components/cta/development";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@buzztrip/ui/components/badge";
+import { Card, CardContent } from "@buzztrip/ui/components/card";
 import {
   Calendar,
   Check,

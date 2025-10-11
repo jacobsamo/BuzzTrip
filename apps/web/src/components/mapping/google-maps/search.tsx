@@ -1,5 +1,5 @@
 "use client";
-import { Command, CommandInputProps } from "@/components/ui/command";
+import { Command, CommandInput } from "@buzztrip/ui/components/command";
 import { cn } from "@/lib/utils";
 import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { Command as CommandPrimitive } from "cmdk";
@@ -167,7 +167,7 @@ Search.displayName = "Search";
 
 // SearchInput component
 export interface SearchInputProps
-  extends Omit<CommandInputProps, "value" | "onValueChange"> {
+  extends Omit<React.ComponentProps<typeof CommandInput>, "value" | "onValueChange"> {
   placeholder?: string;
   showClearButton?: boolean;
   autoFocus?: boolean;

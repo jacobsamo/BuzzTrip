@@ -1,4 +1,4 @@
-import { Form } from "@/components/ui/form";
+import { Form } from "@buzztrip/ui/components/form";
 import { NewLabel, NewMap } from "@buzztrip/backend/types";
 import {
   mapsEditSchema,
