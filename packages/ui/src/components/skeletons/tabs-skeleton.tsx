@@ -1,4 +1,4 @@
-import { Skeleton } from "../skeleton";
+import { Skeleton } from "@buzztrip/ui/components/skeleton";
 
 
 export default function TabSkeleton() {
@@ -7,7 +7,7 @@ export default function TabSkeleton() {
       role="tablist"
       className="mt-2 outline-none bg-muted text-muted-foreground inline-flex h-9 items-center rounded-lg p-[3px] mx-auto w-11/12 justify-evenly"
       tabIndex={0}
-      
+
     >
       <Skeleton
         role="tab"
@@ -24,7 +24,7 @@ export default function TabSkeleton() {
         Collections
       </Skeleton>
       <Skeleton
-    
+
         role="tab"
         aria-selected="false"
         aria-controls="radix-«r2e»-content-markers"
@@ -39,26 +39,5 @@ export default function TabSkeleton() {
         Markers
       </Skeleton>
     </div>
-    // <div
-    //   role="tablist"
-    //   className="bg-muted text-muted-foreground inline-flex h-9 items-center rounded-lg p-[3px] mx-auto w-11/12 justify-evenly"
-
-    // >
-    //       <Skeleton
-
-    //       role="tab"
-    //       className="inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] "
-    //       tabIndex={0}
-    //       data-orientation="horizontal"
-    //     />
-
-    //     <Skeleton
-
-    //       role="tab"
-    //       className="inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] "
-    //       tabIndex={-1}
-    //       data-orientation="horizontal"
-    //     />
-    // </div>
   );
 }

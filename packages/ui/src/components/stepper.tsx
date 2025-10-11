@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@buzztrip/ui/lib/utils";
 import { Slot as SlotPrimitive } from "radix-ui";
 import { CheckIcon, LoaderCircleIcon } from "lucide-react";
 import * as React from "react";
