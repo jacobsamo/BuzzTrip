@@ -69,27 +69,35 @@ const availableFeatures: Feature[] = [
     title: "Real-time Collaboration",
     description:
       "Work together with your team in real-time. See changes instantly as others edit the map.",
-    delay: 0.4,
+    delay: 0.5,
+    available: true,
+  },
+  {
+    icon: <Route className="h-6 w-6 text-white" />,
+    title: "Paths & Basic Measurements",
+    description:
+      "Draw custom paths and shapes on your maps with real-time distance and area measurements.",
+    delay: 0.6,
     available: true,
   },
 ];
 
 const upComingFeatures: Feature[] = [
   {
-    icon: <Route className="h-6 w-6 text-amber-700" />,
-    title: "Paths & Routes",
+    icon: <Smartphone className="h-6 w-6 text-amber-700" />,
+    title: "Mobile Apps",
     description:
-      "Draw custom paths and routes with built-in measurement tools for distance and area calculations.",
+      "Native iOS and Android apps for seamless mapping on the go with offline capabilities.",
     delay: 0.1,
-    timeline: "Q2 2025",
+    timeline: "Q1 2026",
   },
   {
-    icon: <Ruler className="h-6 w-6 text-amber-700" />,
-    title: "Advanced Measurements",
+    icon: <Users className="h-6 w-6 text-amber-700" />,
+    title: "Collaboration & Sharing",
     description:
-      "Precise measurement tools for distances, areas, and elevations with multiple unit options.",
-    delay: 0.6,
-    timeline: "Q3 2025",
+      "Advanced sharing permissions, comments, annotations, and team collaboration features.",
+    delay: 0.2,
+    timeline: "Q2 2026",
   },
   {
     icon: <Download className="h-6 w-6 text-amber-700" />,
@@ -97,7 +105,7 @@ const upComingFeatures: Feature[] = [
     description:
       "Import and export your map data in popular formats including KML, GeoJSON, and CSV.",
     delay: 0.3,
-    timeline: "Q4 2025",
+    timeline: "Q3 2026",
   },
   {
     icon: <Palette className="h-6 w-6 text-amber-700" />,
@@ -105,15 +113,15 @@ const upComingFeatures: Feature[] = [
     description:
       "Personalize your maps with custom themes, colors, and styling options to match your brand.",
     delay: 0.4,
-    timeline: "Q1 2026",
+    timeline: "Q4 2026",
   },
   {
-    icon: <Smartphone className="h-6 w-6 text-amber-700" />,
-    title: "Mobile Apps",
+    icon: <Route className="h-6 w-6 text-amber-700" />,
+    title: "Routes & Directions",
     description:
-      "Native iOS and Android apps for seamless mapping on the go with offline capabilities.",
+      "Turn-by-turn navigation, multi-stop route planning, and route optimization for daily driving.",
     delay: 0.5,
-    timeline: "Q2 2026",
+    timeline: "Q1 2027",
   },
 ];
 
@@ -170,34 +178,90 @@ const roadMap = [
   },
   {
     quarter: "Q2 2025",
-    status: "in-progress",
-    title: "Paths, Routes & Measurements",
+    status: "completed",
+    title: "Enhanced User Experience",
     features: [
-      "Real-time collaborative editing",
-      "Paths & routes with measurements",
-      "Advanced marker customization",
-      "Improved sharing options",
+      "Improved map performance",
+      "Better mobile responsiveness",
+      "Enhanced marker customization",
+      "Search and filter functionality",
     ],
   },
   {
     quarter: "Q3 2025",
+    status: "completed",
+    title: "Paths & Basic Measurements",
+    features: [
+      "Real-time collaborative editing",
+      "Draw custom paths and shapes",
+      "Distance and area measurements",
+      "Path customization options",
+    ],
+  },
+  {
+    quarter: "Q1 2026",
+    status: "in-progress",
+    title: "Mobile Apps",
+    features: [
+      "Native iOS and Android apps",
+      "Offline map support",
+      "GPS tracking and location services",
+      "Camera integration for markers",
+    ],
+  },
+  {
+    quarter: "Q2 2026",
     status: "planned",
     title: "Collaboration & Sharing",
     features: [
       "Advanced sharing permissions",
-      "Email notifications for collaborators",
       "Comments and annotations",
+      "Email notifications for collaborators",
+      "User management for shared maps",
     ],
   },
   {
-    quarter: "Q4 2025",
+    quarter: "Q3 2026",
     status: "planned",
-    title: "Data & Customization",
+    title: "Data Import & Export",
     features: [
-      "Import/Export (KML, GeoJSON, CSV)",
-      "Custom map styles & themes",
-      "Advanced measurement tools",
-      "API access",
+      "Import KML files from Google My Maps",
+      "Export to KML, GeoJSON, and CSV",
+      "Bulk import from spreadsheets",
+      "Backup and restore functionality",
+    ],
+  },
+  {
+    quarter: "Q4 2026",
+    status: "planned",
+    title: "Custom Styling & Themes",
+    features: [
+      "Custom map themes and color schemes",
+      "Custom marker icons and styles",
+      "Brand customization options",
+      "Print-friendly map layouts",
+    ],
+  },
+  {
+    quarter: "Q1 2027",
+    status: "planned",
+    title: "Routes & Directions",
+    features: [
+      "Turn-by-turn navigation",
+      "Multi-stop route planning",
+      "Route optimization for drivers",
+      "Daily route management",
+    ],
+  },
+  {
+    quarter: "Q2 2027",
+    status: "planned",
+    title: "Advanced Measurements",
+    features: [
+      "Elevation profiles and data",
+      "Precise measurement tools",
+      "Multiple unit options",
+      "Advanced distance calculations",
     ],
   },
 ];

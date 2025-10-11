@@ -4,13 +4,16 @@ import { Badge } from "@buzztrip/ui/components/badge";
 import { Card, CardContent } from "@buzztrip/ui/components/card";
 import {
   Calendar,
+  Camera,
   Check,
   Clock,
   Download,
+  Map,
   MapPin,
   Palette,
   Route,
   Ruler,
+  Share2,
   Shield,
   Smartphone,
   Users,
@@ -29,8 +32,8 @@ export default function RoadmapPage() {
       features: [
         { name: "Custom markers with descriptions and photos", icon: MapPin },
         { name: "Collections for organizing markers", icon: MapPin },
-        { name: "Multiple maps support", icon: MapPin },
-        { name: "Basic sharing via public links", icon: MapPin },
+        { name: "Multiple maps support", icon: Map },
+        { name: "Basic sharing via public links", icon: Share2 },
         { name: "Responsive web interface", icon: Smartphone },
         { name: "User authentication and profiles", icon: Users },
       ],
@@ -46,27 +49,34 @@ export default function RoadmapPage() {
         { name: "Better mobile responsiveness", icon: Smartphone },
         { name: "Enhanced marker customization", icon: MapPin },
         { name: "Search and filter functionality", icon: MapPin },
-        // { name: "Keyboard shortcuts for power users", icon: Zap },
       ],
     },
     {
-      month: "June 2025",
-      status: "in-progress",
-      title: "Paths, Routes & Measurements",
+      month: "October 2025",
+      status: "completed",
+      title: "Paths & Basic Measurements",
       description:
-        "Adding powerful tools for planning routes and measuring distances.",
+        "Draw custom paths and shapes with real-time distance and area measurements.",
       features: [
         { name: "Real-time collaborative editing", icon: Users },
-        { name: "Draw custom paths and routes", icon: Route },
+        { name: "Draw custom paths and shapes", icon: Route },
         { name: "Distance and area measurements", icon: Ruler },
-        { name: "Elevation profiles for routes", icon: Route },
-        { name: "Turn-by-turn directions", icon: Route },
-        { name: "Route optimization", icon: Route },
-        { name: "Create custom points of interest (POIs)", icon: MapPin },
+        { name: "Path customization (colors, styles)", icon: Palette },
       ],
     },
     {
-      month: "August 2025",
+      month: "March 2026",
+      status: "in-progress",
+      title: "Mobile Apps",
+      description: "Native iOS and Android apps for mapping on the go.",
+      features: [
+        { name: "Native iOS app", icon: Smartphone },
+        { name: "Native Android app", icon: Smartphone },
+        { name: "Camera integration for quick photo markers", icon: Camera },
+      ],
+    },
+    {
+      month: "June 2026",
       status: "planned",
       title: "Collaboration & Sharing",
       description:
@@ -74,12 +84,12 @@ export default function RoadmapPage() {
       features: [
         { name: "Advanced sharing permissions", icon: Users },
         { name: "Comments and annotations", icon: Users },
-        { name: "Activity feed for shared maps", icon: Users },
         { name: "Email notifications for collaborators", icon: Users },
+        { name: "User management for shared maps", icon: Users },
       ],
     },
     {
-      month: "May 2025",
+      month: "September 2026",
       status: "planned",
       title: "Data Import & Export",
       description:
@@ -88,51 +98,45 @@ export default function RoadmapPage() {
         { name: "Import KML files from Google My Maps", icon: Download },
         { name: "Export to KML, GeoJSON, and CSV", icon: Download },
         { name: "Bulk import from spreadsheets", icon: Download },
-        { name: "Integration with popular travel apps", icon: Download },
         { name: "Backup and restore functionality", icon: Download },
       ],
     },
     {
-      month: "June 2025",
+      month: "December 2026",
       status: "planned",
       title: "Custom Styling & Themes",
       description: "Make your maps truly yours with custom styling options.",
       features: [
         { name: "Custom map themes and color schemes", icon: Palette },
         { name: "Custom marker icons and styles", icon: Palette },
-        { name: "Brand customization for teams", icon: Palette },
-        { name: "Dark mode support", icon: Palette },
+        { name: "Brand customization options", icon: Palette },
         { name: "Print-friendly map layouts", icon: Palette },
       ],
     },
     {
-      month: "July 2025",
+      month: "March 2027",
       status: "planned",
-      title: "Mobile Apps Launch",
-      description: "Native iOS and Android apps for mapping on the go.",
+      title: "Routes & Directions",
+      description:
+        "Turn-by-turn navigation and route planning.",
       features: [
-        { name: "Native iOS app", icon: Smartphone },
-        { name: "Native Android app", icon: Smartphone },
-        { name: "Offline map support", icon: Smartphone },
-        { name: "GPS tracking and location services", icon: Smartphone },
-        {
-          name: "Camera integration for quick photo markers",
-          icon: Smartphone,
-        },
+        { name: "Turn-by-turn navigation", icon: Route },
+        { name: "Multi-stop route planning", icon: Route },
+        { name: "Route optimization for drivers", icon: Route },
+        { name: "Daily route management", icon: Calendar },
       ],
     },
     {
-      month: "August 2025",
+      month: "June 2027",
       status: "planned",
-      title: "Advanced Features & API",
+      title: "Advanced Measurements",
       description:
-        "Power user features and developer tools for advanced use cases.",
+        "Precise measurement tools with elevation data and advanced calculations.",
       features: [
-        { name: "Public API for developers", icon: Zap },
-        { name: "Webhook integrations", icon: Zap },
-        { name: "Advanced analytics and insights", icon: Zap },
-        { name: "Team management and permissions", icon: Shield },
-        { name: "Enterprise security features", icon: Shield },
+        { name: "Elevation profiles and data", icon: Ruler },
+        { name: "Precise measurement tools", icon: Ruler },
+        { name: "Multiple unit options", icon: Ruler },
+        { name: "Advanced distance calculations", icon: Ruler },
       ],
     },
   ];
@@ -156,7 +160,7 @@ export default function RoadmapPage() {
               best mapping platform.
             </p>
             <Badge className="bg-primary/10 text-primary border-primary/20">
-              Updated monthly • Last updated: March 2025
+              Updated monthly • Last updated: October 2025
             </Badge>
           </motion.div>
         </div>
