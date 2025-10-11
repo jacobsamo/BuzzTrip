@@ -35,9 +35,9 @@ export function MapDetailContent({ mapId }: { mapId: Id<"maps"> }) {
     )
   }
 
-  const map = allMaps.find((m) => m._id === mapId)?.owner
+  const mapData = allMaps.find((m) => m._id === mapId)
 
-  if (!map) {
+  if (!mapData) {
     return (
       <DashboardLayout>
         <div className="flex flex-col items-center justify-center h-full">
@@ -75,13 +75,13 @@ export function MapDetailContent({ mapId }: { mapId: Id<"maps"> }) {
           </Link>
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-semibold text-foreground">{map.title}</h1>
+              <h1 className="text-3xl font-semibold text-foreground">{mapData.title}</h1>
               <Badge variant="outline" className="border-border text-muted-foreground bg-background">
-                {getVisibilityIcon(map.visibility)}
-                <span className="ml-1">{map.visibility}</span>
+                {getVisibilityIcon(mapData.visibility)}
+                <span className="ml-1">{mapData.visibility}</span>
               </Badge>
             </div>
-            {map.description && <p className="text-muted-foreground mt-1">{map.description}</p>}
+            {mapData.description && <p className="text-muted-foreground mt-1">{mapData.description}</p>}
           </div>
         </div>
 
@@ -149,9 +149,9 @@ export function MapDetailContent({ mapId }: { mapId: Id<"maps"> }) {
                 <Users className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <p className="text-sm text-muted-foreground">Owner</p>
-                  {map.owner ? (
-                    <Link href={`/users/${map.owner._id}`}>
-                      <p className="font-medium text-primary hover:underline">{map.owner.name}</p>
+                  {mapData.owner ? (
+                    <Link href={`/users/${mapData.owner._id}`}>
+                      <p className="font-medium text-primary hover:underline">{mapData.owner.name}</p>
                     </Link>
                   ) : (
                     <p className="font-medium text-card-foreground">Unknown</p>
@@ -163,8 +163,8 @@ export function MapDetailContent({ mapId }: { mapId: Id<"maps"> }) {
                 <div>
                   <p className="text-sm text-muted-foreground">Created</p>
                   <p className="font-medium text-card-foreground">
-                    {format(new Date(map._creationTime), "PPP")} (
-                    {formatDistanceToNow(new Date(map._creationTime), { addSuffix: true })})
+                    {format(new Date(mapData._creationTime), "PPP")} (
+                    {formatDistanceToNow(new Date(mapData._creationTime), { addSuffix: true })})
                   </p>
                 </div>
               </div>

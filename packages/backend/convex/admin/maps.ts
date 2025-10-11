@@ -1,13 +1,22 @@
-import { query } from "../_generated/server";
-import { v } from "convex/values";
+import { zodQuery } from "../../convex/helpers";
 import { requireAdmin } from "../../helpers/admin-helpers";
+import { mapsSchema, userSchema } from "../../zod-schemas";
+import * as z from "zod";
+import { zid } from "convex-helpers/server/zod";
 
 /**
  * Get all maps with aggregated statistics
  * READ-ONLY
  */
-export const getAllMapsWithStats = query({
+export const getAllMapsWithStats = zodQuery({
   args: {},
+  returns: z.array(
+    mapsSchema.extend({
+      owner: userSchema.nullable(),
+      markersCount: z.number(),
+      collaboratorsCount: z.number(),
+    })
+  ),
   handler: async (ctx) => {
     await requireAdmin(ctx);
 
@@ -40,15 +49,15 @@ export const getAllMapsWithStats = query({
  * Get detailed statistics for a specific map
  * READ-ONLY
  */
-export const getMapDetailStats = query({
-  args: { mapId: v.id("maps") },
-  returns: v.object({
-    markersCount: v.number(),
-    collectionsCount: v.number(),
-    pathsCount: v.number(),
-    labelsCount: v.number(),
-    routesCount: v.number(),
-    collaboratorsCount: v.number(),
+export const getMapDetailStats = zodQuery({
+  args: { mapId: zid("maps") },
+  returns: z.object({
+    markersCount: z.number(),
+    collectionsCount: z.number(),
+    pathsCount: z.number(),
+    labelsCount: z.number(),
+    routesCount: z.number(),
+    collaboratorsCount: z.number(),
   }),
   handler: async (ctx, args) => {
     await requireAdmin(ctx);

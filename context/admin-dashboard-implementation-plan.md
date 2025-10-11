@@ -16,7 +16,7 @@
 - **Convex** (read-only queries via `useQuery`)
 - **Clerk** with role-based middleware
 - **TailwindCSS v4** with `@tailwindcss/postcss` (CSS-only config)
-- **shadcn/ui** from `@buzztrip/components`
+- **shadcn/ui** from `@buzztrip/ui`
 - **Recharts** for charts
 - **TanStack Table v8** for tables
 - **TypeScript 5.9+**
@@ -102,7 +102,7 @@ apps/admin/
   },
   "dependencies": {
     "@buzztrip/backend": "workspace:*",
-    "@buzztrip/components": "workspace:*",
+    "@buzztrip/ui": "workspace:*",
     "@clerk/nextjs": "^6.32.0",
     "@t3-oss/env-nextjs": "^0.13.8",
     "@tailwindcss/postcss": "^4.1.13",
@@ -136,7 +136,7 @@ import type { NextConfig } from "next";
 import "./env";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@buzztrip/backend", "@buzztrip/components"],
+  transpilePackages: ["@buzztrip/backend", "@buzztrip/ui"],
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },
@@ -395,7 +395,7 @@ export async function convexNextjsOptions(): Promise<NextjsOptions> {
 #### **src/app/unauthorized/page.tsx** (Error page for non-admins)
 ```tsx
 import { SignOutButton } from "@clerk/nextjs";
-import { Button } from "@buzztrip/components/ui";
+import { Button } from "@buzztrip/ui/components/button";
 import { ShieldAlert } from "lucide-react";
 import Link from "next/link";
 

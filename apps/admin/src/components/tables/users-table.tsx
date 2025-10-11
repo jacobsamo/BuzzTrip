@@ -10,20 +10,12 @@ import {
 } from "@tanstack/react-table";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  Badge,
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-  Button,
-} from "@buzztrip/components/ui";
+
 import { ArrowUpDown } from "lucide-react";
+import { Badge } from "@buzztrip/ui/components/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@buzztrip/ui/components/avatar";
+import { Button } from "@buzztrip/ui/components/button";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@buzztrip/ui/components/table";
 
 type UserWithStats = {
   _id: string;

@@ -8,7 +8,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { iconsList, type IconType } from "@buzztrip/backend/types";
-import Icon, { popularIconsList } from "@buzztrip/components/icon";
+import Icon, { popularIconsList } from "@buzztrip/ui/components/icon";
 import { Button } from "../ui/button";
 
 interface IconPickerModalProps {

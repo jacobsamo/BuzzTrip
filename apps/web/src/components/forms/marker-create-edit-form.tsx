@@ -25,7 +25,7 @@ import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
 import type { IconType } from "@buzztrip/backend/types";
 import { combinedMarkersSchema } from "@buzztrip/backend/zod-schemas";
-import { popularIconsList } from "@buzztrip/components/icon";
+import { popularIconsList } from "@buzztrip/ui/components/icon";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
 import { Trash2 } from "lucide-react";
@@ -36,7 +36,9 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const Icon = dynamic(() => import("@buzztrip/components/icon"), { ssr: false });
+const Icon = dynamic(() => import("@buzztrip/ui/components/icon"), {
+  ssr: false,
+});
 
 const editSchema = z.object({
   ...combinedMarkersSchema.shape,
