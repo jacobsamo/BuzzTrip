@@ -3,8 +3,10 @@ import { MapStoreProvider } from "@/components/providers/map-state-provider";
 import { convexNextjsOptions, getConvexServerSession } from "@/lib/auth";
 import { api } from "@buzztrip/backend/api";
 import { Id } from "@buzztrip/backend/dataModel";
-import { fetchQuery, preloadQuery } from "convex/nextjs";
+import { mapViewEditSchema, mapViewSchema } from "@buzztrip/backend/zod-schemas";
+import { fetchMutation, fetchQuery, preloadQuery } from "convex/nextjs";
 import { Metadata } from "next";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
 type Params = Promise<{ mapId: string }>;
@@ -19,6 +21,44 @@ const getMap = async (mapId: string) => {
     options
   );
 };
+
+async function trackMapView(mapId: string, userId?: string) {
+  const headersList = await headers();
+  const ip = headersList.get("x-forwarded-for") || headersList.get("x-real-ip");
+  const userAgent = headersList.get("user-agent");
+
+  // Vercel geo headers
+  const country = headersList.get("x-vercel-ip-country");
+  const region = headersList.get("x-vercel-ip-country-region");
+  const city = headersList.get("x-vercel-ip-city");
+
+  /**Basic function to pase the user agent (UA) string into OS, Browser, and Device */
+  const parseUA = (ua: string) => {
+    const os = /Windows|Mac|Linux|Android|iOS/.exec(ua)?.[0];
+    const browser = /Chrome|Firefox|Safari|Edge/.exec(ua)?.[0];
+    const device = /Mobile|Tablet/.test(ua) ? "Mobile" : "Desktop";
+    return { os, browser, device };
+  };
+
+  const { os, browser, device } = userAgent ? parseUA(userAgent) : {};
+
+  const data = mapViewEditSchema.parse({
+    userId,
+    mapId,
+    ip: ip?.split(",")[0], // First IP if multiple
+    country: country || undefined,
+    region: region || undefined,
+    city: city || undefined,
+    userAgent: userAgent || undefined,
+    os,
+    browser,
+    device,
+  });
+
+  console.log("Adding map view", data);
+
+  await fetchMutation(api.maps.index.trackMapView, data);
+}
 
 export async function generateMetadata({
   params,
@@ -88,7 +128,7 @@ export default async function MapPage({ params }: { params: Params }) {
         },
         options
       ),
-        preloadQuery(
+      preloadQuery(
         api.maps.paths.getPathsForMap,
         {
           mapId: map._id,
@@ -116,6 +156,7 @@ export default async function MapPage({ params }: { params: Params }) {
         },
         options
       ),
+      trackMapView(mapId, session.user._id),
     ]);
 
   return (

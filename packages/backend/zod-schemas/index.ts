@@ -9,6 +9,7 @@ export * from "./maps-schema";
 export * from "./places-schema";
 export * from "./shared-schemas";
 export * from "./paths-schema";
+export * from "./analytics-schema";
 
 export const combinedMarkersSchema = markersEditSchema.extend({
   place_id: zid("places").optional(),
