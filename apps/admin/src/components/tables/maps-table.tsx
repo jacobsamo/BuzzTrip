@@ -10,18 +10,10 @@ import {
 } from "@tanstack/react-table";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  Badge,
-  Button,
-} from "@buzztrip/components/ui";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Badge, Table } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@buzztrip/ui/components/button";
+import { TableHeader, TableRow, TableHead, TableBody, TableCell } from "node_modules/@buzztrip/components/src/ui/table";
 
 type MapWithStats = {
   _id: string;

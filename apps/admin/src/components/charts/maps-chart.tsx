@@ -2,7 +2,7 @@
 
 import { useQuery } from "convex/react";
 import { api } from "@buzztrip/backend/api";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@buzztrip/components/ui";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@buzztrip/ui/components/card";
 import {
   AreaChart,
   Area,

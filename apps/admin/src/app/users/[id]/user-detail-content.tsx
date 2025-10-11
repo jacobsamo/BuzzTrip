@@ -2,9 +2,9 @@
 
 import Link from "next/link"
 import { DashboardLayout } from "@/components/dashboard-layout"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@buzztrip/ui/components/card"
+import { Button } from "@buzztrip/ui/components/button"
+import { Badge } from "@buzztrip/ui/components/badge"
 import { ArrowLeft, Mail, Calendar, Map, MapPin, FolderOpen, Users } from "lucide-react"
 import { formatDistanceToNow, format } from "date-fns"
 import { useQuery } from "convex/react"
@@ -26,7 +26,7 @@ export function UserDetailContent({ userId }: { userId: Id<"users"> }) {
     )
   }
 
-  const userMaps = allMaps.filter((map) => map.owner_id === userId)
+  const userMaps = allMaps.filter((map) => map?.owner && map.owner._id === userId)
 
   return (
     <DashboardLayout>

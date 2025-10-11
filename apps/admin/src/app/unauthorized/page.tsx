@@ -1,5 +1,5 @@
 import { SignOutButton } from "@clerk/nextjs";
-import { Button } from "@buzztrip/components/ui";
+import { Button } from "@buzztrip/ui/components/button";
 import { ShieldAlert } from "lucide-react";
 import Link from "next/link";
 
