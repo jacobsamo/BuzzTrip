@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@buzztrip/ui/components/skeleton";
 import React from "react";
 
 const SidebarSkeleton = ({ children }: { children?: React.ReactNode }) => {
