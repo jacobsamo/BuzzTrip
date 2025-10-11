@@ -25,10 +25,6 @@ export default clerkMiddleware(async (auth, req) => {
 
     // Check admin access
     const userRole = user?.publicMetadata?.role;
-    console.log("userRole", {
-      user,
-      userRole,
-    });
     if (userRole !== 'admin') {
       return NextResponse.redirect(new URL('/unauthorized', req.url));
     }

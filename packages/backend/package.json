@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "convex dev",
     "setup": "convex dev --until-success",
-    "deploy": "convex deploy"
+    "deploy": "convex deploy",
+    "update": "bun update --latest"
   },
   "exports": {
     "./api": {
@@ -26,14 +27,14 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@clerk/backend": "^2.12.1",
+    "@clerk/backend": "^2.17.2",
     "@convex-dev/geospatial": "^0.1.9",
     "@convex-dev/migrations": "^0.2.9",
-    "@convex-dev/resend": "^0.1.12",
-    "convex": "^1.26.2",
+    "@convex-dev/resend": "^0.1.13",
+    "convex": "^1.27.5",
     "convex-helpers": "0.1.104",
     "open-location-code-typescript": "^1.5.0",
-    "svix": "^1.76.1",
-    "zod": "3.25.76"
+    "svix": "^1.77.0",
+    "zod": "4.1.12"
   }
 }

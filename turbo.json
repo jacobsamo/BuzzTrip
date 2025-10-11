@@ -22,6 +22,9 @@
     },
     "clean:all": {
       "cache": false
+    },
+    "update": {
+      "cache": false
     }
   }
 }
