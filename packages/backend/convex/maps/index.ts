@@ -5,11 +5,12 @@ import type { UserMap } from "../../types";
 import {
   mapsEditSchema,
   mapUserSchema,
+  mapViewEditSchema,
   userMapsSchema,
 } from "../../zod-schemas";
 import { Id } from "../_generated/dataModel";
 import { MutationCtx } from "../_generated/server";
-import { authedMutation, authedQuery } from "../helpers";
+import { authedMutation, authedQuery, zodMutation } from "../helpers";
 import { createCollectionFunction } from "./collections";
 import { createMapUser } from "./mapUsers";
 // Get methods
@@ -34,38 +35,23 @@ export const getMap = authedQuery({
   },
 });
 
-/**
- * We only want to fetch this as a preload before than using all the other queries
- */
-// export const getAllMapData = authedQuery({
-//   args: {
-//     mapId: zid("maps"),
-//   },
-//   handler: async (ctx, args) => {
-//     const markersPromise = ctx.runQuery(api.maps.markers.getMarkersView, {
-//       map_id: args.mapId,
-//     });
-//     const collectionsPromise = ctx.runQuery(
-//       api.maps.collections.getCollectionsForMap,
-//       {
-//         mapId: args.mapId,
-//       }
-//     );
-//     const collectionLinksPromise = ctx.runQuery(
-//       api.maps.collections.getCollectionLinksForMap,
-//       {
-//         mapId: args.mapId,
-//       }
-//     );
-//     const labelsPromise = ctx.runQuery(api.maps.labels.getMapLabels, {
-//       mapId: args.mapId,
-//     });
-//     const mapUsersPromise = ctx.runQuery(api.maps.mapUsers.getMapUsers, {
-//       mapId: args.mapId,
-//     });
+export const trackMapView = zodMutation({
+  args: mapViewEditSchema,
+  handler: async (ctx, args) => {
+    await ctx.db.insert("mapViews", args);
+  },
+});
 
-//   },
-// });
+export const getMapViews = authedQuery({
+  args: {
+    mapId: zid("maps"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("mapViews")
+      .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId));
+  },
+});
 
 // get all the maps for a user
 export const getUserMaps = authedQuery({

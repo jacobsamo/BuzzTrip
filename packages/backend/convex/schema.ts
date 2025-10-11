@@ -7,7 +7,7 @@ import {
   placesReviewSchema,
 } from "../zod-schemas/places-schema";
 
-import { pathsSchema } from "../zod-schemas";
+import { mapViewSchema, pathsSchema } from "../zod-schemas";
 import {
   collection_linksSchema,
   collectionsSchema,
@@ -24,6 +24,9 @@ export default defineSchema({
   maps: defineTable(zodToConvex(mapsSchema)).index("by_visibility", [
     "visibility",
   ]),
+  mapViews: defineTable(zodToConvex(mapViewSchema))
+    .index("by_map_id", ["mapId"])
+    .index("by_user_id", ["userId"]),
   paths: defineTable(zodToConvex(pathsSchema)).index("byMapId", ["mapId"]),
   map_users: defineTable(zodToConvex(mapUserSchema))
     .index("by_map_id", ["map_id"])
