@@ -1,48 +1,52 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { generateMockUsers } from "@/lib/mock-data"
-import { Search, ArrowUpDown, Map, MapPin, FolderOpen, ChevronRight } from "lucide-react"
+import { Search, ArrowUpDown, Map, MapPin, ChevronRight } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
+import { useQuery } from "convex/react"
+import { api } from "@buzztrip/backend/api"
 
 export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState("")
-  const [sortBy, setSortBy] = useState<"name" | "maps" | "markers" | "lastLogin">("name")
+  const [sortBy, setSortBy] = useState<"name" | "maps" | "markers" | "_creationTime">("name")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
 
-  const users = generateMockUsers(50)
+  const allUsers = useQuery(api.admin.users.getAllUsersWithStats)
 
-  // Filter and sort users
-  const filteredUsers = users
-    .filter(
-      (user) =>
-        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase()),
-    )
-    .sort((a, b) => {
-      let comparison = 0
-      switch (sortBy) {
-        case "name":
-          comparison = a.name.localeCompare(b.name)
-          break
-        case "maps":
-          comparison = a.mapsCount - b.mapsCount
-          break
-        case "markers":
-          comparison = a.markersCount - b.markersCount
-          break
-        case "lastLogin":
-          comparison = new Date(a.lastLogin).getTime() - new Date(b.lastLogin).getTime()
-          break
-      }
-      return sortOrder === "asc" ? comparison : -comparison
-    })
+  const filteredUsers = useMemo(() => {
+    if (!allUsers) return []
+
+    return allUsers
+      .filter(
+        (user) =>
+          user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+      .sort((a, b) => {
+        let comparison = 0
+        switch (sortBy) {
+          case "name":
+            comparison = a.name.localeCompare(b.name)
+            break
+          case "maps":
+            comparison = a.mapsCount - b.mapsCount
+            break
+          case "markers":
+            comparison = a.markersCount - b.markersCount
+            break
+          case "_creationTime":
+            comparison = a._creationTime - b._creationTime
+            break
+        }
+        return sortOrder === "asc" ? comparison : -comparison
+      })
+  }, [allUsers, searchQuery, sortBy, sortOrder])
 
   const toggleSort = (field: typeof sortBy) => {
     if (sortBy === field) {
@@ -51,6 +55,16 @@ export default function UsersPage() {
       setSortBy(field)
       setSortOrder("asc")
     }
+  }
+
+  if (!allUsers) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-full">
+          <p className="text-muted-foreground">Loading users...</p>
+        </div>
+      </DashboardLayout>
+    )
   }
 
   return (
@@ -102,11 +116,11 @@ export default function UsersPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => toggleSort("lastLogin")}
+                  onClick={() => toggleSort("_creationTime")}
                   className="bg-background border-input text-foreground"
                 >
                   <ArrowUpDown className="h-4 w-4 mr-2" />
-                  Last Login
+                  Joined
                 </Button>
               </div>
             </div>
@@ -124,9 +138,6 @@ export default function UsersPage() {
                         Stats
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Last Login
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Joined
                       </th>
                       <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -135,46 +146,47 @@ export default function UsersPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border bg-card">
-                    {filteredUsers.map((user) => (
-                      <tr key={user.id} className="hover:bg-muted/50 transition-colors">
-                        <td className="px-4 py-4">
-                          <div>
-                            <div className="font-medium text-card-foreground">{user.name}</div>
-                            <div className="text-sm text-muted-foreground">{user.email}</div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="flex flex-wrap gap-2">
-                            <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
-                              <Map className="h-3 w-3 mr-1" />
-                              {user.mapsCount} maps
-                            </Badge>
-                            <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
-                              <MapPin className="h-3 w-3 mr-1" />
-                              {user.markersCount} markers
-                            </Badge>
-                            <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
-                              <FolderOpen className="h-3 w-3 mr-1" />
-                              {user.collectionsCount} collections
-                            </Badge>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4 text-sm text-muted-foreground">
-                          {formatDistanceToNow(new Date(user.lastLogin), { addSuffix: true })}
-                        </td>
-                        <td className="px-4 py-4 text-sm text-muted-foreground">
-                          {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
-                        </td>
-                        <td className="px-4 py-4 text-right">
-                          <Link href={`/users/${user.id}`}>
-                            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80">
-                              View Details
-                              <ChevronRight className="h-4 w-4 ml-1" />
-                            </Button>
-                          </Link>
+                    {filteredUsers.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
+                          {searchQuery ? "No users found matching your search" : "No users yet"}
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      filteredUsers.map((user) => (
+                        <tr key={user._id} className="hover:bg-muted/50 transition-colors">
+                          <td className="px-4 py-4">
+                            <div>
+                              <div className="font-medium text-card-foreground">{user.name}</div>
+                              <div className="text-sm text-muted-foreground">{user.email}</div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex flex-wrap gap-2">
+                              <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
+                                <Map className="h-3 w-3 mr-1" />
+                                {user.mapsCount} maps
+                              </Badge>
+                              <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
+                                <MapPin className="h-3 w-3 mr-1" />
+                                {user.markersCount} markers
+                              </Badge>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 text-sm text-muted-foreground">
+                            {formatDistanceToNow(new Date(user._creationTime), { addSuffix: true })}
+                          </td>
+                          <td className="px-4 py-4 text-right">
+                            <Link href={`/users/${user._id}`}>
+                              <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80">
+                                View Details
+                                <ChevronRight className="h-4 w-4 ml-1" />
+                              </Button>
+                            </Link>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>

@@ -1,44 +1,49 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { generateMockMaps } from "@/lib/mock-data"
-import { Search, ArrowUpDown, MapPin, FolderOpen, ChevronRight, Globe, Lock, EyeOff } from "lucide-react"
+import { Search, ArrowUpDown, MapPin, Users, ChevronRight, Globe, Lock, EyeOff } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
+import { useQuery } from "convex/react"
+import { api } from "@buzztrip/backend/api"
 
 export default function MapsPage() {
   const [searchQuery, setSearchQuery] = useState("")
-  const [sortBy, setSortBy] = useState<"title" | "markers" | "updated">("title")
+  const [sortBy, setSortBy] = useState<"title" | "markers" | "_creationTime">("title")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
 
-  const maps = generateMockMaps(100)
+  const allMaps = useQuery(api.admin.maps.getAllMapsWithStats)
 
-  const filteredMaps = maps
-    .filter(
-      (map) =>
-        map.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        map.ownerName.toLowerCase().includes(searchQuery.toLowerCase()),
-    )
-    .sort((a, b) => {
-      let comparison = 0
-      switch (sortBy) {
-        case "title":
-          comparison = a.title.localeCompare(b.title)
-          break
-        case "markers":
-          comparison = a.markersCount - b.markersCount
-          break
-        case "updated":
-          comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
-          break
-      }
-      return sortOrder === "asc" ? comparison : -comparison
-    })
+  const filteredMaps = useMemo(() => {
+    if (!allMaps) return []
+
+    return allMaps
+      .filter(
+        (map) =>
+          map.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          map.owner?.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+      .sort((a, b) => {
+        let comparison = 0
+        switch (sortBy) {
+          case "title":
+            comparison = a.title.localeCompare(b.title)
+            break
+          case "markers":
+            comparison = a.markersCount - b.markersCount
+            break
+          case "_creationTime":
+            comparison = a._creationTime - b._creationTime
+            break
+        }
+        return sortOrder === "asc" ? comparison : -comparison
+      })
+  }, [allMaps, searchQuery, sortBy, sortOrder])
 
   const toggleSort = (field: typeof sortBy) => {
     if (sortBy === field) {
@@ -60,6 +65,16 @@ export default function MapsPage() {
       default:
         return null
     }
+  }
+
+  if (!allMaps) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-full">
+          <p className="text-muted-foreground">Loading maps...</p>
+        </div>
+      </DashboardLayout>
+    )
   }
 
   return (
@@ -110,45 +125,51 @@ export default function MapsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => toggleSort("updated")}
+                  onClick={() => toggleSort("_creationTime")}
                   className="bg-background border-input text-foreground"
                 >
                   <ArrowUpDown className="h-4 w-4 mr-2" />
-                  Updated
+                  Created
                 </Button>
               </div>
             </div>
 
             <div className="space-y-3">
-              {filteredMaps.map((map) => (
-                <Link key={map.id} href={`/maps/${map.id}`}>
-                  <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-secondary hover:bg-secondary/80 transition-colors">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-medium text-secondary-foreground">{map.title}</h3>
-                        <Badge variant="outline" className="text-xs border-border text-muted-foreground bg-background">
-                          {getVisibilityIcon(map.visibility)}
-                          <span className="ml-1">{map.visibility}</span>
-                        </Badge>
+              {filteredMaps.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8">
+                  {searchQuery ? "No maps found matching your search" : "No maps yet"}
+                </p>
+              ) : (
+                filteredMaps.map((map) => (
+                  <Link key={map._id} href={`/maps/${map._id}`}>
+                    <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-secondary hover:bg-secondary/80 transition-colors">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-medium text-secondary-foreground">{map.title}</h3>
+                          <Badge variant="outline" className="text-xs border-border text-muted-foreground bg-background">
+                            {getVisibilityIcon(map.visibility)}
+                            <span className="ml-1">{map.visibility}</span>
+                          </Badge>
+                        </div>
+                        {map.description && <p className="text-sm text-muted-foreground mt-1">{map.description}</p>}
+                        <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
+                          <span>Owner: {map.owner?.name || 'Unknown'}</span>
+                          <span className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            {map.markersCount} markers
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Users className="h-3 w-3" />
+                            {map.collaboratorsCount} collaborators
+                          </span>
+                          <span>Created {formatDistanceToNow(new Date(map._creationTime), { addSuffix: true })}</span>
+                        </div>
                       </div>
-                      {map.description && <p className="text-sm text-muted-foreground mt-1">{map.description}</p>}
-                      <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
-                        <span>Owner: {map.ownerName}</span>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {map.markersCount} markers
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <FolderOpen className="h-3 w-3" />
-                          {map.collectionsCount} collections
-                        </span>
-                        <span>Updated {formatDistanceToNow(new Date(map.updatedAt), { addSuffix: true })}</span>
-                      </div>
+                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
                     </div>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
