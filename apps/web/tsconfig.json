@@ -27,7 +27,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "env": ["env.ts"]
+      "env": ["env.ts"],
+      "@buzztrip/ui/*": ["../../packages/ui/src/*"]
     },
     "types": ["google.maps"]
   },

@@ -122,15 +122,15 @@ The backend uses **Convex** as a real-time database with serverless functions. A
 
 ## Shared Component Library
 
-The `@buzztrip/components` package provides shared UI components following shadcn/ui patterns with Radix UI primitives. Components are exported modularly:
+The `@buzztrip/ui/components` package provides shared UI components following shadcn/ui patterns with Radix UI primitives. Components are exported modularly:
 
 ```typescript
 // Import specific UI components
-import { Button } from "@buzztrip/components/ui"
-import { Icon } from "@buzztrip/components/icon"
+import { Button } from "@buzztrip/ui/components/button"
+import { Icon } from "@buzztrip/ui/components/icon"
 
 // Import utilities
-import { cn } from "@buzztrip/components/lib/utils"
+import { cn } from "@buzztrip/ui/components/lib/utils"
 ```
 
 ## Environment Setup

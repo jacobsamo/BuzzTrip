@@ -14,10 +14,10 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { type IconType, iconsList } from "@buzztrip/backend/types";
-import Icon from "@buzztrip/components/icon";
+import Icon from "@buzztrip/ui/components/icon";
+import { Command as CommandPrimitive } from "cmdk";
 import { Check, ChevronLeft, ChevronRight, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
-import {Command as CommandPrimitive} from "cmdk";
 
 type IconList = {
   id: IconType;
@@ -79,8 +79,8 @@ export function IconPicker({
       const searchResults = fuseInstance
         .search(searchQuery.trim())
         .map((r: any) => r.item) as IconList[];
-      
-        return searchResults
+
+      return searchResults;
     }
     const startIdx = currentPage * ICONS_PER_PAGE;
     const endIdx = startIdx + ICONS_PER_PAGE;

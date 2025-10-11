@@ -1,5 +1,9 @@
-// this file contains all the icons that are used for maps
-import { Icon } from "@phosphor-icons/react";
+import React, { Suspense } from "react";
+import type {
+  IconType,
+  PopularIcon,
+} from "@buzztrip/backend/types";
+import { Icon as PhosphorIcon} from "@phosphor-icons/react";
 import {
   // Transport
   Train,
@@ -60,17 +64,12 @@ import {
 } from "@phosphor-icons/react";
 
 
-import type {
-  IconType,
-  PopularIcon,
-} from "@buzztrip/backend/types";
-
 
 
 /**
  * A list of the most popular icons, derived from the icons object.
  */
-export const popular: Record<PopularIcon, Icon> = {
+export const popular: Record<PopularIcon, PhosphorIcon> = {
   Bed: Bed,
   Car: Car,
   Camping: Tent,
@@ -79,7 +78,7 @@ export const popular: Record<PopularIcon, Icon> = {
   House: HouseLine,
 };
 
-export const Icons: Record<IconType, Icon> = {
+export const Icons: Record<IconType, PhosphorIcon> = {
   // transport
   Train: Train,
   Car: Car,
@@ -146,3 +145,30 @@ export const Icons: Record<IconType, Icon> = {
   Map: MapTrifold,
   MapPinLine: MapPinLine,
 };
+
+
+export interface IconProps {
+  name: IconType;
+  color?: React.CSSProperties["color"] | string;
+  size?: number;
+}
+
+
+
+const Icon = ({
+  name = "MapPin",
+  color = "#000",
+  size = 24,
+  ...props
+}: IconProps) => {
+  const DisplayIcon = Icons[name];
+
+  return <DisplayIcon color={color} size={size} weight="regular" {...props} />;
+};
+
+export default Icon;
+
+
+
+export const iconsList = Object.keys(Icons) as IconType[];
+export const popularIconsList = Object.keys(popular) as PopularIcon[];
