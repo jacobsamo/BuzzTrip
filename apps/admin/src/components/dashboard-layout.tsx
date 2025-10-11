@@ -4,7 +4,7 @@ import { type ReactNode, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Users, Map, BarChart3, Database, Menu, X } from "lucide-react"
+import { Users, Map, BarChart3, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface DashboardLayoutProps {
@@ -15,7 +15,6 @@ const navigation = [
   { name: "Overview", href: "/", icon: BarChart3 },
   { name: "Users", href: "/users", icon: Users },
   { name: "Maps", href: "/maps", icon: Map },
-  { name: "Database", href: "/database", icon: Database },
 ]
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {

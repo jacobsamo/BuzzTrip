@@ -56,12 +56,29 @@ export default function OverviewPage() {
     },
   ]
 
-  // Combine monthly data for chart
-  const monthlyGrowthData = mapsMonthly.map((mapData: any, index: number) => ({
+  // Combine monthly data for chart - create a lookup object for faster matching
+  const markersLookup: Record<string, number> = {}
+  markersMonthly.forEach((item: any) => {
+    markersLookup[item.month] = item.count
+  })
+
+  const monthlyGrowthData = mapsMonthly.map((mapData: any) => ({
     month: mapData.month,
     maps: mapData.count,
-    markers: markersMonthly[index]?.count || 0,
+    markers: markersLookup[mapData.month] || 0,
   }))
+
+  // Debug logging to verify data
+  console.log('Chart Data Debug:', {
+    mapsMonthly,
+    markersMonthly,
+    monthlyGrowthData,
+    totalDataPoints: monthlyGrowthData.length,
+    hasData: monthlyGrowthData.some((d: any) => d.maps > 0 || d.markers > 0)
+  })
+
+  // Check if we have any actual data to display
+  const hasChartData = monthlyGrowthData.length > 0 && monthlyGrowthData.some((d: any) => d.maps > 0 || d.markers > 0)
 
   // Calculate visibility distribution
   const visibilityData = [
@@ -110,31 +127,40 @@ export default function OverviewPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer
-              config={{
-                maps: {
-                  label: "Maps",
-                  color: "hsl(var(--chart-1))",
-                },
-                markers: {
-                  label: "Markers",
-                  color: "hsl(var(--chart-2))",
-                },
-              }}
-              className="h-[300px]"
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthlyGrowthData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Legend />
-                  <Line type="monotone" dataKey="maps" stroke="var(--color-maps)" strokeWidth={2} name="Maps" />
-                  <Line type="monotone" dataKey="markers" stroke="var(--color-markers)" strokeWidth={2} name="Markers" />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartContainer>
+            {!hasChartData ? (
+              <div className="h-[300px] flex items-center justify-center text-center">
+                <div>
+                  <p className="text-muted-foreground mb-2">No data available yet</p>
+                  <p className="text-sm text-muted-foreground">Create some maps and markers to see growth trends</p>
+                </div>
+              </div>
+            ) : (
+              <ChartContainer
+                config={{
+                  maps: {
+                    label: "Maps",
+                    color: "hsl(var(--chart-1))",
+                  },
+                  markers: {
+                    label: "Markers",
+                    color: "hsl(var(--chart-2))",
+                  },
+                }}
+                className="h-[300px]"
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={monthlyGrowthData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Legend />
+                    <Line type="monotone" dataKey="maps" stroke="var(--color-maps)" strokeWidth={2} name="Maps" />
+                    <Line type="monotone" dataKey="markers" stroke="var(--color-markers)" strokeWidth={2} name="Markers" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            )}
           </CardContent>
         </Card>
 
