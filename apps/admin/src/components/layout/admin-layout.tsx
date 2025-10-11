@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@buzztrip/components/ui";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@buzztrip/ui/components/sidebar";
 import { AdminSidebar } from "./admin-sidebar";
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {

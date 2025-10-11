@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@buzztrip/components/ui";
+import { Card, CardContent, CardHeader, CardTitle } from "@buzztrip/ui/components/card";
 import { LucideIcon } from "lucide-react";
 import { TrendingUp, TrendingDown } from "lucide-react";
 

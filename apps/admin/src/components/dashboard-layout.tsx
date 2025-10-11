@@ -3,9 +3,9 @@
 import { type ReactNode, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
+import { cn } from "@buzztrip/ui/lib/utils"
 import { Users, Map, BarChart3, Menu, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@buzztrip/ui/components/button"
 
 interface DashboardLayoutProps {
   children: ReactNode

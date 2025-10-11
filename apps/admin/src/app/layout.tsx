@@ -1,7 +1,7 @@
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
-import "../styles/globals.css";
+import "@buzztrip/ui/globals.css";
 
 export const metadata: Metadata = {
   title: "BuzzTrip Admin Dashboard",

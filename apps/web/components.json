@@ -4,16 +4,15 @@
   "rsc": true,
   "tsx": true,
   "tailwind": {
-    "config": "tailwind.config.ts",
-    "css": "src/lib/styles/globals.css",
+    "config": "",
+    "css": "../../packages/ui/src/styles/globals.css",
     "baseColor": "neutral",
-    "cssVariables": true,
-    "prefix": ""
+    "cssVariables": true
   },
   "aliases": {
     "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
+   "utils": "@buzztrip/ui/lib/utils",
+    "ui": "@buzztrip/ui/components",
     "lib": "@/lib",
     "hooks": "@/hooks"
   },

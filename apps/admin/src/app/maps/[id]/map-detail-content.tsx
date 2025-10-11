@@ -2,9 +2,9 @@
 
 import Link from "next/link"
 import { DashboardLayout } from "@/components/dashboard-layout"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@buzztrip/ui/components/card"
+import { Button } from "@buzztrip/ui/components/button"
+import { Badge } from "@buzztrip/ui/components/badge"
 import {
   ArrowLeft,
   MapPin,
@@ -35,7 +35,7 @@ export function MapDetailContent({ mapId }: { mapId: Id<"maps"> }) {
     )
   }
 
-  const map = allMaps.find((m) => m._id === mapId)
+  const map = allMaps.find((m) => m._id === mapId)?.owner
 
   if (!map) {
     return (

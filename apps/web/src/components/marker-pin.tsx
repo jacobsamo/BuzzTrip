@@ -1,8 +1,8 @@
 import type { IconType } from "@buzztrip/backend/types";
-import type { IconProps } from "@buzztrip/components/icon";
+import type { IconProps } from "@buzztrip/ui/components/icon/index";
 import dynamic from "next/dynamic";
 
-const Icon = dynamic(() => import("@buzztrip/components/icon"), { ssr: false });
+const Icon = dynamic(() => import("@buzztrip/ui/components/icon/index"), { ssr: false });
 
 interface MarkerPinProps extends Omit<IconProps, "name" | "color"> {
   backgroundColor?: string;

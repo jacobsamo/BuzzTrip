@@ -1,23 +1,25 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import { useUser, SignOutButton } from "@clerk/nextjs";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@buzztrip/ui/components/avatar";
+import { Badge } from "@buzztrip/ui/components/badge";
+import { Button } from "@buzztrip/ui/components/button";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuItem,
   SidebarMenuButton,
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-  Badge,
-  Button,
-} from "@buzztrip/components/ui";
-import { LayoutDashboard, Users, Map, LogOut } from "lucide-react";
+  SidebarMenuItem,
+} from "@buzztrip/ui/components/sidebar";
+import { SignOutButton, useUser } from "@clerk/nextjs";
+import { LayoutDashboard, LogOut, Map, Users } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navItems = [
   {
@@ -88,11 +90,16 @@ export function AdminSidebar() {
         <div className="flex items-center justify-between gap-2 px-4 py-3 border-t">
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={user?.imageUrl} alt={user?.fullName || "Admin"} />
+              <AvatarImage
+                src={user?.imageUrl}
+                alt={user?.fullName || "Admin"}
+              />
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <span className="text-sm font-medium">{user?.fullName || "Admin"}</span>
+              <span className="text-sm font-medium">
+                {user?.fullName || "Admin"}
+              </span>
               <Badge variant="outline" className="w-fit text-xs">
                 Admin
               </Badge>
