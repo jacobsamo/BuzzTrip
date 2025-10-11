@@ -1,8 +1,7 @@
-import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
-import { AdminLayout } from "@/components/layout/admin-layout";
-import "@/lib/styles/globals.css";
+import { ClerkProvider } from "@clerk/nextjs";
+import type { Metadata } from "next";
+import "../styles/globals.css";
 
 export const metadata: Metadata = {
   title: "BuzzTrip Admin Dashboard",
@@ -18,9 +17,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body className="antialiased">
-          <ConvexClientProvider>
-            <AdminLayout>{children}</AdminLayout>
-          </ConvexClientProvider>
+          <ConvexClientProvider>{children}</ConvexClientProvider>
         </body>
       </html>
     </ClerkProvider>
