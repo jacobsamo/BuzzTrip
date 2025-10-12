@@ -3,6 +3,74 @@ import { v } from "convex/values";
 import { requireAdmin } from "../../helpers/admin-helpers";
 
 /**
+ * Get daily creation stats for maps and markers
+ * READ-ONLY
+ */
+export const getDailyCreationStats = query({
+  args: { days: v.number() },
+  returns: v.array(v.object({
+    date: v.string(),
+    maps: v.number(),
+    markers: v.number(),
+  })),
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const [maps, markers] = await Promise.all([
+      ctx.db.query("maps").collect(),
+      ctx.db.query("markers").collect(),
+    ]);
+
+    // Initialize date counts
+    const dateCounts: Record<string, { maps: number; markers: number }> = {};
+    const now = new Date();
+
+    // Initialize all days in range
+    for (let i = args.days - 1; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      date.setHours(0, 0, 0, 0);
+      const isoString = date.toISOString();
+      const key = isoString.substring(0, 10); // YYYY-MM-DD
+      dateCounts[key] = { maps: 0, markers: 0 };
+    }
+
+    // Count maps per day
+    maps.forEach(map => {
+      const date = new Date(map._creationTime);
+      date.setHours(0, 0, 0, 0);
+      const isoString = date.toISOString();
+      const key = isoString.substring(0, 10); // YYYY-MM-DD
+      const counts = dateCounts[key];
+      if (counts) {
+        counts.maps++;
+      }
+    });
+
+    // Count markers per day
+    markers.forEach(marker => {
+      const date = new Date(marker._creationTime);
+      date.setHours(0, 0, 0, 0);
+      const isoString = date.toISOString();
+      const key = isoString.substring(0, 10); // YYYY-MM-DD
+      const counts = dateCounts[key];
+      if (counts) {
+        counts.markers++;
+      }
+    });
+
+    // Sort by date and return
+    return Object.entries(dateCounts)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([date, counts]) => ({
+        date,
+        maps: counts.maps,
+        markers: counts.markers,
+      }));
+  },
+});
+
+/**
  * Get maps created by month for charts
  * READ-ONLY
  */

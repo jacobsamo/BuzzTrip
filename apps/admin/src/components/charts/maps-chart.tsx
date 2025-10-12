@@ -43,28 +43,29 @@ export function MapsChart() {
           <AreaChart data={data}>
             <defs>
               <linearGradient id="colorMaps" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={0} />
+                <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
             <XAxis
               dataKey="month"
-              stroke="hsl(var(--muted-foreground))"
+              className="stroke-muted-foreground"
               fontSize={12}
             />
-            <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+            <YAxis className="stroke-muted-foreground" fontSize={12} />
             <Tooltip
               contentStyle={{
-                backgroundColor: "hsl(var(--card))",
-                border: "1px solid hsl(var(--border))",
+                backgroundColor: "oklch(var(--card))",
+                border: "1px solid oklch(var(--border))",
                 borderRadius: "0.5rem",
               }}
             />
             <Area
               type="monotone"
               dataKey="count"
-              stroke="hsl(var(--chart-1))"
+              stroke="#f59e0b"
+              strokeWidth={2}
               fillOpacity={1}
               fill="url(#colorMaps)"
             />

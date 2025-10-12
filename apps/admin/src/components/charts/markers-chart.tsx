@@ -41,21 +41,21 @@ export function MarkersChart() {
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
             <XAxis
               dataKey="month"
-              stroke="hsl(var(--muted-foreground))"
+              className="stroke-muted-foreground"
               fontSize={12}
             />
-            <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+            <YAxis className="stroke-muted-foreground" fontSize={12} />
             <Tooltip
               contentStyle={{
-                backgroundColor: "hsl(var(--card))",
-                border: "1px solid hsl(var(--border))",
+                backgroundColor: "oklch(var(--card))",
+                border: "1px solid oklch(var(--border))",
                 borderRadius: "0.5rem",
               }}
             />
-            <Bar dataKey="count" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
