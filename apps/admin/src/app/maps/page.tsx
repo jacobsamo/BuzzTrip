@@ -4,7 +4,7 @@ import { DashboardLayout } from "@/components/dashboard-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@buzztrip/ui/components/card"
 import { useQuery } from "convex/react"
 import { api } from "@buzztrip/backend/api"
-import { MapsTable } from "@/components/tables/maps-table"
+import { MapsListTable } from "@/components/shared/maps-list-table"
 
 export default function MapsPage() {
   const allMaps = useQuery(api.admin.maps.getAllMapsWithStats)
@@ -35,7 +35,13 @@ export default function MapsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <MapsTable data={allMaps} />
+            <MapsListTable
+              maps={allMaps}
+              enableSorting
+              enablePagination
+              pageSize={10}
+              showActions
+            />
           </CardContent>
         </Card>
       </div>

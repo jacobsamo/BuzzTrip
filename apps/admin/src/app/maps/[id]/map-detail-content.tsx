@@ -10,6 +10,7 @@ import { Badge } from "@buzztrip/ui/components/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@buzztrip/ui/components/avatar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@buzztrip/ui/components/table"
 import { DateRangePicker } from "@/components/date-range-picker"
+import { MapsListTable } from "@/components/shared/maps-list-table"
 import {
   ArrowLeft,
   MapPin,
@@ -569,6 +570,28 @@ export function MapDetailContent({ mapId }: { mapId: Id<"maps"> }) {
             </CardContent>
           </Card>
         </div>
+
+        {/* Other Maps by Owner */}
+        {mapData.owner && (
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-card-foreground flex items-center gap-2">
+                <MapPinned className="h-5 w-5" />
+                Other Maps by {mapData.owner.name}
+              </CardTitle>
+              <CardDescription className="text-muted-foreground">
+                Browse other maps created by this user
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <MapsListTable
+                maps={allMaps.filter((m) => m.owner?._id === mapData.owner_id && m._id !== mapId)}
+                maxHeight="500px"
+                emptyMessage="No other maps by this owner"
+              />
+            </CardContent>
+          </Card>
+        )}
       </div>
     </DashboardLayout>
   )
