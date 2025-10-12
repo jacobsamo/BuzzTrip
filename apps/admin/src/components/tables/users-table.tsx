@@ -1,26 +1,43 @@
 "use client";
 
 import {
+  ColumnDef,
+  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
-  getPaginationRowModel,
   getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
   SortingState,
-  ColumnFiltersState,
-  VisibilityState,
   useReactTable,
-  ColumnDef,
+  VisibilityState,
 } from "@tanstack/react-table";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-import { ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@buzztrip/ui/components/avatar";
 import { Badge } from "@buzztrip/ui/components/badge";
-import { Avatar, AvatarImage, AvatarFallback } from "@buzztrip/ui/components/avatar";
 import { Button } from "@buzztrip/ui/components/button";
 import { Input } from "@buzztrip/ui/components/input";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@buzztrip/ui/components/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@buzztrip/ui/components/table";
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 type UserWithStats = {
   _id: string;
@@ -77,7 +94,9 @@ export function UsersTable({ data }: { data: UserWithStats[] }) {
             </Avatar>
             <div className="min-w-0">
               <div className="font-medium text-foreground">{user.name}</div>
-              <div className="text-sm text-muted-foreground truncate">{user.email}</div>
+              <div className="text-sm text-muted-foreground truncate">
+                {user.email}
+              </div>
             </div>
           </div>
         );
@@ -93,7 +112,9 @@ export function UsersTable({ data }: { data: UserWithStats[] }) {
         return (
           <div className="py-2">
             {username ? (
-              <Badge variant="outline" className="font-mono">@{username}</Badge>
+              <Badge variant="outline" className="font-mono">
+                @{username}
+              </Badge>
             ) : (
               <span className="text-muted-foreground text-sm">—</span>
             )}
@@ -127,7 +148,7 @@ export function UsersTable({ data }: { data: UserWithStats[] }) {
         return (
           <div className="py-2">
             <span className="text-sm text-foreground">
-              {date.toLocaleDateString("en-US", {
+              {date.toLocaleDateString("en-AU", {
                 month: "short",
                 day: "numeric",
                 year: "numeric",
@@ -145,7 +166,9 @@ export function UsersTable({ data }: { data: UserWithStats[] }) {
           <div className="flex justify-center">
             <Button
               variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
               className={`h-8 px-2 hover:bg-muted ${isSorted ? "bg-muted text-foreground" : ""}`}
             >
               Maps
@@ -178,7 +201,9 @@ export function UsersTable({ data }: { data: UserWithStats[] }) {
           <div className="flex justify-center">
             <Button
               variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
               className={`h-8 px-2 hover:bg-muted ${isSorted ? "bg-muted text-foreground" : ""}`}
             >
               Markers
@@ -305,14 +330,20 @@ export function UsersTable({ data }: { data: UserWithStats[] }) {
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="px-4">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   No results found.
                 </TableCell>
               </TableRow>
