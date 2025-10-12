@@ -310,7 +310,7 @@ export function UserDetailContent({ userId }: { userId: Id<"users"> }) {
             <CardDescription className="text-muted-foreground">All maps owned by this user</CardDescription>
           </CardHeader>
           <CardContent>
-            <MapsListTable maps={userMaps} maxHeight="600px" />
+            <MapsListTable maps={userMaps} maxHeight="600px" enableSorting={true} />
           </CardContent>
         </Card>
       </div>
