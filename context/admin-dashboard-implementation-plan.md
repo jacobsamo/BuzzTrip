@@ -113,7 +113,7 @@ apps/admin/
     "next": "^15.5.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "recharts": "^3.2.0",
+        "recharts": "2.15.1",
     "zod": "3.25.76"
   },
   "devDependencies": {
