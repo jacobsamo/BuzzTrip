@@ -1,6 +1,7 @@
 import { zodToConvex } from "convex-helpers/server/zod";
 import { defineSchema, defineTable } from "convex/server";
 import { userSchema } from "../zod-schemas/auth-schema";
+import { betaSignupSchema } from "../zod-schemas/beta-schema";
 import {
   placePhotoSchema,
   placesSchema as places,
@@ -63,4 +64,8 @@ export default defineSchema({
       searchField: "name",
       filterFields: ["email", "username"],
     }),
+  beta_signups: defineTable(zodToConvex(betaSignupSchema))
+    .index("by_email", ["email"])
+    .index("by_completion", ["isCompleted"])
+    .index("by_user_id", ["userId"]),
 });

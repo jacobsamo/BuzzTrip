@@ -1,3 +1,4 @@
+import { BetaWelcomeToast } from "@/components/beta-welcome-toast";
 import UserMaps from "@/components/layouts/user-maps";
 import { convexNextjsOptions, getConvexServerSession } from "@/lib/auth";
 import { api } from "@buzztrip/backend/api";
@@ -6,6 +7,7 @@ import { preloadQuery } from "convex/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 export default async function MapPage() {
   const session = await getConvexServerSession();
@@ -26,6 +28,9 @@ export default async function MapPage() {
 
   return (
     <div className="p-2">
+      <Suspense fallback={null}>
+        <BetaWelcomeToast />
+      </Suspense>
       <nav className="flex items-center justify-between mb-2">
         <Link className="flex items-center justify-center" href="#">
           <Image

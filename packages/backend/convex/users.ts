@@ -99,21 +99,63 @@ export const createUser = internalMutation({
     }
 
     const user = extractUserFields(data);
-    const userId = await ctx.db.insert("users", user);
-    await Promise.all([
-      ctx.runMutation(internal.emails.sendWelcomeEmail, {
+    const now = new Date().toISOString();
+
+    // Check for beta signup
+    const isBetaFromClerk = data.unsafe_metadata?.isBetaUser === true;
+    const betaSignup = await ctx.db
+      .query("beta_signups")
+      .withIndex("by_email", (q) => q.eq("email", user.email))
+      .first();
+
+    const isBetaUser = isBetaFromClerk || betaSignup !== null;
+
+    // Insert user with beta flags if applicable
+    const userId = await ctx.db.insert("users", {
+      ...user,
+      isBetaUser,
+      betaSignupId: betaSignup?._id,
+      betaJoinedAt: isBetaUser ? now : undefined,
+    });
+
+    // Handle beta user setup
+    if (isBetaUser && betaSignup) {
+      // Link beta signup to user
+      await ctx.db.patch(betaSignup._id, {
+        isCompleted: true,
+        userId,
+        completedAt: now,
+      });
+
+      // Send beta-welcome email
+      await ctx.runMutation(internal.emails.sendBetaWelcomeEmail, {
         firstName: user.first_name,
         email: user.email,
-      }),
-      createMapFunction(ctx, {
-        userId: userId,
-        map: {
-          title: "Main map",
-          description: "The starting point to the next adventure!",
-          visibility: "private",
-        },
-      }),
-    ]);
+        whatsappLink: "https://links.buzztrip.co/whatsapp",
+      });
+
+      // Update Clerk public metadata
+      await ctx.scheduler.runAfter(0, internal.clerk.updateUserMetadata, {
+        clerkUserId: data.id,
+        metadata: { isBetaUser: true, betaJoinedAt: now },
+      });
+    } else {
+      // Regular welcome email for non-beta users
+      await ctx.runMutation(internal.emails.sendWelcomeEmail, {
+        firstName: user.first_name,
+        email: user.email,
+      });
+    }
+
+    // Create default map
+    await createMapFunction(ctx, {
+      userId: userId,
+      map: {
+        title: "Main map",
+        description: "The starting point to the next adventure!",
+        visibility: "private",
+      },
+    });
   },
 });
 

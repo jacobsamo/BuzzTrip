@@ -22,3 +22,82 @@ export const sendWelcomeEmail = zodInternalMutation({
     });
   },
 });
+
+/**
+ * Send beta-join email (for new users who need to complete signup)
+ * TODO: Replace with proper React email template rendering
+ */
+export const sendBetaJoinEmail = zodInternalMutation({
+  args: {
+    email: z.string().email(),
+    firstName: z.string().optional(),
+  },
+  handler: async (ctx, { email, firstName }) => {
+    const name = firstName || "there";
+    await resend.sendEmail(ctx, {
+      from: "Jacob Samorowski <info@buzztrip.co>",
+      to: firstName ? `${firstName} <${email}>` : email,
+      subject: "Welcome to BuzzTrip Beta - Complete Your Signup",
+      replyTo: ["jacob.samorowski@buzztrip.co"],
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="UTF-8"></head>
+        <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1>Welcome to BuzzTrip Beta!</h1>
+          <p>Hey ${name}! 👋</p>
+          <p>Thanks for your interest in joining the BuzzTrip Beta program! We're excited to have you as part of our early community.</p>
+          <p>Click the button below to complete your account setup and get started creating amazing custom maps!</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="https://buzztrip.co/sign-up?beta=true" style="background-color: #2C7873; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">Complete Your Signup 🚀</a>
+          </div>
+          <p>Looking forward to seeing you in the beta!</p>
+          <p>Jacob Samorowski<br>Founder, BuzzTrip</p>
+        </body>
+        </html>
+      `,
+    });
+  },
+});
+
+/**
+ * Send beta-welcome email (after account is created)
+ * TODO: Replace with proper React email template rendering
+ */
+export const sendBetaWelcomeEmail = zodInternalMutation({
+  args: {
+    email: z.string().email(),
+    firstName: z.string().optional(),
+    whatsappLink: z.string().url(),
+  },
+  handler: async (ctx, { email, firstName, whatsappLink }) => {
+    const name = firstName || "there";
+    await resend.sendEmail(ctx, {
+      from: "Jacob Samorowski <info@buzztrip.co>",
+      to: firstName ? `${firstName} <${email}>` : email,
+      subject: "Welcome to BuzzTrip Beta!",
+      replyTo: ["jacob.samorowski@buzztrip.co"],
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="UTF-8"></head>
+        <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1>Welcome to BuzzTrip Beta! 🎉</h1>
+          <p>Hey ${name}! 👋</p>
+          <p>I'm Jacob Samorowski, founder of BuzzTrip, and I'm absolutely thrilled to welcome you to our exclusive beta program!</p>
+          <p>You're now part of a select group helping to shape the future of custom mapping. Your feedback, ideas, and early testing will directly influence how BuzzTrip evolves.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${whatsappLink}" style="background-color: #25D366; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">Join WhatsApp Beta Group 💬</a>
+          </div>
+          <p>Ready to start creating?</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="https://buzztrip.co/app" style="background-color: #2C7873; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">Start Creating Maps Now 🗺️</a>
+          </div>
+          <p>Let's build something amazing together!</p>
+          <p>Jacob Samorowski<br>Founder, BuzzTrip<br>jacob.samorowski@buzztrip.co</p>
+        </body>
+        </html>
+      `,
+    });
+  },
+});

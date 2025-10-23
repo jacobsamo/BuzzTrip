@@ -14,6 +14,9 @@ export const userSchema = z.object({
   last_name: z.string().optional(),
   username: z.string().optional(),
   bio: z.string().optional(),
+  isBetaUser: z.boolean().optional().default(false),
+  betaSignupId: z.string().optional(),
+  betaJoinedAt: z.string().optional(),
 });
 
 export const usersEditSchema = insertSchema(userSchema);
