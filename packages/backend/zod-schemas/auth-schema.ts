@@ -14,6 +14,11 @@ export const userSchema = z.object({
   last_name: z.string().optional(),
   username: z.string().optional(),
   bio: z.string().optional(),
+  // Beta/VIP fields
+  isBetaUser: z.boolean().optional(),
+  betaSignupDate: z.string().optional(),
+  betaQuestionnaireResponses: z.record(z.string(), z.any()).optional(),
+  whatsappOptIn: z.boolean().optional(),
 });
 
 export const usersEditSchema = insertSchema(userSchema);
