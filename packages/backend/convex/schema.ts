@@ -63,6 +63,7 @@ export default defineSchema({
   users: defineTable(zodToConvex(userSchema))
     .index("by_email", ["email"])
     .index("by_clerk_id", ["clerkUserId"])
+    .index("by_isBetaUser", ["isBetaUser"])
     .searchIndex("search_user", {
       searchField: "name",
       filterFields: ["email", "username"],

@@ -33,7 +33,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import z from "zod";
+import { z } from "zod";
 import { api } from "@/convex/_generated/api";
 
 export default function BetaQuestionnairePage() {
@@ -388,30 +388,34 @@ export default function BetaQuestionnairePage() {
                     render={() => (
                       <FormItem>
                         <div className="grid md:grid-cols-2 gap-3">
-                          {features.map((feature) => (
-                            <FormField
-                              key={feature}
-                              control={control}
-                              name="expectedFeatures"
-                              render={({ field }) => (
-                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(feature)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([...field.value, feature])
-                                          : field.onChange(field.value?.filter((value) => value !== feature));
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="font-normal cursor-pointer">
-                                    {feature}
-                                  </FormLabel>
-                                </FormItem>
-                              )}
-                            />
-                          ))}
+                          {features.map((feature) => {
+                            const featureId = `feature-${feature.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "")}`;
+                            return (
+                              <FormField
+                                key={feature}
+                                control={control}
+                                name="expectedFeatures"
+                                render={({ field }) => (
+                                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                    <FormControl>
+                                      <Checkbox
+                                        id={featureId}
+                                        checked={field.value?.includes(feature)}
+                                        onCheckedChange={(checked) => {
+                                          return checked
+                                            ? field.onChange([...field.value, feature])
+                                            : field.onChange(field.value?.filter((value) => value !== feature));
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormLabel htmlFor={featureId} className="font-normal cursor-pointer">
+                                      {feature}
+                                    </FormLabel>
+                                  </FormItem>
+                                )}
+                              />
+                            );
+                          })}
                         </div>
                         <FormMessage />
                       </FormItem>

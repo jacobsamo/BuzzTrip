@@ -2,7 +2,7 @@ import { v } from "convex/values";
 import { z } from "zod";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
-import { mutation, query } from "./_generated/server";
+import { internalQuery, mutation, query } from "./_generated/server";
 import { authedMutation, authedQuery, zodMutation } from "./helpers";
 import { getCurrentUser, mustGetCurrentUser } from "./users";
 
@@ -132,7 +132,7 @@ export const completePendingBetaSignup = mutation({
     // Find pending beta signup
     const pending = await ctx.db
       .query("beta_pending_signups")
-      .filter((q) => q.eq(q.field("email"), email))
+      .withIndex("by_email", (q) => q.eq("email", email))
       .first();
 
     if (!pending || pending.expiresAt < Date.now()) {
@@ -177,10 +177,22 @@ export const completePendingBetaSignup = mutation({
  */
 export const verifyQuestionnaireToken = query({
   args: { token: v.string() },
+  returns: v.union(
+    v.object({
+      valid: v.literal(false),
+      reason: v.string(),
+    }),
+    v.object({
+      valid: v.literal(true),
+      userId: v.id("users"),
+      email: v.string(),
+      userName: v.optional(v.string()),
+    })
+  ),
   handler: async (ctx, { token }) => {
     const tokenDoc = await ctx.db
       .query("beta_questionnaire_tokens")
-      .filter((q) => q.eq(q.field("token"), token))
+      .withIndex("by_token", (q) => q.eq("token", token))
       .first();
 
     if (!tokenDoc) {
@@ -225,7 +237,7 @@ export const submitQuestionnaire = zodMutation({
     // Verify token
     const tokenDoc = await ctx.db
       .query("beta_questionnaire_tokens")
-      .filter((q) => q.eq(q.field("token"), token))
+      .withIndex("by_token", (q) => q.eq("token", token))
       .first();
 
     if (!tokenDoc) {
@@ -281,18 +293,24 @@ export const checkBetaStatus = authedQuery({
 
 /**
  * Admin: Get all beta users
+ * Internal query - should be called from admin dashboard with proper auth checks
  */
-export const getBetaUsers = query({
+export const getBetaUsers = internalQuery({
   args: {},
+  returns: v.array(
+    v.object({
+      _id: v.id("users"),
+      name: v.string(),
+      email: v.string(),
+      betaSignupDate: v.optional(v.string()),
+      hasCompletedQuestionnaire: v.boolean(),
+      whatsappOptIn: v.optional(v.boolean()),
+    })
+  ),
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Unauthorized");
-    }
-
     const betaUsers = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("isBetaUser"), true))
+      .withIndex("by_isBetaUser", (q) => q.eq("isBetaUser", true))
       .collect();
 
     return betaUsers.map((user) => ({
@@ -308,18 +326,23 @@ export const getBetaUsers = query({
 
 /**
  * Admin: Get questionnaire responses for analysis
+ * Internal query - should be called from admin dashboard with proper auth checks
  */
-export const getBetaQuestionnaireResponses = query({
+export const getBetaQuestionnaireResponses = internalQuery({
   args: {},
+  returns: v.array(
+    v.object({
+      userId: v.id("users"),
+      email: v.string(),
+      name: v.string(),
+      signupDate: v.optional(v.string()),
+      responses: v.any(), // Using v.any() since the questionnaire responses are dynamic
+    })
+  ),
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Unauthorized");
-    }
-
     const betaUsers = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("isBetaUser"), true))
+      .withIndex("by_isBetaUser", (q) => q.eq("isBetaUser", true))
       .collect();
 
     return betaUsers

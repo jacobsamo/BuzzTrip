@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from "zod";
 import { resend } from "./emails";
 import { zodInternalMutation } from "./helpers";
 
@@ -10,20 +10,32 @@ export const sendBetaWelcomeEmail = zodInternalMutation({
     questionnaireToken: z.string(),
   },
   handler: async (ctx, { firstName, email, whatsappOptIn, questionnaireToken }) => {
-    const name = firstName || "there";
+    // Escape HTML to prevent injection
+    const escapeHtml = (text: string) =>
+      text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+    const name = firstName ? escapeHtml(firstName) : "there";
     const questionnaireUrl = `https://buzztrip.co/beta/questionnaire?token=${questionnaireToken}`;
 
-    const whatsappSection = whatsappOptIn
-      ? `<div style="background-color:rgb(37,211,102);border-radius:12px;padding:24px;margin:32px 0;text-align:center">
+    // Get WhatsApp group link from environment or skip section
+    const whatsappGroupUrl = process.env.WHATSAPP_GROUP_URL;
+    const whatsappSection =
+      whatsappOptIn && whatsappGroupUrl
+        ? `<div style="background-color:rgb(37,211,102);border-radius:12px;padding:24px;margin:32px 0;text-align:center">
           <p style="font-size:18px;color:white;font-weight:600;margin:0 0 16px 0">Join Our WhatsApp Community</p>
           <p style="font-size:14px;color:white;margin:0 0 16px 0">Connect with other beta testers, get instant updates, and share feedback directly with our team!</p>
-          <a href="https://chat.whatsapp.com/YOUR_GROUP_LINK" style="background-color:white;color:rgb(37,211,102);padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;display:inline-block">Join WhatsApp Group</a>
+          <a href="${whatsappGroupUrl}" style="background-color:white;color:rgb(37,211,102);padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;display:inline-block">Join WhatsApp Group</a>
         </div>`
-      : "";
+        : "";
 
     await resend.sendEmail(ctx, {
       from: "Jacob Samorowski <info@buzztrip.co>",
-      to: firstName ? `${firstName} <${email}>` : email,
+      to: firstName ? `${escapeHtml(firstName)} <${email}>` : email,
       subject: "Welcome to BuzzTrip Beta - You're In!",
       replyTo: ["jacob.samorowski@buzztrip.co"],
       html: `<!DOCTYPE html>
