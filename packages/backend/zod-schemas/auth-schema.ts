@@ -32,3 +32,24 @@ export const refinedUserSchema = userSchema.pick({
   name: true,
   image: true,
 });
+
+// Beta program schemas
+export const betaQuestionnaireTokenSchema = z.object({
+  ...defaultFields,
+  userId: zid("users"),
+  token: z.string(),
+  email: z.string(),
+  used: z.boolean(),
+  expiresAt: z.number(),
+});
+
+export const betaPendingSignupSchema = z.object({
+  ...defaultFields,
+  firstName: z.string(),
+  lastName: z.string().optional(),
+  email: z.string(),
+  whatsappOptIn: z.boolean(),
+  token: z.string(),
+  createdAt: z.number(),
+  expiresAt: z.number(),
+});

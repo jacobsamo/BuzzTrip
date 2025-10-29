@@ -7,9 +7,12 @@ export const sendBetaWelcomeEmail = zodInternalMutation({
     firstName: z.string().optional(),
     email: z.string(),
     whatsappOptIn: z.boolean(),
+    questionnaireToken: z.string(),
   },
-  handler: async (ctx, { firstName, email, whatsappOptIn }) => {
+  handler: async (ctx, { firstName, email, whatsappOptIn, questionnaireToken }) => {
     const name = firstName || "there";
+    const questionnaireUrl = `https://buzztrip.co/beta/questionnaire?token=${questionnaireToken}`;
+
     const whatsappSection = whatsappOptIn
       ? `<div style="background-color:rgb(37,211,102);border-radius:12px;padding:24px;margin:32px 0;text-align:center">
           <p style="font-size:18px;color:white;font-weight:600;margin:0 0 16px 0">Join Our WhatsApp Community</p>
@@ -55,6 +58,14 @@ export const sendBetaWelcomeEmail = zodInternalMutation({
                 <p style="margin:16px 0;font-size:16px;color:rgb(4,19,27)"><strong>💬 Direct line to our development team</strong></p>
                 <p style="margin:16px 0;font-size:16px;color:rgb(4,19,27)"><strong>🎁 Special perks and exclusive beta features</strong></p>
                 <p style="margin:16px 0;font-size:16px;color:rgb(4,19,27)"><strong>🗳️ Vote on upcoming features and roadmap</strong></p>
+              </div>
+
+              <div style="background-color:rgb(254,243,199);border:2px solid rgb(251,191,36);border-radius:12px;padding:24px;margin:24px 0">
+                <h2 style="margin:0 0 16px 0;font-size:20px;color:rgb(4,19,27)">📋 Next Step: Complete Your Profile</h2>
+                <p style="margin:0 0 16px 0;font-size:16px;color:rgb(4,19,27);line-height:1.6">Help us build the perfect mapping tool for you! Take 3 minutes to share your needs, preferences, and pricing expectations.</p>
+                <div style="text-align:center;margin:16px 0">
+                  <a href="${questionnaireUrl}" style="background-color:rgb(251,191,36);color:rgb(4,19,27);padding:14px 28px;border-radius:8px;font-size:16px;font-weight:600;text-decoration:none;display:inline-block">Complete Questionnaire →</a>
+                </div>
               </div>
 
               ${whatsappSection}

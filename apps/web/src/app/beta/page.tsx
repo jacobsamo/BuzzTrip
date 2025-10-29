@@ -5,113 +5,65 @@ import { Badge } from "@buzztrip/ui/components/badge";
 import { Button } from "@buzztrip/ui/components/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@buzztrip/ui/components/card";
 import { Checkbox } from "@buzztrip/ui/components/checkbox";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@buzztrip/ui/components/form";
 import { Input } from "@buzztrip/ui/components/input";
-import { Label } from "@buzztrip/ui/components/label";
-import { RadioGroup, RadioGroupItem } from "@buzztrip/ui/components/radio-group";
-import { Textarea } from "@buzztrip/ui/components/textarea";
+import { betaQuickSignupSchema } from "@/types/scheams";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
-import { CheckCircle2, Crown, MessageSquare, Rocket, Sparkles, Users, Zap } from "lucide-react";
+import { CheckCircle2, Crown, Loader2, MessageSquare, Rocket } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import z from "zod";
 import { api } from "@/convex/_generated/api";
 
 export default function BetaSignupPage() {
   const { user, isSignedIn } = useUser();
-  const submitBeta = useMutation(api.beta.submitBetaSignup);
-  const upgradeToBeta = useMutation(api.beta.upgradeToBeta);
-
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    howDidYouHear: "",
-    primaryUseCase: "",
-    expectedFeatures: [] as string[],
-    willingToProvideHelpFeedback: false,
-    additionalComments: "",
-    whatsappOptIn: false,
-  });
+  const quickSignup = useMutation(api.beta.quickBetaSignup);
 
   const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [requiresSignup, setRequiresSignup] = useState(false);
 
-  const features = [
-    "Real-time collaboration",
-    "Advanced map customization",
-    "Import/Export capabilities",
-    "Mobile app",
-    "API access",
-    "Custom map styles",
-    "Analytics dashboard",
-    "Team workspaces",
-  ];
+  const form = useForm<z.infer<typeof betaQuickSignupSchema>>({
+    resolver: zodResolver(betaQuickSignupSchema),
+    defaultValues: {
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
+      email: user?.primaryEmailAddress?.emailAddress || "",
+      whatsappOptIn: false,
+    },
+  });
 
-  const useCases = [
-    { value: "personal", label: "Personal travel planning" },
-    { value: "business", label: "Business/Professional use" },
-    { value: "education", label: "Educational purposes" },
-    { value: "research", label: "Research and data visualization" },
-    { value: "events", label: "Event planning and management" },
-    { value: "other", label: "Other" },
-  ];
+  const {
+    control,
+    formState: { isSubmitting },
+  } = form;
 
-  const handleFeatureToggle = (feature: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      expectedFeatures: prev.expectedFeatures.includes(feature)
-        ? prev.expectedFeatures.filter((f) => f !== feature)
-        : [...prev.expectedFeatures, feature],
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
+  const onSubmit = async (data: z.infer<typeof betaQuickSignupSchema>) => {
     try {
-      if (isSignedIn) {
-        // Existing user - upgrade to beta
-        await upgradeToBeta({
-          questionnaire: {
-            howDidYouHear: formData.howDidYouHear,
-            primaryUseCase: formData.primaryUseCase,
-            expectedFeatures: formData.expectedFeatures,
-            willingToProvideHelpFeedback: formData.willingToProvideHelpFeedback,
-            additionalComments: formData.additionalComments,
-          },
-          whatsappOptIn: formData.whatsappOptIn,
-        });
-        setSubmitted(true);
-      } else {
-        // New user - needs to sign up first
-        const result = await submitBeta({
-          firstName: formData.firstName,
-          lastName: formData.lastName || undefined,
-          email: formData.email,
-          questionnaire: {
-            howDidYouHear: formData.howDidYouHear,
-            primaryUseCase: formData.primaryUseCase,
-            expectedFeatures: formData.expectedFeatures,
-            willingToProvideHelpFeedback: formData.willingToProvideHelpFeedback,
-            additionalComments: formData.additionalComments,
-          },
-          whatsappOptIn: formData.whatsappOptIn,
-          clerkUserId: undefined,
-        });
+      const result = await quickSignup(data);
 
-        if (result.success) {
-          setSubmitted(true);
+      if (result.success) {
+        setSubmitted(true);
+        setRequiresSignup(result.requiresSignup);
+
+        if (!result.requiresSignup) {
+          toast.success("Welcome to the beta! Check your email for next steps.");
         } else {
-          setError(result.message);
+          toast.success("Almost there! Please create an account to join the beta.");
         }
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred. Please try again.");
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "An error occurred. Please try again.");
     }
   };
 
@@ -129,30 +81,39 @@ export default function BetaSignupPage() {
                 <CheckCircle2 className="h-10 w-10 text-primary" />
               </div>
               <CardTitle className="text-3xl font-bold mb-2">
-                Welcome to the Beta!
+                {requiresSignup ? "Almost There!" : "Welcome to the Beta!"}
               </CardTitle>
               <CardDescription className="text-lg">
-                {isSignedIn
-                  ? "You're all set! Check your email for next steps."
-                  : "Thanks for your interest! Please sign up to complete your beta enrollment."}
+                {requiresSignup
+                  ? "Please create an account to complete your beta enrollment."
+                  : "Check your email for a link to complete your beta profile."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {!isSignedIn && (
+              {requiresSignup && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
                   <p className="text-amber-900 text-sm">
-                    To activate your beta access, please create an account using the email you provided.
+                    Create an account with the email you provided to activate your beta access and receive the detailed questionnaire.
                   </p>
                 </div>
               )}
+
+              {!requiresSignup && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <p className="text-blue-900 text-sm">
+                    We've sent you an email with a link to complete a quick questionnaire. This helps us understand your needs and build the best mapping tool for you!
+                  </p>
+                </div>
+              )}
+
               <div className="flex flex-col sm:flex-row gap-3">
-                {isSignedIn ? (
+                {requiresSignup ? (
                   <Button asChild className="flex-1">
-                    <Link href="/app">Go to Dashboard</Link>
+                    <Link href="/sign-up">Create Account</Link>
                   </Button>
                 ) : (
                   <Button asChild className="flex-1">
-                    <Link href="/sign-up">Create Account</Link>
+                    <Link href="/app">Go to Dashboard</Link>
                   </Button>
                 )}
                 <Button variant="outline" asChild className="flex-1">
@@ -184,8 +145,7 @@ export default function BetaSignupPage() {
               Join the BuzzTrip Beta
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Be among the first to shape the future of custom mapping. Get early access to new features,
-              exclusive perks, and direct input on our roadmap.
+              Be among the first to shape the future of custom mapping. Get early access, exclusive perks, and help us build the perfect tool for you.
             </p>
           </motion.div>
 
@@ -227,10 +187,10 @@ export default function BetaSignupPage() {
         </div>
       </section>
 
-      {/* Questionnaire Form */}
+      {/* Quick Signup Form */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-2xl mx-auto">
             <motion.div
               initial={{ y: 50, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
@@ -239,212 +199,126 @@ export default function BetaSignupPage() {
             >
               <Card className="border-gray-200 shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-2xl">Beta Application</CardTitle>
+                  <CardTitle className="text-2xl">Join the Beta</CardTitle>
                   <CardDescription>
-                    Tell us a bit about yourself and how you plan to use BuzzTrip
+                    Quick signup - we'll send you a detailed questionnaire via email
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    {!isSignedIn && (
-                      <>
-                        {/* Personal Information */}
-                        <div className="space-y-4">
-                          <h3 className="font-semibold text-lg flex items-center gap-2">
-                            <Users className="h-5 w-5" />
-                            Personal Information
-                          </h3>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                      {!isSignedIn && (
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <FormField
+                            control={control}
+                            name="firstName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>First Name</FormLabel>
+                                <FormControl>
+                                  <Input {...field} placeholder="John" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
 
-                          <div className="grid md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="firstName">First Name *</Label>
-                              <Input
-                                id="firstName"
-                                required
-                                value={formData.firstName}
-                                onChange={(e) =>
-                                  setFormData({ ...formData, firstName: e.target.value })
-                                }
-                              />
-                            </div>
-
-                            <div className="space-y-2">
-                              <Label htmlFor="lastName">Last Name</Label>
-                              <Input
-                                id="lastName"
-                                value={formData.lastName}
-                                onChange={(e) =>
-                                  setFormData({ ...formData, lastName: e.target.value })
-                                }
-                              />
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="email">Email Address *</Label>
-                            <Input
-                              id="email"
-                              type="email"
-                              required
-                              value={formData.email}
-                              onChange={(e) =>
-                                setFormData({ ...formData, email: e.target.value })
-                              }
-                            />
-                          </div>
+                          <FormField
+                            control={control}
+                            name="lastName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Last Name (Optional)</FormLabel>
+                                <FormControl>
+                                  <Input {...field} placeholder="Doe" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                         </div>
-                      </>
-                    )}
+                      )}
 
-                    {/* How did you hear about us */}
-                    <div className="space-y-4">
-                      <h3 className="font-semibold text-lg flex items-center gap-2">
-                        <Sparkles className="h-5 w-5" />
-                        About You
-                      </h3>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="howDidYouHear">How did you hear about BuzzTrip? *</Label>
-                        <Input
-                          id="howDidYouHear"
-                          required
-                          placeholder="Social media, friend, search, etc."
-                          value={formData.howDidYouHear}
-                          onChange={(e) =>
-                            setFormData({ ...formData, howDidYouHear: e.target.value })
-                          }
+                      {!isSignedIn && (
+                        <FormField
+                          control={control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email Address</FormLabel>
+                              <FormControl>
+                                <Input {...field} type="email" placeholder="john@example.com" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
-                      </div>
+                      )}
 
-                      <div className="space-y-3">
-                        <Label>Primary Use Case *</Label>
-                        <RadioGroup
-                          value={formData.primaryUseCase}
-                          onValueChange={(value) =>
-                            setFormData({ ...formData, primaryUseCase: value })
-                          }
-                          required
-                        >
-                          {useCases.map((useCase) => (
-                            <div key={useCase.value} className="flex items-center space-x-2">
-                              <RadioGroupItem value={useCase.value} id={useCase.value} />
-                              <Label htmlFor={useCase.value} className="font-normal cursor-pointer">
-                                {useCase.label}
-                              </Label>
-                            </div>
-                          ))}
-                        </RadioGroup>
-                      </div>
-                    </div>
-
-                    {/* Features */}
-                    <div className="space-y-4">
-                      <h3 className="font-semibold text-lg flex items-center gap-2">
-                        <Zap className="h-5 w-5" />
-                        Feature Preferences
-                      </h3>
-
-                      <div className="space-y-2">
-                        <Label>Which features are you most excited about? (Select all that apply)</Label>
-                        <div className="grid md:grid-cols-2 gap-3 pt-2">
-                          {features.map((feature) => (
-                            <div key={feature} className="flex items-center space-x-2">
+                      <FormField
+                        control={control}
+                        name="whatsappOptIn"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                            <FormControl>
                               <Checkbox
-                                id={feature}
-                                checked={formData.expectedFeatures.includes(feature)}
-                                onCheckedChange={() => handleFeatureToggle(feature)}
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
                               />
-                              <Label htmlFor={feature} className="font-normal cursor-pointer">
-                                {feature}
-                              </Label>
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel className="font-normal cursor-pointer">
+                                Join our beta tester WhatsApp group
+                              </FormLabel>
+                              <p className="text-sm text-gray-500">
+                                Get instant updates, connect with other testers, and chat directly with our team
+                              </p>
                             </div>
-                          ))}
-                        </div>
-                      </div>
+                          </FormItem>
+                        )}
+                      />
 
-                      <div className="space-y-2">
-                        <Label htmlFor="additionalComments">Additional Comments or Feature Requests</Label>
-                        <Textarea
-                          id="additionalComments"
-                          placeholder="Tell us about any specific features or use cases you're interested in..."
-                          rows={4}
-                          value={formData.additionalComments}
-                          onChange={(e) =>
-                            setFormData({ ...formData, additionalComments: e.target.value })
-                          }
-                        />
-                      </div>
-                    </div>
+                      <Button
+                        type="submit"
+                        className="w-full"
+                        size="lg"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="size-4 animate-spin mr-2" />
+                            Joining...
+                          </>
+                        ) : (
+                          "Join Beta Program"
+                        )}
+                      </Button>
 
-                    {/* Participation */}
-                    <div className="space-y-4 border-t pt-6">
-                      <div className="flex items-start space-x-3">
-                        <Checkbox
-                          id="feedback"
-                          checked={formData.willingToProvideHelpFeedback}
-                          onCheckedChange={(checked) =>
-                            setFormData({
-                              ...formData,
-                              willingToProvideHelpFeedback: checked === true,
-                            })
-                          }
-                        />
-                        <div className="space-y-1">
-                          <Label htmlFor="feedback" className="font-normal cursor-pointer">
-                            I'm willing to provide regular feedback and participate in user research
-                          </Label>
-                          <p className="text-sm text-gray-500">
-                            Help us build the best mapping platform by sharing your experiences and insights
-                          </p>
-                        </div>
-                      </div>
+                      <p className="text-xs text-gray-500 text-center">
+                        By joining the beta, you agree to our{" "}
+                        <Link href="/legal/terms" className="underline">
+                          Terms of Service
+                        </Link>{" "}
+                        and{" "}
+                        <Link href="/legal/privacy" className="underline">
+                          Privacy Policy
+                        </Link>
+                        .
+                      </p>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
 
-                      <div className="flex items-start space-x-3">
-                        <Checkbox
-                          id="whatsapp"
-                          checked={formData.whatsappOptIn}
-                          onCheckedChange={(checked) =>
-                            setFormData({ ...formData, whatsappOptIn: checked === true })
-                          }
-                        />
-                        <div className="space-y-1">
-                          <Label htmlFor="whatsapp" className="font-normal cursor-pointer">
-                            Join our beta tester WhatsApp group
-                          </Label>
-                          <p className="text-sm text-gray-500">
-                            Get instant updates, connect with other testers, and chat directly with our team
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {error && (
-                      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <p className="text-red-900 text-sm">{error}</p>
-                      </div>
-                    )}
-
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      size="lg"
-                      disabled={loading}
-                    >
-                      {loading ? "Submitting..." : "Join Beta Program"}
-                    </Button>
-
-                    <p className="text-xs text-gray-500 text-center">
-                      By joining the beta, you agree to our{" "}
-                      <Link href="/legal/terms" className="underline">
-                        Terms of Service
-                      </Link>{" "}
-                      and{" "}
-                      <Link href="/legal/privacy" className="underline">
-                        Privacy Policy
-                      </Link>
-                      .
-                    </p>
-                  </form>
+              <Card className="mt-6 bg-blue-50 border-blue-200">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-gray-900 mb-2">What happens next?</h3>
+                  <ol className="space-y-2 text-sm text-gray-600 list-decimal list-inside">
+                    <li>You'll receive a welcome email with a link to a detailed questionnaire</li>
+                    <li>The questionnaire takes ~3 minutes and helps us understand your needs</li>
+                    <li>We'll use your feedback to build features you actually want</li>
+                    <li>Get early access to new features as we roll them out</li>
+                  </ol>
                 </CardContent>
               </Card>
             </motion.div>
