@@ -33,9 +33,7 @@ body:
       description: Which part of BuzzTrip would this affect?
       options:
         - Web App
-        - Admin Dashboard
         - Mobile App (iOS/Android)
-        - Backend/API (Convex)
         - Shared Components
         - Authentication
         - Maps/Markers
@@ -133,7 +131,6 @@ body:
         - Some Users (25-50%)
         - Few Users (<25%)
         - Power Users/Advanced
-        - Administrators Only
         - Not Sure
     validations:
       required: true

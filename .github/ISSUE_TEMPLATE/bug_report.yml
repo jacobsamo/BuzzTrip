@@ -17,10 +17,8 @@ body:
       description: Which part of BuzzTrip is affected?
       options:
         - Web App
-        - Admin Dashboard
         - Mobile App (iOS)
         - Mobile App (Android)
-        - Backend/API (Convex)
         - Shared Components
         - Authentication (Clerk)
         - Maps/Markers
