@@ -22,7 +22,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "@buzztrip/backend/api";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 interface MapCardProps {
@@ -34,7 +33,6 @@ const MapCard = ({ map }: MapCardProps) => {
   const [isDuplicating, setIsDuplicating] = useState(false);
   const mapImage = map.image || "/placeholder.svg?height=200&width=400";
   const mapColor = map.color || "#2C7772";
-  const router = useRouter();
   const duplicateMap = useMutation(api.maps.index.duplicateMap);
 
   const handleDuplicate = async (e: React.MouseEvent) => {
@@ -43,9 +41,8 @@ const MapCard = ({ map }: MapCardProps) => {
 
     setIsDuplicating(true);
     try {
-      const newMapId = await duplicateMap({ mapId: map.map_id });
-      toast.success("Map duplicated successfully!");
-      router.push(`/app/map/${newMapId}`);
+      await duplicateMap({ mapId: map.map_id });
+      toast.success("Map duplicated successfully! Check your maps list.");
     } catch (error) {
       console.error("Failed to duplicate map:", error);
       toast.error("Failed to duplicate map. Please try again.");
