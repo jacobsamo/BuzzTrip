@@ -55,6 +55,7 @@ export default function MarkerForm() {
     markers,
     getCollectionsForMarker,
     collectionLinks,
+    trackChange,
   } = useMapStore((store) => store);
   if (
     activeState &&
@@ -165,6 +166,7 @@ export default function MarkerForm() {
           toast.promise(updatedMarker, {
             loading: "Updating marker...",
             success: async (res) => {
+              trackChange("markers", "updated");
               return "Marker updated successfully!";
             },
             error: "Failed to update marker",
@@ -183,7 +185,10 @@ export default function MarkerForm() {
 
           toast.promise(createdMarker, {
             loading: "Creating marker...",
-            success: "Marker created successfully!",
+            success: () => {
+              trackChange("markers", "added");
+              return "Marker created successfully!";
+            },
             error: "Failed to create marker",
           });
         }
@@ -203,6 +208,7 @@ export default function MarkerForm() {
       toast.promise(deletedMarker, {
         loading: "Deleting marker...",
         success: () => {
+          trackChange("markers", "deleted");
           clearForm();
           return "Marker deleted successfully";
         },

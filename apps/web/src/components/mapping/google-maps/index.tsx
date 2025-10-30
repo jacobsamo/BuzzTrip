@@ -35,18 +35,19 @@ const GoogleMapsMapView = () => {
     isMobile,
     setActiveState,
     uiState,
-    paths,
-    collections,
+    shouldUpdateThumbnail,
+    resetChanges,
   } = useMapStore((state) => state);
 
   if (!map) return null;
 
-  // Initialize thumbnail capture hook
-  const { captureThumbnail } = useMapThumbnail({
+  // Initialize thumbnail capture hook with smart change tracking
+  useMapThumbnail({
     mapId: map._id,
     mapElementId: "google-map-container",
     enabled: true,
-    debounceMs: 3000, // Wait 3 seconds after changes before capturing
+    shouldUpdate: shouldUpdateThumbnail,
+    resetChanges: resetChanges,
   });
 
   const places = useMapsLibrary("places");
@@ -111,14 +112,6 @@ const GoogleMapsMapView = () => {
       window.removeEventListener("beforeunload", handlePageUnload);
     };
   }, [googleMap, map]);
-
-  // Trigger thumbnail capture when map data changes
-  useEffect(() => {
-    if (!googleMap) return;
-
-    // Capture thumbnail when markers, paths, or collections change
-    captureThumbnail();
-  }, [markers, paths, collections, captureThumbnail, googleMap]);
 
   const handlePlaceSearch = (placeId: string) => {
     if (!placesService) return;

@@ -131,5 +131,60 @@ export const createStore = (initState: InitState) =>
       },
       setTerraDrawInstance: (instance: TerraDraw | null) =>
         set(() => ({ terraDrawInstance: instance })),
+
+      // Change tracking actions
+      trackChange: (
+        type: "markers" | "paths" | "collections",
+        action: "added" | "updated" | "deleted"
+      ) => {
+        set((state) => {
+          const newChanges = { ...state.mapChanges };
+          newChanges[type][action] += 1;
+          newChanges.totalChanges += 1;
+          return { mapChanges: newChanges };
+        });
+      },
+
+      resetChanges: () => {
+        set(() => ({
+          mapChanges: {
+            markers: { added: 0, updated: 0, deleted: 0 },
+            paths: { added: 0, updated: 0, deleted: 0 },
+            collections: { added: 0, updated: 0, deleted: 0 },
+            totalChanges: 0,
+          },
+        }));
+      },
+
+      shouldUpdateThumbnail: () => {
+        const changes = get().mapChanges;
+
+        // No changes, no update needed
+        if (changes.totalChanges === 0) return false;
+
+        // Significant changes that warrant an update:
+        // - 2 or more markers deleted
+        // - 3 or more markers added
+        // - Any path changes (drawings are important)
+        // - 2 or more collections added/deleted
+
+        const hasSignificantMarkerChanges =
+          changes.markers.deleted >= 2 || changes.markers.added >= 3;
+
+        const hasPathChanges =
+          changes.paths.added > 0 ||
+          changes.paths.updated > 0 ||
+          changes.paths.deleted > 0;
+
+        const hasSignificantCollectionChanges =
+          changes.collections.added >= 2 || changes.collections.deleted >= 2;
+
+        // Always update if there are significant changes
+        return (
+          hasSignificantMarkerChanges ||
+          hasPathChanges ||
+          hasSignificantCollectionChanges
+        );
+      },
     };
   });
