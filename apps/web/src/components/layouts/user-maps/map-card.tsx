@@ -8,12 +8,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@buzztrip/ui/components/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@buzztrip/ui/components/dropdown-menu";
 import { UserMap } from "@buzztrip/backend/types";
 import { formatDistanceToNow } from "date-fns";
-import { Calendar, Edit2, MapIcon, User } from "lucide-react";
+import { Calendar, Copy, Edit2, MapIcon, MoreVertical, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useMutation } from "convex/react";
+import { api } from "@buzztrip/backend/api";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface MapCardProps {
   map: UserMap;
@@ -21,8 +31,28 @@ interface MapCardProps {
 
 const MapCard = ({ map }: MapCardProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDuplicating, setIsDuplicating] = useState(false);
   const mapImage = map.image || "/placeholder.svg?height=200&width=400";
   const mapColor = map.color || "#2C7772";
+  const router = useRouter();
+  const duplicateMap = useMutation(api.maps.index.duplicateMap);
+
+  const handleDuplicate = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setIsDuplicating(true);
+    try {
+      const newMapId = await duplicateMap({ mapId: map.map_id });
+      toast.success("Map duplicated successfully!");
+      router.push(`/app/map/${newMapId}`);
+    } catch (error) {
+      console.error("Failed to duplicate map:", error);
+      toast.error("Failed to duplicate map. Please try again.");
+    } finally {
+      setIsDuplicating(false);
+    }
+  };
 
   return (
     <>
@@ -52,16 +82,40 @@ const MapCard = ({ map }: MapCardProps) => {
             <div className="flex justify-between items-start">
               <CardTitle className="text-lg truncate">{map.title}</CardTitle>
               {(map.permission === "owner" || map.permission === "editor") && (
-                <Button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setIsEditModalOpen(true);
-                  }}
-                  variant={"ghost"}
-                  size="icon"
-                >
-                  <Edit2 />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      variant="ghost"
+                      size="icon"
+                      disabled={isDuplicating}
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsEditModalOpen(true);
+                      }}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={handleDuplicate}
+                      disabled={isDuplicating}
+                    >
+                      <Copy className="h-4 w-4" />
+                      {isDuplicating ? "Duplicating..." : "Duplicate"}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </CardHeader>
