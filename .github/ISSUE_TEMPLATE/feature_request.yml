@@ -1,0 +1,243 @@
+name: Feature Request / Improvement
+description: Suggest a new feature or improvement for BuzzTrip
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to suggest a feature or improvement! Please provide as much detail as possible to help us understand your idea.
+
+  - type: dropdown
+    id: request-type
+    attributes:
+      label: Request Type
+      description: What type of request is this?
+      options:
+        - New Feature
+        - Enhancement/Improvement
+        - Performance Optimization
+        - User Experience (UX) Improvement
+        - Accessibility Improvement
+        - Developer Experience (DX)
+        - Documentation
+    validations:
+      required: true
+
+  - type: dropdown
+    id: application
+    attributes:
+      label: Application/Area
+      description: Which part of BuzzTrip would this affect?
+      options:
+        - Web App
+        - Admin Dashboard
+        - Mobile App (iOS/Android)
+        - Backend/API (Convex)
+        - Shared Components
+        - Authentication
+        - Maps/Markers
+        - Places/Reviews
+        - Collections
+        - Paths/Drawing
+        - Analytics
+        - Infrastructure/DevOps
+        - Multiple Areas
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature/Improvement Description
+      description: A clear and concise description of the feature or improvement
+      placeholder: Describe what you'd like to see added or improved...
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-statement
+    attributes:
+      label: Problem/Pain Point
+      description: What problem does this solve? What pain point does this address?
+      placeholder: |
+        Describe the problem or limitation you're experiencing.
+        Example: "I'm frustrated when..." or "It's difficult to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: User Story
+      description: Describe this from a user's perspective
+      placeholder: |
+        As a [type of user],
+        I want to [action/feature],
+        So that [benefit/value].
+
+        Example:
+        As a map creator,
+        I want to bulk import markers from a CSV file,
+        So that I can quickly add multiple locations without manual entry.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: How do you envision this working?
+      placeholder: |
+        Describe your ideal solution in detail:
+        - What would the UI look like?
+        - How would users interact with it?
+        - What are the key workflows?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternative-solutions
+    attributes:
+      label: Alternative Solutions
+      description: Have you considered any alternative approaches?
+      placeholder: |
+        Describe any alternative solutions or workarounds you've considered.
+        What are the pros/cons of each approach?
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority/Importance
+      description: How important is this to you?
+      options:
+        - Critical (Blocking my use of the app)
+        - High (Would significantly improve my experience)
+        - Medium (Would be nice to have)
+        - Low (Minor improvement)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: user-impact
+    attributes:
+      label: User Impact
+      description: How many users would benefit from this?
+      options:
+        - All Users
+        - Most Users (75%+)
+        - Many Users (50-75%)
+        - Some Users (25-50%)
+        - Few Users (<25%)
+        - Power Users/Advanced
+        - Administrators Only
+        - Not Sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: Use Cases/Examples
+      description: Provide specific examples of when/how this would be used
+      placeholder: |
+        Example scenarios:
+        1. When planning a road trip, I want to...
+        2. When sharing a map with collaborators, it would help if...
+        3. For business users tracking store locations...
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What would need to be true for this feature to be considered complete?
+      placeholder: |
+        - [ ] Users can...
+        - [ ] The system should...
+        - [ ] Error handling for...
+        - [ ] Works on mobile/desktop
+        - [ ] Accessible via keyboard navigation
+
+  - type: textarea
+    id: design-considerations
+    attributes:
+      label: Design/UX Considerations
+      description: Any thoughts on design, user experience, or accessibility?
+      placeholder: |
+        - Visual design ideas or mockups
+        - Interaction patterns to follow
+        - Accessibility requirements
+        - Mobile vs desktop experience
+        - Animation/transition ideas
+
+  - type: textarea
+    id: technical-considerations
+    attributes:
+      label: Technical Considerations
+      description: Any technical details, constraints, or implementation ideas? (Optional - for technical users)
+      placeholder: |
+        - API/backend requirements
+        - Database schema changes
+        - Performance implications
+        - Third-party integrations needed
+        - Potential technical challenges
+
+  - type: textarea
+    id: existing-examples
+    attributes:
+      label: Similar Features in Other Apps
+      description: Have you seen this implemented elsewhere? Provide examples
+      placeholder: |
+        - App/Website name and link
+        - Screenshot or description of how they handle it
+        - What aspects work well?
+        - What could be improved?
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups/Wireframes/Screenshots
+      description: Visual representation of your idea (optional but very helpful!)
+      placeholder: |
+        Drag and drop images here, or paste URLs to mockups/wireframes.
+        Even hand-drawn sketches are helpful!
+
+  - type: dropdown
+    id: willing-to-contribute
+    attributes:
+      label: Contribution
+      description: Would you be willing to help implement this?
+      options:
+        - "Yes, I can contribute code"
+        - "Yes, I can help with design/UX"
+        - "Yes, I can help with testing"
+        - "Yes, I can help with documentation"
+        - "No, but happy to provide feedback"
+        - "Not sure"
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other information or context about the feature
+      placeholder: |
+        - Related features or dependencies
+        - Business justification
+        - Competitive analysis
+        - Research or data supporting this request
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmation
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate
+          required: true
+        - label: I have provided a clear description of the feature/improvement
+          required: true
+        - label: I have explained the problem this solves
+          required: true
