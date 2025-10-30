@@ -43,16 +43,23 @@ export function PhotoGallery({
       : useQuery(api.photos.getMarkerPhotos, { marker_id: entityId as Id<"markers"> });
 
   const deletePlacePhoto = useMutation(api.photos.deletePlacePhoto);
-  const deleteMarkerPhoto = useMutation(api.photos.deleteMarkerPhoto);
+  const archiveMarkerPhoto = useMutation(api.photos.archiveMarkerPhoto);
 
-  const handleDelete = async (photoId: Id<"place_photos"> | Id<"marker_photos">) => {
+  const handleDelete = async (photoId: Id<"place_photos"> | Id<"marker_photos">, userId?: Id<"users">) => {
     try {
       if (type === "place") {
+        // For places, only the uploader can delete their own photos
+        if (currentUserId !== userId) {
+          toast.error("You can only delete your own photos");
+          return;
+        }
         await deletePlacePhoto({ photo_id: photoId as Id<"place_photos"> });
+        toast.success("Photo deleted successfully");
       } else {
-        await deleteMarkerPhoto({ photo_id: photoId as Id<"marker_photos"> });
+        // For markers, anyone can archive (soft delete)
+        await archiveMarkerPhoto({ photo_id: photoId as Id<"marker_photos"> });
+        toast.success("Photo archived successfully");
       }
-      toast.success("Photo deleted successfully");
     } catch (error) {
       console.error("Error deleting photo:", error);
       toast.error("Failed to delete photo. Please try again.");
@@ -106,14 +113,14 @@ export function PhotoGallery({
                 className="size-full object-cover"
               />
             </button>
-            {currentUserId && photo.user_id === currentUserId && (
+            {currentUserId && (type === "marker" || photo.user_id === currentUserId) && (
               <Button
                 size="icon-sm"
                 variant="destructive"
                 className="absolute top-2 right-2 opacity-0 transition-opacity group-hover:opacity-100"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleDelete(photo._id);
+                  handleDelete(photo._id, photo.user_id);
                 }}
               >
                 <Trash2Icon className="size-3" />

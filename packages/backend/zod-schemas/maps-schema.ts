@@ -177,6 +177,8 @@ export const markerPhotoSchema = defaultSchema(
     width: z.number(),
     height: z.number(),
     caption: z.string().optional(),
+    archived: z.boolean().default(false), // Soft delete for marker photos
+    archived_at: z.string().datetime().optional(), // When it was archived
   })
 );
 

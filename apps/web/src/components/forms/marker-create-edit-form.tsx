@@ -2,7 +2,7 @@ import { ColorPicker } from "@/components/color-picker";
 import { IconPicker } from "@/components/icon-picker";
 import MarkerPin from "@/components/marker-pin";
 import OpenCollectionModal from "@/components/modals/open-collection-modal";
-import { PhotoGallery, PhotoUpload } from "@/components/photos";
+import { PhotoPicker, type PendingPhoto } from "@/components/photos";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@buzztrip/ui/components/button";
 import { Checkbox } from "@buzztrip/ui/components/checkbox";
@@ -19,8 +19,6 @@ import {
 import { Input } from "@buzztrip/ui/components/input";
 import { Label } from "@buzztrip/ui/components/label";
 import { ScrollArea } from "@buzztrip/ui/components/scroll-area";
-import { Separator } from "@buzztrip/ui/components/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@buzztrip/ui/components/tabs";
 import { Textarea } from "@buzztrip/ui/components/textarea";
 import { popularColors } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -31,10 +29,10 @@ import { combinedMarkersSchema } from "@buzztrip/backend/zod-schemas";
 import { popularIconsList } from "@buzztrip/ui/components/icon";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "convex/react";
-import { Trash2 } from "lucide-react";
+import { ImageIcon, Trash2 } from "lucide-react";
 import dynamic from "next/dynamic";
 import * as React from "react";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -73,6 +71,12 @@ export default function MarkerForm() {
       null
     );
     const [isLoading, setIsLoading] = React.useState(false);
+    const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
+    const [showPhotoPicker, setShowPhotoPicker] = useState(false);
+
+    // Mutations for photo uploads
+    const generateUploadUrl = useMutation(api.photos.generateUploadUrl);
+    const saveMarkerPhotos = useMutation(api.photos.saveMarkerPhotos);
 
     const form = useForm<z.infer<typeof editSchema>>({
       resolver: zodResolver(editSchema),
@@ -120,7 +124,43 @@ export default function MarkerForm() {
 
     const clearForm = () => {
       reset();
+      setPendingPhotos([]);
+      setShowPhotoPicker(false);
       setActiveState(null);
+    };
+
+    // Upload photos to storage and save metadata
+    const uploadPhotos = async (markerId: Id<"markers">) => {
+      if (pendingPhotos.length === 0) return;
+
+      const photosToSave = [];
+
+      for (const photo of pendingPhotos) {
+        // Generate upload URL
+        const uploadUrl = await generateUploadUrl();
+
+        // Upload the file to Convex storage
+        const result = await fetch(uploadUrl, {
+          method: "POST",
+          headers: { "Content-Type": photo.file.type },
+          body: photo.file,
+        });
+
+        const { storageId } = await result.json();
+
+        photosToSave.push({
+          storage_id: storageId,
+          width: photo.width,
+          height: photo.height,
+          caption: photo.caption,
+        });
+      }
+
+      // Batch save all photos
+      await saveMarkerPhotos({
+        marker_id: markerId,
+        photos: photosToSave,
+      });
     };
 
     const onSubmit: SubmitHandler<z.infer<typeof editSchema>> = async (
@@ -165,13 +205,20 @@ export default function MarkerForm() {
 
           setActiveLocation(null);
 
-          toast.promise(updatedMarker, {
-            loading: "Updating marker...",
-            success: async (res) => {
-              return "Marker updated successfully!";
-            },
-            error: "Failed to update marker",
-          });
+          await toast.promise(
+            (async () => {
+              await updatedMarker;
+              // Upload photos after marker is updated
+              await uploadPhotos(markerId as Id<"markers">);
+            })(),
+            {
+              loading: pendingPhotos.length > 0 ? "Updating marker and uploading photos..." : "Updating marker...",
+              success: pendingPhotos.length > 0
+                ? `Marker updated with ${pendingPhotos.length} photo${pendingPhotos.length > 1 ? 's' : ''}!`
+                : "Marker updated successfully!",
+              error: "Failed to update marker",
+            }
+          );
         }
 
         if (activeState.event === "markers:create") {
@@ -184,11 +231,21 @@ export default function MarkerForm() {
           });
           setActiveLocation(null);
 
-          toast.promise(createdMarker, {
-            loading: "Creating marker...",
-            success: "Marker created successfully!",
-            error: "Failed to create marker",
-          });
+          await toast.promise(
+            (async () => {
+              const markerId = await createdMarker;
+              // Upload photos after marker is created
+              await uploadPhotos(markerId);
+              return markerId;
+            })(),
+            {
+              loading: pendingPhotos.length > 0 ? "Creating marker and uploading photos..." : "Creating marker...",
+              success: pendingPhotos.length > 0
+                ? `Marker created with ${pendingPhotos.length} photo${pendingPhotos.length > 1 ? 's' : ''}!`
+                : "Marker created successfully!",
+              error: "Failed to create marker",
+            }
+          );
         }
 
         clearForm();
@@ -229,7 +286,6 @@ export default function MarkerForm() {
 
     const selectedColor = watch("color") ?? "#fff";
     const selectedIcon = watch("icon") ?? "MapPin";
-    const currentUser = useQuery(api.users.viewer);
 
     return (
       <div className="p-2 z-10">
@@ -346,6 +402,26 @@ export default function MarkerForm() {
               }}
             />
 
+            {/* Photo Picker */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium">Photos</Label>
+                {pendingPhotos.length > 0 && (
+                  <span className="text-muted-foreground text-xs">
+                    {pendingPhotos.length} photo{pendingPhotos.length > 1 ? "s" : ""} ready to upload
+                  </span>
+                )}
+              </div>
+              <PhotoPicker
+                value={pendingPhotos}
+                onChange={setPendingPhotos}
+                maxFiles={5}
+              />
+              <p className="text-muted-foreground text-xs">
+                Add photos to this marker. They'll be uploaded when you save.
+              </p>
+            </div>
+
             <FormField
               control={control}
               name="note"
@@ -361,93 +437,40 @@ export default function MarkerForm() {
               )}
             />
 
-            <Tabs defaultValue="details" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="details">Details</TabsTrigger>
-                <TabsTrigger value="photos" disabled={!isSaved}>
-                  Photos {!isSaved && "(Save first)"}
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="details" className="space-y-4">
-                <div className="space-y-2">
-                  <div className="inline-flex items-center justify-between w-full">
-                    <Label className="text-sm font-medium">Collections </Label>
-                    <OpenCollectionModal />
-                  </div>
-                  <ScrollArea className="space-y-4 h-36 w-full">
-                    {collections &&
-                      collections.map((collection, index) => {
-                        const isChecked =
-                          watch("collection_ids")?.includes(collection._id) ??
-                          false;
-                        return (
-                          <div
-                            key={collection._id}
-                            className="flex items-center gap-2"
-                          >
-                            <Checkbox
-                              id={collection._id}
-                              checked={isChecked}
-                              onCheckedChange={() => handleChange(collection._id!)}
-                              className="rounded-full w-4 h-4"
-                            />
-                            <Icon name={collection.icon as IconType} size={20} />
-                            <Label
-                              htmlFor={collection._id}
-                              className="text-sm cursor-pointer flex-1"
-                            >
-                              {collection.title}
-                            </Label>
-                          </div>
-                        );
-                      })}
-                  </ScrollArea>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="photos" className="space-y-4">
-                {isSaved && marker?._id && (
-                  <>
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Marker Photos</Label>
-                      <p className="text-muted-foreground text-xs">
-                        Photos visible only on this marker
-                      </p>
-                      <PhotoUpload
-                        type="marker"
-                        entityId={marker._id as Id<"markers">}
-                        maxFiles={5}
-                      />
-                      <PhotoGallery
-                        type="marker"
-                        entityId={marker._id as Id<"markers">}
-                        currentUserId={currentUser?._id}
-                      />
-                    </div>
-
-                    <Separator />
-
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Place Photos (Public)</Label>
-                      <p className="text-muted-foreground text-xs">
-                        Photos visible to everyone who views {marker.place.title}
-                      </p>
-                      <PhotoUpload
-                        type="place"
-                        entityId={marker.place_id as Id<"places">}
-                        maxFiles={5}
-                      />
-                      <PhotoGallery
-                        type="place"
-                        entityId={marker.place_id as Id<"places">}
-                        currentUserId={currentUser?._id}
-                      />
-                    </div>
-                  </>
-                )}
-              </TabsContent>
-            </Tabs>
+            <div className="space-y-2">
+              <div className="inline-flex items-center justify-between w-full">
+                <Label className="text-sm font-medium">Collections </Label>
+                <OpenCollectionModal />
+              </div>
+              <ScrollArea className="space-y-4 h-36 w-full">
+                {collections &&
+                  collections.map((collection, index) => {
+                    const isChecked =
+                      watch("collection_ids")?.includes(collection._id) ??
+                      false;
+                    return (
+                      <div
+                        key={collection._id}
+                        className="flex items-center gap-2"
+                      >
+                        <Checkbox
+                          id={collection._id}
+                          checked={isChecked}
+                          onCheckedChange={() => handleChange(collection._id!)}
+                          className="rounded-full w-4 h-4"
+                        />
+                        <Icon name={collection.icon as IconType} size={20} />
+                        <Label
+                          htmlFor={collection._id}
+                          className="text-sm cursor-pointer flex-1"
+                        >
+                          {collection.title}
+                        </Label>
+                      </div>
+                    );
+                  })}
+              </ScrollArea>
+            </div>
 
             <div
               className={cn(

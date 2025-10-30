@@ -48,7 +48,8 @@ export default defineSchema({
   ]),
   marker_photos: defineTable(zodToConvex(markerPhotoSchema))
     .index("by_marker_id", ["marker_id"])
-    .index("by_user_id", ["user_id"]),
+    .index("by_user_id", ["user_id"])
+    .index("by_marker_archived", ["marker_id", "archived"]),
   // places
   places: defineTable(zodToConvex(places))
     .index("gm_place_id_ixd", ["gm_place_id"])
