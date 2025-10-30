@@ -5,6 +5,13 @@
       "args": [
         "@playwright/mcp@latest"
       ]
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": [
+        "shadcn@latest",
+        "mcp"
+      ]
     }
   }
 }
