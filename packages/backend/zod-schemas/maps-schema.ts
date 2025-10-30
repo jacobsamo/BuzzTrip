@@ -167,3 +167,27 @@ export const route_stopsSchema = defaultSchema(
   })
 );
 export const route_stopsEditSchema = insertSchema(route_stopsSchema);
+
+// Travel time boundaries for visualizing reachable areas
+export const travelBoundariesSchema = defaultSchema(
+  z.object({
+    map_id: zid("maps"),
+    title: z.string().optional(),
+    center_lat: z.number(),
+    center_lng: z.number(),
+    duration_minutes: z.number().min(15).max(720), // 15 minutes to 12 hours
+    polygon: z.array(
+      z.object({
+        lat: z.number(),
+        lng: z.number(),
+      })
+    ),
+    is_visible: z.boolean().default(true),
+    created_by: zid("users"),
+    updatedAt: z.string().datetime().optional(),
+  })
+);
+
+export const travelBoundariesEditSchema = insertSchema(travelBoundariesSchema).extend({
+  created_by: zid("users").optional(),
+});

@@ -34,6 +34,8 @@ import {
   routesSchema,
   shareMapUserSchema,
   stylesSchema,
+  travelBoundariesEditSchema,
+  travelBoundariesSchema,
   travelTypeEnumSchema,
   userMapsSchema,
   userSchema,
@@ -99,3 +101,6 @@ export type LineMeasurements = z.infer<typeof lineMeasurements>;
 export type PolygonMeasurements = z.infer<typeof polygonMeasurements>;
 
 export type PathStyle = z.infer<typeof stylesSchema>;
+
+export type TravelBoundary = z.infer<typeof travelBoundariesSchema>;
+export type NewTravelBoundary = z.infer<typeof travelBoundariesEditSchema>;

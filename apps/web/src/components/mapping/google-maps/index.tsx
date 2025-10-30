@@ -19,6 +19,8 @@ import Drawing from "./drawing";
 import { detailsRequestCallback } from "./helpers";
 import DisplayMarkerInfo from "./marker-info-box";
 import { Search, SearchInput, SearchResults } from "./search";
+import AddBoundaryButton from "./travel-boundaries/add-boundary-button";
+import TravelBoundaryPolygons from "./travel-boundaries/boundary-polygons";
 
 const GoogleMapsMapView = () => {
   const googleMap = useMap();
@@ -281,7 +283,9 @@ const GoogleMapsMapView = () => {
           </div>
         )}
         {uiState !== "paths" && <AddMarkerButton />}
+        {uiState !== "paths" && <AddBoundaryButton />}
         <Drawing />
+        <TravelBoundaryPolygons />
 
         {activeLocation && (
           <>

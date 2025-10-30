@@ -112,7 +112,7 @@ export default async function MapPage({ params }: { params: Params }) {
   }
 
   // preload on server to avoid any lag on the client
-  const [markers, collections, paths, collectionLinks, labels, mapUsers] =
+  const [markers, collections, paths, collectionLinks, labels, mapUsers, travelBoundaries] =
     await Promise.all([
       preloadQuery(
         api.maps.markers.getMarkersView,
@@ -156,6 +156,13 @@ export default async function MapPage({ params }: { params: Params }) {
         },
         options
       ),
+      preloadQuery(
+        api.maps.travelBoundaries.getTravelBoundaries,
+        {
+          mapId: map._id,
+        },
+        options
+      ),
       trackMapView(mapId, session.user._id),
     ]);
 
@@ -174,6 +181,7 @@ export default async function MapPage({ params }: { params: Params }) {
         labels,
         mapUsers,
         paths,
+        travelBoundaries,
       }}
     >
       <Map_page />

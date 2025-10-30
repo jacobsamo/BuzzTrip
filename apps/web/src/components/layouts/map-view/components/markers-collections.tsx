@@ -5,9 +5,10 @@ import { useEffect, useState } from "react";
 import DisplayMarker from "./display-marker";
 import CollectionTree from "./tree-view";
 import DisplayPath from "./display-path";
+import DisplayTravelBoundary from "./display-travel-boundary";
 
 const MarkersCollectionTabs = () => {
-  const { markers, collections, paths } = useMapStore((state) => state);
+  const { markers, collections, paths, travelBoundaries } = useMapStore((state) => state);
   const [defaultTab, setDefaultTab] = useState("collections");
 
   useEffect(() => {
@@ -22,6 +23,7 @@ const MarkersCollectionTabs = () => {
         <TabsList className="mx-auto w-11/12 justify-evenly">
           <TabsTrigger value="collections">Collections</TabsTrigger>
           <TabsTrigger value="markers">Markers</TabsTrigger>
+          <TabsTrigger value="boundaries">Boundaries</TabsTrigger>
         </TabsList>
         <TabsContent value="collections">
           <ScrollArea>
@@ -45,6 +47,19 @@ const MarkersCollectionTabs = () => {
             )}
             {paths &&
               paths.map((path) => <DisplayPath path={path} key={path._id} />)}
+          </ScrollArea>
+        </TabsContent>
+        <TabsContent value="boundaries">
+          <ScrollArea className="h-full">
+            {travelBoundaries && travelBoundaries.length > 0 ? (
+              travelBoundaries.map((boundary) => (
+                <DisplayTravelBoundary boundary={boundary} key={boundary._id} />
+              ))
+            ) : (
+              <p className="p-4 text-sm text-muted-foreground">
+                No travel boundaries yet. Click the timer icon to create one.
+              </p>
+            )}
           </ScrollArea>
         </TabsContent>
       </Tabs>

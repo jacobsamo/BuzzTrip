@@ -8,9 +8,11 @@ import type {
   MapUser,
   NewCollection,
   NewPath,
+  NewTravelBoundary,
   Path,
   Route,
   RouteStop,
+  TravelBoundary,
 } from "@buzztrip/backend/types";
 import { TerraDraw } from "terra-draw";
 
@@ -18,6 +20,7 @@ const eventType = [
   ...createAction("collections", ["create", "update", "delete"]),
   ...createAction("markers", ["create", "update", "delete"]),
   ...createAction("paths", ["create", "update", "delete"]),
+  ...createAction("travelBoundaries", ["create", "update", "delete"]),
 ] as const;
 type EventType = (typeof eventType)[number];
 
@@ -28,6 +31,8 @@ type EventPayloadMap = {
   "markers:update": CombinedMarker;
   "paths:create": NewPath;
   "paths:update": NewPath;
+  "travelBoundaries:create": null;
+  "travelBoundaries:update": NewTravelBoundary;
 };
 
 export type ActiveState = {
@@ -55,6 +60,7 @@ export type StoreState = {
   routes: Route[] | null;
   routeStops: RouteStop[] | null;
   paths: Path[] | null;
+  travelBoundaries: TravelBoundary[] | null;
 
   // uiState
   isMobile: boolean;
@@ -95,6 +101,7 @@ export const defaultState: Omit<StoreState, "map"> = {
   routeStops: null,
   labels: null,
   paths: null,
+  travelBoundaries: null,
 
   // states
   isMobile: false,

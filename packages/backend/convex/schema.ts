@@ -17,6 +17,7 @@ import {
   markersSchema,
   route_stopsSchema,
   routesSchema,
+  travelBoundariesSchema,
 } from "../zod-schemas/maps-schema";
 
 export default defineSchema({
@@ -45,6 +46,9 @@ export default defineSchema({
   route_stops: defineTable(zodToConvex(route_stopsSchema)).index("by_map_id", [
     "map_id",
   ]),
+  travel_boundaries: defineTable(zodToConvex(travelBoundariesSchema))
+    .index("by_map_id", ["map_id"])
+    .index("by_created_by", ["created_by"]),
   // places
   places: defineTable(zodToConvex(places))
     .index("gm_place_id_ixd", ["gm_place_id"])
