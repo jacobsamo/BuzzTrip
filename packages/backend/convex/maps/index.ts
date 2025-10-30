@@ -197,6 +197,30 @@ export const updateMapThumbnail = authedMutation({
   },
 });
 
+export const updateMapBounds = authedMutation({
+  args: {
+    mapId: zid("maps"),
+    lat: z.number(),
+    lng: z.number(),
+    bounds: z.object({
+      north: z.number(),
+      south: z.number(),
+      east: z.number(),
+      west: z.number(),
+    }),
+    location_name: z.string().optional(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.mapId, {
+      lat: args.lat,
+      lng: args.lng,
+      bounds: args.bounds,
+      location_name: args.location_name,
+      updatedAt: new Date().toISOString(),
+    });
+  },
+});
+
 export const deleteMap = authedMutation({
   args: {
     mapId: zid("maps"),

@@ -22,7 +22,7 @@ import DisplayMarkerInfo from "./marker-info-box";
 import { Search, SearchInput, SearchResults } from "./search";
 
 const GoogleMapsMapView = () => {
-  const googleMap = useMap();
+  const googleMap = useMap('google-map-container');
   // const drawingManager = useDrawingManager();
 
   const {
@@ -30,24 +30,25 @@ const GoogleMapsMapView = () => {
     setSearchValue,
     activeLocation,
     setActiveLocation,
-    markers,
     map,
+    markers,
     isMobile,
     setActiveState,
     uiState,
-    shouldUpdateThumbnail,
-    resetChanges,
   } = useMapStore((state) => state);
 
   if (!map) return null;
 
-  // Initialize thumbnail capture hook with smart change tracking
+  // Initialize thumbnail capture hook
+  // Only generates on page unload/tab switch/navigation, never automatically
+  // Updates bounds only if items are outside current bounds
+  // Accesses markers, paths, and change tracking directly from store
   useMapThumbnail({
     mapId: map._id as Id<"maps">,
     mapElementId: "google-map-container",
+    googleMapInstance: googleMap,
+    currentMap: map,
     enabled: true,
-    shouldUpdate: shouldUpdateThumbnail,
-    resetChanges: resetChanges,
   });
 
   const places = useMapsLibrary("places");
@@ -308,8 +309,10 @@ const GoogleMapsMapView = () => {
               position={{ lat: marker.lat, lng: marker.lng }}
               title={marker.title}
               onClick={() => {
-                googleMap!.panTo({ lat: marker.lat, lng: marker.lng });
-                setActiveLocation(marker);
+                if (googleMap) {
+                  googleMap.panTo({ lat: marker.lat, lng: marker.lng });
+                  setActiveLocation(marker);
+                }
               }}
             >
               <MarkerPin
