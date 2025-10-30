@@ -184,6 +184,19 @@ export const partialMapUpdate = authedMutation({
   },
 });
 
+export const updateMapThumbnail = authedMutation({
+  args: {
+    mapId: zid("maps"),
+    thumbnail: z.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.mapId, {
+      thumbnail: args.thumbnail,
+      updatedAt: new Date().toISOString(),
+    });
+  },
+});
+
 export const deleteMap = authedMutation({
   args: {
     mapId: zid("maps"),

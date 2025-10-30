@@ -1,6 +1,7 @@
 "use client";
 import MarkerPin from "@/components/marker-pin";
 import { useMapStore } from "@/components/providers/map-state-provider";
+import { useMapThumbnail } from "@/hooks/use-map-thumbnail";
 import { cn } from "@/lib/utils";
 import { Id } from "@buzztrip/backend/dataModel";
 import { IconType } from "@buzztrip/backend/types";
@@ -34,9 +35,19 @@ const GoogleMapsMapView = () => {
     isMobile,
     setActiveState,
     uiState,
+    paths,
+    collections,
   } = useMapStore((state) => state);
 
   if (!map) return null;
+
+  // Initialize thumbnail capture hook
+  const { captureThumbnail } = useMapThumbnail({
+    mapId: map._id,
+    mapElementId: "google-map-container",
+    enabled: true,
+    debounceMs: 3000, // Wait 3 seconds after changes before capturing
+  });
 
   const places = useMapsLibrary("places");
   const routesLibrary = useMapsLibrary("routes");
@@ -100,6 +111,14 @@ const GoogleMapsMapView = () => {
       window.removeEventListener("beforeunload", handlePageUnload);
     };
   }, [googleMap, map]);
+
+  // Trigger thumbnail capture when map data changes
+  useEffect(() => {
+    if (!googleMap) return;
+
+    // Capture thumbnail when markers, paths, or collections change
+    captureThumbnail();
+  }, [markers, paths, collections, captureThumbnail, googleMap]);
 
   const handlePlaceSearch = (placeId: string) => {
     if (!placesService) return;
