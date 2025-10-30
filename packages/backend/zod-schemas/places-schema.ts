@@ -50,9 +50,10 @@ export const placePhotoSchema = defaultSchema(
     place_id: zid("places"),
     user_id: zid("users"),
     photo_url: z.string(),
+    storage_id: z.string().optional(), // Convex storage ID for uploaded photos
     width: z.number(),
     height: z.number(),
-    caption: z.string(),
+    caption: z.string().optional(),
   })
 );
 

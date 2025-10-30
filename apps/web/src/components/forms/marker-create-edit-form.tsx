@@ -2,6 +2,7 @@ import { ColorPicker } from "@/components/color-picker";
 import { IconPicker } from "@/components/icon-picker";
 import MarkerPin from "@/components/marker-pin";
 import OpenCollectionModal from "@/components/modals/open-collection-modal";
+import { PhotoGallery, PhotoUpload } from "@/components/photos";
 import { useMapStore } from "@/components/providers/map-state-provider";
 import { Button } from "@buzztrip/ui/components/button";
 import { Checkbox } from "@buzztrip/ui/components/checkbox";
@@ -18,6 +19,8 @@ import {
 import { Input } from "@buzztrip/ui/components/input";
 import { Label } from "@buzztrip/ui/components/label";
 import { ScrollArea } from "@buzztrip/ui/components/scroll-area";
+import { Separator } from "@buzztrip/ui/components/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@buzztrip/ui/components/tabs";
 import { Textarea } from "@buzztrip/ui/components/textarea";
 import { popularColors } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -27,7 +30,7 @@ import type { IconType } from "@buzztrip/backend/types";
 import { combinedMarkersSchema } from "@buzztrip/backend/zod-schemas";
 import { popularIconsList } from "@buzztrip/ui/components/icon";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { Trash2 } from "lucide-react";
 import dynamic from "next/dynamic";
 import * as React from "react";
@@ -226,6 +229,7 @@ export default function MarkerForm() {
 
     const selectedColor = watch("color") ?? "#fff";
     const selectedIcon = watch("icon") ?? "MapPin";
+    const currentUser = useQuery(api.users.viewer);
 
     return (
       <div className="p-2 z-10">
@@ -357,40 +361,93 @@ export default function MarkerForm() {
               )}
             />
 
-            <div className="space-y-2">
-              <div className="inline-flex items-center justify-between w-full">
-                <Label className="text-sm font-medium">Collections </Label>
-                <OpenCollectionModal />
-              </div>
-              <ScrollArea className="space-y-4 h-36 w-full">
-                {collections &&
-                  collections.map((collection, index) => {
-                    const isChecked =
-                      watch("collection_ids")?.includes(collection._id) ??
-                      false;
-                    return (
-                      <div
-                        key={collection._id}
-                        className="flex items-center gap-2"
-                      >
-                        <Checkbox
-                          id={collection._id}
-                          checked={isChecked}
-                          onCheckedChange={() => handleChange(collection._id!)}
-                          className="rounded-full w-4 h-4"
-                        />
-                        <Icon name={collection.icon as IconType} size={20} />
-                        <Label
-                          htmlFor={collection._id}
-                          className="text-sm cursor-pointer flex-1"
-                        >
-                          {collection.title}
-                        </Label>
-                      </div>
-                    );
-                  })}
-              </ScrollArea>
-            </div>
+            <Tabs defaultValue="details" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="details">Details</TabsTrigger>
+                <TabsTrigger value="photos" disabled={!isSaved}>
+                  Photos {!isSaved && "(Save first)"}
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="details" className="space-y-4">
+                <div className="space-y-2">
+                  <div className="inline-flex items-center justify-between w-full">
+                    <Label className="text-sm font-medium">Collections </Label>
+                    <OpenCollectionModal />
+                  </div>
+                  <ScrollArea className="space-y-4 h-36 w-full">
+                    {collections &&
+                      collections.map((collection, index) => {
+                        const isChecked =
+                          watch("collection_ids")?.includes(collection._id) ??
+                          false;
+                        return (
+                          <div
+                            key={collection._id}
+                            className="flex items-center gap-2"
+                          >
+                            <Checkbox
+                              id={collection._id}
+                              checked={isChecked}
+                              onCheckedChange={() => handleChange(collection._id!)}
+                              className="rounded-full w-4 h-4"
+                            />
+                            <Icon name={collection.icon as IconType} size={20} />
+                            <Label
+                              htmlFor={collection._id}
+                              className="text-sm cursor-pointer flex-1"
+                            >
+                              {collection.title}
+                            </Label>
+                          </div>
+                        );
+                      })}
+                  </ScrollArea>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="photos" className="space-y-4">
+                {isSaved && marker?._id && (
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Marker Photos</Label>
+                      <p className="text-muted-foreground text-xs">
+                        Photos visible only on this marker
+                      </p>
+                      <PhotoUpload
+                        type="marker"
+                        entityId={marker._id as Id<"markers">}
+                        maxFiles={5}
+                      />
+                      <PhotoGallery
+                        type="marker"
+                        entityId={marker._id as Id<"markers">}
+                        currentUserId={currentUser?._id}
+                      />
+                    </div>
+
+                    <Separator />
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Place Photos (Public)</Label>
+                      <p className="text-muted-foreground text-xs">
+                        Photos visible to everyone who views {marker.place.title}
+                      </p>
+                      <PhotoUpload
+                        type="place"
+                        entityId={marker.place_id as Id<"places">}
+                        maxFiles={5}
+                      />
+                      <PhotoGallery
+                        type="place"
+                        entityId={marker.place_id as Id<"places">}
+                        currentUserId={currentUser?._id}
+                      />
+                    </div>
+                  </>
+                )}
+              </TabsContent>
+            </Tabs>
 
             <div
               className={cn(

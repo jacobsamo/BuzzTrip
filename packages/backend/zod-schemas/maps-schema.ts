@@ -167,3 +167,17 @@ export const route_stopsSchema = defaultSchema(
   })
 );
 export const route_stopsEditSchema = insertSchema(route_stopsSchema);
+
+export const markerPhotoSchema = defaultSchema(
+  z.object({
+    marker_id: zid("markers"),
+    user_id: zid("users"),
+    photo_url: z.string(),
+    storage_id: z.string().optional(), // Convex storage ID for uploaded photos
+    width: z.number(),
+    height: z.number(),
+    caption: z.string().optional(),
+  })
+);
+
+export const markerPhotoEditSchema = insertSchema(markerPhotoSchema);

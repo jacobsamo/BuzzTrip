@@ -14,6 +14,7 @@ import {
   labelsSchema,
   mapsSchema,
   mapUserSchema,
+  markerPhotoSchema,
   markersSchema,
   route_stopsSchema,
   routesSchema,
@@ -45,6 +46,9 @@ export default defineSchema({
   route_stops: defineTable(zodToConvex(route_stopsSchema)).index("by_map_id", [
     "map_id",
   ]),
+  marker_photos: defineTable(zodToConvex(markerPhotoSchema))
+    .index("by_marker_id", ["marker_id"])
+    .index("by_user_id", ["user_id"]),
   // places
   places: defineTable(zodToConvex(places))
     .index("gm_place_id_ixd", ["gm_place_id"])
@@ -55,7 +59,9 @@ export default defineSchema({
     .index("by_place_lat_lng", ["lat", "lng"])
     .index("places_address_idx", ["address"]),
   places_reviews: defineTable(zodToConvex(placesReviewSchema)),
-  place_photos: defineTable(zodToConvex(placePhotoSchema)),
+  place_photos: defineTable(zodToConvex(placePhotoSchema))
+    .index("by_place_id", ["place_id"])
+    .index("by_user_id", ["user_id"]),
   users: defineTable(zodToConvex(userSchema))
     .index("by_email", ["email"])
     .index("by_clerk_id", ["clerkUserId"])
