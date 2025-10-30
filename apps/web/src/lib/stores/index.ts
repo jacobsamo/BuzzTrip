@@ -157,8 +157,15 @@ export const createStore = (initState: InitState) =>
       },
 
       shouldUpdateThumbnail: () => {
+        const map = get().map;
         const changes = get().mapChanges;
 
+        // If no thumbnail exists, always generate one
+        if (!map.thumbnailUrl) {
+          return true;
+        }
+
+        // If thumbnail exists, only update if there are significant changes
         // No changes, no update needed
         if (changes.totalChanges === 0) return false;
 

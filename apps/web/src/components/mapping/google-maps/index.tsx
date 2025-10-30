@@ -43,7 +43,7 @@ const GoogleMapsMapView = () => {
 
   // Initialize thumbnail capture hook with smart change tracking
   useMapThumbnail({
-    mapId: map._id,
+    mapId: map._id as Id<"maps">,
     mapElementId: "google-map-container",
     enabled: true,
     shouldUpdate: shouldUpdateThumbnail,

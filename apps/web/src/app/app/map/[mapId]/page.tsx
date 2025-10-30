@@ -75,8 +75,8 @@ export async function generateMetadata({
     ...(map.description && {
       description: map.description,
     }),
-    ...(map.image && {
-      image: map.image,
+    ...(map.thumbnailUrl && {
+      image: map.thumbnailUrl,
     }),
   };
 }

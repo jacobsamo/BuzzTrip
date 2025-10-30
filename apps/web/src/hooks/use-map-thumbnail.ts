@@ -20,16 +20,16 @@ interface UseMapThumbnailOptions {
  * Custom hook to capture and update map thumbnails intelligently
  *
  * Features:
- * - Captures DOM snapshot of the map ONLY on page unload
- * - Uses change tracking from Zustand store to decide if update is needed
+ * - Captures DOM snapshot of the map on page unload or visibility change
+ * - Smart logic: Always generate if no thumbnail exists, only update on changes if one exists
  * - Non-blocking, fast capture using sendBeacon fallback
  * - Converts to base64 and stores in Convex
  *
  * Strategy:
+ * - If map has NO thumbnail: Always generate on page close/refresh/tab switch
+ * - If map HAS thumbnail: Only regenerate when significant changes are detected
  * - Changes are tracked locally in the store (markers, paths, collections)
- * - Before page closes, we check if changes are significant enough
- * - If yes, capture and upload thumbnail
- * - If no, skip the capture to save bandwidth and processing
+ * - Before page closes, we check shouldUpdate() which implements this logic
  *
  * @param options Configuration options for thumbnail generation
  * @returns Object with manual capture trigger if needed
@@ -43,7 +43,7 @@ export function useMapThumbnail({
   onSuccess,
   onError,
 }: UseMapThumbnailOptions) {
-  const updateThumbnail = useMutation(api.maps.updateMapThumbnail);
+  const updateThumbnail = useMutation(api.maps.index.updateMapThumbnail);
   const isCapturingRef = useRef(false);
 
   /**
@@ -53,9 +53,11 @@ export function useMapThumbnail({
   const captureAndUpload = useCallback(async () => {
     if (!enabled || isCapturingRef.current) return;
 
-    // Check if we should even bother updating
+    // Check if we should update:
+    // - Always true if no thumbnail exists
+    // - Only true if significant changes detected when thumbnail exists
     if (!shouldUpdate()) {
-      console.log("Skipping thumbnail update - no significant changes");
+      console.log("Skipping thumbnail update - has thumbnail and no significant changes");
       return;
     }
 
