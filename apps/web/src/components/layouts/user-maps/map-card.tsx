@@ -45,7 +45,8 @@ const MapCard = ({ map }: MapCardProps) => {
       toast.success("Map duplicated successfully! Check your maps list.");
     } catch (error) {
       console.error("Failed to duplicate map:", error);
-      toast.error("Failed to duplicate map. Please try again.");
+      const errorMessage = error instanceof Error ? error.message : "Failed to duplicate map. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setIsDuplicating(false);
     }
@@ -101,14 +102,14 @@ const MapCard = ({ map }: MapCardProps) => {
                         setIsEditModalOpen(true);
                       }}
                     >
-                      <Edit2 className="h-4 w-4" />
+                      <Edit2 className="mr-2 h-4 w-4" />
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={handleDuplicate}
                       disabled={isDuplicating}
                     >
-                      <Copy className="h-4 w-4" />
+                      <Copy className="mr-2 h-4 w-4" />
                       {isDuplicating ? "Duplicating..." : "Duplicate"}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
