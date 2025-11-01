@@ -62,7 +62,7 @@ const generateTitle = (paths: Path[] | null, pathType: Path["pathType"]) => {
 };
 
 const PathsForm = () => {
-  const { map, activeState, paths, setActiveState, terraDrawInstance } =
+  const { map, activeState, paths, setActiveState, terraDrawInstance, trackChange } =
     useMapStore((store) => store);
   if (
     activeState &&
@@ -153,6 +153,7 @@ const PathsForm = () => {
           toast.promise(updatedPath, {
             loading: "Updating path...",
             success: async (res) => {
+              trackChange("paths", "updated");
               return "Path updated successfully!";
             },
             error: "Failed to update path",
@@ -169,7 +170,10 @@ const PathsForm = () => {
 
           toast.promise(createdPath, {
             loading: "Creating path...",
-            success: "Path created successfully!",
+            success: () => {
+              trackChange("paths", "added");
+              return "Path created successfully!";
+            },
             error: "Failed to create path",
           });
         }
@@ -189,6 +193,7 @@ const PathsForm = () => {
       toast.promise(deletedPath, {
         loading: "Deleting path...",
         success: () => {
+          trackChange("paths", "deleted");
           clearForm();
           return "Path deleted successfully";
         },

@@ -20,7 +20,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function CollectionForm() {
-  const { map, activeState, setActiveState } = useMapStore((state) => state);
+  const { map, activeState, setActiveState, trackChange } = useMapStore((state) => state);
   if (
     activeState &&
     (activeState.event === "collections:create" ||
@@ -53,6 +53,7 @@ export default function CollectionForm() {
           toast.promise(create, {
             loading: "Creating collection...",
             success: async (res) => {
+              trackChange("collections", "added");
               return "Collection created successfully!";
             },
             error: "Failed to create collection",
@@ -69,6 +70,7 @@ export default function CollectionForm() {
             loading: "Editing collection...",
             success: async (res) => {
               if (res) {
+                trackChange("collections", "updated");
                 return "Collection edited successfully!";
               }
               return "Failed to edit collection";

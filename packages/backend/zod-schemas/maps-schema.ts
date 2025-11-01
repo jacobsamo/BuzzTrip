@@ -39,7 +39,7 @@ export const mapsSchema = defaultSchema(
   z.object({
     title: z.string(),
     description: z.string().optional(),
-    image: z.string().optional(),
+    thumbnailUrl: z.string().optional(), // URL or base64 encoded thumbnail image of the map
     icon: iconSchema.nullish(),
     color: z.string().optional(),
     owner_id: zid("users"),

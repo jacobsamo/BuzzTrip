@@ -24,7 +24,7 @@ import MarkerPin from "@/components/marker-pin";
 
 const DisplayMarkerInfo = () => {
   const [markerRef, marker] = useAdvancedMarkerRef();
-  const { setActiveLocation, setActiveState, activeLocation } = useMapStore(
+  const { setActiveLocation, setActiveState, activeLocation, trackChange } = useMapStore(
     (store) => store
   );
   const updateConvexMarker = useMutation(api.maps.markers.editMarker);
@@ -71,12 +71,13 @@ const DisplayMarkerInfo = () => {
     toast.promise(deletedMarker, {
       loading: "Deleting marker...",
       success: () => {
+        trackChange("markers", "deleted");
         setActiveLocation(null);
         return "Marker deleted successfully";
       },
       error: "Failed to delete marker",
     });
-  }, [activeLocation._id, deleteMarker, setActiveLocation]);
+  }, [activeLocation._id, deleteMarker, setActiveLocation, trackChange]);
 
   // Use a stable key that doesn't change when activeLocation properties change
   const stableKey =

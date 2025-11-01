@@ -121,7 +121,7 @@ function MapForm({
           ...data,
           description: data.description ?? undefined,
           title: data.title ?? undefined,
-          image: data.image ?? undefined,
+          thumbnailUrl: data.thumbnailUrl ?? undefined,
           icon: data.icon ?? "Map",
           color: data.color ?? undefined,
           visibility: data.visibility ?? "private",

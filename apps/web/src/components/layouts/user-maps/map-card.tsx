@@ -21,7 +21,7 @@ interface MapCardProps {
 
 const MapCard = ({ map }: MapCardProps) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const mapImage = map.image || "/placeholder.svg?height=200&width=400";
+  const mapImage = map.thumbnailUrl || "/placeholder.svg?height=200&width=400";
   const mapColor = map.color || "#2C7772";
 
   return (
@@ -29,12 +29,10 @@ const MapCard = ({ map }: MapCardProps) => {
       <Card className="overflow-hidden hover:shadow-md transition-shadow py-0 gap-2">
         <Link href={`/app/map/${map.map_id}`}>
           <div className="relative h-40 w-full bg-muted">
-            {map.image ? (
+            {map.thumbnailUrl ? (
               <Image
                 src={mapImage || "/placeholder.svg"}
                 alt={map.title}
-                width={400}
-                height={200}
                 fill
                 className="object-cover"
               />
@@ -100,7 +98,7 @@ const MapCard = ({ map }: MapCardProps) => {
           _id: map.map_id,
           title: map.title,
           description: map.description,
-          image: map.image,
+          thumbnailUrl: map.thumbnailUrl,
           icon: map.icon,
           color: map.color,
           owner_id: map.owner_id,

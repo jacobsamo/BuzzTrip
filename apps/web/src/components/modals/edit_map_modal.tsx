@@ -136,7 +136,7 @@ function MapForm({
           ...data,
           title: data.title,
           description: data.description,
-          image: data.image ?? undefined,
+          thumbnailUrl: data.thumbnailUrl ?? undefined,
         },
       });
 

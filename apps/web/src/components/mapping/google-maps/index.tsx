@@ -1,6 +1,7 @@
 "use client";
 import MarkerPin from "@/components/marker-pin";
 import { useMapStore } from "@/components/providers/map-state-provider";
+import { useMapThumbnail } from "@/hooks/use-map-thumbnail";
 import { cn } from "@/lib/utils";
 import { Id } from "@buzztrip/backend/dataModel";
 import { IconType } from "@buzztrip/backend/types";
@@ -21,7 +22,7 @@ import DisplayMarkerInfo from "./marker-info-box";
 import { Search, SearchInput, SearchResults } from "./search";
 
 const GoogleMapsMapView = () => {
-  const googleMap = useMap();
+  const googleMap = useMap('google-map-container');
   // const drawingManager = useDrawingManager();
 
   const {
@@ -29,14 +30,26 @@ const GoogleMapsMapView = () => {
     setSearchValue,
     activeLocation,
     setActiveLocation,
-    markers,
     map,
+    markers,
     isMobile,
     setActiveState,
     uiState,
   } = useMapStore((state) => state);
 
   if (!map) return null;
+
+  // Initialize thumbnail capture hook
+  // Only generates on page unload/tab switch/navigation, never automatically
+  // Updates bounds only if items are outside current bounds
+  // Accesses markers, paths, and change tracking directly from store
+  useMapThumbnail({
+    mapId: map._id as Id<"maps">,
+    mapElementId: "google-map-container",
+    googleMapInstance: googleMap,
+    currentMap: map,
+    enabled: true,
+  });
 
   const places = useMapsLibrary("places");
   const routesLibrary = useMapsLibrary("routes");
@@ -296,8 +309,10 @@ const GoogleMapsMapView = () => {
               position={{ lat: marker.lat, lng: marker.lng }}
               title={marker.title}
               onClick={() => {
-                googleMap!.panTo({ lat: marker.lat, lng: marker.lng });
-                setActiveLocation(marker);
+                if (googleMap) {
+                  googleMap.panTo({ lat: marker.lat, lng: marker.lng });
+                  setActiveLocation(marker);
+                }
               }}
             >
               <MarkerPin

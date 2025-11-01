@@ -44,6 +44,25 @@ export type DrawerState = {
 
 export type UIState = "searching" | "add-marker" | "paths" | "default";
 
+export type MapChanges = {
+  markers: {
+    added: number;
+    updated: number;
+    deleted: number;
+  };
+  paths: {
+    added: number;
+    updated: number;
+    deleted: number;
+  };
+  collections: {
+    added: number;
+    updated: number;
+    deleted: number;
+  };
+  totalChanges: number;
+};
+
 export type StoreState = {
   // data
   map: Map;
@@ -66,6 +85,9 @@ export type StoreState = {
   searchValue: string | null;
   searchActive: boolean;
   terraDrawInstance: TerraDraw | null;
+
+  // change tracking for thumbnail updates
+  mapChanges: MapChanges;
 };
 
 export type StoreActions = {
@@ -83,6 +105,14 @@ export type StoreActions = {
   setSearchActive: (active: boolean) => void;
   setUiState: (uiState: UIState) => void;
   setTerraDrawInstance: (instance: TerraDraw | null) => void;
+
+  // Change tracking
+  trackChange: (
+    type: "markers" | "paths" | "collections",
+    action: "added" | "updated" | "deleted"
+  ) => void;
+  resetChanges: () => void;
+  shouldUpdateThumbnail: () => boolean;
 };
 
 export const defaultState: Omit<StoreState, "map"> = {
@@ -109,4 +139,12 @@ export const defaultState: Omit<StoreState, "map"> = {
   searchValue: null,
   searchActive: false,
   terraDrawInstance: null,
+
+  // change tracking
+  mapChanges: {
+    markers: { added: 0, updated: 0, deleted: 0 },
+    paths: { added: 0, updated: 0, deleted: 0 },
+    collections: { added: 0, updated: 0, deleted: 0 },
+    totalChanges: 0,
+  },
 };
