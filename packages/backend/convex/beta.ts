@@ -2,8 +2,8 @@ import { v } from "convex/values";
 import { z } from "zod";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
-import { internalQuery, mutation, query } from "./_generated/server";
-import { authedMutation, authedQuery, zodMutation } from "./helpers";
+import { mutation, query } from "./_generated/server";
+import { authedQuery, zodMutation } from "./helpers";
 import { getCurrentUser, mustGetCurrentUser } from "./users";
 
 // Quick signup schema
@@ -275,10 +275,10 @@ export const submitQuestionnaire = zodMutation({
  */
 export const checkBetaStatus = authedQuery({
   args: {},
-  returns: v.object({
-    isBetaUser: v.boolean(),
-    betaSignupDate: v.optional(v.string()),
-    hasCompletedQuestionnaire: v.boolean(),
+  returns: z.object({
+    isBetaUser: z.boolean(),
+    betaSignupDate: z.string().optional(),
+    hasCompletedQuestionnaire: z.boolean(),
   }),
   handler: async (ctx) => {
     const user = await mustGetCurrentUser(ctx);
@@ -295,19 +295,22 @@ export const checkBetaStatus = authedQuery({
  * Admin: Get all beta users
  * Internal query - should be called from admin dashboard with proper auth checks
  */
-export const getBetaUsers = internalQuery({
+export const getBetaUsers = query({
   args: {},
   returns: v.array(
     v.object({
       _id: v.id("users"),
       name: v.string(),
       email: v.string(),
-      betaSignupDate: v.optional(v.string()),
+      betaSignupDate: v.union(v.string(), v.null()),
       hasCompletedQuestionnaire: v.boolean(),
-      whatsappOptIn: v.optional(v.boolean()),
+      whatsappOptIn: v.union(v.boolean(), v.null()),
     })
   ),
   handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
     const betaUsers = await ctx.db
       .query("users")
       .withIndex("by_isBetaUser", (q) => q.eq("isBetaUser", true))
@@ -317,9 +320,9 @@ export const getBetaUsers = internalQuery({
       _id: user._id,
       name: user.name,
       email: user.email,
-      betaSignupDate: user.betaSignupDate,
+      betaSignupDate: user.betaSignupDate ?? null,
       hasCompletedQuestionnaire: !!user.betaQuestionnaireResponses,
-      whatsappOptIn: user.whatsappOptIn,
+      whatsappOptIn: user.whatsappOptIn ?? null,
     }));
   },
 });
@@ -328,18 +331,21 @@ export const getBetaUsers = internalQuery({
  * Admin: Get questionnaire responses for analysis
  * Internal query - should be called from admin dashboard with proper auth checks
  */
-export const getBetaQuestionnaireResponses = internalQuery({
+export const getBetaQuestionnaireResponses = query({
   args: {},
   returns: v.array(
     v.object({
       userId: v.id("users"),
       email: v.string(),
       name: v.string(),
-      signupDate: v.optional(v.string()),
+      signupDate: v.union(v.string(), v.null()),
       responses: v.any(), // Using v.any() since the questionnaire responses are dynamic
     })
   ),
   handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+
     const betaUsers = await ctx.db
       .query("users")
       .withIndex("by_isBetaUser", (q) => q.eq("isBetaUser", true))
@@ -351,7 +357,7 @@ export const getBetaQuestionnaireResponses = internalQuery({
         userId: user._id,
         email: user.email,
         name: user.name,
-        signupDate: user.betaSignupDate,
+        signupDate: user.betaSignupDate ?? null,
         responses: user.betaQuestionnaireResponses,
       }));
   },
