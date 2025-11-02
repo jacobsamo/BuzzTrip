@@ -24,7 +24,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { api } from "@/convex/_generated/api";
+import { api } from "@buzztrip/backend/api";
 
 export default function BetaSignupPage() {
   const { user, isSignedIn } = useUser();
