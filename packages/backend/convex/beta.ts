@@ -85,7 +85,7 @@ export const quickBetaSignup = zodMutation({
       // Send beta welcome email with questionnaire link
       await ctx.scheduler.runAfter(
         0,
-        internal["emails-beta"].sendBetaWelcomeEmail,
+        internal.emails_beta.sendBetaWelcomeEmail,
         {
           firstName: currentUser.first_name ?? firstName,
           email: currentUser.email,
@@ -158,7 +158,7 @@ export const completePendingBetaSignup = mutation({
     });
 
     // Send beta welcome email
-    await ctx.scheduler.runAfter(0, internal["emails-beta"].sendBetaWelcomeEmail, {
+    await ctx.scheduler.runAfter(0, internal.emails_beta.sendBetaWelcomeEmail, {
       firstName: pending.firstName,
       email,
       whatsappOptIn: pending.whatsappOptIn,
