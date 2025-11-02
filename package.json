@@ -9,6 +9,8 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "dev:web": "turbo run dev --filter=@buzztrip/web --filter=@buzztrip/backend",
+    "dev:admin": "turbo run dev --filter=@buzztrip/admin --filter=@buzztrip/backend",
     "sherif": "bunx sherif@latest -p ./apps/mobile",
     "lint": "turbo lint && bun sherif",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,md,mdx}\"",
@@ -25,6 +27,7 @@
     "prettier-plugin-tailwindcss": "^0.6.14",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "shadcn": "^3.5.0",
     "turbo": "^2.5.8",
     "typescript": "^5.9.3"
   },

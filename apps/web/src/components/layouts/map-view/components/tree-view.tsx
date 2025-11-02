@@ -103,7 +103,7 @@ export default function CollectionTree() {
     setActiveState,
     setActiveLocation,
   } = useMapStore((state) => state);
-  const map = useMap();
+  const map = useMap('google-map-container');
 
   const [treeState, setTreeState] = useState<Partial<TreeState<Item>>>({
     expandedItems: collections?.map((collection) => collection._id) ?? [],

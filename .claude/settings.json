@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(bun install)",
+      "Bash(npx tsc:*)",
+      "WebFetch(domain:docs.convex.dev)",
+      "WebFetch(domain:clerk.com)",
+      "Bash(mcp list-tools:*)",
+      "WebFetch(domain:tanstack.com)",
+      "WebFetch(domain:ui.shadcn.com)",
+      "Bash(mcp__playwright__browser_navigate:*)",
+      "Bash(bun run dev)",
+      "Bash(cat:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

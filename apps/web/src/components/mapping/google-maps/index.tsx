@@ -21,7 +21,7 @@ import DisplayMarkerInfo from "./marker-info-box";
 import { Search, SearchInput, SearchResults } from "./search";
 
 const GoogleMapsMapView = () => {
-  const googleMap = useMap();
+  const googleMap = useMap('google-map-container');
   // const drawingManager = useDrawingManager();
 
   const {

@@ -51,7 +51,7 @@ const Drawing = () => {
     terraDrawInstance,
     setTerraDrawInstance,
   } = useMapStore((state) => state);
-  const googleMap = useMap();
+  const googleMap = useMap('google-map-container');
   const adapterRef = useRef<TerraDrawGoogleMapsAdapter | null>(null);
   const [mode, setMode] = useState<DrawingMode>("static");
   const [isReady, setIsReady] = useState(false);
