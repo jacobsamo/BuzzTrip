@@ -14,7 +14,7 @@ interface DisplayPathProps {
 
 const DisplayPath = ({ path }: DisplayPathProps) => {
   const { setActiveState, setActiveLocation } = useMapStore((store) => store);
-  const map = useMap();
+  const map = useMap('google-map-container');
 
   const onpathClick = (path: Path) => {
     if (map) {

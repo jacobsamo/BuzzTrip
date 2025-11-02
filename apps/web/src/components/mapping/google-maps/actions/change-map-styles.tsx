@@ -39,7 +39,7 @@ const mapTypes: { id: MapTypeId; image: string; description: string }[] = [
 ];
 
 const ChangeMapStyle = () => {
-  const googleMap = useMap();
+  const googleMap = useMap('google-map-container');
   const { map, isMobile } = useMapStore((state) => state);
   const updateMap = useMutation(api.maps.index.partialMapUpdate);
   const [open, setOpen] = useState(false);
