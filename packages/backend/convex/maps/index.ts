@@ -298,7 +298,7 @@ export const duplicateMap = authedMutation({
         )
       );
       collections.forEach((collection, index) => {
-        collectionIdMap.set(collection._id, newCollectionIds[index]);
+        collectionIdMap.set(collection._id, newCollectionIds[index]!);
       });
 
       // Duplicate markers in parallel and track ID mapping
@@ -320,7 +320,7 @@ export const duplicateMap = authedMutation({
         )
       );
       markers.forEach((marker, index) => {
-        markerIdMap.set(marker._id, newMarkerIds[index]);
+        markerIdMap.set(marker._id, newMarkerIds[index]!);
       });
 
       // Duplicate routes in parallel and track ID mapping
@@ -338,7 +338,7 @@ export const duplicateMap = authedMutation({
         )
       );
       routes.forEach((route, index) => {
-        routeIdMap.set(route._id, newRouteIds[index]);
+        routeIdMap.set(route._id, newRouteIds[index]!);
       });
 
       // Duplicate paths and labels in parallel (they don't need ID mapping)
