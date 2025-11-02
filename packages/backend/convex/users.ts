@@ -157,7 +157,7 @@ export async function userById(ctx: QueryCtx, id: Id<"users">) {
   return await ctx.db.get(id);
 }
 
-async function getCurrentUser(ctx: QueryCtx): Promise<Doc<"users"> | null> {
+export async function getCurrentUser(ctx: QueryCtx): Promise<Doc<"users"> | null> {
   const identity = await ctx.auth.getUserIdentity();
   if (identity === null) {
     return null;
