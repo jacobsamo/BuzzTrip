@@ -47,15 +47,49 @@ export default function ConfirmWaitlistPage() {
 
   const [state, setState] = useState<"initial" | "confirming" | "confirmed" | "completed" | "error" | "no_account" | "already_completed">("initial");
   const [message, setMessage] = useState("");
-  const [userName, setUserName] = useState("");
 
-  // Check if token exists
+  // Check token status on page load
   useEffect(() => {
     if (!token) {
       setState("error");
       setMessage("No confirmation token provided.");
+      return;
     }
-  }, [token]);
+
+    // Automatically check if email is already confirmed or questionnaire completed
+    const checkStatus = async () => {
+      setState("confirming");
+      try {
+        const result = await confirmEmail({ token });
+
+        if (result.success) {
+          setState("confirmed");
+          setMessage(result.message);
+          // Smooth scroll to questionnaire
+          setTimeout(() => {
+            const questionnaireElement = document.getElementById("questionnaire-section");
+            questionnaireElement?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 100);
+        } else {
+          if (result.error === "already_completed") {
+            setState("already_completed");
+            setMessage(result.message);
+          } else if (result.error === "no_account") {
+            setState("no_account");
+            setMessage(result.message);
+          } else {
+            setState("error");
+            setMessage(result.message);
+          }
+        }
+      } catch (error) {
+        setState("error");
+        setMessage(error instanceof Error ? error.message : "An unexpected error occurred.");
+      }
+    };
+
+    checkStatus();
+  }, [token, confirmEmail]);
 
   // Form setup
   const form = useForm<z.infer<typeof betaQuestionnaireSchema>>({
@@ -122,40 +156,6 @@ export default function ConfirmWaitlistPage() {
     "Analytics dashboard",
     "Team workspaces",
   ];
-
-  const handleConfirm = async () => {
-    if (!token) return;
-
-    setState("confirming");
-
-    try {
-      const result = await confirmEmail({ token });
-
-      if (result.success) {
-        setState("confirmed");
-        setMessage(result.message);
-        // Smooth scroll to questionnaire
-        setTimeout(() => {
-          const questionnaireElement = document.getElementById("questionnaire-section");
-          questionnaireElement?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 100);
-      } else {
-        if (result.error === "already_completed") {
-          setState("already_completed");
-          setMessage(result.message);
-        } else if (result.error === "no_account") {
-          setState("no_account");
-          setMessage(result.message);
-        } else {
-          setState("error");
-          setMessage(result.message);
-        }
-      }
-    } catch (error) {
-      setState("error");
-      setMessage(error instanceof Error ? error.message : "An unexpected error occurred.");
-    }
-  };
 
   const onSubmit = async (data: z.infer<typeof betaQuestionnaireSchema>) => {
     if (!token) {
@@ -248,58 +248,23 @@ export default function ConfirmWaitlistPage() {
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-primary/10 py-12">
       <div className="container mx-auto px-4">
         {/* Confirmation Section */}
-        {(state === "initial" || state === "confirming") && (
+        {state === "confirming" && (
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="max-w-2xl mx-auto mb-12"
           >
-            {state === "initial" && (
-              <Card className="border-primary/20 shadow-xl">
-                <CardHeader className="text-center pb-8">
-                  <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Mail className="h-10 w-10 text-primary" />
-                  </div>
-                  <CardTitle className="text-4xl font-bold mb-4">Confirm Your Email</CardTitle>
-                  <CardDescription className="text-lg">
-                    Click the button below to confirm your email and proceed to the beta questionnaire
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                    <p className="text-blue-900 font-semibold mb-3 text-base">
-                      📋 What's Next?
-                    </p>
-                    <ol className="text-blue-800 space-y-2 text-base list-decimal list-inside">
-                      <li>Confirm your email address</li>
-                      <li>Complete a 3-5 minute questionnaire below</li>
-                      <li>Get instant beta access to BuzzTrip!</li>
-                    </ol>
-                    <p className="text-blue-700 text-sm mt-4">
-                      <strong>Note:</strong> The questionnaire is required to access the beta program.
-                    </p>
-                  </div>
-
-                  <Button onClick={handleConfirm} className="w-full py-6 text-lg" size="lg">
-                    Confirm Email & Continue →
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-
-            {state === "confirming" && (
-              <Card className="border-primary/20 shadow-xl">
-                <CardHeader className="text-center pb-8">
-                  <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Loader2 className="h-10 w-10 text-primary animate-spin" />
-                  </div>
-                  <CardTitle className="text-3xl font-bold mb-2">Confirming Your Email</CardTitle>
-                  <CardDescription className="text-lg">
-                    Please wait while we verify your email...
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            )}
+            <Card className="border-primary/20 shadow-xl">
+              <CardHeader className="text-center pb-8">
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Loader2 className="h-10 w-10 text-primary animate-spin" />
+                </div>
+                <CardTitle className="text-3xl font-bold mb-2">Verifying Your Status</CardTitle>
+                <CardDescription className="text-lg">
+                  Please wait while we check your confirmation...
+                </CardDescription>
+              </CardHeader>
+            </Card>
           </motion.div>
         )}
 
