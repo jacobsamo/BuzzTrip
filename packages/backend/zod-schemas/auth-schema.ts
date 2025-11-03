@@ -19,6 +19,8 @@ export const userSchema = z.object({
   betaSignupDate: z.string().optional(),
   betaQuestionnaireResponses: z.record(z.string(), z.any()).optional(),
   whatsappOptIn: z.boolean().optional(),
+  emailConfirmedAt: z.string().optional(),
+  questionnaireCompletedAt: z.string().optional(),
 });
 
 export const usersEditSchema = insertSchema(userSchema);
@@ -33,23 +35,34 @@ export const refinedUserSchema = userSchema.pick({
   image: true,
 });
 
-// Beta program schemas
-export const betaQuestionnaireTokenSchema = z.object({
+// Consolidated Beta Users schema - handles entire beta signup flow
+export const betaUsersSchema = z.object({
   ...defaultFields,
-  userId: zid("users"),
-  token: z.string(),
+  // Identity
   email: z.string(),
-  used: z.boolean(),
-  expiresAt: z.number(),
-});
-
-export const betaPendingSignupSchema = z.object({
-  ...defaultFields,
   firstName: z.string(),
   lastName: z.string().optional(),
-  email: z.string(),
-  whatsappOptIn: z.boolean(),
+
+  // Token & Flow
   token: z.string(),
-  createdAt: z.number(),
   expiresAt: z.number(),
+
+  // Status Tracking
+  emailConfirmed: z.boolean(),
+  emailConfirmedAt: z.number().optional(),
+  questionnaireCompleted: z.boolean(),
+  questionnaireCompletedAt: z.number().optional(),
+
+  // User Preferences
+  whatsappOptIn: z.boolean(),
+
+  // Questionnaire Responses (stored directly)
+  questionnaireResponses: z.record(z.string(), z.any()).optional(),
+
+  // Link to actual user account (optional - set when user creates account)
+  userId: zid("users").optional(),
+
+  // Timestamps
+  createdAt: z.number(),
+  updatedAt: z.number(),
 });

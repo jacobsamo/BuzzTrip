@@ -20,7 +20,7 @@ import { useMutation } from "convex/react";
 import { CheckCircle2, Crown, Loader2, MessageSquare, Rocket } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -31,7 +31,9 @@ export default function BetaSignupPage() {
   const quickSignup = useMutation(api.beta.quickBetaSignup);
 
   const [submitted, setSubmitted] = useState(false);
-  const [requiresSignup, setRequiresSignup] = useState(false);
+  const [requiresConfirmation, setRequiresConfirmation] = useState(false);
+  const [alreadyConfirmed, setAlreadyConfirmed] = useState(false);
+  const [resentConfirmation, setResentConfirmation] = useState(false);
 
   const form = useForm<z.infer<typeof betaQuickSignupSchema>>({
     resolver: zodResolver(betaQuickSignupSchema),
@@ -48,18 +50,34 @@ export default function BetaSignupPage() {
     formState: { isSubmitting },
   } = form;
 
+  // Update form values when user data loads
+  useEffect(() => {
+    if (user && isSignedIn) {
+      form.reset({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        email: user.primaryEmailAddress?.emailAddress || "",
+        whatsappOptIn: false,
+      });
+    }
+  }, [user, isSignedIn, form]);
+
   const onSubmit = async (data: z.infer<typeof betaQuickSignupSchema>) => {
     try {
       const result = await quickSignup(data);
 
       if (result.success) {
         setSubmitted(true);
-        setRequiresSignup(result.requiresSignup);
+        setRequiresConfirmation(result.requiresConfirmation ?? false);
+        setAlreadyConfirmed(result.alreadyConfirmed ?? false);
+        setResentConfirmation(result.resentConfirmation ?? false);
 
-        if (!result.requiresSignup) {
-          toast.success("Welcome to the beta! Check your email for next steps.");
-        } else {
-          toast.success("Almost there! Please create an account to join the beta.");
+        if (result.alreadyConfirmed) {
+          toast.success("You've already completed the beta signup. Please sign in.");
+        } else if (result.resentConfirmation) {
+          toast.success("Confirmation email resent! Please check your inbox.");
+        } else if (result.requiresConfirmation) {
+          toast.success("Please check your email to confirm your beta signup.");
         }
       }
     } catch (error) {
@@ -81,44 +99,56 @@ export default function BetaSignupPage() {
                 <CheckCircle2 className="h-10 w-10 text-primary" />
               </div>
               <CardTitle className="text-3xl font-bold mb-2">
-                {requiresSignup ? "Almost There!" : "Welcome to the Beta!"}
+                {alreadyConfirmed ? "Already Confirmed!" : resentConfirmation ? "Email Resent!" : "Check Your Email!"}
               </CardTitle>
               <CardDescription className="text-lg">
-                {requiresSignup
-                  ? "Please create an account to complete your beta enrollment."
-                  : "Check your email for a link to complete your beta profile."}
+                {alreadyConfirmed
+                  ? "You've already completed the beta signup process."
+                  : resentConfirmation
+                    ? "We've resent your confirmation email."
+                    : "We've sent you a confirmation link to get started."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {requiresSignup && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-                  <p className="text-amber-900 text-sm">
-                    Create an account with the email you provided to activate your beta access and receive the detailed questionnaire.
+              {alreadyConfirmed && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                  <p className="text-green-900 text-sm">
+                    You've already confirmed your email and completed the questionnaire. Please sign in to access your beta account.
                   </p>
                 </div>
               )}
 
-              {!requiresSignup && (
+              {(resentConfirmation || requiresConfirmation) && !alreadyConfirmed && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                  <p className="text-blue-900 text-sm">
-                    We've sent you an email with a link to complete a quick questionnaire. This helps us understand your needs and build the best mapping tool for you!
+                  <p className="text-blue-900 text-sm font-semibold mb-2">
+                    📧 Check your inbox for the confirmation email
+                  </p>
+                  <p className="text-blue-800 text-sm">
+                    Click the confirmation link in the email, then you'll be able to complete the questionnaire and get beta access.
+                  </p>
+                  <p className="text-blue-700 text-xs mt-2">
+                    Don't see it? Check your spam folder or click "Join Beta Program" again to resend.
                   </p>
                 </div>
               )}
 
               <div className="flex flex-col sm:flex-row gap-3">
-                {requiresSignup ? (
-                  <Button asChild className="flex-1">
-                    <Link href="/sign-up">Create Account</Link>
-                  </Button>
+                {alreadyConfirmed ? (
+                  <>
+                    <Button asChild className="flex-1">
+                      <Link href="/sign-in">Sign In</Link>
+                    </Button>
+                    <Button variant="outline" asChild className="flex-1">
+                      <Link href="/">Back to Home</Link>
+                    </Button>
+                  </>
                 ) : (
-                  <Button asChild className="flex-1">
-                    <Link href="/app">Go to Dashboard</Link>
-                  </Button>
+                  <>
+                    <Button variant="outline" asChild className="flex-1">
+                      <Link href="/">Back to Home</Link>
+                    </Button>
+                  </>
                 )}
-                <Button variant="outline" asChild className="flex-1">
-                  <Link href="/">Back to Home</Link>
-                </Button>
               </div>
             </CardContent>
           </Card>
@@ -201,7 +231,9 @@ export default function BetaSignupPage() {
                 <CardHeader>
                   <CardTitle className="text-2xl">Join the Beta</CardTitle>
                   <CardDescription>
-                    Quick signup - we'll send you a detailed questionnaire via email
+                    {isSignedIn && user
+                      ? `Signing up as ${user.firstName || user.primaryEmailAddress?.emailAddress || "you"}`
+                      : "Quick signup - we'll send you a detailed questionnaire via email"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -314,10 +346,10 @@ export default function BetaSignupPage() {
                 <CardContent className="p-6">
                   <h3 className="font-semibold text-gray-900 mb-2">What happens next?</h3>
                   <ol className="space-y-2 text-sm text-gray-600 list-decimal list-inside">
-                    <li>You'll receive a welcome email with a link to a detailed questionnaire</li>
-                    <li>The questionnaire takes ~3 minutes and helps us understand your needs</li>
-                    <li>We'll use your feedback to build features you actually want</li>
-                    <li>Get early access to new features as we roll them out</li>
+                    <li>You'll receive a confirmation email - click the link to verify your email</li>
+                    <li>After confirming, you'll complete a quick 3-minute questionnaire about your needs</li>
+                    <li>Once submitted, you'll instantly get beta access to all features</li>
+                    <li>Your feedback helps us build features you actually want</li>
                   </ol>
                 </CardContent>
               </Card>

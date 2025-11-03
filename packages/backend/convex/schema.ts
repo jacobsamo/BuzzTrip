@@ -1,8 +1,7 @@
 import { zodToConvex } from "convex-helpers/server/zod";
 import { defineSchema, defineTable } from "convex/server";
 import {
-  betaPendingSignupSchema,
-  betaQuestionnaireTokenSchema,
+  betaUsersSchema,
   userSchema,
 } from "../zod-schemas/auth-schema";
 import {
@@ -68,14 +67,9 @@ export default defineSchema({
       searchField: "name",
       filterFields: ["email", "username"],
     }),
-  // beta program
-  beta_questionnaire_tokens: defineTable(
-    zodToConvex(betaQuestionnaireTokenSchema)
-  )
-    .index("by_token", ["token"])
-    .index("by_user_id", ["userId"])
-    .index("by_email", ["email"]),
-  beta_pending_signups: defineTable(zodToConvex(betaPendingSignupSchema))
+  // Beta program - consolidated table
+  beta_users: defineTable(zodToConvex(betaUsersSchema))
     .index("by_email", ["email"])
-    .index("by_token", ["token"]),
+    .index("by_token", ["token"])
+    .index("by_user_id", ["userId"]),
 });

@@ -54,13 +54,13 @@ export default function BetaQuestionnairePage() {
     defaultValues: {
       howDidYouHear: "",
       currentMappingTool: "",
-      primaryUseCase: "personal",
+      primaryUseCase: undefined,
       useCaseDetails: "",
       mapsPerMonth: undefined,
       collaboratorsCount: undefined,
       expectedFeatures: [],
       mostImportantFeature: "",
-      willingToPay: "free-only",
+      willingToPay: undefined,
       pricingModel: undefined,
       willingToProvideHelpFeedback: false,
       participationLevel: undefined,
@@ -133,24 +133,41 @@ export default function BetaQuestionnairePage() {
   }
 
   if (!tokenVerification.valid) {
+    const isEmailNotConfirmed = tokenVerification.reason?.includes("Email not confirmed");
+    const isAlreadyCompleted = tokenVerification.reason === "Questionnaire already completed";
+
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center">
             <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">
-              {tokenVerification.reason === "Token already used"
+              {isAlreadyCompleted
                 ? "Already Completed"
-                : "Invalid or Expired"}
+                : isEmailNotConfirmed
+                  ? "Email Not Confirmed"
+                  : "Invalid or Expired"}
             </h2>
             <p className="text-gray-600 mb-4">
-              {tokenVerification.reason === "Token already used"
-                ? "You've already completed this questionnaire. Thank you!"
-                : `This link is ${tokenVerification.reason?.toLowerCase()}.`}
+              {isAlreadyCompleted
+                ? "You've already completed this questionnaire and have beta access. Thank you!"
+                : isEmailNotConfirmed
+                  ? "Please confirm your email first by clicking the link in your confirmation email."
+                  : tokenVerification.reason || "This link is invalid or expired."}
             </p>
-            <Button asChild>
-              <Link href="/app">Go to Dashboard</Link>
-            </Button>
+            {isAlreadyCompleted ? (
+              <Button asChild>
+                <Link href="/app">Go to Dashboard</Link>
+              </Button>
+            ) : isEmailNotConfirmed ? (
+              <Button asChild>
+                <Link href="/beta">Back to Beta Signup</Link>
+              </Button>
+            ) : (
+              <Button asChild>
+                <Link href="/beta">Join Beta</Link>
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -170,16 +187,18 @@ export default function BetaQuestionnairePage() {
               <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle2 className="h-10 w-10 text-primary" />
               </div>
-              <CardTitle className="text-3xl font-bold mb-2">Thank You!</CardTitle>
+              <CardTitle className="text-3xl font-bold mb-2">You're In! 🎉</CardTitle>
               <CardDescription className="text-lg">
-                Your feedback helps us build the best mapping tool for you.
+                You now have full beta access to BuzzTrip!
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <p className="text-blue-900 text-sm">
-                  We'll use your responses to prioritize features and ensure BuzzTrip meets your needs.
-                  You're now part of our exclusive beta program!
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
+                <p className="text-primary font-semibold text-sm mb-2">
+                  ✨ Beta Access Granted
+                </p>
+                <p className="text-gray-900 text-sm">
+                  Thank you for completing the questionnaire! Your feedback will help us build the perfect mapping tool. Start creating custom maps and enjoy all our beta features.
                 </p>
               </div>
 
@@ -199,181 +218,206 @@ export default function BetaQuestionnairePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white py-12">
-      <div className="container mx-auto px-4 max-w-3xl">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-primary/10 py-12">
+      <div className="container mx-auto px-4 max-w-4xl">
         <motion.div
-          initial={{ y: 20, opacity: 0 }}
+          initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
         >
-          <div className="text-center mb-8">
-            <Badge className="bg-primary/10 text-primary border-primary/20 mb-4">
+          <div className="text-center mb-12">
+            <Badge className="bg-primary text-white border-primary/20 mb-6 px-4 py-2 text-sm font-semibold">
               Beta Questionnaire
             </Badge>
-            <h1 className="text-3xl font-bold mb-2">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
               Welcome, {tokenVerification.userName}!
             </h1>
-            <p className="text-gray-600">
-              Help us build the perfect mapping tool for you. This takes about 3 minutes.
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Help us build the perfect mapping tool for you. This takes about 3-5 minutes.
+            </p>
+            <p className="text-base text-gray-500 mt-2">
+              <strong>Required:</strong> Complete this to get beta access
             </p>
           </div>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               {/* Discovery Section */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5" />
-                    Discovery & Background
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <FormField
-                    control={control}
-                    name="howDidYouHear"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>How did you hear about BuzzTrip?</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Social media, friend, search engine, etc." />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4 }}
+              >
+                <Card className="shadow-lg border-2">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-2xl">
+                      <MessageSquare className="h-6 w-6 text-primary" />
+                      Discovery & Background
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <FormField
+                      control={control}
+                      name="howDidYouHear"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-base font-semibold">How did you hear about BuzzTrip? *</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Social media, friend, search engine, etc." className="text-base py-6" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={control}
-                    name="currentMappingTool"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>What mapping tools do you currently use? (Optional)</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Google My Maps, Mapbox, etc." />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
+                    <FormField
+                      control={control}
+                      name="currentMappingTool"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-base font-semibold">What mapping tools do you currently use? (Optional)</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Google My Maps, Mapbox, etc." className="text-base py-6" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+              </motion.div>
 
               {/* Use Case Section */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    Your Use Case
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <FormField
-                    control={control}
-                    name="primaryUseCase"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
-                        <FormLabel>What will you primarily use BuzzTrip for?</FormLabel>
-                        <FormControl>
-                          <RadioGroup onValueChange={field.onChange} defaultValue={field.value}>
-                            {[
-                              { value: "personal", label: "Personal travel planning" },
-                              { value: "business", label: "Business/Professional use" },
-                              { value: "education", label: "Educational purposes" },
-                              { value: "research", label: "Research and data visualization" },
-                              { value: "events", label: "Event planning and management" },
-                              { value: "content-creation", label: "Content creation" },
-                              { value: "other", label: "Other" },
-                            ].map((option) => (
-                              <div key={option.value} className="flex items-center space-x-2">
-                                <RadioGroupItem value={option.value} id={option.value} />
-                                <FormLabel htmlFor={option.value} className="font-normal cursor-pointer">
-                                  {option.label}
-                                </FormLabel>
-                              </div>
-                            ))}
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+              >
+                <Card className="shadow-lg border-2">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-2xl">
+                      <Users className="h-6 w-6 text-primary" />
+                      Your Use Case
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <FormField
+                      control={control}
+                      name="primaryUseCase"
+                      render={({ field }) => (
+                        <FormItem className="space-y-4">
+                          <FormLabel className="text-base font-semibold">What will you primarily use BuzzTrip for? *</FormLabel>
+                          <FormControl>
+                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-3">
+                              {[
+                                { value: "personal", label: "Personal travel planning" },
+                                { value: "business", label: "Business/Professional use" },
+                                { value: "education", label: "Educational purposes" },
+                                { value: "research", label: "Research and data visualization" },
+                                { value: "events", label: "Event planning and management" },
+                                { value: "content-creation", label: "Content creation" },
+                                { value: "other", label: "Other" },
+                              ].map((option) => (
+                                <div key={option.value} className="flex items-center space-x-3 p-3 rounded-lg border border-gray-200 hover:border-primary/50 hover:bg-primary/5 transition-colors">
+                                  <RadioGroupItem value={option.value} id={option.value} className="h-5 w-5" />
+                                  <FormLabel htmlFor={option.value} className="font-normal cursor-pointer text-base flex-1">
+                                    {option.label}
+                                  </FormLabel>
+                                </div>
+                              ))}
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={control}
-                    name="useCaseDetails"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tell us more about your use case (Optional)</FormLabel>
-                        <FormControl>
-                          <Textarea {...field} rows={3} placeholder="Share more details about how you plan to use BuzzTrip..." />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
+                    <FormField
+                      control={control}
+                      name="useCaseDetails"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-base font-semibold">Tell us more about your use case (Optional)</FormLabel>
+                          <FormControl>
+                            <Textarea {...field} rows={4} placeholder="Share more details about how you plan to use BuzzTrip..." className="text-base resize-none" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+              </motion.div>
 
               {/* Usage & Scale */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5" />
-                    Usage & Scale
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <FormField
-                    control={control}
-                    name="mapsPerMonth"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>How many maps do you expect to create per month?</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a range" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="1-5">1-5 maps</SelectItem>
-                            <SelectItem value="6-10">6-10 maps</SelectItem>
-                            <SelectItem value="11-25">11-25 maps</SelectItem>
-                            <SelectItem value="26-50">26-50 maps</SelectItem>
-                            <SelectItem value="50+">50+ maps</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.15 }}
+              >
+                <Card className="shadow-lg border-2">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-2xl">
+                      <TrendingUp className="h-6 w-6 text-primary" />
+                      Usage & Scale
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <FormField
+                      control={control}
+                      name="mapsPerMonth"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-base font-semibold">How many maps do you expect to create per month? *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="text-base py-6">
+                                <SelectValue placeholder="Select a range" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="1-5" className="text-base py-3">1-5 maps</SelectItem>
+                              <SelectItem value="6-10" className="text-base py-3">6-10 maps</SelectItem>
+                              <SelectItem value="11-25" className="text-base py-3">11-25 maps</SelectItem>
+                              <SelectItem value="26-50" className="text-base py-3">26-50 maps</SelectItem>
+                              <SelectItem value="50+" className="text-base py-3">50+ maps</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={control}
-                    name="collaboratorsCount"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>How many people will collaborate on your maps?</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a range" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="just-me">Just me</SelectItem>
-                            <SelectItem value="2-5">2-5 people</SelectItem>
-                            <SelectItem value="6-10">6-10 people</SelectItem>
-                            <SelectItem value="11-25">11-25 people</SelectItem>
-                            <SelectItem value="25+">25+ people</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
+                    <FormField
+                      control={control}
+                      name="collaboratorsCount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-base font-semibold">How many people will collaborate on your maps? *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="text-base py-6">
+                                <SelectValue placeholder="Select a range" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="just-me" className="text-base py-3">Just me</SelectItem>
+                              <SelectItem value="2-5" className="text-base py-3">2-5 people</SelectItem>
+                              <SelectItem value="6-10" className="text-base py-3">6-10 people</SelectItem>
+                              <SelectItem value="11-25" className="text-base py-3">11-25 people</SelectItem>
+                              <SelectItem value="25+" className="text-base py-3">25+ people</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+              </motion.div>
 
               {/* Features */}
               <Card>
@@ -505,59 +549,75 @@ export default function BetaQuestionnairePage() {
               </Card>
 
               {/* Participation & Feedback */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Participation</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <FormField
-                    control={control}
-                    name="willingToProvideHelpFeedback"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel className="cursor-pointer">
-                            I'm willing to provide regular feedback and participate in user research
-                          </FormLabel>
-                          <FormDescription>
-                            Help us build better features by sharing your experiences
-                          </FormDescription>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.25 }}
+              >
+                <Card className="shadow-lg border-2">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-2xl">
+                      Your Participation
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <FormField
+                      control={control}
+                      name="willingToProvideHelpFeedback"
+                      render={({ field }) => (
+                        <FormItem>
+                          <label
+                            htmlFor="feedback-checkbox"
+                            className="flex flex-row items-start space-x-4 space-y-0 rounded-lg border-2 p-6 cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-colors"
+                          >
+                            <FormControl>
+                              <Checkbox
+                                id="feedback-checkbox"
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                className="h-5 w-5 mt-0.5"
+                              />
+                            </FormControl>
+                            <div className="space-y-2 leading-none flex-1">
+                              <div className="cursor-pointer text-base font-semibold">
+                                I'm willing to provide regular feedback and participate in user research
+                              </div>
+                              <FormDescription className="text-base">
+                                Help us build better features by sharing your experiences
+                              </FormDescription>
+                            </div>
+                          </label>
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={control}
-                    name="participationLevel"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>How active do you want to be in the beta program?</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select your level" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="passive">Passive (just using the product)</SelectItem>
-                            <SelectItem value="occasional">Occasional (some feedback)</SelectItem>
-                            <SelectItem value="active">Active (regular feedback)</SelectItem>
-                            <SelectItem value="super-user">Super user (heavy involvement)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-              </Card>
+                    <FormField
+                      control={control}
+                      name="participationLevel"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-base font-semibold">How active do you want to be in the beta program? *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="text-base py-6">
+                                <SelectValue placeholder="Select your level" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="passive" className="text-base py-3">Passive (just using the product)</SelectItem>
+                              <SelectItem value="occasional" className="text-base py-3">Occasional (some feedback)</SelectItem>
+                              <SelectItem value="active" className="text-base py-3">Active (regular feedback)</SelectItem>
+                              <SelectItem value="super-user" className="text-base py-3">Super user (heavy involvement)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </CardContent>
+                </Card>
+              </motion.div>
 
               {/* Open-ended */}
               <Card>

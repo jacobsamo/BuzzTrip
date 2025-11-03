@@ -18,7 +18,9 @@ const betaQuickSignupSchema = z.object({
 const betaQuestionnaireResponseSchema = z.object({
   // Discovery
   howDidYouHear: z.string(),
-  currentMappingTool: z.string().optional(),
+  howDidYouHearOther: z.string().optional(),
+  currentMappingTools: z.array(z.string()).optional(),
+  currentMappingToolsOther: z.string().optional(),
 
   // Use Cases
   primaryUseCase: z.string(),
@@ -48,14 +50,16 @@ const betaQuestionnaireResponseSchema = z.object({
 
 /**
  * Quick beta signup - Step 1
- * Creates beta user record and sends email with questionnaire link
+ * Creates waitlist entry and sends confirmation email
  */
 export const quickBetaSignup = zodMutation({
   args: betaQuickSignupSchema,
   returns: z.object({
     success: z.boolean(),
     message: z.string(),
-    requiresSignup: z.boolean(),
+    requiresConfirmation: z.boolean().optional(),
+    alreadyConfirmed: z.boolean().optional(),
+    resentConfirmation: z.boolean().optional(),
   }),
   handler: async (ctx, args) => {
     const { firstName, lastName, email, whatsappOptIn } = args;
@@ -63,62 +67,106 @@ export const quickBetaSignup = zodMutation({
     // Check if user is already authenticated
     const currentUser = await getCurrentUser(ctx);
 
-    if (currentUser) {
-      // Existing user - immediately upgrade to beta
-      await ctx.db.patch(currentUser._id, {
-        isBetaUser: true,
-        betaSignupDate: new Date().toISOString(),
-        whatsappOptIn: whatsappOptIn,
-        updatedAt: new Date().toISOString(),
-      });
+    // Check for existing beta_users entry for this email
+    const existingBetaUser = await ctx.db
+      .query("beta_users")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .first();
 
-      // Generate questionnaire token
-      const token = crypto.randomUUID();
-      await ctx.db.insert("beta_questionnaire_tokens", {
-        userId: currentUser._id,
-        token,
-        email: currentUser.email,
-        used: false,
-        expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days
-      });
+    if (existingBetaUser) {
+      // Check if already confirmed and completed
+      if (existingBetaUser.emailConfirmed && existingBetaUser.questionnaireCompleted) {
+        return {
+          success: true,
+          message: "You've already completed the beta signup. Please sign in.",
+          alreadyConfirmed: true,
+        };
+      }
 
-      // Send beta welcome email with questionnaire link
-      await ctx.scheduler.runAfter(
-        0,
-        internal.emails_beta.sendBetaWelcomeEmail,
-        {
-          firstName: currentUser.first_name ?? firstName,
-          email: currentUser.email,
-          whatsappOptIn,
-          questionnaireToken: token,
-        }
-      );
+      // If not confirmed, resend confirmation email with same token
+      if (!existingBetaUser.emailConfirmed) {
+        await ctx.scheduler.runAfter(
+          0,
+          internal.emails_beta.sendBetaConfirmationEmail,
+          {
+            firstName,
+            email,
+            token: existingBetaUser.token,
+          }
+        );
 
-      return {
-        success: true,
-        message: "Welcome to the beta! Check your email for next steps.",
-        requiresSignup: false,
-      };
-    } else {
-      // New user - they need to sign up first
-      // Store their beta interest with a token
-      const token = crypto.randomUUID();
-      await ctx.db.insert("beta_pending_signups", {
-        firstName,
-        lastName: lastName ?? undefined,
-        email,
-        whatsappOptIn,
-        token,
-        createdAt: Date.now(),
-        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
-      });
+        return {
+          success: true,
+          message: "Confirmation email resent. Please check your inbox.",
+          resentConfirmation: true,
+        };
+      }
 
-      return {
-        success: true,
-        message: "Please create an account to join the beta program.",
-        requiresSignup: true,
-      };
+      // If confirmed but not completed questionnaire, resend link
+      if (existingBetaUser.emailConfirmed && !existingBetaUser.questionnaireCompleted) {
+        await ctx.scheduler.runAfter(
+          0,
+          internal.emails_beta.sendBetaConfirmationEmail,
+          {
+            firstName,
+            email,
+            token: existingBetaUser.token,
+          }
+        );
+
+        return {
+          success: true,
+          message: "Confirmation email resent. Please check your inbox.",
+          resentConfirmation: true,
+        };
+      }
     }
+
+    // Create or get user ID
+    let userId: Id<"users"> | undefined = currentUser?._id;
+
+    // If no user exists, check if they have an account by email
+    if (!userId) {
+      const existingUser = await ctx.db
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", email))
+        .first();
+      userId = existingUser?._id;
+    }
+
+    // Generate token and create beta_users entry
+    const token = crypto.randomUUID();
+    const now = Date.now();
+    await ctx.db.insert("beta_users", {
+      firstName,
+      lastName: lastName ?? undefined,
+      email,
+      whatsappOptIn,
+      token,
+      emailConfirmed: false,
+      questionnaireCompleted: false,
+      userId: userId ?? undefined,
+      createdAt: now,
+      updatedAt: now,
+      expiresAt: now + 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+
+    // Send confirmation email
+    await ctx.scheduler.runAfter(
+      0,
+      internal.emails_beta.sendBetaConfirmationEmail,
+      {
+        firstName,
+        email,
+        token,
+      }
+    );
+
+    return {
+      success: true,
+      message: "Please check your email to confirm your beta signup.",
+      requiresConfirmation: true,
+    };
   },
 });
 
@@ -129,46 +177,121 @@ export const quickBetaSignup = zodMutation({
 export const completePendingBetaSignup = mutation({
   args: { email: v.string(), userId: v.id("users") },
   handler: async (ctx, { email, userId }) => {
-    // Find pending beta signup
-    const pending = await ctx.db
-      .query("beta_pending_signups")
+    // Find beta_users entry for this email
+    const betaUser = await ctx.db
+      .query("beta_users")
       .withIndex("by_email", (q) => q.eq("email", email))
       .first();
 
-    if (!pending || pending.expiresAt < Date.now()) {
+    if (!betaUser || betaUser.expiresAt < Date.now()) {
       return { found: false };
     }
 
-    // Upgrade user to beta
-    await ctx.db.patch(userId, {
-      isBetaUser: true,
-      betaSignupDate: new Date().toISOString(),
-      whatsappOptIn: pending.whatsappOptIn,
-      updatedAt: new Date().toISOString(),
-    });
-
-    // Generate questionnaire token
-    const token = crypto.randomUUID();
-    await ctx.db.insert("beta_questionnaire_tokens", {
+    // Link the beta_users entry to the new user account
+    const now = Date.now();
+    await ctx.db.patch(betaUser._id, {
       userId,
-      token,
-      email,
-      used: false,
-      expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+      updatedAt: now,
     });
 
-    // Send beta welcome email
-    await ctx.scheduler.runAfter(0, internal.emails_beta.sendBetaWelcomeEmail, {
-      firstName: pending.firstName,
-      email,
-      whatsappOptIn: pending.whatsappOptIn,
-      questionnaireToken: token,
+    // Update user with beta info
+    const nowISO = new Date(now).toISOString();
+    await ctx.db.patch(userId, {
+      whatsappOptIn: betaUser.whatsappOptIn,
+      updatedAt: nowISO,
     });
 
-    // Clean up pending signup
-    await ctx.db.delete(pending._id);
+    // If questionnaire already completed, grant beta access
+    if (betaUser.questionnaireCompleted) {
+      await ctx.db.patch(userId, {
+        isBetaUser: true,
+        betaSignupDate: nowISO,
+        betaQuestionnaireResponses: betaUser.questionnaireResponses,
+        questionnaireCompletedAt: betaUser.questionnaireCompletedAt
+          ? new Date(betaUser.questionnaireCompletedAt).toISOString()
+          : nowISO,
+        updatedAt: nowISO,
+      });
+    }
 
-    return { found: true, token };
+    return { found: true, token: betaUser.token };
+  },
+});
+
+/**
+ * Confirm email from confirmation link
+ * Marks email as confirmed and allows questionnaire access
+ */
+export const confirmEmail = zodMutation({
+  args: z.object({
+    token: z.string(),
+  }),
+  returns: z.object({
+    success: z.boolean(),
+    message: z.string(),
+    error: z.string().optional(),
+  }),
+  handler: async (ctx, { token }) => {
+    // Query beta_users table
+    const betaUser = await ctx.db
+      .query("beta_users")
+      .withIndex("by_token", (q) => q.eq("token", token))
+      .first();
+
+    if (!betaUser) {
+      return {
+        success: false,
+        message: "Invalid or expired token.",
+        error: "not_found",
+      };
+    }
+
+    // Check if questionnaire already completed
+    if (betaUser.questionnaireCompleted) {
+      return {
+        success: false,
+        message: "You've already completed the questionnaire and have beta access!",
+        error: "already_completed",
+      };
+    }
+
+    // Check if already confirmed
+    if (betaUser.emailConfirmed) {
+      return {
+        success: true,
+        message: "Email already confirmed. You can now complete the questionnaire.",
+      };
+    }
+
+    // Check if expired
+    if (betaUser.expiresAt < Date.now()) {
+      return {
+        success: false,
+        message: "Token has expired.",
+        error: "expired",
+      };
+    }
+
+    // Mark as email confirmed
+    const now = Date.now();
+    await ctx.db.patch(betaUser._id, {
+      emailConfirmed: true,
+      emailConfirmedAt: now,
+      updatedAt: now,
+    });
+
+    // If user has an account, update the user record too
+    if (betaUser.userId) {
+      await ctx.db.patch(betaUser.userId, {
+        emailConfirmedAt: new Date(now).toISOString(),
+        updatedAt: new Date(now).toISOString(),
+      });
+    }
+
+    return {
+      success: true,
+      message: "Email confirmed! Please complete the questionnaire.",
+    };
   },
 });
 
@@ -184,45 +307,55 @@ export const verifyQuestionnaireToken = query({
     }),
     v.object({
       valid: v.literal(true),
-      userId: v.id("users"),
+      userId: v.union(v.id("users"), v.null()),
       email: v.string(),
       userName: v.optional(v.string()),
     })
   ),
   handler: async (ctx, { token }) => {
-    const tokenDoc = await ctx.db
-      .query("beta_questionnaire_tokens")
+    const betaUser = await ctx.db
+      .query("beta_users")
       .withIndex("by_token", (q) => q.eq("token", token))
       .first();
 
-    if (!tokenDoc) {
-      return { valid: false, reason: "Token not found" };
+    if (!betaUser) {
+      return { valid: false as const, reason: "Token not found" };
     }
 
-    if (tokenDoc.used) {
-      return { valid: false, reason: "Token already used" };
+    if (!betaUser.emailConfirmed) {
+      return { valid: false as const, reason: "Email not confirmed. Please check your inbox for the confirmation email." };
     }
 
-    if (tokenDoc.expiresAt < Date.now()) {
-      return { valid: false, reason: "Token expired" };
+    if (betaUser.questionnaireCompleted) {
+      return { valid: false as const, reason: "Questionnaire already completed" };
     }
 
-    const user = await ctx.db.get(tokenDoc.userId);
-    if (!user) {
-      return { valid: false, reason: "User not found" };
+    if (betaUser.expiresAt < Date.now()) {
+      return { valid: false as const, reason: "Token expired" };
+    }
+
+    // Get user name if userId is set
+    let userName: string | undefined;
+    if (betaUser.userId) {
+      const user = await ctx.db.get(betaUser.userId);
+      userName = user?.first_name ?? user?.name;
+    } else {
+      // Use first name from beta_users if no account yet
+      userName = betaUser.firstName;
     }
 
     return {
-      valid: true,
-      userId: tokenDoc.userId,
-      email: tokenDoc.email,
-      userName: user.first_name ?? user.name,
+      valid: true as const,
+      userId: betaUser.userId ?? null,
+      email: betaUser.email,
+      userName,
     };
   },
 });
 
 /**
  * Submit questionnaire responses - Step 2
+ * Grants beta access after questionnaire completion
  */
 export const submitQuestionnaire = zodMutation({
   args: {
@@ -235,37 +368,129 @@ export const submitQuestionnaire = zodMutation({
   }),
   handler: async (ctx, { token, responses }) => {
     // Verify token
-    const tokenDoc = await ctx.db
-      .query("beta_questionnaire_tokens")
+    const betaUser = await ctx.db
+      .query("beta_users")
       .withIndex("by_token", (q) => q.eq("token", token))
       .first();
 
-    if (!tokenDoc) {
+    if (!betaUser) {
       throw new Error("Invalid token");
     }
 
-    if (tokenDoc.used) {
-      throw new Error("Token already used");
+    if (!betaUser.emailConfirmed) {
+      throw new Error("Email not confirmed");
     }
 
-    if (tokenDoc.expiresAt < Date.now()) {
+    if (betaUser.questionnaireCompleted) {
+      throw new Error("Questionnaire already completed");
+    }
+
+    if (betaUser.expiresAt < Date.now()) {
       throw new Error("Token expired");
     }
 
-    // Update user with questionnaire responses
-    await ctx.db.patch(tokenDoc.userId, {
-      betaQuestionnaireResponses: responses,
-      updatedAt: new Date().toISOString(),
+    // Store questionnaire responses in beta_users table
+    const now = Date.now();
+    await ctx.db.patch(betaUser._id, {
+      questionnaireResponses: responses,
+      questionnaireCompleted: true,
+      questionnaireCompletedAt: now,
+      updatedAt: now,
     });
 
-    // Mark token as used
-    await ctx.db.patch(tokenDoc._id, {
-      used: true,
-    });
+    // If user has an account, grant them beta access
+    if (betaUser.userId) {
+      const user = await ctx.db.get(betaUser.userId);
+      if (user) {
+        const nowISO = new Date(now).toISOString();
+        await ctx.db.patch(betaUser.userId, {
+          betaQuestionnaireResponses: responses,
+          questionnaireCompletedAt: nowISO,
+          isBetaUser: true,
+          betaSignupDate: nowISO,
+          updatedAt: nowISO,
+        });
+
+        // Send beta welcome email
+        await ctx.scheduler.runAfter(0, internal.emails_beta.sendBetaWelcomeEmail, {
+          firstName: user.first_name ?? user.name,
+          email: betaUser.email,
+          whatsappOptIn: betaUser.whatsappOptIn,
+          questionnaireToken: token,
+        });
+      }
+    } else {
+      // User doesn't have an account yet - just send welcome email
+      await ctx.scheduler.runAfter(0, internal.emails_beta.sendBetaWelcomeEmail, {
+        firstName: betaUser.firstName,
+        email: betaUser.email,
+        whatsappOptIn: betaUser.whatsappOptIn,
+        questionnaireToken: token,
+      });
+    }
 
     return {
       success: true,
-      message: "Thank you for completing the questionnaire!",
+      message: "Thank you for completing the questionnaire! You now have beta access.",
+    };
+  },
+});
+
+/**
+ * Check waitlist status by email
+ */
+export const checkWaitlistStatus = query({
+  args: { email: v.string() },
+  returns: v.object({
+    status: v.union(
+      v.literal("not_signed_up"),
+      v.literal("pending_confirmation"),
+      v.literal("confirmed"),
+      v.literal("completed")
+    ),
+    emailConfirmed: v.optional(v.boolean()),
+    questionnaireCompleted: v.optional(v.boolean()),
+  }),
+  handler: async (ctx, { email }) => {
+    // Check for existing beta_users entry
+    const betaUser = await ctx.db
+      .query("beta_users")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .first();
+
+    if (!betaUser) {
+      return {
+        status: "not_signed_up" as const,
+      };
+    }
+
+    // Check status based on beta_users fields
+    if (betaUser.emailConfirmed && betaUser.questionnaireCompleted) {
+      return {
+        status: "completed" as const,
+        emailConfirmed: true,
+        questionnaireCompleted: true,
+      };
+    }
+
+    if (betaUser.emailConfirmed && !betaUser.questionnaireCompleted) {
+      return {
+        status: "confirmed" as const,
+        emailConfirmed: true,
+        questionnaireCompleted: false,
+      };
+    }
+
+    if (!betaUser.emailConfirmed) {
+      return {
+        status: "pending_confirmation" as const,
+        emailConfirmed: false,
+        questionnaireCompleted: false,
+      };
+    }
+
+    return {
+      status: "not_signed_up" as const,
     };
   },
 });
