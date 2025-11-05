@@ -190,6 +190,40 @@ export const updateMapThumbnail = authedMutation({
     thumbnailUrl: z.string(),
   },
   handler: async (ctx, args) => {
+    // Authorization: Check if user has permission to edit this map
+    const map = await ctx.db.get(args.mapId);
+    if (!map) {
+      throw new Error("Map not found");
+    }
+
+    // Check if user is the owner or has editor permission
+    const mapUser = await ctx.db
+      .query("map_users")
+      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+      .filter((q) => q.eq(q.field("user_id"), ctx.user._id))
+      .first();
+
+    const isOwner = map.owner_id === ctx.user._id;
+    const isEditor = mapUser?.permission === "editor" || mapUser?.permission === "owner";
+
+    if (!isOwner && !isEditor) {
+      throw new Error("Unauthorized: You don't have permission to update this map's thumbnail");
+    }
+
+    // Input validation: Check thumbnail size (max 5MB for base64)
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+    if (args.thumbnailUrl.length > MAX_SIZE) {
+      throw new Error("Thumbnail size exceeds maximum allowed size of 5MB");
+    }
+
+    // Validate base64 format if it's a data URL
+    if (args.thumbnailUrl.startsWith("data:")) {
+      const base64Pattern = /^data:image\/(jpeg|jpg|png|webp);base64,/;
+      if (!base64Pattern.test(args.thumbnailUrl)) {
+        throw new Error("Invalid thumbnail format. Must be a valid base64 image (JPEG, PNG, or WebP)");
+      }
+    }
+
     await ctx.db.patch(args.mapId, {
       thumbnailUrl: args.thumbnailUrl,
       updatedAt: new Date().toISOString(),
@@ -211,6 +245,26 @@ export const updateMapBounds = authedMutation({
     location_name: z.string().optional(),
   },
   handler: async (ctx, args) => {
+    // Authorization: Check if user has permission to edit this map
+    const map = await ctx.db.get(args.mapId);
+    if (!map) {
+      throw new Error("Map not found");
+    }
+
+    // Check if user is the owner or has editor permission
+    const mapUser = await ctx.db
+      .query("map_users")
+      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+      .filter((q) => q.eq(q.field("user_id"), ctx.user._id))
+      .first();
+
+    const isOwner = map.owner_id === ctx.user._id;
+    const isEditor = mapUser?.permission === "editor" || mapUser?.permission === "owner";
+
+    if (!isOwner && !isEditor) {
+      throw new Error("Unauthorized: You don't have permission to update this map's bounds");
+    }
+
     await ctx.db.patch(args.mapId, {
       lat: args.lat,
       lng: args.lng,
