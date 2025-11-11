@@ -11,7 +11,9 @@ This is a mono repo using turbo repo that contains a set of packages and apps ac
 ## Quick Start
 
 ```bash
-bun dev        # Start development server (Rails + Vite)
+bun dev #runs the web, admin and backend projects
+bun dev:web # runs the backend and web project
+bun dev:admin # runs the backend and admin project 
 ```
 
 ## Documentation Structure
@@ -33,9 +35,9 @@ Start with **[/docs/overview.md](/docs/overview.md)** which indexes all document
 
 ### Technology Stack
 - **Backend**: Convex
-- **Frontend**: Svelte 5 with Inertia.js
-- **Styling**: Tailwind CSS + DaisyUI + ShadcnUI
-- **Build**: Vite
+- **Frontend**: Nextjs
+- **Package manager**: [Bun](https://bun.com)
+- **Styling**: Tailwind CSS + ShadcnUI
 
 ### Key Directories
 - `/apps/web/` - Main web application (Next.js) includes the landing pages and main web app
