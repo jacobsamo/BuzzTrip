@@ -5,6 +5,8 @@ import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { authedQuery, zodMutation, zodQuery } from "./helpers";
 import { getCurrentUser, mustGetCurrentUser } from "./users";
+import { BETA_TOKEN_EXPIRY_MS } from "./utils/constants";
+import { generateSecureToken, isValidTokenFormat } from "./utils/crypto";
 
 // Import schemas from shared location
 // Quick signup schema (without validation messages for backend)
@@ -174,22 +176,53 @@ export const quickBetaSignup = zodMutation({
       userId = existingUser?._id;
     }
 
-    // Generate token and create beta_users entry
-    const token = crypto.randomUUID();
+    // Generate cryptographically secure token and create beta_users entry
+    const token = generateSecureToken();
     const now = Date.now();
-    await ctx.db.insert("beta_users", {
-      firstName,
-      lastName: lastName ?? undefined,
-      email,
-      whatsappOptIn,
-      token,
-      emailConfirmed: false,
-      questionnaireCompleted: false,
-      userId: userId ?? undefined,
-      createdAt: now,
-      updatedAt: now,
-      expiresAt: now + 30 * 24 * 60 * 60 * 1000, // 30 days
-    });
+
+    try {
+      await ctx.db.insert("beta_users", {
+        firstName,
+        lastName: lastName ?? undefined,
+        email,
+        whatsappOptIn,
+        token,
+        emailConfirmed: false,
+        questionnaireCompleted: false,
+        userId: userId ?? undefined,
+        createdAt: now,
+        updatedAt: now,
+        expiresAt: now + BETA_TOKEN_EXPIRY_MS,
+      });
+    } catch (error) {
+      // Handle race condition - another request may have created entry
+      const existingEntry = await ctx.db
+        .query("beta_users")
+        .withIndex("by_email", (q) => q.eq("email", email))
+        .first();
+
+      if (existingEntry && !existingEntry.emailConfirmed) {
+        // Resend confirmation with existing token
+        await ctx.scheduler.runAfter(
+          0,
+          internal.emails_beta.sendBetaConfirmationEmail,
+          {
+            firstName,
+            email,
+            token: existingEntry.token,
+          }
+        );
+
+        return {
+          success: true,
+          message: "Confirmation email resent. Please check your inbox.",
+          resentConfirmation: true,
+        };
+      }
+
+      // Re-throw if it's a different error
+      throw error;
+    }
 
     // Send confirmation email
     await ctx.scheduler.runAfter(
@@ -268,6 +301,15 @@ export const confirmEmail = zodMutation({
     error: z.string().optional(),
   }),
   handler: async (ctx, { token }) => {
+    // Validate token format
+    if (!token || !isValidTokenFormat(token)) {
+      return {
+        success: false,
+        message: "Invalid token format.",
+        error: "invalid_format",
+      };
+    }
+
     // Query beta_users table
     const betaUser = await ctx.db
       .query("beta_users")
@@ -337,8 +379,18 @@ export const submitQuestionnaire = zodMutation({
   returns: z.object({
     success: z.boolean(),
     message: z.string(),
+    error: z.string().optional(),
   }),
   handler: async (ctx, { token, responses }) => {
+    // Validate token format
+    if (!token || !isValidTokenFormat(token)) {
+      return {
+        success: false,
+        message: "Invalid token format.",
+        error: "invalid_format",
+      };
+    }
+
     // Verify token
     const betaUser = await ctx.db
       .query("beta_users")
@@ -346,19 +398,35 @@ export const submitQuestionnaire = zodMutation({
       .first();
 
     if (!betaUser) {
-      throw new Error("Invalid token");
+      return {
+        success: false,
+        message: "Invalid token.",
+        error: "not_found",
+      };
     }
 
     if (!betaUser.emailConfirmed) {
-      throw new Error("Email not confirmed");
+      return {
+        success: false,
+        message: "Email not confirmed. Please confirm your email first.",
+        error: "email_not_confirmed",
+      };
     }
 
     if (betaUser.questionnaireCompleted) {
-      throw new Error("Questionnaire already completed");
+      return {
+        success: false,
+        message: "Questionnaire already completed.",
+        error: "already_completed",
+      };
     }
 
     if (betaUser.expiresAt < Date.now()) {
-      throw new Error("Token expired");
+      return {
+        success: false,
+        message: "Token expired.",
+        error: "expired",
+      };
     }
 
     // Store questionnaire responses in beta_users table
@@ -513,14 +581,18 @@ export const checkBetaStatus = authedQuery({
 
 /**
  * Admin: Get all beta users
- * Internal query - should be called from admin dashboard with proper auth checks
+ * TODO: Add proper role-based authorization when admin roles are implemented
+ * For now, requires authentication - should only be exposed to admin users
  */
 export const getBetaUsers = zodQuery({
   args: {},
   returns: z.array(betaUserReturnSchema),
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
+    // Ensure user is authenticated
+    const currentUser = await mustGetCurrentUser(ctx);
+
+    // TODO: Add admin check when role system is implemented
+    // Example: if (!currentUser.isAdmin) throw new Error("Forbidden: Admin access required");
 
     const betaUsers = await ctx.db.query("beta_users").collect();
 
@@ -541,7 +613,8 @@ export const getBetaUsers = zodQuery({
 
 /**
  * Admin: Get questionnaire responses for analysis
- * Internal query - should be called from admin dashboard with proper auth checks
+ * TODO: Add proper role-based authorization when admin roles are implemented
+ * For now, requires authentication - should only be exposed to admin users
  */
 export const getBetaQuestionnaireResponses = zodQuery({
   args: {},
@@ -557,8 +630,11 @@ export const getBetaQuestionnaireResponses = zodQuery({
     })
   ),
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
+    // Ensure user is authenticated
+    const currentUser = await mustGetCurrentUser(ctx);
+
+    // TODO: Add admin check when role system is implemented
+    // Example: if (!currentUser.isAdmin) throw new Error("Forbidden: Admin access required");
 
     const betaUsers = await ctx.db.query("beta_users").collect();
 

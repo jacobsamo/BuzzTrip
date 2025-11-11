@@ -1,9 +1,16 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
+import { betaQuickSignupSchema } from "@/types/schemas";
+import { api } from "@buzztrip/backend/api";
 import { Badge } from "@buzztrip/ui/components/badge";
 import { Button } from "@buzztrip/ui/components/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@buzztrip/ui/components/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@buzztrip/ui/components/card";
 import { Checkbox } from "@buzztrip/ui/components/checkbox";
 import {
   Form,
@@ -14,17 +21,22 @@ import {
   FormMessage,
 } from "@buzztrip/ui/components/form";
 import { Input } from "@buzztrip/ui/components/input";
-import { betaQuickSignupSchema } from "@/types/scheams";
+import { useUser } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
-import { CheckCircle2, Crown, Loader2, MessageSquare, Rocket } from "lucide-react";
+import {
+  CheckCircle2,
+  Crown,
+  Loader2,
+  MessageSquare,
+  Rocket,
+} from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { api } from "@buzztrip/backend/api";
 
 export default function BetaSignupPage() {
   const { user, isSignedIn } = useUser();
@@ -73,7 +85,9 @@ export default function BetaSignupPage() {
         setResentConfirmation(result.resentConfirmation ?? false);
 
         if (result.alreadyConfirmed) {
-          toast.success("You've already completed the beta signup. Please sign in.");
+          toast.success(
+            "You've already completed the beta signup. Please sign in."
+          );
         } else if (result.resentConfirmation) {
           toast.success("Confirmation email resent! Please check your inbox.");
         } else if (result.requiresConfirmation) {
@@ -81,7 +95,11 @@ export default function BetaSignupPage() {
         }
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "An error occurred. Please try again.");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "An error occurred. Please try again."
+      );
     }
   };
 
@@ -99,7 +117,11 @@ export default function BetaSignupPage() {
                 <CheckCircle2 className="h-10 w-10 text-primary" />
               </div>
               <CardTitle className="text-3xl font-bold mb-2">
-                {alreadyConfirmed ? "Already Confirmed!" : resentConfirmation ? "Email Resent!" : "Check Your Email!"}
+                {alreadyConfirmed
+                  ? "Already Confirmed!"
+                  : resentConfirmation
+                    ? "Email Resent!"
+                    : "Check Your Email!"}
               </CardTitle>
               <CardDescription className="text-lg">
                 {alreadyConfirmed
@@ -113,35 +135,53 @@ export default function BetaSignupPage() {
               {alreadyConfirmed && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
                   <p className="text-green-900 text-sm">
-                    You've already confirmed your email and completed the questionnaire. Please sign in to access your beta account.
+                    You've already confirmed your email and completed the
+                    questionnaire.{" "}
+                    {isSignedIn
+                      ? "Head to your dashboard to start creating maps!"
+                      : "Please sign in to access your beta account."}
                   </p>
                 </div>
               )}
 
-              {(resentConfirmation || requiresConfirmation) && !alreadyConfirmed && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                  <p className="text-blue-900 text-sm font-semibold mb-2">
-                    📧 Check your inbox for the confirmation email
-                  </p>
-                  <p className="text-blue-800 text-sm">
-                    Click the confirmation link in the email, then you'll be able to complete the questionnaire and get beta access.
-                  </p>
-                  <p className="text-blue-700 text-xs mt-2">
-                    Don't see it? Check your spam folder or click "Join Beta Program" again to resend.
-                  </p>
-                </div>
-              )}
+              {(resentConfirmation || requiresConfirmation) &&
+                !alreadyConfirmed && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <p className="text-blue-900 text-sm font-semibold mb-2">
+                      📧 Check your inbox for the confirmation email
+                    </p>
+                    <p className="text-blue-800 text-sm">
+                      Click the confirmation link in the email, then you'll be
+                      able to complete the questionnaire and get beta access.
+                    </p>
+                    <p className="text-blue-700 text-xs mt-2">
+                      Don't see it? Check your spam folder or click "Join Beta
+                      Program" again to resend.
+                    </p>
+                  </div>
+                )}
 
               <div className="flex flex-col sm:flex-row gap-3">
                 {alreadyConfirmed ? (
-                  <>
-                    <Button asChild className="flex-1">
-                      <Link href="/sign-in">Sign In</Link>
-                    </Button>
-                    <Button variant="outline" asChild className="flex-1">
-                      <Link href="/">Back to Home</Link>
-                    </Button>
-                  </>
+                  isSignedIn ? (
+                    <>
+                      <Button asChild className="flex-1">
+                        <Link href="/app">Go to Dashboard</Link>
+                      </Button>
+                      <Button variant="outline" asChild className="flex-1">
+                        <Link href="/">Back to Home</Link>
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button asChild className="flex-1">
+                        <Link href="/sign-in">Sign In</Link>
+                      </Button>
+                      <Button variant="outline" asChild className="flex-1">
+                        <Link href="/">Back to Home</Link>
+                      </Button>
+                    </>
+                  )
                 ) : (
                   <>
                     <Button variant="outline" asChild className="flex-1">
@@ -175,7 +215,9 @@ export default function BetaSignupPage() {
               Join the BuzzTrip Beta
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Be among the first to shape the future of custom mapping. Get early access, exclusive perks, and help us build the perfect tool for you.
+              Be among the first to shape the future of custom mapping. Get
+              early access, exclusive perks, and help us build the perfect tool
+              for you.
             </p>
           </motion.div>
 
@@ -190,7 +232,8 @@ export default function BetaSignupPage() {
               {
                 icon: Rocket,
                 title: "Early Access",
-                description: "Get first access to new features before anyone else",
+                description:
+                  "Get first access to new features before anyone else",
               },
               {
                 icon: MessageSquare,
@@ -200,7 +243,8 @@ export default function BetaSignupPage() {
               {
                 icon: Crown,
                 title: "Exclusive Perks",
-                description: "Special benefits and recognition as a founding member",
+                description:
+                  "Special benefits and recognition as a founding member",
               },
             ].map((benefit, index) => (
               <Card key={index} className="border-gray-200">
@@ -208,7 +252,9 @@ export default function BetaSignupPage() {
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                     <benefit.icon className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-lg mb-2">{benefit.title}</h3>
+                  <h3 className="font-semibold text-lg mb-2">
+                    {benefit.title}
+                  </h3>
                   <p className="text-gray-600 text-sm">{benefit.description}</p>
                 </CardContent>
               </Card>
@@ -238,7 +284,10 @@ export default function BetaSignupPage() {
                 </CardHeader>
                 <CardContent>
                   <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <form
+                      onSubmit={form.handleSubmit(onSubmit)}
+                      className="space-y-6"
+                    >
                       {!isSignedIn && (
                         <div className="grid md:grid-cols-2 gap-4">
                           <FormField
@@ -279,7 +328,11 @@ export default function BetaSignupPage() {
                             <FormItem>
                               <FormLabel>Email Address</FormLabel>
                               <FormControl>
-                                <Input {...field} type="email" placeholder="john@example.com" />
+                                <Input
+                                  {...field}
+                                  type="email"
+                                  placeholder="john@example.com"
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -303,7 +356,8 @@ export default function BetaSignupPage() {
                                 Join our beta tester WhatsApp group
                               </FormLabel>
                               <p className="text-sm text-gray-500">
-                                Get instant updates, connect with other testers, and chat directly with our team
+                                Get instant updates, connect with other testers,
+                                and chat directly with our team
                               </p>
                             </div>
                           </FormItem>
@@ -344,12 +398,25 @@ export default function BetaSignupPage() {
 
               <Card className="mt-6 bg-blue-50 border-blue-200">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-gray-900 mb-2">What happens next?</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2">
+                    What happens next?
+                  </h3>
                   <ol className="space-y-2 text-sm text-gray-600 list-decimal list-inside">
-                    <li>You'll receive a confirmation email - click the link to verify your email</li>
-                    <li>After confirming, you'll complete a quick 3-minute questionnaire about your needs</li>
-                    <li>Once submitted, you'll instantly get beta access to all features</li>
-                    <li>Your feedback helps us build features you actually want</li>
+                    <li>
+                      You'll receive a confirmation email - click the link to
+                      verify your email
+                    </li>
+                    <li>
+                      After confirming, you'll complete a quick 3-minute
+                      questionnaire about your needs
+                    </li>
+                    <li>
+                      Once submitted, you'll instantly get beta access to all
+                      features
+                    </li>
+                    <li>
+                      Your feedback helps us build features you actually want
+                    </li>
                   </ol>
                 </CardContent>
               </Card>

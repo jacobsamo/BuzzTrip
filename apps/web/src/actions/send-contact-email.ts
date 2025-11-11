@@ -1,7 +1,7 @@
 "use server";
 
 import { publicAction } from "@/actions/safe-action";
-import { contactSchema } from "@/types/scheams";
+import { contactSchema } from "@/types/schemas";
 import ContactUsEmail from "@buzztrip/transactional/emails/contact-us";
 import { createResend, sendEmail } from "@buzztrip/transactional/helpers";
 import { env } from "env";

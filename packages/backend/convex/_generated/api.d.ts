@@ -26,6 +26,8 @@ import type * as maps_paths from "../maps/paths.js";
 import type * as migrations from "../migrations.js";
 import type * as places from "../places.js";
 import type * as users from "../users.js";
+import type * as utils_constants from "../utils/constants.js";
+import type * as utils_crypto from "../utils/crypto.js";
 
 import type {
   ApiFromModules,
@@ -60,6 +62,8 @@ declare const fullApi: ApiFromModules<{
   migrations: typeof migrations;
   places: typeof places;
   users: typeof users;
+  "utils/constants": typeof utils_constants;
+  "utils/crypto": typeof utils_crypto;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

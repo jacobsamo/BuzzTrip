@@ -1,9 +1,16 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
+import { betaQuestionnaireSchema } from "@/types/schemas";
+import { api } from "@buzztrip/backend/api";
 import { Badge } from "@buzztrip/ui/components/badge";
 import { Button } from "@buzztrip/ui/components/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@buzztrip/ui/components/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@buzztrip/ui/components/card";
 import { Checkbox } from "@buzztrip/ui/components/checkbox";
 import {
   Form,
@@ -15,7 +22,10 @@ import {
   FormMessage,
 } from "@buzztrip/ui/components/form";
 import { Input } from "@buzztrip/ui/components/input";
-import { RadioGroup, RadioGroupItem } from "@buzztrip/ui/components/radio-group";
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from "@buzztrip/ui/components/radio-group";
 import {
   Select,
   SelectContent,
@@ -24,10 +34,19 @@ import {
   SelectValue,
 } from "@buzztrip/ui/components/select";
 import { Textarea } from "@buzztrip/ui/components/textarea";
-import { betaQuestionnaireSchema } from "@/types/scheams";
+import { useUser } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
-import { AlertCircle, CheckCircle2, DollarSign, Loader2, Mail, MessageSquare, TrendingUp, Users } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  DollarSign,
+  Loader2,
+  Mail,
+  MessageSquare,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -35,7 +54,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { api } from "@buzztrip/backend/api";
 
 export default function ConfirmWaitlistPage() {
   const searchParams = useSearchParams();
@@ -45,7 +63,15 @@ export default function ConfirmWaitlistPage() {
   const confirmEmail = useMutation(api.beta.confirmEmail);
   const submitQuestionnaire = useMutation(api.beta.submitQuestionnaire);
 
-  const [state, setState] = useState<"initial" | "confirming" | "confirmed" | "completed" | "error" | "no_account" | "already_completed">("initial");
+  const [state, setState] = useState<
+    | "initial"
+    | "confirming"
+    | "confirmed"
+    | "completed"
+    | "error"
+    | "no_account"
+    | "already_completed"
+  >("initial");
   const [message, setMessage] = useState("");
 
   // Check token status on page load
@@ -67,8 +93,13 @@ export default function ConfirmWaitlistPage() {
           setMessage(result.message);
           // Smooth scroll to questionnaire
           setTimeout(() => {
-            const questionnaireElement = document.getElementById("questionnaire-section");
-            questionnaireElement?.scrollIntoView({ behavior: "smooth", block: "start" });
+            const questionnaireElement = document.getElementById(
+              "questionnaire-section"
+            );
+            questionnaireElement?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
           }, 100);
         } else {
           if (result.error === "already_completed") {
@@ -84,7 +115,11 @@ export default function ConfirmWaitlistPage() {
         }
       } catch (error) {
         setState("error");
-        setMessage(error instanceof Error ? error.message : "An unexpected error occurred.");
+        setMessage(
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred."
+        );
       }
     };
 
@@ -137,7 +172,7 @@ export default function ConfirmWaitlistPage() {
   const mappingToolOptions = [
     "Google My Maps",
     "Google Maps",
-    "Wonderlog",
+    "Wanderlog",
     "TripIt",
     "Roadtrippers",
     "Wanderlog",
@@ -175,7 +210,10 @@ export default function ConfirmWaitlistPage() {
       }
     } catch (error) {
       console.error("Questionnaire submission error:", error);
-      const errorMessage = error instanceof Error ? error.message : "An error occurred while submitting the questionnaire. Please try again.";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An error occurred while submitting the questionnaire. Please try again.";
       toast.error(errorMessage);
     }
   };
@@ -194,7 +232,9 @@ export default function ConfirmWaitlistPage() {
               <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle2 className="h-10 w-10 text-primary" />
               </div>
-              <CardTitle className="text-4xl font-bold mb-2">You're In! 🎉</CardTitle>
+              <CardTitle className="text-4xl font-bold mb-2">
+                You're In! 🎉
+              </CardTitle>
               <CardDescription className="text-lg">
                 You now have full beta access to BuzzTrip!
               </CardDescription>
@@ -205,7 +245,9 @@ export default function ConfirmWaitlistPage() {
                   ✨ Beta Access Granted
                 </p>
                 <p className="text-gray-900 text-sm">
-                  Thank you for completing the questionnaire! Your feedback will help us build the perfect mapping tool. Start creating custom maps and enjoy all our beta features.
+                  Thank you for completing the questionnaire! Your feedback will
+                  help us build the perfect mapping tool. Start creating custom
+                  maps and enjoy all our beta features.
                 </p>
               </div>
 
@@ -224,7 +266,8 @@ export default function ConfirmWaitlistPage() {
                 <>
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                     <p className="text-blue-900 text-sm">
-                      <strong>Next step:</strong> Sign in to your account or create one to access your beta features!
+                      <strong>Next step:</strong> Sign in to your account or
+                      create one to access your beta features!
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3">
@@ -259,7 +302,9 @@ export default function ConfirmWaitlistPage() {
                 <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Loader2 className="h-10 w-10 text-primary animate-spin" />
                 </div>
-                <CardTitle className="text-3xl font-bold mb-2">Verifying Your Status</CardTitle>
+                <CardTitle className="text-3xl font-bold mb-2">
+                  Verifying Your Status
+                </CardTitle>
                 <CardDescription className="text-lg">
                   Please wait while we check your confirmation...
                 </CardDescription>
@@ -280,7 +325,9 @@ export default function ConfirmWaitlistPage() {
                 <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Mail className="h-10 w-10 text-amber-600" />
                 </div>
-                <CardTitle className="text-3xl font-bold mb-2">Account Required</CardTitle>
+                <CardTitle className="text-3xl font-bold mb-2">
+                  Account Required
+                </CardTitle>
                 <CardDescription className="text-lg">{message}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -289,7 +336,9 @@ export default function ConfirmWaitlistPage() {
                     📝 Next Steps
                   </p>
                   <p className="text-amber-800 text-sm">
-                    Please create an account using the same email address you used to sign up for the beta. Once you have an account, you can return to this confirmation link.
+                    Please create an account using the same email address you
+                    used to sign up for the beta. Once you have an account, you
+                    can return to this confirmation link.
                   </p>
                 </div>
 
@@ -317,7 +366,9 @@ export default function ConfirmWaitlistPage() {
                 <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <CheckCircle2 className="h-10 w-10 text-green-600" />
                 </div>
-                <CardTitle className="text-3xl font-bold mb-2">Already Completed!</CardTitle>
+                <CardTitle className="text-3xl font-bold mb-2">
+                  Already Completed!
+                </CardTitle>
                 <CardDescription className="text-lg">{message}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -326,7 +377,10 @@ export default function ConfirmWaitlistPage() {
                     ✅ You're all set!
                   </p>
                   <p className="text-green-800 text-sm">
-                    You've already completed the beta questionnaire. {isSignedIn ? "Head to your dashboard to start creating maps!" : "Sign in to access your beta features!"}
+                    You've already completed the beta questionnaire.{" "}
+                    {isSignedIn
+                      ? "Head to your dashboard to start creating maps!"
+                      : "Sign in to access your beta features!"}
                   </p>
                 </div>
 
@@ -365,7 +419,9 @@ export default function ConfirmWaitlistPage() {
                 <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <AlertCircle className="h-10 w-10 text-red-600" />
                 </div>
-                <CardTitle className="text-3xl font-bold mb-2">Confirmation Failed</CardTitle>
+                <CardTitle className="text-3xl font-bold mb-2">
+                  Confirmation Failed
+                </CardTitle>
                 <CardDescription className="text-lg">{message}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -374,9 +430,17 @@ export default function ConfirmWaitlistPage() {
                     What can you do?
                   </p>
                   <ul className="text-red-800 text-sm space-y-1 list-disc list-inside">
-                    <li>Make sure you're using the latest confirmation link from your email</li>
-                    <li>Check if your link has expired (links are valid for 30 days)</li>
-                    <li>Try signing up again to receive a new confirmation email</li>
+                    <li>
+                      Make sure you're using the latest confirmation link from
+                      your email
+                    </li>
+                    <li>
+                      Check if your link has expired (links are valid for 30
+                      days)
+                    </li>
+                    <li>
+                      Try signing up again to receive a new confirmation email
+                    </li>
                   </ul>
                 </div>
 
@@ -420,15 +484,20 @@ export default function ConfirmWaitlistPage() {
                 Almost There!
               </h1>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-2">
-                Complete the questionnaire below to get full beta access. Takes 3-5 minutes.
+                Complete the questionnaire below to get full beta access. Takes
+                3-5 minutes.
               </p>
               <p className="text-sm text-gray-500">
-                <strong>Required:</strong> Your feedback helps us build the perfect tool for you
+                <strong>Required:</strong> Your feedback helps us build the
+                perfect tool for you
               </p>
             </div>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
                 {/* Discovery Section */}
                 <motion.div
                   initial={{ y: 20, opacity: 0 }}
@@ -449,13 +518,29 @@ export default function ConfirmWaitlistPage() {
                         name="howDidYouHear"
                         render={({ field }) => (
                           <FormItem className="space-y-3">
-                            <FormLabel className="text-sm font-medium">How did you hear about BuzzTrip? *</FormLabel>
+                            <FormLabel className="text-sm font-medium">
+                              How did you hear about BuzzTrip? *
+                            </FormLabel>
                             <FormControl>
-                              <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="space-y-2"
+                              >
                                 {howDidYouHearOptions.map((option) => (
-                                  <div key={option.value} className="flex items-center space-x-3 py-2 px-3 rounded-md hover:bg-gray-50 transition-colors cursor-pointer">
-                                    <RadioGroupItem value={option.value} id={`hear-${option.value}`} className="h-4 w-4" />
-                                    <FormLabel htmlFor={`hear-${option.value}`} className="font-normal cursor-pointer text-sm flex-1">
+                                  <div
+                                    key={option.value}
+                                    className="flex items-center space-x-3 py-2 px-3 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
+                                  >
+                                    <RadioGroupItem
+                                      value={option.value}
+                                      id={`hear-${option.value}`}
+                                      className="h-4 w-4"
+                                    />
+                                    <FormLabel
+                                      htmlFor={`hear-${option.value}`}
+                                      className="font-normal cursor-pointer text-sm flex-1"
+                                    >
                                       {option.label}
                                     </FormLabel>
                                   </div>
@@ -473,9 +558,15 @@ export default function ConfirmWaitlistPage() {
                           name="howDidYouHearOther"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-sm font-medium">Please specify</FormLabel>
+                              <FormLabel className="text-sm font-medium">
+                                Please specify
+                              </FormLabel>
                               <FormControl>
-                                <Input {...field} placeholder="Tell us where you heard about us..." className="text-sm h-10" />
+                                <Input
+                                  {...field}
+                                  placeholder="Tell us where you heard about us..."
+                                  className="text-sm h-10"
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -488,10 +579,16 @@ export default function ConfirmWaitlistPage() {
                         name="currentMappingTools"
                         render={() => (
                           <FormItem>
-                            <FormLabel className="text-sm font-medium">What mapping tools do you currently use? (Optional)</FormLabel>
+                            <FormLabel className="text-sm font-medium">
+                              What mapping tools do you currently use?
+                              (Optional)
+                            </FormLabel>
                             <div className="space-y-2">
                               {mappingToolOptions.map((tool) => {
-                                const toolId = `tool-${tool.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "")}`;
+                                const toolId = `tool-${tool
+                                  .toLowerCase()
+                                  .replace(/\s+/g, "-")
+                                  .replace(/[^\w-]/g, "")}`;
                                 return (
                                   <FormField
                                     key={tool}
@@ -506,11 +603,21 @@ export default function ConfirmWaitlistPage() {
                                           <FormControl>
                                             <Checkbox
                                               id={toolId}
-                                              checked={field.value?.includes(tool)}
+                                              checked={field.value?.includes(
+                                                tool
+                                              )}
                                               onCheckedChange={(checked) => {
                                                 return checked
-                                                  ? field.onChange([...(field.value || []), tool])
-                                                  : field.onChange(field.value?.filter((value) => value !== tool));
+                                                  ? field.onChange([
+                                                      ...(field.value || []),
+                                                      tool,
+                                                    ])
+                                                  : field.onChange(
+                                                      field.value?.filter(
+                                                        (value) =>
+                                                          value !== tool
+                                                      )
+                                                    );
                                               }}
                                               className="h-4 w-4"
                                             />
@@ -536,9 +643,15 @@ export default function ConfirmWaitlistPage() {
                           name="currentMappingToolsOther"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-sm font-medium">Please specify other tools</FormLabel>
+                              <FormLabel className="text-sm font-medium">
+                                Please specify other tools
+                              </FormLabel>
                               <FormControl>
-                                <Input {...field} placeholder="Enter other mapping tools..." className="text-sm h-10" />
+                                <Input
+                                  {...field}
+                                  placeholder="Enter other mapping tools..."
+                                  className="text-sm h-10"
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -569,21 +682,55 @@ export default function ConfirmWaitlistPage() {
                         name="primaryUseCase"
                         render={({ field }) => (
                           <FormItem className="space-y-3">
-                            <FormLabel className="text-sm font-medium">What will you primarily use BuzzTrip for? *</FormLabel>
+                            <FormLabel className="text-sm font-medium">
+                              What will you primarily use BuzzTrip for? *
+                            </FormLabel>
                             <FormControl>
-                              <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="space-y-2"
+                              >
                                 {[
-                                  { value: "personal", label: "Personal travel planning" },
-                                  { value: "business", label: "Business/Professional use" },
-                                  { value: "education", label: "Educational purposes" },
-                                  { value: "research", label: "Research and data visualization" },
-                                  { value: "events", label: "Event planning and management" },
-                                  { value: "content-creation", label: "Content creation" },
+                                  {
+                                    value: "personal",
+                                    label: "Personal travel planning",
+                                  },
+                                  {
+                                    value: "business",
+                                    label: "Business/Professional use",
+                                  },
+                                  {
+                                    value: "education",
+                                    label: "Educational purposes",
+                                  },
+                                  {
+                                    value: "research",
+                                    label: "Research and data visualization",
+                                  },
+                                  {
+                                    value: "events",
+                                    label: "Event planning and management",
+                                  },
+                                  {
+                                    value: "content-creation",
+                                    label: "Content creation",
+                                  },
                                   { value: "other", label: "Other" },
                                 ].map((option) => (
-                                  <div key={option.value} className="flex items-center space-x-3 py-2 px-3 rounded-md hover:bg-gray-50 transition-colors cursor-pointer">
-                                    <RadioGroupItem value={option.value} id={option.value} className="h-4 w-4" />
-                                    <FormLabel htmlFor={option.value} className="font-normal cursor-pointer text-sm flex-1">
+                                  <div
+                                    key={option.value}
+                                    className="flex items-center space-x-3 py-2 px-3 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
+                                  >
+                                    <RadioGroupItem
+                                      value={option.value}
+                                      id={option.value}
+                                      className="h-4 w-4"
+                                    />
+                                    <FormLabel
+                                      htmlFor={option.value}
+                                      className="font-normal cursor-pointer text-sm flex-1"
+                                    >
                                       {option.label}
                                     </FormLabel>
                                   </div>
@@ -600,9 +747,16 @@ export default function ConfirmWaitlistPage() {
                         name="useCaseDetails"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-medium">Tell us more about your use case (Optional)</FormLabel>
+                            <FormLabel className="text-sm font-medium">
+                              Tell us more about your use case (Optional)
+                            </FormLabel>
                             <FormControl>
-                              <Textarea {...field} rows={3} placeholder="Share more details about how you plan to use BuzzTrip..." className="text-sm resize-none" />
+                              <Textarea
+                                {...field}
+                                rows={3}
+                                placeholder="Share more details about how you plan to use BuzzTrip..."
+                                className="text-sm resize-none"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -632,19 +786,34 @@ export default function ConfirmWaitlistPage() {
                         name="mapsPerMonth"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-medium">How many maps do you expect to create per month? *</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormLabel className="text-sm font-medium">
+                              How many maps do you expect to create per month? *
+                            </FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
                               <FormControl>
                                 <SelectTrigger className="text-sm h-10">
                                   <SelectValue placeholder="Select a range" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="1-5" className="text-sm">1-5 maps</SelectItem>
-                                <SelectItem value="6-10" className="text-sm">6-10 maps</SelectItem>
-                                <SelectItem value="11-25" className="text-sm">11-25 maps</SelectItem>
-                                <SelectItem value="26-50" className="text-sm">26-50 maps</SelectItem>
-                                <SelectItem value="50+" className="text-sm">50+ maps</SelectItem>
+                                <SelectItem value="1-5" className="text-sm">
+                                  1-5 maps
+                                </SelectItem>
+                                <SelectItem value="6-10" className="text-sm">
+                                  6-10 maps
+                                </SelectItem>
+                                <SelectItem value="11-25" className="text-sm">
+                                  11-25 maps
+                                </SelectItem>
+                                <SelectItem value="26-50" className="text-sm">
+                                  26-50 maps
+                                </SelectItem>
+                                <SelectItem value="50+" className="text-sm">
+                                  50+ maps
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -657,19 +826,34 @@ export default function ConfirmWaitlistPage() {
                         name="collaboratorsCount"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-medium">How many people will collaborate on your maps? *</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormLabel className="text-sm font-medium">
+                              How many people will collaborate on your maps? *
+                            </FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
                               <FormControl>
                                 <SelectTrigger className="text-sm h-10">
                                   <SelectValue placeholder="Select a range" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="just-me" className="text-sm">Just me</SelectItem>
-                                <SelectItem value="2-5" className="text-sm">2-5 people</SelectItem>
-                                <SelectItem value="6-10" className="text-sm">6-10 people</SelectItem>
-                                <SelectItem value="11-25" className="text-sm">11-25 people</SelectItem>
-                                <SelectItem value="25+" className="text-sm">25+ people</SelectItem>
+                                <SelectItem value="just-me" className="text-sm">
+                                  Just me
+                                </SelectItem>
+                                <SelectItem value="2-5" className="text-sm">
+                                  2-5 people
+                                </SelectItem>
+                                <SelectItem value="6-10" className="text-sm">
+                                  6-10 people
+                                </SelectItem>
+                                <SelectItem value="11-25" className="text-sm">
+                                  11-25 people
+                                </SelectItem>
+                                <SelectItem value="25+" className="text-sm">
+                                  25+ people
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -689,8 +873,12 @@ export default function ConfirmWaitlistPage() {
                 >
                   <Card className="shadow-sm border">
                     <CardHeader className="pb-4">
-                      <CardTitle className="text-xl">Feature Preferences</CardTitle>
-                      <CardDescription className="text-sm">Select all features you're interested in</CardDescription>
+                      <CardTitle className="text-xl">
+                        Feature Preferences
+                      </CardTitle>
+                      <CardDescription className="text-sm">
+                        Select all features you're interested in
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <FormField
@@ -698,10 +886,15 @@ export default function ConfirmWaitlistPage() {
                         name="expectedFeatures"
                         render={() => (
                           <FormItem>
-                            <FormLabel className="text-sm font-medium mb-3">Which features are you most interested in? *</FormLabel>
+                            <FormLabel className="text-sm font-medium mb-3">
+                              Which features are you most interested in? *
+                            </FormLabel>
                             <div className="grid md:grid-cols-2 gap-2">
                               {features.map((feature) => {
-                                const featureId = `feature-${feature.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "")}`;
+                                const featureId = `feature-${feature
+                                  .toLowerCase()
+                                  .replace(/\s+/g, "-")
+                                  .replace(/[^\w-]/g, "")}`;
                                 return (
                                   <FormField
                                     key={feature}
@@ -716,11 +909,21 @@ export default function ConfirmWaitlistPage() {
                                           <FormControl>
                                             <Checkbox
                                               id={featureId}
-                                              checked={field.value?.includes(feature)}
+                                              checked={field.value?.includes(
+                                                feature
+                                              )}
                                               onCheckedChange={(checked) => {
                                                 return checked
-                                                  ? field.onChange([...field.value, feature])
-                                                  : field.onChange(field.value?.filter((value) => value !== feature));
+                                                  ? field.onChange([
+                                                      ...field.value,
+                                                      feature,
+                                                    ])
+                                                  : field.onChange(
+                                                      field.value?.filter(
+                                                        (value) =>
+                                                          value !== feature
+                                                      )
+                                                    );
                                               }}
                                               className="h-4 w-4"
                                             />
@@ -745,9 +948,15 @@ export default function ConfirmWaitlistPage() {
                         name="mostImportantFeature"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-medium">What's the most important feature for you? *</FormLabel>
+                            <FormLabel className="text-sm font-medium">
+                              What's the most important feature for you? *
+                            </FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Describe the one feature you can't live without..." className="text-sm h-10" />
+                              <Input
+                                {...field}
+                                placeholder="Describe the one feature you can't live without..."
+                                className="text-sm h-10"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -770,7 +979,9 @@ export default function ConfirmWaitlistPage() {
                         <DollarSign className="h-5 w-5 text-primary" />
                         Pricing
                       </CardTitle>
-                      <CardDescription className="text-sm">Help us understand your budget expectations</CardDescription>
+                      <CardDescription className="text-sm">
+                        Help us understand your budget expectations
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <FormField
@@ -778,9 +989,15 @@ export default function ConfirmWaitlistPage() {
                         name="willingToPay"
                         render={({ field }) => (
                           <FormItem className="space-y-3">
-                            <FormLabel className="text-sm font-medium">How much would you be willing to pay per month? *</FormLabel>
+                            <FormLabel className="text-sm font-medium">
+                              How much would you be willing to pay per month? *
+                            </FormLabel>
                             <FormControl>
-                              <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="space-y-2"
+                              >
                                 {[
                                   { value: "free-only", label: "Free only" },
                                   { value: "0-5", label: "$0-$5/month" },
@@ -789,9 +1006,19 @@ export default function ConfirmWaitlistPage() {
                                   { value: "20-50", label: "$20-$50/month" },
                                   { value: "50+", label: "$50+/month" },
                                 ].map((option) => (
-                                  <div key={option.value} className="flex items-center space-x-3 py-2 px-3 rounded-md hover:bg-gray-50 transition-colors cursor-pointer">
-                                    <RadioGroupItem value={option.value} id={`price-${option.value}`} className="h-4 w-4" />
-                                    <FormLabel htmlFor={`price-${option.value}`} className="font-normal cursor-pointer text-sm flex-1">
+                                  <div
+                                    key={option.value}
+                                    className="flex items-center space-x-3 py-2 px-3 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
+                                  >
+                                    <RadioGroupItem
+                                      value={option.value}
+                                      id={`price-${option.value}`}
+                                      className="h-4 w-4"
+                                    />
+                                    <FormLabel
+                                      htmlFor={`price-${option.value}`}
+                                      className="font-normal cursor-pointer text-sm flex-1"
+                                    >
                                       {option.label}
                                     </FormLabel>
                                   </div>
@@ -808,18 +1035,37 @@ export default function ConfirmWaitlistPage() {
                         name="pricingModel"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-medium">Preferred pricing model *</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormLabel className="text-sm font-medium">
+                              Preferred pricing model *
+                            </FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
                               <FormControl>
                                 <SelectTrigger className="text-sm h-10">
                                   <SelectValue placeholder="Select your preference" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="monthly" className="text-sm">Monthly subscription</SelectItem>
-                                <SelectItem value="yearly" className="text-sm">Yearly subscription (discounted)</SelectItem>
-                                <SelectItem value="one-time" className="text-sm">One-time purchase</SelectItem>
-                                <SelectItem value="usage-based" className="text-sm">Pay per use</SelectItem>
+                                <SelectItem value="monthly" className="text-sm">
+                                  Monthly subscription
+                                </SelectItem>
+                                <SelectItem value="yearly" className="text-sm">
+                                  Yearly subscription (discounted)
+                                </SelectItem>
+                                <SelectItem
+                                  value="one-time"
+                                  className="text-sm"
+                                >
+                                  One-time purchase
+                                </SelectItem>
+                                <SelectItem
+                                  value="usage-based"
+                                  className="text-sm"
+                                >
+                                  Pay per use
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -863,10 +1109,12 @@ export default function ConfirmWaitlistPage() {
                               </FormControl>
                               <div className="space-y-1 leading-none flex-1">
                                 <div className="cursor-pointer text-sm font-medium">
-                                  I'm willing to provide regular feedback and participate in user research
+                                  I'm willing to provide regular feedback and
+                                  participate in user research
                                 </div>
                                 <FormDescription className="text-xs">
-                                  Help us build better features by sharing your experiences
+                                  Help us build better features by sharing your
+                                  experiences
                                 </FormDescription>
                               </div>
                             </label>
@@ -879,18 +1127,38 @@ export default function ConfirmWaitlistPage() {
                         name="participationLevel"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-medium">How active do you want to be in the beta program? *</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormLabel className="text-sm font-medium">
+                              How active do you want to be in the beta program?
+                              *
+                            </FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
                               <FormControl>
                                 <SelectTrigger className="text-sm h-10">
                                   <SelectValue placeholder="Select your level" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="passive" className="text-sm">Passive (just using the product)</SelectItem>
-                                <SelectItem value="occasional" className="text-sm">Occasional (some feedback)</SelectItem>
-                                <SelectItem value="active" className="text-sm">Active (regular feedback)</SelectItem>
-                                <SelectItem value="super-user" className="text-sm">Super user (heavy involvement)</SelectItem>
+                                <SelectItem value="passive" className="text-sm">
+                                  Passive (just using the product)
+                                </SelectItem>
+                                <SelectItem
+                                  value="occasional"
+                                  className="text-sm"
+                                >
+                                  Occasional (some feedback)
+                                </SelectItem>
+                                <SelectItem value="active" className="text-sm">
+                                  Active (regular feedback)
+                                </SelectItem>
+                                <SelectItem
+                                  value="super-user"
+                                  className="text-sm"
+                                >
+                                  Super user (heavy involvement)
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -910,8 +1178,12 @@ export default function ConfirmWaitlistPage() {
                 >
                   <Card className="shadow-sm border">
                     <CardHeader className="pb-4">
-                      <CardTitle className="text-xl">Additional Feedback</CardTitle>
-                      <CardDescription className="text-sm">Optional - but your insights are valuable!</CardDescription>
+                      <CardTitle className="text-xl">
+                        Additional Feedback
+                      </CardTitle>
+                      <CardDescription className="text-sm">
+                        Optional - but your insights are valuable!
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <FormField
@@ -919,9 +1191,17 @@ export default function ConfirmWaitlistPage() {
                         name="painPoints"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-medium">What are your biggest pain points with current mapping tools?</FormLabel>
+                            <FormLabel className="text-sm font-medium">
+                              What are your biggest pain points with current
+                              mapping tools?
+                            </FormLabel>
                             <FormControl>
-                              <Textarea {...field} rows={3} placeholder="Tell us what frustrates you..." className="text-sm resize-none" />
+                              <Textarea
+                                {...field}
+                                rows={3}
+                                placeholder="Tell us what frustrates you..."
+                                className="text-sm resize-none"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -933,9 +1213,16 @@ export default function ConfirmWaitlistPage() {
                         name="dealbreakers"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-medium">What would be a dealbreaker for you?</FormLabel>
+                            <FormLabel className="text-sm font-medium">
+                              What would be a dealbreaker for you?
+                            </FormLabel>
                             <FormControl>
-                              <Textarea {...field} rows={3} placeholder="What would make you stop using the product?" className="text-sm resize-none" />
+                              <Textarea
+                                {...field}
+                                rows={3}
+                                placeholder="What would make you stop using the product?"
+                                className="text-sm resize-none"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -947,9 +1234,16 @@ export default function ConfirmWaitlistPage() {
                         name="additionalComments"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-medium">Anything else you'd like to share?</FormLabel>
+                            <FormLabel className="text-sm font-medium">
+                              Anything else you'd like to share?
+                            </FormLabel>
                             <FormControl>
-                              <Textarea {...field} rows={3} placeholder="Any other thoughts, ideas, or feedback?" className="text-sm resize-none" />
+                              <Textarea
+                                {...field}
+                                rows={3}
+                                placeholder="Any other thoughts, ideas, or feedback?"
+                                className="text-sm resize-none"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -985,7 +1279,8 @@ export default function ConfirmWaitlistPage() {
                         )}
                       </Button>
                       <p className="text-center text-xs text-gray-600 mt-3">
-                        By submitting, you'll get instant access to all beta features
+                        By submitting, you'll get instant access to all beta
+                        features
                       </p>
                     </CardContent>
                   </Card>

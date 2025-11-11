@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { resend } from "./emails";
 import { zodInternalMutation } from "./helpers";
+import { APP_URL, getBetaConfirmationUrl } from "./utils/constants";
 
 export const sendBetaConfirmationEmail = zodInternalMutation({
   args: {
@@ -9,7 +10,7 @@ export const sendBetaConfirmationEmail = zodInternalMutation({
     token: z.string(),
   },
   handler: async (ctx, { firstName, email, token }) => {
-    // Escape HTML to prevent injection
+    // Escape HTML to prevent injection - kept inline per project requirements
     const escapeHtml = (text: string) =>
       text
         .replace(/&/g, "&amp;")
@@ -19,7 +20,7 @@ export const sendBetaConfirmationEmail = zodInternalMutation({
         .replace(/'/g, "&#039;");
 
     const name = escapeHtml(firstName);
-    const confirmationUrl = `https://buzztrip.co/confirm-waitlist?token=${token}`;
+    const confirmationUrl = getBetaConfirmationUrl(token);
 
     await resend.sendEmail(ctx, {
       from: "Jacob Samorowski <info@buzztrip.co>",
@@ -100,8 +101,11 @@ export const sendBetaWelcomeEmail = zodInternalMutation({
     whatsappOptIn: z.boolean(),
     questionnaireToken: z.string(),
   },
-  handler: async (ctx, { firstName, email, whatsappOptIn, questionnaireToken }) => {
-    // Escape HTML to prevent injection
+  handler: async (
+    ctx,
+    { firstName, email, whatsappOptIn, questionnaireToken }
+  ) => {
+    // Escape HTML to prevent injection - kept inline per project requirements
     const escapeHtml = (text: string) =>
       text
         .replace(/&/g, "&amp;")
@@ -170,7 +174,7 @@ export const sendBetaWelcomeEmail = zodInternalMutation({
               ${whatsappSection}
 
               <div style="text-align:center;margin:32px 0">
-                <a href="https://buzztrip.co/app" style="background-color:rgb(44,120,115);color:white;padding:16px 32px;border-radius:8px;font-size:16px;font-weight:600;text-decoration:none;display:inline-block">Start Creating Maps</a>
+                <a href="${APP_URL}" style="background-color:rgb(44,120,115);color:white;padding:16px 32px;border-radius:8px;font-size:16px;font-weight:600;text-decoration:none;display:inline-block">Start Creating Maps</a>
               </div>
 
               <p style="font-size:16px;color:rgb(4,19,27);margin:24px 0;line-height:1.6">Your feedback is invaluable. Whether it's a bug, a feature request, or just thoughts on your experience – I want to hear it all. Reply to this email anytime!</p>
