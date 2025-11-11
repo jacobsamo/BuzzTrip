@@ -14,33 +14,49 @@ const betaQuickSignupSchema = z.object({
   whatsappOptIn: z.boolean(),
 });
 
-// Full questionnaire schema
+// Full questionnaire schema - matches frontend validation
 const betaQuestionnaireResponseSchema = z.object({
-  // Discovery
-  howDidYouHear: z.string(),
+  // Discovery & Background
+  howDidYouHear: z.enum([
+    "google",
+    "friend",
+    "social-media",
+    "blog-article",
+    "youtube",
+    "reddit",
+    "other",
+  ]),
   howDidYouHearOther: z.string().optional(),
   currentMappingTools: z.array(z.string()).optional(),
   currentMappingToolsOther: z.string().optional(),
 
   // Use Cases
-  primaryUseCase: z.string(),
+  primaryUseCase: z.enum([
+    "personal",
+    "business",
+    "education",
+    "research",
+    "events",
+    "content-creation",
+    "other",
+  ]),
   useCaseDetails: z.string().optional(),
 
   // Frequency & Scale
-  mapsPerMonth: z.string().optional(),
-  collaboratorsCount: z.string().optional(),
+  mapsPerMonth: z.enum(["1-5", "6-10", "11-25", "26-50", "50+"]),
+  collaboratorsCount: z.enum(["just-me", "2-5", "6-10", "11-25", "25+"]),
 
   // Features
-  expectedFeatures: z.array(z.string()),
-  mostImportantFeature: z.string().optional(),
+  expectedFeatures: z.array(z.string()).min(1),
+  mostImportantFeature: z.string().min(2),
 
   // Pricing
-  willingToPay: z.string(),
-  pricingModel: z.string().optional(),
+  willingToPay: z.enum(["free-only", "0-5", "5-10", "10-20", "20-50", "50+"]),
+  pricingModel: z.enum(["monthly", "yearly", "one-time", "usage-based"]),
 
   // Participation
   willingToProvideHelpFeedback: z.boolean(),
-  participationLevel: z.string().optional(),
+  participationLevel: z.enum(["passive", "occasional", "active", "super-user"]),
 
   // Open-ended
   painPoints: z.string().optional(),
@@ -291,64 +307,6 @@ export const confirmEmail = zodMutation({
     return {
       success: true,
       message: "Email confirmed! Please complete the questionnaire.",
-    };
-  },
-});
-
-/**
- * Verify questionnaire token
- */
-export const verifyQuestionnaireToken = query({
-  args: { token: v.string() },
-  returns: v.union(
-    v.object({
-      valid: v.literal(false),
-      reason: v.string(),
-    }),
-    v.object({
-      valid: v.literal(true),
-      userId: v.union(v.id("users"), v.null()),
-      email: v.string(),
-      userName: v.optional(v.string()),
-    })
-  ),
-  handler: async (ctx, { token }) => {
-    const betaUser = await ctx.db
-      .query("beta_users")
-      .withIndex("by_token", (q) => q.eq("token", token))
-      .first();
-
-    if (!betaUser) {
-      return { valid: false as const, reason: "Token not found" };
-    }
-
-    if (!betaUser.emailConfirmed) {
-      return { valid: false as const, reason: "Email not confirmed. Please check your inbox for the confirmation email." };
-    }
-
-    if (betaUser.questionnaireCompleted) {
-      return { valid: false as const, reason: "Questionnaire already completed" };
-    }
-
-    if (betaUser.expiresAt < Date.now()) {
-      return { valid: false as const, reason: "Token expired" };
-    }
-
-    // Get user name if userId is set
-    let userName: string | undefined;
-    if (betaUser.userId) {
-      const user = await ctx.db.get(betaUser.userId);
-      userName = user?.first_name ?? user?.name;
-    } else {
-      // Use first name from beta_users if no account yet
-      userName = betaUser.firstName;
-    }
-
-    return {
-      valid: true as const,
-      userId: betaUser.userId ?? null,
-      email: betaUser.email,
-      userName,
     };
   },
 });

@@ -111,7 +111,6 @@ export const sendBetaWelcomeEmail = zodInternalMutation({
         .replace(/'/g, "&#039;");
 
     const name = firstName ? escapeHtml(firstName) : "there";
-    const questionnaireUrl = `https://buzztrip.co/beta/questionnaire?token=${questionnaireToken}`;
 
     // Get WhatsApp group link from environment or skip section
     const whatsappGroupUrl = process.env.WHATSAPP_GROUP_URL;
