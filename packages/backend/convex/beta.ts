@@ -1,12 +1,13 @@
-import { v } from "convex/values";
+import { zid } from "convex-helpers/server/zod";
 import { z } from "zod";
+import { betaUsersEditSchema } from "../zod-schemas";
 import { internal } from "./_generated/api";
-import { Id } from "./_generated/dataModel";
-import { mutation, query } from "./_generated/server";
-import { authedQuery, zodMutation } from "./helpers";
+import type { Id } from "./_generated/dataModel";
+import { authedQuery, zodMutation, zodQuery } from "./helpers";
 import { getCurrentUser, mustGetCurrentUser } from "./users";
 
-// Quick signup schema
+// Import schemas from shared location
+// Quick signup schema (without validation messages for backend)
 const betaQuickSignupSchema = z.object({
   firstName: z.string(),
   lastName: z.string().optional(),
@@ -14,7 +15,7 @@ const betaQuickSignupSchema = z.object({
   whatsappOptIn: z.boolean(),
 });
 
-// Full questionnaire schema - matches frontend validation
+// Questionnaire response schema (without validation messages for backend)
 const betaQuestionnaireResponseSchema = z.object({
   // Discovery & Background
   howDidYouHear: z.enum([
@@ -64,6 +65,23 @@ const betaQuestionnaireResponseSchema = z.object({
   additionalComments: z.string().optional(),
 });
 
+// Reusable return type schemas - based on betaUsersSchema
+const betaUserReturnSchema = betaUsersEditSchema
+  .pick({
+    _id: true,
+    userId: true,
+    firstName: true,
+    lastName: true,
+    email: true,
+    createdAt: true,
+    emailConfirmed: true,
+    questionnaireCompleted: true,
+    whatsappOptIn: true,
+  })
+  .extend({
+    betaSignupDate: z.string(), // ISO string representation of createdAt
+  });
+
 /**
  * Quick beta signup - Step 1
  * Creates waitlist entry and sends confirmation email
@@ -91,7 +109,10 @@ export const quickBetaSignup = zodMutation({
 
     if (existingBetaUser) {
       // Check if already confirmed and completed
-      if (existingBetaUser.emailConfirmed && existingBetaUser.questionnaireCompleted) {
+      if (
+        existingBetaUser.emailConfirmed &&
+        existingBetaUser.questionnaireCompleted
+      ) {
         return {
           success: true,
           message: "You've already completed the beta signup. Please sign in.",
@@ -119,7 +140,10 @@ export const quickBetaSignup = zodMutation({
       }
 
       // If confirmed but not completed questionnaire, resend link
-      if (existingBetaUser.emailConfirmed && !existingBetaUser.questionnaireCompleted) {
+      if (
+        existingBetaUser.emailConfirmed &&
+        !existingBetaUser.questionnaireCompleted
+      ) {
         await ctx.scheduler.runAfter(
           0,
           internal.emails_beta.sendBetaConfirmationEmail,
@@ -190,8 +214,15 @@ export const quickBetaSignup = zodMutation({
  * Complete pending beta signup after user creates account
  * Called from user creation webhook
  */
-export const completePendingBetaSignup = mutation({
-  args: { email: v.string(), userId: v.id("users") },
+export const completePendingBetaSignup = zodMutation({
+  args: {
+    email: z.string().email(),
+    userId: zid("users"),
+  },
+  returns: z.object({
+    found: z.boolean(),
+    token: z.string().optional(),
+  }),
   handler: async (ctx, { email, userId }) => {
     // Find beta_users entry for this email
     const betaUser = await ctx.db
@@ -210,22 +241,11 @@ export const completePendingBetaSignup = mutation({
       updatedAt: now,
     });
 
-    // Update user with beta info
-    const nowISO = new Date(now).toISOString();
-    await ctx.db.patch(userId, {
-      whatsappOptIn: betaUser.whatsappOptIn,
-      updatedAt: nowISO,
-    });
-
     // If questionnaire already completed, grant beta access
     if (betaUser.questionnaireCompleted) {
+      const nowISO = new Date(now).toISOString();
       await ctx.db.patch(userId, {
         isBetaUser: true,
-        betaSignupDate: nowISO,
-        betaQuestionnaireResponses: betaUser.questionnaireResponses,
-        questionnaireCompletedAt: betaUser.questionnaireCompletedAt
-          ? new Date(betaUser.questionnaireCompletedAt).toISOString()
-          : nowISO,
         updatedAt: nowISO,
       });
     }
@@ -266,7 +286,8 @@ export const confirmEmail = zodMutation({
     if (betaUser.questionnaireCompleted) {
       return {
         success: false,
-        message: "You've already completed the questionnaire and have beta access!",
+        message:
+          "You've already completed the questionnaire and have beta access!",
         error: "already_completed",
       };
     }
@@ -275,7 +296,8 @@ export const confirmEmail = zodMutation({
     if (betaUser.emailConfirmed) {
       return {
         success: true,
-        message: "Email already confirmed. You can now complete the questionnaire.",
+        message:
+          "Email already confirmed. You can now complete the questionnaire.",
       };
     }
 
@@ -295,14 +317,6 @@ export const confirmEmail = zodMutation({
       emailConfirmedAt: now,
       updatedAt: now,
     });
-
-    // If user has an account, update the user record too
-    if (betaUser.userId) {
-      await ctx.db.patch(betaUser.userId, {
-        emailConfirmedAt: new Date(now).toISOString(),
-        updatedAt: new Date(now).toISOString(),
-      });
-    }
 
     return {
       success: true,
@@ -362,34 +376,40 @@ export const submitQuestionnaire = zodMutation({
       if (user) {
         const nowISO = new Date(now).toISOString();
         await ctx.db.patch(betaUser.userId, {
-          betaQuestionnaireResponses: responses,
-          questionnaireCompletedAt: nowISO,
           isBetaUser: true,
-          betaSignupDate: nowISO,
           updatedAt: nowISO,
         });
 
         // Send beta welcome email
-        await ctx.scheduler.runAfter(0, internal.emails_beta.sendBetaWelcomeEmail, {
-          firstName: user.first_name ?? user.name,
-          email: betaUser.email,
-          whatsappOptIn: betaUser.whatsappOptIn,
-          questionnaireToken: token,
-        });
+        await ctx.scheduler.runAfter(
+          0,
+          internal.emails_beta.sendBetaWelcomeEmail,
+          {
+            firstName: user.first_name ?? user.name,
+            email: betaUser.email,
+            whatsappOptIn: betaUser.whatsappOptIn,
+            questionnaireToken: token,
+          }
+        );
       }
     } else {
       // User doesn't have an account yet - just send welcome email
-      await ctx.scheduler.runAfter(0, internal.emails_beta.sendBetaWelcomeEmail, {
-        firstName: betaUser.firstName,
-        email: betaUser.email,
-        whatsappOptIn: betaUser.whatsappOptIn,
-        questionnaireToken: token,
-      });
+      await ctx.scheduler.runAfter(
+        0,
+        internal.emails_beta.sendBetaWelcomeEmail,
+        {
+          firstName: betaUser.firstName,
+          email: betaUser.email,
+          whatsappOptIn: betaUser.whatsappOptIn,
+          questionnaireToken: token,
+        }
+      );
     }
 
     return {
       success: true,
-      message: "Thank you for completing the questionnaire! You now have beta access.",
+      message:
+        "Thank you for completing the questionnaire! You now have beta access.",
     };
   },
 });
@@ -397,17 +417,19 @@ export const submitQuestionnaire = zodMutation({
 /**
  * Check waitlist status by email
  */
-export const checkWaitlistStatus = query({
-  args: { email: v.string() },
-  returns: v.object({
-    status: v.union(
-      v.literal("not_signed_up"),
-      v.literal("pending_confirmation"),
-      v.literal("confirmed"),
-      v.literal("completed")
-    ),
-    emailConfirmed: v.optional(v.boolean()),
-    questionnaireCompleted: v.optional(v.boolean()),
+export const checkWaitlistStatus = zodQuery({
+  args: {
+    email: z.string().email(),
+  },
+  returns: z.object({
+    status: z.enum([
+      "not_signed_up",
+      "pending_confirmation",
+      "confirmed",
+      "completed",
+    ]),
+    emailConfirmed: z.boolean().optional(),
+    questionnaireCompleted: z.boolean().optional(),
   }),
   handler: async (ctx, { email }) => {
     // Check for existing beta_users entry
@@ -462,14 +484,29 @@ export const checkBetaStatus = authedQuery({
     isBetaUser: z.boolean(),
     betaSignupDate: z.string().optional(),
     hasCompletedQuestionnaire: z.boolean(),
+    whatsappOptIn: z.boolean().optional(),
   }),
   handler: async (ctx) => {
     const user = await mustGetCurrentUser(ctx);
 
+    // Get beta info from beta_users table
+    const betaUser = await ctx.db
+      .query("beta_users")
+      .withIndex("by_user_id", (q) => q.eq("userId", user._id))
+      .first();
+
+    if (!betaUser) {
+      return {
+        isBetaUser: false,
+        hasCompletedQuestionnaire: false,
+      };
+    }
+
     return {
       isBetaUser: user.isBetaUser ?? false,
-      betaSignupDate: user.betaSignupDate,
-      hasCompletedQuestionnaire: !!user.betaQuestionnaireResponses,
+      betaSignupDate: new Date(betaUser.createdAt).toISOString(),
+      hasCompletedQuestionnaire: betaUser.questionnaireCompleted,
+      whatsappOptIn: betaUser.whatsappOptIn,
     };
   },
 });
@@ -478,34 +515,26 @@ export const checkBetaStatus = authedQuery({
  * Admin: Get all beta users
  * Internal query - should be called from admin dashboard with proper auth checks
  */
-export const getBetaUsers = query({
+export const getBetaUsers = zodQuery({
   args: {},
-  returns: v.array(
-    v.object({
-      _id: v.id("users"),
-      name: v.string(),
-      email: v.string(),
-      betaSignupDate: v.union(v.string(), v.null()),
-      hasCompletedQuestionnaire: v.boolean(),
-      whatsappOptIn: v.union(v.boolean(), v.null()),
-    })
-  ),
+  returns: z.array(betaUserReturnSchema),
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthorized");
 
-    const betaUsers = await ctx.db
-      .query("users")
-      .withIndex("by_isBetaUser", (q) => q.eq("isBetaUser", true))
-      .collect();
+    const betaUsers = await ctx.db.query("beta_users").collect();
 
-    return betaUsers.map((user) => ({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      betaSignupDate: user.betaSignupDate ?? null,
-      hasCompletedQuestionnaire: !!user.betaQuestionnaireResponses,
-      whatsappOptIn: user.whatsappOptIn ?? null,
+    return betaUsers.map((betaUser) => ({
+      _id: betaUser._id,
+      userId: betaUser.userId ?? undefined,
+      firstName: betaUser.firstName,
+      lastName: betaUser.lastName ?? undefined,
+      email: betaUser.email,
+      createdAt: betaUser.createdAt,
+      betaSignupDate: new Date(betaUser.createdAt).toISOString(),
+      emailConfirmed: betaUser.emailConfirmed,
+      questionnaireCompleted: betaUser.questionnaireCompleted,
+      whatsappOptIn: betaUser.whatsappOptIn,
     }));
   },
 });
@@ -514,34 +543,38 @@ export const getBetaUsers = query({
  * Admin: Get questionnaire responses for analysis
  * Internal query - should be called from admin dashboard with proper auth checks
  */
-export const getBetaQuestionnaireResponses = query({
+export const getBetaQuestionnaireResponses = zodQuery({
   args: {},
-  returns: v.array(
-    v.object({
-      userId: v.id("users"),
-      email: v.string(),
-      name: v.string(),
-      signupDate: v.union(v.string(), v.null()),
-      responses: v.any(), // Using v.any() since the questionnaire responses are dynamic
+  returns: z.array(
+    z.object({
+      betaUserId: zid("beta_users"),
+      userId: zid("users").nullish(),
+      email: z.string(),
+      firstName: z.string(),
+      lastName: z.string().nullish(),
+      signupDate: z.string(),
+      responses: z.record(z.string(), z.any()),
     })
   ),
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthorized");
 
-    const betaUsers = await ctx.db
-      .query("users")
-      .withIndex("by_isBetaUser", (q) => q.eq("isBetaUser", true))
-      .collect();
+    const betaUsers = await ctx.db.query("beta_users").collect();
 
     return betaUsers
-      .filter((user) => user.betaQuestionnaireResponses)
-      .map((user) => ({
-        userId: user._id,
-        email: user.email,
-        name: user.name,
-        signupDate: user.betaSignupDate ?? null,
-        responses: user.betaQuestionnaireResponses,
+      .filter(
+        (betaUser) =>
+          betaUser.questionnaireCompleted && betaUser.questionnaireResponses
+      )
+      .map((betaUser) => ({
+        betaUserId: betaUser._id,
+        userId: betaUser.userId ?? undefined,
+        email: betaUser.email,
+        firstName: betaUser.firstName,
+        lastName: betaUser.lastName ?? undefined,
+        signupDate: new Date(betaUser.createdAt).toISOString(),
+        responses: betaUser.questionnaireResponses!,
       }));
   },
 });

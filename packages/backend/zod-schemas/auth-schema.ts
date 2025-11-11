@@ -14,13 +14,8 @@ export const userSchema = z.object({
   last_name: z.string().optional(),
   username: z.string().optional(),
   bio: z.string().optional(),
-  // Beta/VIP fields
+  // Beta flag - used for quick auth checks without joining tables
   isBetaUser: z.boolean().optional(),
-  betaSignupDate: z.string().optional(),
-  betaQuestionnaireResponses: z.record(z.string(), z.any()).optional(),
-  whatsappOptIn: z.boolean().optional(),
-  emailConfirmedAt: z.string().optional(),
-  questionnaireCompletedAt: z.string().optional(),
 });
 
 export const usersEditSchema = insertSchema(userSchema);
@@ -41,7 +36,7 @@ export const betaUsersSchema = z.object({
   // Identity
   email: z.string(),
   firstName: z.string(),
-  lastName: z.string().optional(),
+  lastName: z.string().nullish(),
 
   // Token & Flow
   token: z.string(),
@@ -60,9 +55,11 @@ export const betaUsersSchema = z.object({
   questionnaireResponses: z.record(z.string(), z.any()).optional(),
 
   // Link to actual user account (optional - set when user creates account)
-  userId: zid("users").optional(),
+  userId: zid("users").nullish(),
 
   // Timestamps
   createdAt: z.number(),
   updatedAt: z.number(),
 });
+
+export const betaUsersEditSchema = insertSchema(betaUsersSchema)

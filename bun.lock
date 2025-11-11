@@ -171,6 +171,9 @@
         "svix": "^1.77.0",
         "zod": "3.25.76",
       },
+      "devDependencies": {
+        "typescript": "^5.9.3",
+      },
     },
     "packages/transactional": {
       "name": "@buzztrip/transactional",
