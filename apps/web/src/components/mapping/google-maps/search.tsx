@@ -77,7 +77,7 @@ export const Search = React.forwardRef<HTMLDivElement, SearchProps>(
     },
     ref
   ) => {
-    const map = useMap();
+    const map = useMap('google-map-container');
     const places = useMapsLibrary("places");
 
     // Internal state
@@ -297,7 +297,7 @@ export const SearchResults = React.forwardRef<
     },
     ref
   ) => {
-    const map = useMap();
+    const map = useMap('google-map-container');
     const places = useMapsLibrary("places");
     const {
       predictions,

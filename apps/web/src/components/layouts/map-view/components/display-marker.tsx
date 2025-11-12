@@ -14,7 +14,7 @@ interface DisplayMarkerProps {
 
 const DisplayMarker = ({ marker }: DisplayMarkerProps) => {
   const { setActiveState, setActiveLocation } = useMapStore((store) => store);
-  const map = useMap();
+  const map = useMap('google-map-container');
 
   const onMarkerClick = (marker: CombinedMarker) => {
     if (map) {

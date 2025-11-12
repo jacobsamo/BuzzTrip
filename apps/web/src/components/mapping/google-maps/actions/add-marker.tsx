@@ -17,7 +17,7 @@ const AddMarkerButton = () => {
   const { isMobile, searchValue, uiState, setUiState } = useMapStore(
     (state) => state
   );
-  const googleMap = useMap();
+  const googleMap = useMap('google-map-container');
 
   const handleClose = () => {
     if (!googleMap) return;
