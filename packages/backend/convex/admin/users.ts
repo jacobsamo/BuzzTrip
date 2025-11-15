@@ -1,4 +1,4 @@
-import { zid } from "convex-helpers/server/zod";
+import { zid } from "convex-helpers/server/zod4";
 import * as z from "zod";
 import { zodQuery } from "../../convex/helpers";
 import { requireAdmin } from "../../helpers/admin-helpers";

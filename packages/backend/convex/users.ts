@@ -38,23 +38,29 @@ type UserLoginStatus =
  *
  * Like all Convex queries, errors on expired Clerk token.
  */
-export const userLoginStatus = query(async (ctx): Promise<UserLoginStatus> => {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) {
-    // no JWT token, user hasn't completed login flow yet
-    return { message: "No JWT Token", user: null };
-  }
-  const user = await getCurrentUser(ctx);
-  if (user === null) {
-    // If Clerk has not told us about this user we're still waiting for the
-    // webhook notification.
-    return { message: "No Clerk User", user: null };
-  }
-  return { message: "Logged In", user };
+export const userLoginStatus = query({
+  args: {},
+  handler: async (ctx): Promise<UserLoginStatus> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      // no JWT token, user hasn't completed login flow yet
+      return { message: "No JWT Token", user: null };
+    }
+    const user = await getCurrentUser(ctx);
+    if (user === null) {
+      // If Clerk has not told us about this user we're still waiting for the
+      // webhook notification.
+      return { message: "No Clerk User", user: null };
+    }
+    return { message: "Logged In", user };
+  },
 });
 
 /** The current user, containing user preferences and Clerk user info. */
-export const currentUser = query((ctx: QueryCtx) => getCurrentUser(ctx));
+export const currentUser = query({
+  args: {},
+  handler: (ctx: QueryCtx) => getCurrentUser(ctx),
+});
 
 /** Get user by Clerk use id (AKA "subject" on auth)  */
 export const getUser = query({

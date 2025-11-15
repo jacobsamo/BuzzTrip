@@ -1,4 +1,4 @@
-import { zid } from "convex-helpers/server/zod";
+import { zid } from "convex-helpers/server/zod4";
 import { IconType } from "../../types";
 import {
   collection_linksSchema,

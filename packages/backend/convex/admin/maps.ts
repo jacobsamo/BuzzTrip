@@ -2,7 +2,7 @@ import { zodQuery } from "../../convex/helpers";
 import { requireAdmin } from "../../helpers/admin-helpers";
 import { mapsSchema, userSchema, mapViewSchema, iconSchema } from "../../zod-schemas";
 import * as z from "zod";
-import { zid } from "convex-helpers/server/zod";
+import { zid } from "convex-helpers/server/zod4";
 
 /**
  * Get all maps with aggregated statistics

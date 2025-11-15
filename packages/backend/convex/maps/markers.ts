@@ -1,4 +1,4 @@
-import { zid } from "convex-helpers/server/zod";
+import { zid } from "convex-helpers/server/zod4";
 import { z } from "zod";
 import type { CombinedMarker, IconType } from "../../types";
 import { combinedMarkersSchema, markersEditSchema } from "../../zod-schemas";

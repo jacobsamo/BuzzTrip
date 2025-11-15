@@ -1,5 +1,5 @@
 import { getManyFrom } from "convex-helpers/server/relationships";
-import { zid } from "convex-helpers/server/zod";
+import { zid } from "convex-helpers/server/zod4";
 import type { RefinedUser } from "../../types";
 import {
   combinedMapUser,
