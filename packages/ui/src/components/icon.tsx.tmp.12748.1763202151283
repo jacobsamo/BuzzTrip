@@ -21,7 +21,6 @@ import {
   Tram,
   Van,
   Ambulance,
-  CableCar,
 
   // Accommodation
   BuildingApartment,
@@ -47,7 +46,6 @@ import {
   BowlFood,
   Cake,
   FishSimple,
-  TeaBag,
 
   // Activities
   PersonSimpleHike,
@@ -94,12 +92,14 @@ import {
   Barbell,
   SwimmingPool,
   BaseballCap,
+  Buildings as Stadium, // Stadium not available, using Buildings
   Medal,
   BoxingGlove,
 
   // Culture
   Bank,
   Palette,
+  Buildings as Monument, // Monument not available, using Buildings
   Flag,
   Storefront,
   Ticket,
@@ -111,6 +111,7 @@ import {
   Camera,
   Eye,
   Sun,
+  SunHorizon as Sunset,
   SunHorizon,
   PaintBrush,
   Cube,
@@ -136,7 +137,7 @@ import {
 
   // Landmarks
   Church,
-  CastleTurret,
+  CastleTurret as Castle,
   Mosque,
   Bridge,
 
@@ -202,12 +203,12 @@ export const Icons: Record<IconType, PhosphorIconType> = {
   "bicycle": Bicycle,
   "bus": Bus,
   "truck": Truck,
-  "helicopter": Airplane,
+  "helicopter": Truck,
   "boat": Boat,
   "yacht": Sailboat,
   "scooter": Scooter,
   "subway": Subway,
-  "cable-car": CableCar,
+  "cable-car": Funicular,
   "tram": Tram,
   "caravan": Van,
   "van": Van,
@@ -215,7 +216,7 @@ export const Icons: Record<IconType, PhosphorIconType> = {
   "speedboat": Boat,
 
   // Accommodation (15 icons)
-  "hotel": Building,
+  "hotel": BuildingApartment,
   "motel": Warehouse,
   "house": HouseLine,
   "cabin": HouseSimple,
@@ -241,14 +242,14 @@ export const Icons: Record<IconType, PhosphorIconType> = {
   "ice-cream": IceCream,
   "bakery": Bread,
   "coffee": Coffee,
-  "tea": TeaBag,
+  "tea": Coffee,
   "wine": Wine,
   "beer": BeerBottle,
   "cocktail": Martini,
   "sushi": ForkKnife,
   "taco": ForkKnife,
   "pasta": ForkKnife,
-  "salad": BowlFood,
+  "salad": Bowl,
   "barbecue": ForkKnife,
   "donut": Cake,
   "brunch": ForkKnife,
@@ -257,11 +258,11 @@ export const Icons: Record<IconType, PhosphorIconType> = {
   "deli": Bread,
   "dessert": Cake,
   "smoothie": Coffee,
-  "soup": BowlFood,
+  "soup": Bowl,
   "fish-market": FishSimple,
   "steakhouse": ForkKnife,
   "breakfast": Coffee,
-  "noodles": BowlFood,
+  "noodles": Bowl,
 
   // Activities (35 icons)
   "hiking": PersonSimpleHike,
@@ -281,7 +282,7 @@ export const Icons: Record<IconType, PhosphorIconType> = {
   "volleyball": Volleyball,
   "fishing": FishSimple,
   "rock-climbing": Ladder,
-  "skateboarding": Scooter,
+  "skateboarding": Skateboard,
   "surfing": Waves,
   "kayaking": Boat,
   "canoeing": Boat,
@@ -292,13 +293,13 @@ export const Icons: Record<IconType, PhosphorIconType> = {
   "paintball": Target,
   "archery": Target,
   "bowling": BowlingBall,
-  "roller-skating": Scooter,
-  "ice-skating": Scooter,
+  "roller-skating": Skateboard,
+  "ice-skating": Skateboard,
   "scuba-diving": Waves,
   "snorkeling": Waves,
   "skiing": Snowflake,
   "snowboarding": Snowflake,
-  "amusement-park": Circle,
+  "amusement-park": FerrisWheel,
 
   // Nature (25 icons)
   "mountain": Mountains,
@@ -313,7 +314,7 @@ export const Icons: Record<IconType, PhosphorIconType> = {
   "desert": Cactus,
   "valley": Mountains,
   "volcano": Mountains,
-  "cave": Funnel,
+  "cave": Mountains,
   "meadow": Flower,
   "wetland": Drop,
   "island": Island,
@@ -337,14 +338,14 @@ export const Icons: Record<IconType, PhosphorIconType> = {
   "weightlifting": Barbell,
   "rowing": Boat,
   "climbing-wall": Ladder,
-  "skate-park": Scooter,
+  "skate-park": Skateboard,
   "tennis-court": TennisBall,
   "basketball-court": Basketball,
   "soccer-field": SoccerBall,
   "running-track": PersonSimpleRun,
   "swimming-pool": SwimmingPool,
   "baseball-field": BaseballCap,
-  "stadium": Buildings,
+  "stadium": Stadium,
   "marathon": Medal,
   "bike-race": Bicycle,
   "triathlon": Medal,
@@ -352,7 +353,7 @@ export const Icons: Record<IconType, PhosphorIconType> = {
   // Culture (20 icons)
   "museum": Bank,
   "art-gallery": Palette,
-  "monument": Buildings,
+  "monument": Monument,
   "music-festival": MusicNotes,
   "parade": Flag,
   "fair": Confetti,
@@ -369,13 +370,13 @@ export const Icons: Record<IconType, PhosphorIconType> = {
   "jazz-club": MusicNotes,
   "gallery-walk": Palette,
   "fireworks": Balloon,
-  "sports-event": Buildings,
+  "sports-event": Stadium,
 
   // Photography (15 icons)
   "camera": Camera,
   "viewpoint": Eye,
   "photo-spot": Camera,
-  "sunset-spot": SunHorizon,
+  "sunset-spot": Sunset,
   "sunrise-spot": SunHorizon,
   "photo-walk": Camera,
   "urban-art": PaintBrush,
@@ -412,20 +413,20 @@ export const Icons: Record<IconType, PhosphorIconType> = {
 
   // Landmarks (15 icons)
   "church": Church,
-  "castle": CastleTurret,
+  "castle": Castle,
   "temple": Church,
   "mosque": Mosque,
   "synagogue": Church,
-  "statue": Buildings,
+  "statue": Monument,
   "bridge": Bridge,
   "tower": Buildings,
-  "arch": Buildings,
-  "memorial": Buildings,
+  "arch": Monument,
+  "memorial": Monument,
   "historic-building": Building,
-  "ruins": Buildings,
-  "palace": CastleTurret,
-  "fort": CastleTurret,
-  "heritage-site": Buildings,
+  "ruins": Monument,
+  "palace": Castle,
+  "fort": Castle,
+  "heritage-site": Monument,
 
   // Shopping (15 icons)
   "supermarket": ShoppingCart,
@@ -458,7 +459,7 @@ export const Icons: Record<IconType, PhosphorIconType> = {
   "airport": AirplaneLanding,
   "ferry-terminal": Boat,
   "meeting-point": Users,
-  "landmark-marker": Buildings,
+  "landmark-marker": Monument,
   "route-marker": Signpost,
 
   // Seasonal (10 icons)
