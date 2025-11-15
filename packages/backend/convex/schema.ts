@@ -1,55 +1,48 @@
-import { zodToConvex } from "convex-helpers/server/zod";
-import { defineSchema, defineTable } from "convex/server";
+import { defineSchema } from "convex/server";
 import {
-  betaUsersSchema,
-  userSchema,
+  betaUsersTable,
+  usersTable,
 } from "../zod-schemas/auth-schema";
 import {
-  placePhotoSchema,
-  placesSchema as places,
-  placesReviewSchema,
+  placePhotosTable,
+  placesTable,
+  placesReviewsTable,
 } from "../zod-schemas/places-schema";
-
-import { mapViewSchema, pathsSchema } from "../zod-schemas";
+import { mapViewsTable } from "../zod-schemas/analytics-schema";
 import {
-  collection_linksSchema,
-  collectionsSchema,
-  labelsSchema,
-  mapsSchema,
-  mapUserSchema,
-  markersSchema,
-  route_stopsSchema,
-  routesSchema,
+  collectionLinksTable,
+  collectionsTable,
+  labelsTable,
+  mapsTable,
+  mapUsersTable,
+  markersTable,
+  routesTable,
+  routeStopsTable,
 } from "../zod-schemas/maps-schema";
+import { pathsTable } from "../zod-schemas/paths-schema";
 
 export default defineSchema({
   // maps
-  maps: defineTable(zodToConvex(mapsSchema)).index("by_visibility", [
-    "visibility",
-  ]),
-  mapViews: defineTable(zodToConvex(mapViewSchema))
+  maps: mapsTable.table().index("by_visibility", ["visibility"]),
+  mapViews: mapViewsTable.table()
     .index("by_map_id", ["mapId"])
     .index("by_user_id", ["userId"]),
-  paths: defineTable(zodToConvex(pathsSchema)).index("byMapId", ["mapId"]),
-  map_users: defineTable(zodToConvex(mapUserSchema))
+  paths: pathsTable.table().index("byMapId", ["mapId"]),
+  map_users: mapUsersTable.table()
     .index("by_map_id", ["map_id"])
     .index("by_user_id", ["user_id"]),
-  labels: defineTable(zodToConvex(labelsSchema)).index("by_map_id", ["map_id"]),
-  markers: defineTable(zodToConvex(markersSchema))
+  labels: labelsTable.table().index("by_map_id", ["map_id"]),
+  markers: markersTable.table()
     .index("by_map_id", ["map_id"])
     .index("by_place_id", ["place_id"]),
-  collections: defineTable(zodToConvex(collectionsSchema)).index("by_map_id", [
-    "map_id",
-  ]),
-  collection_links: defineTable(zodToConvex(collection_linksSchema))
+  collections: collectionsTable.table().index("by_map_id", ["map_id"]),
+  collection_links: collectionLinksTable.table()
     .index("by_map_id", ["map_id"])
     .index("by_collection_id", ["collection_id"]),
-  routes: defineTable(zodToConvex(routesSchema)).index("by_map_id", ["map_id"]),
-  route_stops: defineTable(zodToConvex(route_stopsSchema)).index("by_map_id", [
-    "map_id",
-  ]),
+  routes: routesTable.table().index("by_map_id", ["map_id"]),
+  route_stops: routeStopsTable.table().index("by_map_id", ["map_id"]),
   // places
-  places: defineTable(zodToConvex(places))
+  places: placesTable.table()
     .index("gm_place_id_ixd", ["gm_place_id"])
     .index("mb_place_id_ixd", ["mb_place_id"])
     .index("fq_place_id_ixd", ["fq_place_id"])
@@ -57,9 +50,9 @@ export default defineSchema({
     .index("places_lng_idx", ["lng"])
     .index("by_place_lat_lng", ["lat", "lng"])
     .index("places_address_idx", ["address"]),
-  places_reviews: defineTable(zodToConvex(placesReviewSchema)),
-  place_photos: defineTable(zodToConvex(placePhotoSchema)),
-  users: defineTable(zodToConvex(userSchema))
+  places_reviews: placesReviewsTable.table(),
+  place_photos: placePhotosTable.table(),
+  users: usersTable.table()
     .index("by_email", ["email"])
     .index("by_clerk_id", ["clerkUserId"])
     .index("by_isBetaUser", ["isBetaUser"])
@@ -68,7 +61,7 @@ export default defineSchema({
       filterFields: ["email", "username"],
     }),
   // Beta program - consolidated table
-  beta_users: defineTable(zodToConvex(betaUsersSchema))
+  beta_users: betaUsersTable.table()
     .index("by_email", ["email"])
     .index("by_token", ["token"])
     .index("by_user_id", ["userId"]),

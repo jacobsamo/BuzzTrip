@@ -1,6 +1,6 @@
 import { GeospatialIndex } from "@convex-dev/geospatial";
 import { NoOp } from "convex-helpers/server/customFunctions";
-import { zCustomMutation, zCustomQuery } from "convex-helpers/server/zod";
+import { zCustomMutation, zCustomQuery, zCustomAction } from "convex-helpers/server/zod4";
 import { components } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import {
@@ -8,7 +8,8 @@ import {
   type QueryCtx,
   mutation,
   query,
-  internalMutation
+  internalMutation,
+  action
 } from "./_generated/server";
 
 export const geospatial = new GeospatialIndex(components.geospatial);
@@ -65,3 +66,4 @@ export const authedQuery = zCustomQuery(query, {
 export const zodQuery = zCustomQuery(query, NoOp);
 export const zodMutation = zCustomMutation(mutation, NoOp);
 export const zodInternalMutation = zCustomMutation(internalMutation, NoOp);
+export const zodAction = zCustomAction(action, NoOp)

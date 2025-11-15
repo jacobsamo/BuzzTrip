@@ -1,9 +1,9 @@
-import { zid } from "convex-helpers/server/zod";
+import { zid } from "convex-helpers/server/zod4";
 import * as z from "zod";
-import { defaultFields, insertSchema } from "./shared-schemas";
+import { zodTable } from "./helpers";
 
-export const mapViewSchema = z.object({
-  ...defaultFields,
+// Define mapViews table
+export const mapViewsTable = zodTable("mapViews", {
   userId: zid("users").optional(),
   mapId: zid("maps"),
   ip: z.string().optional(),
@@ -16,4 +16,5 @@ export const mapViewSchema = z.object({
   device: z.string().optional(),
 });
 
-export const mapViewEditSchema = insertSchema(mapViewSchema);
+export const mapViewSchema = mapViewsTable.schema;
+export const mapViewEditSchema = mapViewsTable.insertSchema;

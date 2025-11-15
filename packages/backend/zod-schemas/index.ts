@@ -1,4 +1,4 @@
-import { zid } from "convex-helpers/server/zod";
+import { zid } from "convex-helpers/server/zod4";
 import { refinedUserSchema } from "./auth-schema";
 import { mapsSchema, mapUserSchema, markersEditSchema } from "./maps-schema";
 import { placesEditSchema } from "./places-schema";

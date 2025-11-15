@@ -1,9 +1,9 @@
-import { zid } from "convex-helpers/server/zod";
+import { zid } from "convex-helpers/server/zod4";
 import * as z from "zod";
-import { defaultFields, insertSchema } from "./shared-schemas";
+import { zodTable } from "./helpers";
 
-export const userSchema = z.object({
-  ...defaultFields,
+// Define users table
+export const usersTable = zodTable("users", {
   clerkUserId: z.string(),
   name: z.string(),
   email: z.string(),
@@ -18,7 +18,9 @@ export const userSchema = z.object({
   isBetaUser: z.boolean().optional(),
 });
 
-export const usersEditSchema = insertSchema(userSchema);
+// Export schema
+export const userSchema = usersTable.schema;
+export const usersEditSchema = usersTable.insertSchema;
 
 export const refinedUserSchema = userSchema.pick({
   _id: true,
@@ -30,9 +32,8 @@ export const refinedUserSchema = userSchema.pick({
   image: true,
 });
 
-// Consolidated Beta Users schema - handles entire beta signup flow
-export const betaUsersSchema = z.object({
-  ...defaultFields,
+// Define beta_users table
+export const betaUsersTable = zodTable("beta_users", {
   // Identity
   email: z.string(),
   firstName: z.string(),
@@ -62,4 +63,6 @@ export const betaUsersSchema = z.object({
   updatedAt: z.number(),
 });
 
-export const betaUsersEditSchema = insertSchema(betaUsersSchema)
+// Export schema
+export const betaUsersSchema = betaUsersTable.schema;
+export const betaUsersEditSchema = betaUsersTable.insertSchema;

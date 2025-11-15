@@ -1,6 +1,6 @@
-import { zid } from "convex-helpers/server/zod";
+import { zid } from "convex-helpers/server/zod4";
 import * as z from "zod";
-import { defaultSchema, insertSchema } from "./shared-schemas";
+import { zodTable } from "./helpers";
 
 // --- Constants ---
 const pathTypes = ["text", "circle", "rectangle", "polygon", "line"] as const;
@@ -66,23 +66,20 @@ const pointsSchema = z.union([
   strictPosition.array().array(),
 ]);
 
-// --- Main Schema ---
-export const pathsSchema = defaultSchema(
-  z.object({
-    mapId: zid("maps"),
-    pathType: pathTypeEnum,
-    title: z.string(),
-    note: z.string().optional(),
-    points: pointsSchema,
-    measurements: measurementsSchema.optional(),
-    styles: stylesSchema.optional(),
-    createdBy: zid("users"),
-    updatedAt: z.string().datetime().optional(), // allow optional for updates
-  })
-);
-
-// --- Edit Schema ---
-export const pathsEditSchema = insertSchema(pathsSchema).extend({
-  createdBy: zid("users").optional(),
+// Define paths table
+export const pathsTable = zodTable("paths", {
+  mapId: zid("maps"),
+  pathType: pathTypeEnum,
+  title: z.string(),
+  note: z.string().optional(),
+  points: pointsSchema,
+  measurements: measurementsSchema.optional(),
+  styles: stylesSchema.optional(),
+  createdBy: zid("users"),
+  updatedAt: z.string().datetime().optional(), // allow optional for updates
 });
-// Position | Position[] | Position[][]
+
+export const pathsSchema = pathsTable.schema;
+export const pathsEditSchema = pathsTable.insertSchema.extend({
+  createdBy: pathsTable.insertSchema.shape.createdBy.optional(),
+});

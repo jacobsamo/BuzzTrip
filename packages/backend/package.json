@@ -27,15 +27,15 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@clerk/backend": "^2.17.2",
-    "@convex-dev/geospatial": "^0.1.9",
-    "@convex-dev/migrations": "^0.2.9",
+    "@clerk/backend": "^2.22.0",
+    "@convex-dev/geospatial": "^0.2.0",
+    "@convex-dev/migrations": "^0.3.0",
     "@convex-dev/resend": "^0.1.13",
-    "convex": "^1.27.5",
-    "convex-helpers": "0.1.104",
+    "convex": "^1.29.1",
+    "convex-helpers": "0.1.105-alpha.1",
     "open-location-code-typescript": "^1.5.0",
-    "svix": "^1.77.0",
-    "zod": "3.25.76"
+    "svix": "^1.81.0",
+    "zod": "4.1.12"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

@@ -1,11 +1,7 @@
-import { zid } from "convex-helpers/server/zod";
+import { zid } from "convex-helpers/server/zod4";
 import * as z from "zod";
-import {
-  defaultSchema,
-  iconSchema,
-  insertSchema,
-  mapBoundsSchema,
-} from "./shared-schemas";
+import { zodTable } from "./helpers";
+import { iconSchema, mapBoundsSchema } from "./shared-schemas";
 
 export const permissionEnum = [
   "owner",
@@ -35,43 +31,45 @@ export const travelTypeEnumSchema = z.enum(routeTravelTypeEnum);
 
 export const mapTypeIdEnum = z.enum(mapTypeIdOptions);
 
-export const mapsSchema = defaultSchema(
-  z.object({
-    title: z.string(),
-    description: z.string().optional(),
-    image: z.string().optional(),
-    icon: iconSchema.nullish(),
-    color: z.string().optional(),
-    owner_id: zid("users"),
-    location_name: z.string().optional(), // the location where the map is saved too e.g Brisbane, Australia, etc
-    lat: z.optional(z.number()),
-    lng: z.optional(z.number()),
-    bounds: mapBoundsSchema.nullish(),
-    visibility: z.enum(visibilityOptions),
-    mapTypeId: mapTypeIdEnum.optional(),
-    updatedAt: z.string().datetime().optional(),
-  })
-);
+// Define maps table
+export const mapsTable = zodTable("maps", {
+  title: z.string(),
+  description: z.string().optional(),
+  image: z.string().optional(),
+  icon: iconSchema.nullish(),
+  color: z.string().optional(),
+  owner_id: zid("users"),
+  location_name: z.string().optional(), // the location where the map is saved too e.g Brisbane, Australia, etc
+  lat: z.optional(z.number()),
+  lng: z.optional(z.number()),
+  bounds: mapBoundsSchema.nullish(),
+  visibility: z.enum(visibilityOptions),
+  mapTypeId: mapTypeIdEnum.optional(),
+  updatedAt: z.string().datetime().optional(),
+});
 
-export const mapsEditSchema = insertSchema(mapsSchema).extend({
+export const mapsSchema = mapsTable.schema;
+export const mapsEditSchema = mapsTable.insertSchema.extend({
   owner_id: zid("users").optional(),
 });
 
-export const mapUserSchema = defaultSchema(
-  z.object({
-    map_id: zid("maps"),
-    user_id: zid("users"),
-    permission: permissionEnumSchema.default("editor"),
-  })
-);
-export const mapUserEditSchema = insertSchema(mapUserSchema);
+// Define map_users table
+export const mapUsersTable = zodTable("map_users", {
+  map_id: zid("maps"),
+  user_id: zid("users"),
+  permission: permissionEnumSchema.default("editor"),
+});
+
+export const mapUserSchema = mapUsersTable.schema;
+export const mapUserEditSchema = mapUsersTable.insertSchema;
 
 export const shareMapUserSchema = mapUserSchema.pick({
   user_id: true,
   permission: true,
 });
 
-const labelSchema = z.object({
+// Define labels table
+const labelSchemaFields = {
   map_id: zid("maps"),
   title: z.string(),
   description: z.string(),
@@ -79,16 +77,20 @@ const labelSchema = z.object({
   color: z.string().optional(),
   created_by: zid("users"),
   updatedAt: z.string().datetime().optional(),
-});
+};
 
-export const labelsSchema = defaultSchema(labelSchema).refine(
+export const labelsTable = zodTable("labels", labelSchemaFields);
+
+// Apply refinement to the exported schema
+export const labelsSchema = labelsTable.schema.refine(
   (data) => !(data.icon === null && data.color === null),
   {
     message: "Either icon or color must be provided.",
     path: ["icon"],
   }
 );
-export const labelsEditSchema = insertSchema(labelSchema).refine(
+
+export const labelsEditSchema = labelsTable.insertSchema.refine(
   (data) => !(data.icon === null && data.color === null),
   {
     message: "Either icon or color must be provided.",
@@ -96,74 +98,76 @@ export const labelsEditSchema = insertSchema(labelSchema).refine(
   }
 );
 
-export const markersSchema = defaultSchema(
-  z.object({
-    title: z.string(),
-    note: z.string().optional(),
-    lat: z.number(),
-    lng: z.number(),
-    created_by: zid("users"),
-    icon: iconSchema,
-    color: z.string(),
-    place_id: zid("places"),
-    map_id: zid("maps"),
-    updatedAt: z.string().datetime().optional(),
-  })
-);
+// Define markers table
+export const markersTable = zodTable("markers", {
+  title: z.string(),
+  note: z.string().optional(),
+  lat: z.number(),
+  lng: z.number(),
+  created_by: zid("users"),
+  icon: iconSchema,
+  color: z.string(),
+  place_id: zid("places"),
+  map_id: zid("maps"),
+  updatedAt: z.string().datetime().optional(),
+});
 
-export const markersEditSchema = insertSchema(markersSchema).extend({
+export const markersSchema = markersTable.schema;
+export const markersEditSchema = markersTable.insertSchema.extend({
   created_by: zid("users").optional(),
 });
 
-export const collectionsSchema = defaultSchema(
-  z.object({
-    map_id: zid("maps"),
-    title: z.string(),
-    description: z.string().optional(),
-    created_by: zid("users"),
-    icon: iconSchema,
-    color: z.string().optional(),
-    updatedAt: z.string().datetime().optional(),
-  })
-);
+// Define collections table
+export const collectionsTable = zodTable("collections", {
+  map_id: zid("maps"),
+  title: z.string(),
+  description: z.string().optional(),
+  created_by: zid("users"),
+  icon: iconSchema,
+  color: z.string().optional(),
+  updatedAt: z.string().datetime().optional(),
+});
 
-export const collectionsEditSchema = insertSchema(collectionsSchema).extend({
+export const collectionsSchema = collectionsTable.schema;
+export const collectionsEditSchema = collectionsTable.insertSchema.extend({
   created_by: zid("users").optional(),
 });
 
-export const collection_linksSchema = defaultSchema(
-  z.object({
-    collection_id: zid("collections"),
-    marker_id: zid("markers"),
-    map_id: zid("maps"),
-    user_id: zid("users"),
-  })
-);
-export const collection_linksEditSchema = insertSchema(collection_linksSchema);
+// Define collection_links table
+export const collectionLinksTable = zodTable("collection_links", {
+  collection_id: zid("collections"),
+  marker_id: zid("markers"),
+  map_id: zid("maps"),
+  user_id: zid("users"),
+});
 
-export const routesSchema = defaultSchema(
-  z.object({
-    map_id: zid("maps"),
-    name: z.string(),
-    description: z.string().optional(),
-    travel_type: travelTypeEnumSchema,
-    user_id: zid("users"),
-    updatedAt: z.string().datetime().optional(),
-  })
-);
+export const collection_linksSchema = collectionLinksTable.schema;
+export const collection_linksEditSchema = collectionLinksTable.insertSchema;
 
-export const routesEditSchema = insertSchema(routesSchema);
+// Define routes table
+export const routesTable = zodTable("routes", {
+  map_id: zid("maps"),
+  name: z.string(),
+  description: z.string().optional(),
+  travel_type: travelTypeEnumSchema,
+  user_id: zid("users"),
+  updatedAt: z.string().datetime().optional(),
+});
 
-export const route_stopsSchema = defaultSchema(
-  z.object({
-    map_id: zid("maps"),
-    route_id: zid("routes"),
-    marker_id: zid("markers"),
-    user_id: zid("users"),
-    lat: z.number(),
-    lng: z.number(),
-    stop_order: z.number(),
-    updatedAt: z.string().datetime().optional(),
-  })
-);
-export const route_stopsEditSchema = insertSchema(route_stopsSchema);
+export const routesSchema = routesTable.schema;
+export const routesEditSchema = routesTable.insertSchema;
+
+// Define route_stops table
+export const routeStopsTable = zodTable("route_stops", {
+  map_id: zid("maps"),
+  route_id: zid("routes"),
+  marker_id: zid("markers"),
+  user_id: zid("users"),
+  lat: z.number(),
+  lng: z.number(),
+  stop_order: z.number(),
+  updatedAt: z.string().datetime().optional(),
+});
+
+export const route_stopsSchema = routeStopsTable.schema;
+export const route_stopsEditSchema = routeStopsTable.insertSchema;
