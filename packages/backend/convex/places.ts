@@ -30,6 +30,7 @@ export const createPlace = async (ctx: MutationCtx, place: NewPlace) => {
     types: place.types,
     website: place.website,
     phone: place.phone,
+    isArchived: false,
   });
 
   await geospatial.insert(

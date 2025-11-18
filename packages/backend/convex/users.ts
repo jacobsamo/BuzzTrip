@@ -20,7 +20,7 @@ export const searchUsers = authedQuery({
       .collect();
 
     return (
-      searchUsers.map((user) => ({
+      searchUsers.filter((u) => !u.isArchived).map((user) => ({
         ...user,
       })) ?? null
     );
@@ -105,7 +105,10 @@ export const createUser = internalMutation({
     }
 
     const user = extractUserFields(data);
-    const userId = await ctx.db.insert("users", user);
+    const userId = await ctx.db.insert("users", {
+      ...user,
+      isArchived: false,
+    });
     await Promise.all([
       ctx.runMutation(internal.emails.sendWelcomeEmail, {
         firstName: user.first_name,
@@ -145,7 +148,10 @@ export const deleteUser = internalMutation({
     if (userRecord === null) {
       console.warn("can't delete user, does not exist", id);
     } else {
-      await ctx.db.delete(userRecord._id);
+      await ctx.db.patch(userRecord._id, {
+        isArchived: true,
+        updatedAt: new Date().toISOString(),
+      });
     }
   },
 });
@@ -153,14 +159,18 @@ export const deleteUser = internalMutation({
 // Helpers
 
 export async function userQuery(ctx: QueryCtx, clerkUserId: string) {
-  return await ctx.db
+  const user = await ctx.db
     .query("users")
     .withIndex("by_clerk_id", (q) => q.eq("clerkUserId", clerkUserId))
     .unique();
+  if (user?.isArchived) return null;
+  return user;
 }
 
 export async function userById(ctx: QueryCtx, id: Id<"users">) {
-  return await ctx.db.get(id);
+  const user = await ctx.db.get(id);
+  if (user?.isArchived) return null;
+  return user;
 }
 
 export async function getCurrentUser(ctx: QueryCtx): Promise<Doc<"users"> | null> {

@@ -17,10 +17,11 @@ export const getMapUsers = authedQuery({
   },
   returns: mapUserSchema.array(),
   handler: async (ctx, args) => {
-    return await ctx.db
+    const mapUsers = await ctx.db
       .query("map_users")
       .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
       .collect();
+    return mapUsers.filter((mu) => !mu.isArchived);
   },
 });
 
@@ -39,15 +40,17 @@ export const getCombinedMapUsers = authedQuery({
       .collect();
 
     const combinedUsers = await Promise.all(
-      mapUsers.map(async (mapUser) => {
-        const user = await ctx.db.get(mapUser.user_id);
-        if (!user) return null;
+      mapUsers
+        .filter((mu) => !mu.isArchived)
+        .map(async (mapUser) => {
+          const user = await ctx.db.get(mapUser.user_id);
+          if (!user || user.isArchived) return null;
 
-        return {
-          ...mapUser,
-          user,
-        };
-      })
+          return {
+            ...mapUser,
+            user,
+          };
+        })
     );
 
     // Properly filter out nulls and type narrow
@@ -68,7 +71,10 @@ export async function createMapUser(
   },
   skipLogging = false
 ) {
-  const mapUserId = await ctx.db.insert("map_users", user);
+  const mapUserId = await ctx.db.insert("map_users", {
+    ...user,
+    isArchived: false,
+  });
 
   if (!skipLogging) {
     await logMapEvent(
@@ -100,12 +106,14 @@ export const shareMap = authedMutation({
   },
   handler: async (ctx, args) => {
     if (args.users) {
-      const existingUsers = await getManyFrom(
+      const existingUsersAll = await getManyFrom(
         ctx.db,
         "map_users",
         "by_map_id",
         args.mapId
       );
+
+      const existingUsers = existingUsersAll.filter((u) => !u.isArchived);
 
       const newUsers = args.users.filter((user) => {
         return !existingUsers.some(
@@ -160,7 +168,9 @@ export const deleteMapUser = authedMutation({
     const mapUser = await ctx.db.get(args.mapUserId);
     if (!mapUser) throw new Error("Map user not found");
 
-    await ctx.db.delete(args.mapUserId);
+    await ctx.db.patch(args.mapUserId, {
+      isArchived: true,
+    });
 
     await logMapEvent(
       ctx,

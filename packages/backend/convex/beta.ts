@@ -193,6 +193,7 @@ export const quickBetaSignup = zodMutation({
         createdAt: now,
         updatedAt: now,
         expiresAt: now + BETA_TOKEN_EXPIRY_MS,
+        isArchived: false,
       });
     } catch (error) {
       // Handle race condition - another request may have created entry

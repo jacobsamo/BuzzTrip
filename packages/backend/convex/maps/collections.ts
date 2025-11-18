@@ -15,10 +15,11 @@ export const getCollectionsForMap = authedQuery({
   },
   returns: collectionsSchema.array().nullable(),
   handler: async (ctx, args) => {
-    return await ctx.db
+    const collections = await ctx.db
       .query("collections")
       .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
       .collect();
+    return collections.filter((c) => !c.isArchived);
   },
 });
 
@@ -28,10 +29,11 @@ export const getCollectionLinksForMap = authedQuery({
   },
   returns: collection_linksSchema.array().nullable(),
   handler: async (ctx, args) => {
-    return await ctx.db
+    const links = await ctx.db
       .query("collection_links")
       .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
       .collect();
+    return links.filter((l) => !l.isArchived);
   },
 });
 
@@ -49,6 +51,7 @@ export const createCollectionFunction = async (
     ...args.collection,
     ...(args.collection.icon ? { icon: args.collection.icon as IconType } : {}),
     created_by: args.userId,
+    isArchived: false,
   });
 
   if (!skipLogging) {
@@ -114,7 +117,10 @@ export const deleteCollection = authedMutation({
     const collection = await ctx.db.get(args.collectionId);
     if (!collection) throw new Error("Collection not found");
 
-    await ctx.db.delete(args.collectionId);
+    await ctx.db.patch(args.collectionId, {
+      isArchived: true,
+      updatedAt: new Date().toISOString(),
+    });
 
     await logMapEvent(
       ctx,

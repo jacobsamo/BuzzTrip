@@ -36,6 +36,7 @@ export async function logMapEvent(
     event,
     details,
     userId,
+    isArchived: false,
   });
 }
 

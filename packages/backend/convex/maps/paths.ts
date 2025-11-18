@@ -8,12 +8,11 @@ export const getPathsForMap = authedQuery({
   },
   returns: pathsSchema.array().nullable(),
   handler: async (ctx, args) => {
-    return pathsSchema.array().parse(
-      await ctx.db
-        .query("paths")
-        .withIndex("byMapId", (q) => q.eq("mapId", args.mapId))
-        .collect()
-    );
+    const paths = await ctx.db
+      .query("paths")
+      .withIndex("byMapId", (q) => q.eq("mapId", args.mapId))
+      .collect();
+    return pathsSchema.array().parse(paths.filter((p) => !p.isArchived));
   },
 });
 
@@ -25,6 +24,7 @@ export const createPath = authedMutation({
     const pathId = await ctx.db.insert("paths", {
       ...args,
       createdBy: ctx.user._id,
+      isArchived: false,
     });
 
     await logMapEvent(
@@ -77,7 +77,10 @@ export const deletePath = authedMutation({
     const path = await ctx.db.get(args.pathId);
     if (!path) throw new Error("Path not found");
 
-    await ctx.db.delete(args.pathId);
+    await ctx.db.patch(args.pathId, {
+      isArchived: true,
+      updatedAt: new Date().toISOString(),
+    });
 
     await logMapEvent(
       ctx,

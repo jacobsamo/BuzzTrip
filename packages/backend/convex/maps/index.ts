@@ -25,9 +25,11 @@ export const getMapUsers = authedQuery({
     mapId: zid("maps"),
   },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const mapUsers = await ctx.db
       .query("map_users")
-      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId));
+      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+      .collect();
+    return mapUsers.filter((mu) => !mu.isArchived);
   },
 });
 
@@ -43,7 +45,10 @@ export const getMap = authedQuery({
 export const trackMapView = zodMutation({
   args: mapViewEditSchema,
   handler: async (ctx, args) => {
-    await ctx.db.insert("mapViews", args);
+    await ctx.db.insert("mapViews", {
+      ...args,
+      isArchived: false,
+    });
   },
 });
 
@@ -72,17 +77,20 @@ export const getUserMaps = authedQuery({
       .collect();
 
     const combinedMaps = await Promise.all(
-      mapUsers.map(async (mapUser) => {
-        const map = await ctx.db.get(mapUser.map_id);
-        return {
-          ...map,
-          ...mapUser,
-          _id: mapUser._id,
-          map_id: mapUser.map_id,
-        } as UserMap;
-      })
+      mapUsers
+        .filter((mu) => !mu.isArchived)
+        .map(async (mapUser) => {
+          const map = await ctx.db.get(mapUser.map_id);
+          if (map?.isArchived) return null;
+          return {
+            ...map,
+            ...mapUser,
+            _id: mapUser._id,
+            map_id: mapUser.map_id,
+          } as UserMap;
+        })
     );
-    return combinedMaps;
+    return combinedMaps.filter((m): m is UserMap => m !== null);
   },
 });
 
@@ -116,6 +124,7 @@ export const createMapFunction = async (
       title: uppercaseFirstLetter(map.title),
       owner_id: args.userId,
       mapTypeId: map.mapTypeId ?? "hybrid",
+      isArchived: false,
     });
 
     const userPromise =
@@ -224,7 +233,10 @@ export const deleteMap = authedMutation({
     const map = await ctx.db.get(args.mapId as Id<"maps">);
     if (!map) throw new Error("Map not found");
 
-    await ctx.db.delete(args.mapId as Id<"maps">);
+    await ctx.db.patch(args.mapId as Id<"maps">, {
+      isArchived: true,
+      updatedAt: new Date().toISOString(),
+    });
 
     await logMapEvent(
       ctx,
@@ -289,6 +301,7 @@ export const duplicateMap = authedMutation({
       title: `Copy of ${originalMap.title}`,
       owner_id: ctx.user._id,
       updatedAt: new Date().toISOString(),
+      isArchived: false,
     });
 
     try {
@@ -301,13 +314,13 @@ export const duplicateMap = authedMutation({
 
       // Fetch all related data in parallel
       const [
-        collections,
-        markers,
-        collectionLinks,
-        paths,
-        labels,
-        routes,
-        routeStops,
+        collectionsAll,
+        markersAll,
+        collectionLinksAll,
+        pathsAll,
+        labelsAll,
+        routesAll,
+        routeStopsAll,
       ] = await Promise.all([
         ctx.db
           .query("collections")
@@ -339,6 +352,15 @@ export const duplicateMap = authedMutation({
           .collect(),
       ]);
 
+      // Filter out archived items
+      const collections = collectionsAll.filter((c) => !c.isArchived);
+      const markers = markersAll.filter((m) => !m.isArchived);
+      const collectionLinks = collectionLinksAll.filter((cl) => !cl.isArchived);
+      const paths = pathsAll.filter((p) => !p.isArchived);
+      const labels = labelsAll.filter((l) => !l.isArchived);
+      const routes = routesAll.filter((r) => !r.isArchived);
+      const routeStops = routeStopsAll.filter((rs) => !rs.isArchived);
+
       // Duplicate collections in parallel and track ID mapping
       const collectionIdMap = new Map<Id<"collections">, Id<"collections">>();
       const newCollectionIds = await Promise.all(
@@ -351,6 +373,7 @@ export const duplicateMap = authedMutation({
             icon: collection.icon,
             color: collection.color,
             updatedAt: new Date().toISOString(),
+            isArchived: false,
           })
         )
       );
@@ -373,6 +396,7 @@ export const duplicateMap = authedMutation({
             place_id: marker.place_id,
             map_id: newMapId,
             updatedAt: new Date().toISOString(),
+            isArchived: false,
           })
         )
       );
@@ -391,6 +415,7 @@ export const duplicateMap = authedMutation({
             travel_type: route.travel_type,
             user_id: ctx.user._id,
             updatedAt: new Date().toISOString(),
+            isArchived: false,
           })
         )
       );
@@ -411,6 +436,7 @@ export const duplicateMap = authedMutation({
             styles: path.styles,
             createdBy: ctx.user._id,
             updatedAt: new Date().toISOString(),
+            isArchived: false,
           })
         ),
         ...labels.map((label) =>
@@ -422,6 +448,7 @@ export const duplicateMap = authedMutation({
             color: label.color,
             created_by: ctx.user._id,
             updatedAt: new Date().toISOString(),
+            isArchived: false,
           })
         ),
       ]);
@@ -438,6 +465,7 @@ export const duplicateMap = authedMutation({
                 marker_id: newMarkerId,
                 map_id: newMapId,
                 user_id: ctx.user._id,
+                isArchived: false,
               });
             }
             return null;
@@ -457,6 +485,7 @@ export const duplicateMap = authedMutation({
                 lng: stop.lng,
                 stop_order: stop.stop_order,
                 updatedAt: new Date().toISOString(),
+                isArchived: false,
               });
             }
             return null;

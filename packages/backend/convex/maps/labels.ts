@@ -9,10 +9,11 @@ export const getMapLabels = authedQuery({
   },
   returns: labelsSchema.array().nullable(),
   handler: async (ctx, args) => {
-    return await ctx.db
+    const labels = await ctx.db
       .query("labels")
       .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
       .collect();
+    return labels.filter((l) => !l.isArchived);
   },
 });
 
@@ -28,6 +29,7 @@ export const createLabel = authedMutation({
       ...args.label,
       map_id: args.mapId,
       created_by: ctx.user._id,
+      isArchived: false,
     });
 
     await logMapEvent(
@@ -83,7 +85,10 @@ export const deleteLabel = authedMutation({
     const label = await ctx.db.get(args.labelId);
     if (!label) throw new Error("Label not found");
 
-    await ctx.db.delete(args.labelId);
+    await ctx.db.patch(args.labelId, {
+      isArchived: true,
+      updatedAt: new Date().toISOString(),
+    });
 
     await logMapEvent(
       ctx,

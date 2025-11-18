@@ -52,16 +52,18 @@ export const zodTable = <
   tableName: Table,
   schema: T
 ) => {
-  // add _id and _creationTime
+  // add _id, _creationTime, and isArchived (for soft deletes)
   const fullSchema = z.object({
     ...schema,
     _id: zid(tableName),
     _creationTime: z.number(),
+    isArchived: z.boolean().default(false),
   });
 
   const insertSchema = fullSchema.partial({
     _id: true,
     _creationTime: true,
+    isArchived: true,
   });
 
   const updateSchema = fullSchema
