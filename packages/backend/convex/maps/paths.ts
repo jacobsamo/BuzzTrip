@@ -1,6 +1,6 @@
 import { zid } from "convex-helpers/server/zod4";
 import { pathsEditSchema, pathsSchema } from "../../zod-schemas";
-import { authedMutation, authedQuery } from "../helpers";
+import { authedMutation, authedQuery, logMapEvent } from "../helpers";
 
 export const getPathsForMap = authedQuery({
   args: {
@@ -22,10 +22,24 @@ export const createPath = authedMutation({
     createdBy: true,
   }),
   handler: async (ctx, args) => {
-    return await ctx.db.insert("paths", {
+    const pathId = await ctx.db.insert("paths", {
       ...args,
       createdBy: ctx.user._id,
     });
+
+    await logMapEvent(
+      ctx,
+      args.mapId,
+      "path.create",
+      {
+        pathId,
+        title: args.title,
+        pathType: args.pathType,
+      },
+      ctx.user._id
+    );
+
+    return pathId;
   },
 });
 
@@ -40,6 +54,17 @@ export const editPath = authedMutation({
       updatedAt: new Date().toISOString(),
     });
 
+    await logMapEvent(
+      ctx,
+      args.path.mapId,
+      "path.update",
+      {
+        pathId: args.pathId,
+        updatedFields: Object.keys(args.path),
+      },
+      ctx.user._id
+    );
+
     return args.pathId;
   },
 });
@@ -49,7 +74,22 @@ export const deletePath = authedMutation({
     pathId: zid("paths"),
   },
   handler: async (ctx, args) => {
+    const path = await ctx.db.get(args.pathId);
+    if (!path) throw new Error("Path not found");
+
     await ctx.db.delete(args.pathId);
+
+    await logMapEvent(
+      ctx,
+      path.mapId,
+      "path.delete",
+      {
+        pathId: args.pathId,
+        title: path.title,
+      },
+      ctx.user._id
+    );
+
     return args.pathId;
   },
 });

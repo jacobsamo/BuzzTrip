@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { CombinedMarker, IconType } from "../../types";
 import { combinedMarkersSchema, markersEditSchema } from "../../zod-schemas";
 import { Id } from "../_generated/dataModel";
-import { authedMutation, authedQuery } from "../helpers";
+import { authedMutation, authedQuery, logMapEvent } from "../helpers";
 import { createPlace } from "../places";
 
 export const getMarkersView = authedQuery({
@@ -108,6 +108,19 @@ export const createMarker = authedMutation({
       }
     }
 
+    await logMapEvent(
+      ctx,
+      args.mapId,
+      "marker.create",
+      {
+        markerId: newMarkerId,
+        title: args.marker.title,
+        placeId: place?._id ?? placeId,
+        collectionIds: args.collectionIds,
+      },
+      ctx.user._id
+    );
+
     return newMarkerId;
   },
 });
@@ -159,6 +172,19 @@ export const editMarker = authedMutation({
       updatedAt: new Date().toISOString(),
     });
 
+    await logMapEvent(
+      ctx,
+      args.mapId,
+      "marker.update",
+      {
+        markerId: args.marker_id,
+        updatedFields: Object.keys(args.marker),
+        collectionLinksAdded: collectionLinkCreatedIds,
+        collectionLinksRemoved: collectionLinksDeleted,
+      },
+      ctx.user._id
+    );
+
     return {
       collectionLinksDeleted: collectionLinksDeleted,
       collectionLinksCreated: collectionLinkCreatedIds,
@@ -171,6 +197,20 @@ export const deleteMarker = authedMutation({
     markerId: zid("markers"),
   },
   handler: async (ctx, args) => {
+    const marker = await ctx.db.get(args.markerId);
+    if (!marker) throw new Error("Marker not found");
+
     await ctx.db.delete(args.markerId);
+
+    await logMapEvent(
+      ctx,
+      marker.map_id,
+      "marker.delete",
+      {
+        markerId: args.markerId,
+        title: marker.title,
+      },
+      ctx.user._id
+    );
   },
 });

@@ -10,7 +10,12 @@ import {
 } from "../../zod-schemas";
 import { Id } from "../_generated/dataModel";
 import { MutationCtx } from "../_generated/server";
-import { authedMutation, authedQuery, zodMutation } from "../helpers";
+import {
+  authedMutation,
+  authedQuery,
+  logMapEvent,
+  zodMutation,
+} from "../helpers";
 import { createCollectionFunction } from "./collections";
 import { createMapUser } from "./mapUsers";
 // Get methods
@@ -130,16 +135,32 @@ export const createMapFunction = async (
         permission: "owner",
         map_id: mapId,
       }),
-      // create a default collection for the map
-      createCollectionFunction(ctx, {
-        collection: {
-          map_id: mapId,
-          title: "Default Collection",
-          icon: "Folder",
+      // create a default collection for the map (skip logging for default collection)
+      createCollectionFunction(
+        ctx,
+        {
+          collection: {
+            map_id: mapId,
+            title: "Default Collection",
+            icon: "Folder",
+          },
+          userId: args.userId,
         },
-        userId: args.userId,
-      }),
+        true
+      ),
     ]);
+
+    await logMapEvent(
+      ctx,
+      mapId,
+      "map.create",
+      {
+        mapId,
+        title: map.title,
+        visibility: map.visibility,
+      },
+      args.userId
+    );
 
     return mapId;
   } catch (error) {
@@ -168,6 +189,17 @@ export const updateMap = authedMutation({
         : {}),
       updatedAt: new Date().toISOString(),
     });
+
+    await logMapEvent(
+      ctx,
+      args.mapId,
+      "map.update",
+      {
+        mapId: args.mapId,
+        updatedFields: Object.keys(args.map),
+      },
+      ctx.user._id
+    );
   },
 });
 
@@ -189,7 +221,21 @@ export const deleteMap = authedMutation({
     mapId: zid("maps"),
   },
   handler: async (ctx, args) => {
+    const map = await ctx.db.get(args.mapId as Id<"maps">);
+    if (!map) throw new Error("Map not found");
+
     await ctx.db.delete(args.mapId as Id<"maps">);
+
+    await logMapEvent(
+      ctx,
+      args.mapId,
+      "map.delete",
+      {
+        mapId: args.mapId,
+        title: map.title,
+      },
+      ctx.user._id
+    );
   },
 });
 
@@ -222,7 +268,11 @@ export const duplicateMap = authedMutation({
     // 1. User is the owner
     // 2. User has access to the map (owner/editor/viewer)
     // 3. Map is public (anyone can duplicate public maps)
-    if (!mapUser && originalMap.owner_id !== ctx.user._id && originalMap.visibility !== "public") {
+    if (
+      !mapUser &&
+      originalMap.owner_id !== ctx.user._id &&
+      originalMap.visibility !== "public"
+    ) {
       throw new Error("You don't have permission to duplicate this map");
     }
 
@@ -250,8 +300,15 @@ export const duplicateMap = authedMutation({
       });
 
       // Fetch all related data in parallel
-      const [collections, markers, collectionLinks, paths, labels, routes, routeStops] =
-        await Promise.all([
+      const [
+        collections,
+        markers,
+        collectionLinks,
+        paths,
+        labels,
+        routes,
+        routeStops,
+      ] = await Promise.all([
         ctx.db
           .query("collections")
           .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
@@ -280,7 +337,7 @@ export const duplicateMap = authedMutation({
           .query("route_stops")
           .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
           .collect(),
-        ]);
+      ]);
 
       // Duplicate collections in parallel and track ID mapping
       const collectionIdMap = new Map<Id<"collections">, Id<"collections">>();

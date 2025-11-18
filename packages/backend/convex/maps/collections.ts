@@ -1,13 +1,13 @@
 import { zid } from "convex-helpers/server/zod4";
+import { z } from "zod";
 import { IconType } from "../../types";
 import {
   collection_linksSchema,
   collectionsEditSchema,
   collectionsSchema,
 } from "../../zod-schemas";
-import { authedMutation, authedQuery } from "../helpers";
 import { MutationCtx } from "../_generated/server";
-import {z} from "zod";
+import { authedMutation, authedQuery, logMapEvent } from "../helpers";
 
 export const getCollectionsForMap = authedQuery({
   args: {
@@ -42,20 +42,39 @@ const createCollectionPropsSchema = z.object({
 
 export const createCollectionFunction = async (
   ctx: MutationCtx,
-  args: z.infer<typeof createCollectionPropsSchema>
+  args: z.infer<typeof createCollectionPropsSchema>,
+  skipLogging = false
 ) => {
-  return  await ctx.db.insert("collections", {
-      ...args.collection,
-      ...(args.collection.icon ? { icon: args.collection.icon as IconType } : {}),
-      created_by: args.userId,
-    })
-}
+  const collectionId = await ctx.db.insert("collections", {
+    ...args.collection,
+    ...(args.collection.icon ? { icon: args.collection.icon as IconType } : {}),
+    created_by: args.userId,
+  });
 
+  if (!skipLogging) {
+    await logMapEvent(
+      ctx,
+      args.collection.map_id,
+      "collection.create",
+      {
+        collectionId,
+        title: args.collection.title,
+      },
+      args.userId
+    );
+  }
+
+  return collectionId;
+};
 
 // Mutations for collections
 export const createCollection = authedMutation({
   args: collectionsEditSchema,
-  handler: async (ctx, args) => await createCollectionFunction(ctx, {collection: args, userId: ctx.user._id})
+  handler: async (ctx, args) =>
+    await createCollectionFunction(ctx, {
+      collection: args,
+      userId: ctx.user._id,
+    }),
 });
 
 export const editCollection = authedMutation({
@@ -72,6 +91,17 @@ export const editCollection = authedMutation({
       updatedAt: new Date().toISOString(),
     });
 
+    await logMapEvent(
+      ctx,
+      args.collection.map_id,
+      "collection.update",
+      {
+        collectionId: args.collectionId,
+        updatedFields: Object.keys(args.collection),
+      },
+      ctx.user._id
+    );
+
     return args.collectionId;
   },
 });
@@ -81,7 +111,22 @@ export const deleteCollection = authedMutation({
     collectionId: zid("collections"),
   },
   handler: async (ctx, args) => {
+    const collection = await ctx.db.get(args.collectionId);
+    if (!collection) throw new Error("Collection not found");
+
     await ctx.db.delete(args.collectionId);
+
+    await logMapEvent(
+      ctx,
+      collection.map_id,
+      "collection.delete",
+      {
+        collectionId: args.collectionId,
+        title: collection.title,
+      },
+      ctx.user._id
+    );
+
     return args.collectionId;
   },
 });

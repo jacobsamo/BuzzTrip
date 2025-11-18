@@ -18,3 +18,13 @@ export const mapViewsTable = zodTable("mapViews", {
 
 export const mapViewSchema = mapViewsTable.schema;
 export const mapViewEditSchema = mapViewsTable.insertSchema;
+
+export const mapEventTable = zodTable("mapEvents", {
+  userId: zid("users").optional(),
+  mapId: zid("maps"),
+  event: z.string(),
+  details: z.record(z.string(), z.any()),
+});
+
+export const mapEventSchema = mapEventTable.schema;
+export const mapEventEditSchema = mapEventTable.insertSchema;

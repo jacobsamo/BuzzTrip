@@ -9,7 +9,7 @@ import {
 } from "../../zod-schemas";
 import { Id } from "../_generated/dataModel";
 import { MutationCtx } from "../_generated/server";
-import { authedMutation, authedQuery } from "../helpers";
+import { authedMutation, authedQuery, logMapEvent } from "../helpers";
 
 export const getMapUsers = authedQuery({
   args: {
@@ -65,9 +65,26 @@ export async function createMapUser(
     user_id: Id<"users">;
     permission: "owner" | "editor" | "viewer" | "commenter";
     map_id: Id<"maps">;
-  }
+  },
+  skipLogging = false
 ) {
-  await ctx.db.insert("map_users", user);
+  const mapUserId = await ctx.db.insert("map_users", user);
+
+  if (!skipLogging) {
+    await logMapEvent(
+      ctx,
+      user.map_id,
+      "map_user.create",
+      {
+        mapUserId,
+        userId: user.user_id,
+        permission: user.permission,
+      },
+      user.user_id
+    );
+  }
+
+  return mapUserId;
 }
 
 export const shareMap = authedMutation({
@@ -112,9 +129,25 @@ export const shareMap = authedMutation({
 export const editMapUser = authedMutation({
   args: mapUserEditSchema,
   handler: async (ctx, args) => {
+    const existingMapUser = await ctx.db.get(args._id as Id<"map_users">);
+    if (!existingMapUser) throw new Error("Map user not found");
+
     await ctx.db.patch(args._id as Id<"map_users">, {
       permission: args.permission,
     });
+
+    await logMapEvent(
+      ctx,
+      existingMapUser.map_id,
+      "map_user.update",
+      {
+        mapUserId: args._id,
+        userId: existingMapUser.user_id,
+        newPermission: args.permission,
+        oldPermission: existingMapUser.permission,
+      },
+      ctx.user._id
+    );
   },
 });
 
@@ -124,6 +157,21 @@ export const deleteMapUser = authedMutation({
     mapUserId: zid("map_users"),
   },
   handler: async (ctx, args) => {
+    const mapUser = await ctx.db.get(args.mapUserId);
+    if (!mapUser) throw new Error("Map user not found");
+
     await ctx.db.delete(args.mapUserId);
+
+    await logMapEvent(
+      ctx,
+      args.mapId,
+      "map_user.delete",
+      {
+        mapUserId: args.mapUserId,
+        userId: mapUser.user_id,
+        permission: mapUser.permission,
+      },
+      ctx.user._id
+    );
   },
 });
