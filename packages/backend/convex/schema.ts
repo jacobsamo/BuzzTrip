@@ -1,6 +1,7 @@
 import { defineSchema } from "convex/server";
 import { mapEventTable, mapViewsTable } from "../zod-schemas/analytics-schema";
 import { betaUsersTable, usersTable } from "../zod-schemas/auth-schema";
+import { dataLayerTable } from "../zod-schemas/data-layers-schema";
 import {
   collectionLinksTable,
   collectionsTable,
@@ -35,6 +36,10 @@ export default defineSchema({
     .index("by_map_id", ["mapId"])
     .index("by_user_id", ["userId"]),
   // Map data
+  dataLayers: dataLayerTable
+    .table()
+    .index("by_map_id", ["mapId"])
+    .index("by_created_by", ["createdBy"]),
   markers: markersTable
     .table()
     .index("by_map_id", ["map_id"])
