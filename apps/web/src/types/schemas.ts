@@ -27,7 +27,7 @@ export const betaQuestionnaireSchema = z.object({
     "reddit",
     "other",
   ], {
-    required_error: "Please tell us how you found BuzzTrip",
+    error: "Please tell us how you found BuzzTrip",
   }),
   howDidYouHearOther: z.string().optional(),
   currentMappingTools: z.array(z.string()).optional(),
@@ -43,16 +43,16 @@ export const betaQuestionnaireSchema = z.object({
     "content-creation",
     "other",
   ], {
-    required_error: "Please select your primary use case",
+    error: "Please select your primary use case",
   }),
   useCaseDetails: z.string().optional(),
 
   // Frequency & Scale
   mapsPerMonth: z.enum(["1-5", "6-10", "11-25", "26-50", "50+"], {
-    required_error: "Please select how many maps you'll create",
+    error: "Please select how many maps you'll create",
   }),
   collaboratorsCount: z.enum(["just-me", "2-5", "6-10", "11-25", "25+"], {
-    required_error: "Please select how many collaborators you'll have",
+    error: "Please select how many collaborators you'll have",
   }),
 
   // Feature Preferences
@@ -61,16 +61,16 @@ export const betaQuestionnaireSchema = z.object({
 
   // Pricing
   willingToPay: z.enum(["free-only", "0-5", "5-10", "10-20", "20-50", "50+"], {
-    required_error: "Please select your budget",
+    error: "Please select your budget",
   }),
   pricingModel: z.enum(["monthly", "yearly", "one-time", "usage-based"], {
-    required_error: "Please select your preferred pricing model",
+    error: "Please select your preferred pricing model",
   }),
 
   // Feedback & Participation
   willingToProvideHelpFeedback: z.boolean(),
   participationLevel: z.enum(["passive", "occasional", "active", "super-user"], {
-    required_error: "Please select your participation level",
+    error: "Please select your participation level",
   }),
 
   // Open-ended

@@ -20,6 +20,7 @@ import { env } from "./env";
 const nextConfig: NextConfig = {
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   transpilePackages: ["@buzztrip/backend", "@buzztrip/ui"],
+  reactCompiler: true,
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -67,7 +68,7 @@ const nextConfig: NextConfig = {
 
 const withMDX = createMDX({
   options: {
-    // remarkPlugins: [['remark-gfm', { strict: true, throwOnError: true }]],
+    remarkPlugins: [["remark-gfm", { strict: true, throwOnError: true }]],
     // rehypePlugins: [],
   },
 });
