@@ -75,8 +75,7 @@ export const pathsTable = zodTable("paths", {
   points: pointsSchema,
   measurements: measurementsSchema.optional(),
   styles: stylesSchema.optional(),
-  createdBy: zid("users"),
-  updatedAt: z.string().datetime().optional(), // allow optional for updates
+  createdBy: zid("users"), // allow optional for updates
 });
 
 export const pathsSchema = pathsTable.schema;

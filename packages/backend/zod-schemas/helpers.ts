@@ -58,6 +58,7 @@ export const zodTable = <
     _id: zid(tableName),
     _creationTime: z.number(),
     isArchived: z.boolean().default(false),
+    updatedAt: z.iso.datetime().default(new Date().toISOString()),
   });
 
   const insertSchema = fullSchema.partial({

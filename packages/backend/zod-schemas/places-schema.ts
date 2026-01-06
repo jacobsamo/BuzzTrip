@@ -29,11 +29,11 @@ export const placesEditSchema = placesTable.insertSchema;
 
 // Define places_reviews table
 export const placesReviewsTable = zodTable("places_reviews", {
-  place_id: zid("places"),
-  user_id: zid("users"),
-  author_name: z.string(),
-  author_url: z.string().nullable(),
-  profile_photo_url: z.string(),
+  placeId: zid("places"),
+  userId: zid("users"),
+  authorName: z.string(),
+  authorUrl: z.string().nullable(),
+  profilePhotoUrl: z.string(),
   rating: z.number().nullable(),
   description: z.string(),
 });
@@ -43,9 +43,9 @@ export const placesReviewEditSchema = placesReviewsTable.insertSchema;
 
 // Define place_photos table
 export const placePhotosTable = zodTable("place_photos", {
-  place_id: zid("places"),
-  user_id: zid("users"),
-  photo_url: z.string(),
+  placeId: zid("places"),
+  userId: zid("users"),
+  photoUrl: z.string(),
   width: z.number(),
   height: z.number(),
   caption: z.string(),

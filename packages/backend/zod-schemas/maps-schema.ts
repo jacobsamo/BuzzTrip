@@ -45,7 +45,6 @@ export const mapsTable = zodTable("maps", {
   bounds: mapBoundsSchema.nullish(),
   visibility: z.enum(visibilityOptions),
   mapTypeId: mapTypeIdEnum.optional(),
-  updatedAt: z.string().datetime().optional(),
 });
 
 export const mapsSchema = mapsTable.schema;
@@ -76,7 +75,6 @@ const labelSchemaFields = {
   icon: iconSchema.nullish(),
   color: z.string().optional(),
   created_by: zid("users"),
-  updatedAt: z.string().datetime().optional(),
 };
 
 export const labelsTable = zodTable("labels", labelSchemaFields);
@@ -109,7 +107,6 @@ export const markersTable = zodTable("markers", {
   color: z.string(),
   place_id: zid("places"),
   map_id: zid("maps"),
-  updatedAt: z.string().datetime().optional(),
 });
 
 export const markersSchema = markersTable.schema;
@@ -125,7 +122,6 @@ export const collectionsTable = zodTable("collections", {
   created_by: zid("users"),
   icon: iconSchema,
   color: z.string().optional(),
-  updatedAt: z.string().datetime().optional(),
 });
 
 export const collectionsSchema = collectionsTable.schema;
@@ -151,7 +147,6 @@ export const routesTable = zodTable("routes", {
   description: z.string().optional(),
   travel_type: travelTypeEnumSchema,
   user_id: zid("users"),
-  updatedAt: z.string().datetime().optional(),
 });
 
 export const routesSchema = routesTable.schema;
@@ -166,7 +161,6 @@ export const routeStopsTable = zodTable("route_stops", {
   lat: z.number(),
   lng: z.number(),
   stop_order: z.number(),
-  updatedAt: z.string().datetime().optional(),
 });
 
 export const route_stopsSchema = routeStopsTable.schema;

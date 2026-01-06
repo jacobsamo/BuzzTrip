@@ -8,7 +8,6 @@ export const usersTable = zodTable("users", {
   name: z.string(),
   email: z.string(),
   image: z.string(),
-  updatedAt: z.string(),
   createdAt: z.string().optional(),
   first_name: z.string().optional(),
   last_name: z.string().optional(),
@@ -16,6 +15,9 @@ export const usersTable = zodTable("users", {
   bio: z.string().optional(),
   // Beta flag - used for quick auth checks without joining tables
   isBetaUser: z.boolean().optional(),
+  country: z.string().optional(),
+  currency: z.string().optional(),
+  language: z.string().optional(),
 });
 
 // Export schema

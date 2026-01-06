@@ -12,4 +12,5 @@ export const dataLayerTable = zodTable("dataLayers", {
   hidden: z.boolean().default(false),
   createdBy: zid("users"),
   mapId: zid("maps"),
+  order: z.number().default(0),
 })
