@@ -2,9 +2,9 @@ import * as z from "zod";
 import { IconType } from "../types";
 
 export const reviewsSchema = z.object({
-  author_name: z.string(),
-  author_url: z.string().nullable(),
-  profile_photo_url: z.string(),
+  authorName: z.string(),
+  authorUrl: z.string().nullable(),
+  profilePhotoUrl: z.string(),
   rating: z.number().nullable(),
   description: z.string(),
 });

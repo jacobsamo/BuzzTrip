@@ -1,6 +1,6 @@
 import { zodQuery } from "../../convex/helpers";
 import { requireAdmin } from "../../helpers/admin-helpers";
-import { mapsSchema, userSchema, mapViewSchema, iconSchema } from "../../zod-schemas";
+import { userSchema, iconSchema } from "../../zod-schemas";
 import * as z from "zod";
 import { zid } from "convex-helpers/server/zod4";
 
@@ -11,7 +11,20 @@ import { zid } from "convex-helpers/server/zod4";
 export const getAllMapsWithStats = zodQuery({
   args: {},
   returns: z.array(
-    mapsSchema.extend({
+    z.object({
+      _id: zid("maps"),
+      _creationTime: z.number(),
+      title: z.string(),
+      description: z.string().optional(),
+      image: z.string().optional(),
+      icon: iconSchema.nullish(),
+      color: z.string().optional(),
+      ownerId: zid("users"),
+      locationName: z.string().optional(),
+      lat: z.number().optional(),
+      lng: z.number().optional(),
+      visibility: z.enum(["private", "public", "unlisted"]),
+      mapTypeId: z.enum(["hybrid", "roadmap", "satellite", "terrain"]).optional(),
       owner: userSchema.nullable(),
       markersCount: z.number(),
       collaboratorsCount: z.number(),
@@ -24,19 +37,31 @@ export const getAllMapsWithStats = zodQuery({
 
     return await Promise.all(maps.map(async (map) => {
       const [owner, markers, collaborators] = await Promise.all([
-        ctx.db.get(map.owner_id),
+        ctx.db.get(map.ownerId),
         ctx.db
           .query("markers")
-          .withIndex("by_map_id", q => q.eq("map_id", map._id))
+          .withIndex("by_map_id", q => q.eq("mapId", map._id))
           .collect(),
         ctx.db
           .query("map_users")
-          .withIndex("by_map_id", q => q.eq("map_id", map._id))
+          .withIndex("by_map_id", q => q.eq("mapId", map._id))
           .collect(),
       ]);
 
       return {
-        ...map,
+        _id: map._id,
+        _creationTime: map._creationTime,
+        title: map.title,
+        description: map.description,
+        image: map.image,
+        icon: map.icon,
+        color: map.color,
+        ownerId: map.ownerId,
+        locationName: map.locationName,
+        lat: map.lat,
+        lng: map.lng,
+        visibility: map.visibility,
+        mapTypeId: map.mapTypeId,
         owner,
         markersCount: markers.length,
         collaboratorsCount: collaborators.length,
@@ -63,12 +88,12 @@ export const getMapDetailStats = zodQuery({
     await requireAdmin(ctx);
 
     const [markers, collections, paths, labels, routes, collaborators] = await Promise.all([
-      ctx.db.query("markers").withIndex("by_map_id", q => q.eq("map_id", args.mapId)).collect(),
-      ctx.db.query("collections").withIndex("by_map_id", q => q.eq("map_id", args.mapId)).collect(),
+      ctx.db.query("markers").withIndex("by_map_id", q => q.eq("mapId", args.mapId)).collect(),
+      ctx.db.query("collections").withIndex("by_map_id", q => q.eq("mapId", args.mapId)).collect(),
       ctx.db.query("paths").withIndex("byMapId", q => q.eq("mapId", args.mapId)).collect(),
-      ctx.db.query("labels").withIndex("by_map_id", q => q.eq("map_id", args.mapId)).collect(),
-      ctx.db.query("routes").withIndex("by_map_id", q => q.eq("map_id", args.mapId)).collect(),
-      ctx.db.query("map_users").withIndex("by_map_id", q => q.eq("map_id", args.mapId)).collect(),
+      ctx.db.query("labels").withIndex("by_map_id", q => q.eq("mapId", args.mapId)).collect(),
+      ctx.db.query("routes").withIndex("by_map_id", q => q.eq("mapId", args.mapId)).collect(),
+      ctx.db.query("map_users").withIndex("by_map_id", q => q.eq("mapId", args.mapId)).collect(),
     ]);
 
     return {
@@ -93,14 +118,14 @@ export const getMapViewAnalytics = zodQuery({
     uniqueUsers: z.number(),
     lastAccessed: z.number().nullable(),
     recentViews: z.array(
-      mapViewSchema.pick({
-        _id: true,
-        _creationTime: true,
-        userId: true,
-        country: true,
-        city: true,
-        browser: true,
-        device: true,
+      z.object({
+        _id: zid("mapViews"),
+        _creationTime: z.number(),
+        userId: zid("users").nullable(),
+        country: z.string().optional(),
+        city: z.string().optional(),
+        browser: z.string().optional(),
+        device: z.string().optional(),
       })
     ),
     dailyViews: z.array(
@@ -126,7 +151,16 @@ export const getMapViewAnalytics = zodQuery({
     // Get most recent 10 views
     const recentViews = views
       .sort((a, b) => b._creationTime - a._creationTime)
-      .slice(0, 10);
+      .slice(0, 10)
+      .map((v) => ({
+        _id: v._id,
+        _creationTime: v._creationTime,
+        userId: v.userId ?? null,
+        country: v.country,
+        city: v.city,
+        browser: v.browser,
+        device: v.device,
+      }));
 
     // Get last accessed time (most recent view)
     const lastAccessed = views.length > 0
@@ -177,7 +211,7 @@ export const getMapMarkers = zodQuery({
       lng: z.number(),
       icon: iconSchema,
       color: z.string(),
-      created_by: zid("users"),
+      createdBy: zid("users"),
       creatorName: z.string().nullable(),
     })
   ),
@@ -186,12 +220,12 @@ export const getMapMarkers = zodQuery({
 
     const markers = await ctx.db
       .query("markers")
-      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+      .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId))
       .collect();
 
     return await Promise.all(
       markers.map(async (marker) => {
-        const creator = await ctx.db.get(marker.created_by);
+        const creator = await ctx.db.get(marker.createdBy);
         return {
           _id: marker._id,
           _creationTime: marker._creationTime,
@@ -201,7 +235,7 @@ export const getMapMarkers = zodQuery({
           lng: marker.lng,
           icon: marker.icon,
           color: marker.color,
-          created_by: marker.created_by,
+          createdBy: marker.createdBy,
           creatorName: creator?.name ?? null,
         };
       })
@@ -261,7 +295,7 @@ export const getMapCollaborators = zodQuery({
     z.object({
       _id: zid("map_users"),
       _creationTime: z.number(),
-      user_id: zid("users"),
+      userId: zid("users"),
       permission: z.enum(["owner", "editor", "viewer", "commenter"]).optional(),
       userName: z.string().nullable(),
       userEmail: z.string().nullable(),
@@ -273,16 +307,16 @@ export const getMapCollaborators = zodQuery({
 
     const collaborators = await ctx.db
       .query("map_users")
-      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+      .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId))
       .collect();
 
     return await Promise.all(
       collaborators.map(async (collab) => {
-        const user = await ctx.db.get(collab.user_id);
+        const user = await ctx.db.get(collab.userId);
         return {
           _id: collab._id,
           _creationTime: collab._creationTime,
-          user_id: collab.user_id,
+          userId: collab.userId,
           permission: collab.permission,
           userName: user?.name ?? null,
           userEmail: user?.email ?? null,
@@ -314,7 +348,7 @@ export const getMapCreationTimeline = zodQuery({
     const [markers, paths] = await Promise.all([
       ctx.db
         .query("markers")
-        .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+        .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId))
         .collect(),
       ctx.db
         .query("paths")

@@ -22,7 +22,7 @@ type MapWithStats = {
   title: string;
   description?: string;
   visibility: "public" | "private" | "unlisted";
-  owner_id: string;
+  ownerId: string;
   owner: {
     name: string;
     email: string;
@@ -68,7 +68,7 @@ export function MapsTable({ data }: { data: MapWithStats[] }) {
         const owner = row.getValue("owner") as MapWithStats["owner"];
         return owner ? (
           <Link
-            href={`/users/${row.original.owner_id}`}
+            href={`/users/${row.original.ownerId}`}
             className="text-sm hover:underline"
             onClick={(e) => e.stopPropagation()}
           >

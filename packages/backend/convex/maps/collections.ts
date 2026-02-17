@@ -2,7 +2,7 @@ import { zid } from "convex-helpers/server/zod4";
 import { z } from "zod";
 import { IconType } from "../../types";
 import {
-  collection_linksSchema,
+  collectionLinksSchema,
   collectionsEditSchema,
   collectionsSchema,
 } from "../../zod-schemas";
@@ -17,7 +17,7 @@ export const getCollectionsForMap = authedQuery({
   handler: async (ctx, args) => {
     const collections = await ctx.db
       .query("collections")
-      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+      .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId))
       .collect();
     return collections.filter((c) => !c.isArchived);
   },
@@ -27,11 +27,11 @@ export const getCollectionLinksForMap = authedQuery({
   args: {
     mapId: zid("maps"),
   },
-  returns: collection_linksSchema.array().nullable(),
+  returns: collectionLinksSchema.array().nullable(),
   handler: async (ctx, args) => {
     const links = await ctx.db
       .query("collection_links")
-      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+      .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId))
       .collect();
     return links.filter((l) => !l.isArchived);
   },
@@ -50,14 +50,14 @@ export const createCollectionFunction = async (
   const collectionId = await ctx.db.insert("collections", {
     ...args.collection,
     ...(args.collection.icon ? { icon: args.collection.icon as IconType } : {}),
-    created_by: args.userId,
+    createdBy: args.userId,
     isArchived: false,
   });
 
   if (!skipLogging) {
     await logMapEvent(
       ctx,
-      args.collection.map_id,
+      args.collection.mapId,
       "collection.create",
       {
         collectionId,
@@ -96,7 +96,7 @@ export const editCollection = authedMutation({
 
     await logMapEvent(
       ctx,
-      args.collection.map_id,
+      args.collection.mapId,
       "collection.update",
       {
         collectionId: args.collectionId,
@@ -124,7 +124,7 @@ export const deleteCollection = authedMutation({
 
     await logMapEvent(
       ctx,
-      collection.map_id,
+      collection.mapId,
       "collection.delete",
       {
         collectionId: args.collectionId,

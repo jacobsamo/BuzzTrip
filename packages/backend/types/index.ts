@@ -2,8 +2,8 @@ import { z } from "zod";
 import {
   boundsSchema,
   circleMeasurements,
-  collection_linksEditSchema,
-  collection_linksSchema,
+  collectionLinksEditSchema,
+  collectionLinksSchema,
   collectionsEditSchema,
   collectionsSchema,
   combinedMapUser,
@@ -28,8 +28,8 @@ import {
   rectangleMeasurements,
   refinedUserSchema,
   reviewsSchema,
-  route_stopsEditSchema,
-  route_stopsSchema,
+  routeStopsEditSchema,
+  routeStopsSchema,
   routesEditSchema,
   routesSchema,
   shareMapUserSchema,
@@ -68,8 +68,8 @@ export type NewPlace = z.infer<typeof placesEditSchema>;
 export type Collection = z.infer<typeof collectionsSchema>;
 export type NewCollection = z.infer<typeof collectionsEditSchema>;
 
-export type CollectionLink = z.infer<typeof collection_linksSchema>;
-export type NewCollectionLink = z.infer<typeof collection_linksEditSchema>;
+export type CollectionLink = z.infer<typeof collectionLinksSchema>;
+export type NewCollectionLink = z.infer<typeof collectionLinksEditSchema>;
 
 export type MapUser = z.infer<typeof mapUserSchema>;
 export type NewMapUser = z.infer<typeof mapUserEditSchema>;
@@ -77,8 +77,8 @@ export type NewMapUser = z.infer<typeof mapUserEditSchema>;
 export type Route = z.infer<typeof routesSchema>;
 export type NewRoute = z.infer<typeof routesEditSchema>;
 
-export type RouteStop = z.infer<typeof route_stopsSchema>;
-export type NewRouteStop = z.infer<typeof route_stopsEditSchema>;
+export type RouteStop = z.infer<typeof routeStopsSchema>;
+export type NewRouteStop = z.infer<typeof routeStopsEditSchema>;
 
 export type Bounds = z.infer<typeof boundsSchema>;
 export type Review = z.infer<typeof reviewsSchema>;

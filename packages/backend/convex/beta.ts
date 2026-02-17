@@ -454,7 +454,7 @@ export const submitQuestionnaire = zodMutation({
           0,
           internal.emails_beta.sendBetaWelcomeEmail,
           {
-            firstName: user.first_name ?? user.name,
+            firstName: user.firstName ?? user.name,
             email: betaUser.email,
             whatsappOptIn: betaUser.whatsappOptIn,
             questionnaireToken: token,

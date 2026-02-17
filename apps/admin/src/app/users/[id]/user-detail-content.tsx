@@ -86,21 +86,21 @@ export function UserDetailContent({ userId }: { userId: Id<"users"> }) {
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
-              {user.first_name && (
+              {user.firstName && (
                 <div className="flex items-center gap-3">
                   <User className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">First Name</p>
-                    <p className="font-medium text-card-foreground">{user.first_name}</p>
+                    <p className="font-medium text-card-foreground">{user.firstName}</p>
                   </div>
                 </div>
               )}
-              {user.last_name && (
+              {user.lastName && (
                 <div className="flex items-center gap-3">
                   <User className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Last Name</p>
-                    <p className="font-medium text-card-foreground">{user.last_name}</p>
+                    <p className="font-medium text-card-foreground">{user.lastName}</p>
                   </div>
                 </div>
               )}

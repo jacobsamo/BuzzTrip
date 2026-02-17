@@ -252,12 +252,12 @@ export function MapDetailContent({ mapId }: { mapId: Id<"maps"> }) {
                   </p>
                 </div>
               </div>
-              {mapData.location_name && (
+              {mapData.locationName && (
                 <div className="flex items-center gap-3">
                   <MapPinned className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Location</p>
-                    <p className="font-medium text-card-foreground">{mapData.location_name}</p>
+                    <p className="font-medium text-card-foreground">{mapData.locationName}</p>
                   </div>
                 </div>
               )}
@@ -297,7 +297,7 @@ export function MapDetailContent({ mapId }: { mapId: Id<"maps"> }) {
               {collaborators.length > 0 ? (
                 <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
                   {collaborators.map((collab) => (
-                    <Link key={collab._id} href={`/users/${collab.user_id}`}>
+                    <Link key={collab._id} href={`/users/${collab.userId}`}>
                       <Card className="bg-background border-border hover:border-primary transition-colors cursor-pointer">
                         <CardContent className="p-3">
                           <div className="flex items-center gap-2">
@@ -501,7 +501,7 @@ export function MapDetailContent({ mapId }: { mapId: Id<"maps"> }) {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Link href={`/users/${marker.created_by}`} className="text-primary hover:underline">
+                            <Link href={`/users/${marker.createdBy}`} className="text-primary hover:underline">
                               {marker.creatorName || "Unknown"}
                             </Link>
                           </TableCell>
@@ -585,7 +585,7 @@ export function MapDetailContent({ mapId }: { mapId: Id<"maps"> }) {
             </CardHeader>
             <CardContent>
               <MapsListTable
-                maps={allMaps.filter((m) => m.owner?._id === mapData.owner_id && m._id !== mapId)}
+                maps={allMaps.filter((m) => m.owner?._id === mapData.ownerId && m._id !== mapId)}
                 maxHeight="500px"
                 emptyMessage="No other maps by this owner"
               />

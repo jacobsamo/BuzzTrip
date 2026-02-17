@@ -19,7 +19,7 @@ export const getMapUsers = authedQuery({
   handler: async (ctx, args) => {
     const mapUsers = await ctx.db
       .query("map_users")
-      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+      .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId))
       .collect();
     return mapUsers.filter((mu) => !mu.isArchived);
   },
@@ -36,14 +36,14 @@ export const getCombinedMapUsers = authedQuery({
   handler: async (ctx, args) => {
     const mapUsers = await ctx.db
       .query("map_users")
-      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+      .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId))
       .collect();
 
     const combinedUsers = await Promise.all(
       mapUsers
         .filter((mu) => !mu.isArchived)
         .map(async (mapUser) => {
-          const user = await ctx.db.get(mapUser.user_id);
+          const user = await ctx.db.get(mapUser.userId);
           if (!user || user.isArchived) return null;
 
           return {
@@ -65,9 +65,9 @@ export const getCombinedMapUsers = authedQuery({
 export async function createMapUser(
   ctx: MutationCtx,
   user: {
-    user_id: Id<"users">;
+    userId: Id<"users">;
     permission: "owner" | "editor" | "viewer" | "commenter";
-    map_id: Id<"maps">;
+    mapId: Id<"maps">;
   },
   skipLogging = false
 ) {
@@ -79,14 +79,14 @@ export async function createMapUser(
   if (!skipLogging) {
     await logMapEvent(
       ctx,
-      user.map_id,
+      user.mapId,
       "map_user.create",
       {
         mapUserId,
-        userId: user.user_id,
+        userId: user.userId,
         permission: user.permission,
       },
-      user.user_id
+      user.userId
     );
   }
 
@@ -98,7 +98,7 @@ export const shareMap = authedMutation({
     mapId: zid("maps"),
     users: shareMapUserSchema
       .pick({
-        user_id: true,
+        userId: true,
         permission: true,
       })
       .array()
@@ -117,16 +117,16 @@ export const shareMap = authedMutation({
 
       const newUsers = args.users.filter((user) => {
         return !existingUsers.some(
-          (existingUser) => existingUser.user_id === user.user_id
+          (existingUser) => existingUser.userId === user.userId
         );
       });
 
       await Promise.all([
         newUsers.map((user) =>
           createMapUser(ctx, {
-            user_id: user.user_id,
+            userId: user.userId,
             permission: user.permission,
-            map_id: args.mapId,
+            mapId: args.mapId,
           })
         ),
       ]);
@@ -146,11 +146,11 @@ export const editMapUser = authedMutation({
 
     await logMapEvent(
       ctx,
-      existingMapUser.map_id,
+      existingMapUser.mapId,
       "map_user.update",
       {
         mapUserId: args._id,
-        userId: existingMapUser.user_id,
+        userId: existingMapUser.userId,
         newPermission: args.permission,
         oldPermission: existingMapUser.permission,
       },
@@ -178,7 +178,7 @@ export const deleteMapUser = authedMutation({
       "map_user.delete",
       {
         mapUserId: args.mapUserId,
-        userId: mapUser.user_id,
+        userId: mapUser.userId,
         permission: mapUser.permission,
       },
       ctx.user._id

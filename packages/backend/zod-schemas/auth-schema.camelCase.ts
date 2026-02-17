@@ -1,26 +1,31 @@
+/**
+ * CAMEL CASE VERSION OF AUTH SCHEMA
+ *
+ * Replace auth-schema.ts with this file AFTER running the migration.
+ * Rename this file to auth-schema.ts after migration is complete.
+ */
+
 import { zid } from "convex-helpers/server/zod4";
 import * as z from "zod";
 import { zodTable } from "./helpers";
 
-// Define users table
+// Define users table - CAMEL CASE
 export const usersTable = zodTable("users", {
   clerkUserId: z.string(),
   name: z.string(),
   email: z.string(),
   image: z.string(),
   createdAt: z.string().optional(),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
+  firstName: z.string().optional(), // was: first_name
+  lastName: z.string().optional(), // was: last_name
   username: z.string().optional(),
   bio: z.string().optional(),
-  // Beta flag - used for quick auth checks without joining tables
   isBetaUser: z.boolean().optional(),
   country: z.string().optional(),
   currency: z.string().optional(),
   language: z.string().optional(),
 });
 
-// Export schema
 export const userSchema = usersTable.schema;
 export const usersEditSchema = usersTable.insertSchema;
 
@@ -34,37 +39,23 @@ export const refinedUserSchema = userSchema.pick({
   image: true,
 });
 
-// Define beta_users table
-export const betaUsersTable = zodTable("beta_users", {
-  // Identity
+// Define betaUsers table - CAMEL CASE (table name)
+export const betaUsersTable = zodTable("betaUsers", {
   email: z.string(),
   firstName: z.string(),
   lastName: z.string().nullish(),
-
-  // Token & Flow
   token: z.string(),
   expiresAt: z.number(),
-
-  // Status Tracking
   emailConfirmed: z.boolean(),
   emailConfirmedAt: z.number().optional(),
   questionnaireCompleted: z.boolean(),
   questionnaireCompletedAt: z.number().optional(),
-
-  // User Preferences
   whatsappOptIn: z.boolean(),
-
-  // Questionnaire Responses (stored directly)
   questionnaireResponses: z.record(z.string(), z.any()).optional(),
-
-  // Link to actual user account (optional - set when user creates account)
   userId: zid("users").nullish(),
-
-  // Timestamps
   createdAt: z.number(),
   updatedAt: z.number(),
 });
 
-// Export schema
 export const betaUsersSchema = betaUsersTable.schema;
 export const betaUsersEditSchema = betaUsersTable.insertSchema;

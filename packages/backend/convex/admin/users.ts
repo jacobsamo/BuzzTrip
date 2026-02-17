@@ -36,12 +36,12 @@ export const getAllUsersWithStats = zodQuery({
         const [ownedMaps, createdMarkers] = await Promise.all([
           ctx.db
             .query("map_users")
-            .withIndex("by_user_id", (q) => q.eq("user_id", user._id))
+            .withIndex("by_user_id", (q) => q.eq("userId", user._id))
             .filter((q) => q.eq(q.field("permission"), "owner"))
             .collect(),
           ctx.db
             .query("markers")
-            .filter((q) => q.eq(q.field("created_by"), user._id))
+            .filter((q) => q.eq(q.field("createdBy"), user._id))
             .collect(),
         ]);
 
@@ -66,11 +66,45 @@ export const getAllUsersWithStats = zodQuery({
  */
 export const getUserById = zodQuery({
   args: { userId: zid("users") },
-  returns: userSchema.nullable(),
+  returns: z.object({
+    _id: zid("users"),
+    _creationTime: z.number(),
+    clerkUserId: z.string(),
+    name: z.string(),
+    email: z.string(),
+    image: z.string(),
+    createdAt: z.string().optional(),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+    username: z.string().optional(),
+    bio: z.string().optional(),
+    isBetaUser: z.boolean().optional(),
+    country: z.string().optional(),
+    currency: z.string().optional(),
+    language: z.string().optional(),
+  }).nullable(),
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
     const user = await userById(ctx, args.userId);
-    return user ?? null;
+    if (!user) return null;
+
+    return {
+      _id: user._id,
+      _creationTime: user._creationTime,
+      clerkUserId: user.clerkUserId,
+      name: user.name,
+      email: user.email,
+      image: user.image,
+      createdAt: user.createdAt,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+      bio: user.bio,
+      isBetaUser: user.isBetaUser,
+      country: user.country,
+      currency: user.currency,
+      language: user.language,
+    };
   },
 });
 
@@ -107,20 +141,20 @@ export const getUserDetailStats = zodQuery({
     ] = await Promise.all([
       ctx.db
         .query("map_users")
-        .withIndex("by_user_id", (q) => q.eq("user_id", args.userId))
+        .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
         .filter((q) => q.eq(q.field("permission"), "owner"))
         .collect(),
       ctx.db
         .query("map_users")
-        .withIndex("by_user_id", (q) => q.eq("user_id", args.userId))
+        .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
         .collect(),
       ctx.db
         .query("markers")
-        .filter((q) => q.eq(q.field("created_by"), args.userId))
+        .filter((q) => q.eq(q.field("createdBy"), args.userId))
         .collect(),
       ctx.db
         .query("collections")
-        .filter((q) => q.eq(q.field("created_by"), args.userId))
+        .filter((q) => q.eq(q.field("createdBy"), args.userId))
         .collect(),
       ctx.db
         .query("paths")
@@ -128,15 +162,15 @@ export const getUserDetailStats = zodQuery({
         .collect(),
       ctx.db
         .query("routes")
-        .filter((q) => q.eq(q.field("user_id"), args.userId))
+        .filter((q) => q.eq(q.field("userId"), args.userId))
         .collect(),
       ctx.db
         .query("labels")
-        .filter((q) => q.eq(q.field("created_by"), args.userId))
+        .filter((q) => q.eq(q.field("createdBy"), args.userId))
         .collect(),
       ctx.db
         .query("places_reviews")
-        .filter((q) => q.eq(q.field("user_id"), args.userId))
+        .filter((q) => q.eq(q.field("userId"), args.userId))
         .collect(),
       ctx.db
         .query("mapViews")

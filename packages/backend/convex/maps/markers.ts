@@ -16,7 +16,7 @@ export const getMarkersView = authedQuery({
     // Build the initial query on the markers table
     let markersQuery = ctx.db
       .query("markers")
-      .withIndex("by_map_id", (q) => q.eq("map_id", mapId));
+      .withIndex("by_map_id", (q) => q.eq("mapId", mapId));
 
     // If markerId is provided, add an additional filter
     if (markerId) {
@@ -31,14 +31,14 @@ export const getMarkersView = authedQuery({
       markers
         .filter((m) => !m.isArchived)
         .map(async (marker) => {
-          const place = await ctx.db.get(marker.place_id);
+          const place = await ctx.db.get(marker.placeId);
           if (!place || place.isArchived) return;
 
           const newMarker: CombinedMarker = {
             ...marker,
             lat: place?.lat ?? marker.lat,
             lng: place?.lng ?? marker.lng,
-            place_id: place?._id ?? marker.place_id,
+            placeId: place?._id ?? marker.placeId,
 
             icon: marker.icon as IconType,
             place: {
@@ -60,7 +60,7 @@ export const createMarker = authedMutation({
   args: {
     mapId: zid("maps"),
     marker: combinedMarkersSchema.extend({
-      place_id: zid("places").optional(),
+      placeId: zid("places").optional(),
     }),
     collectionIds: z.string().array().nullish(),
   },
@@ -91,11 +91,11 @@ export const createMarker = authedMutation({
       note: args.marker.note,
       lat: args.marker.lat,
       lng: args.marker.lng,
-      created_by: ctx.user._id,
+      createdBy: ctx.user._id,
       icon: args.marker.icon as IconType,
       color: args.marker.color,
-      place_id: place?._id ?? (placeId as Id<"places">),
-      map_id: args.mapId,
+      placeId: place?._id ?? (placeId as Id<"places">),
+      mapId: args.mapId,
       updatedAt: args.marker.updatedAt,
       isArchived: false,
     });
@@ -103,10 +103,10 @@ export const createMarker = authedMutation({
     if (args.collectionIds) {
       for (const collectionId of args.collectionIds) {
         await ctx.db.insert("collection_links", {
-          marker_id: newMarkerId,
-          collection_id: collectionId as Id<"collections">,
-          map_id: args.mapId,
-          user_id: ctx.user._id,
+          markerId: newMarkerId,
+          collectionId: collectionId as Id<"collections">,
+          mapId: args.mapId,
+          userId: ctx.user._id,
           isArchived: false,
         });
       }
@@ -131,23 +131,23 @@ export const createMarker = authedMutation({
 
 export const editMarker = authedMutation({
   args: {
-    marker_id: zid("markers"),
+    markerId: zid("markers"),
     mapId: zid("maps"),
     marker: markersEditSchema
       .omit({ _id: true, _creationTime: true })
       .partial(),
-    collectionIds_to_add: zid("collections").array().nullish(),
-    collectionIds_to_remove: zid("collections").array().nullish(),
+    collectionIdsToAdd: zid("collections").array().nullish(),
+    collectionIdsToRemove: zid("collections").array().nullish(),
   },
   handler: async (ctx, args) => {
     let collectionLinkCreatedIds: string[] | null = null;
-    if (args.collectionIds_to_add) {
-      for (const collectionId of args.collectionIds_to_add) {
+    if (args.collectionIdsToAdd) {
+      for (const collectionId of args.collectionIdsToAdd) {
         await ctx.db.insert("collection_links", {
-          marker_id: args.marker_id,
-          collection_id: collectionId as Id<"collections">,
-          map_id: args.mapId,
-          user_id: ctx.user._id,
+          markerId: args.markerId,
+          collectionId: collectionId as Id<"collections">,
+          mapId: args.mapId,
+          userId: ctx.user._id,
           isArchived: false,
         });
         collectionLinkCreatedIds = collectionLinkCreatedIds ?? [];
@@ -156,12 +156,12 @@ export const editMarker = authedMutation({
     }
 
     let collectionLinksDeleted: string[] = [];
-    if (args.collectionIds_to_remove) {
-      for (const collectionId of args.collectionIds_to_remove) {
+    if (args.collectionIdsToRemove) {
+      for (const collectionId of args.collectionIdsToRemove) {
         const collectionLink = await ctx.db
           .query("collection_links")
           .withIndex("by_collection_id", (q) =>
-            q.eq("collection_id", collectionId)
+            q.eq("collectionId", collectionId)
           )
           .first();
         if (!collectionLink) continue;
@@ -171,7 +171,7 @@ export const editMarker = authedMutation({
       }
     }
 
-    await ctx.db.patch(args.marker_id, {
+    await ctx.db.patch(args.markerId, {
       ...args.marker,
       ...(args.marker.icon ? { icon: args.marker.icon as IconType } : {}),
       updatedAt: new Date().toISOString(),
@@ -182,7 +182,7 @@ export const editMarker = authedMutation({
       args.mapId,
       "marker.update",
       {
-        markerId: args.marker_id,
+        markerId: args.markerId,
         updatedFields: Object.keys(args.marker),
         collectionLinksAdded: collectionLinkCreatedIds,
         collectionLinksRemoved: collectionLinksDeleted,
@@ -212,7 +212,7 @@ export const deleteMarker = authedMutation({
 
     await logMapEvent(
       ctx,
-      marker.map_id,
+      marker.mapId,
       "marker.delete",
       {
         markerId: args.markerId,

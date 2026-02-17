@@ -12,7 +12,7 @@ export * from "./paths-schema";
 export * from "./analytics-schema";
 
 export const combinedMarkersSchema = markersEditSchema.extend({
-  place_id: zid("places").optional(),
+  placeId: zid("places").optional(),
   place: placesEditSchema.extend({
     bounds: boundsSchema.nullable(),
   }),

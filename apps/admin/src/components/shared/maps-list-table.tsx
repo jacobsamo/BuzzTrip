@@ -48,7 +48,7 @@ export type MapWithStats = {
   title: string;
   description?: string;
   visibility: "public" | "private" | "unlisted";
-  owner_id: string;
+  ownerId: string;
   owner: {
     _id: string;
     name: string;
@@ -179,7 +179,7 @@ export function MapsListTable({
             <div className="py-2">
               {owner ? (
                 <Link
-                  href={`/users/${row.original.owner_id}`}
+                  href={`/users/${row.original.ownerId}`}
                   className="text-sm text-foreground hover:underline font-medium"
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -495,7 +495,7 @@ export function MapsListTable({
                         <Users className="h-3.5 w-3.5 text-muted-foreground" />
                         {map.owner ? (
                           <Link
-                            href={`/users/${map.owner_id}`}
+                            href={`/users/${map.ownerId}`}
                             className="text-primary hover:underline"
                             onClick={(e) => e.stopPropagation()}
                           >
@@ -619,7 +619,7 @@ export function MapsListTable({
                         <TableCell>
                           {map.owner ? (
                             <Link
-                              href={`/users/${map.owner_id}`}
+                              href={`/users/${map.ownerId}`}
                               className="text-primary hover:underline text-sm"
                             >
                               {map.owner.name}

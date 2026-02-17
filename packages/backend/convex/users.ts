@@ -86,9 +86,9 @@ function extractUserFields(data: UserJSON) {
   return {
     clerkUserId: data.id,
     name: `${data.first_name} ${data.last_name}`,
-    first_name: data.first_name ?? undefined,
+    firstName: data.first_name ?? undefined,
     email: userEmailAddress.email_address,
-    last_name: data.last_name ?? undefined,
+    lastName: data.last_name ?? undefined,
     username: data.username ?? undefined,
     image: data.image_url,
     updatedAt: new Date().toISOString(),
@@ -111,7 +111,7 @@ export const createUser = internalMutation({
     });
     await Promise.all([
       ctx.runMutation(internal.emails.sendWelcomeEmail, {
-        firstName: user.first_name,
+        firstName: user.firstName,
         email: user.email,
       }),
       createMapFunction(ctx, {

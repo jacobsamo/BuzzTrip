@@ -27,7 +27,7 @@ export const getMapUsers = authedQuery({
   handler: async (ctx, args) => {
     const mapUsers = await ctx.db
       .query("map_users")
-      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+      .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId))
       .collect();
     return mapUsers.filter((mu) => !mu.isArchived);
   },
@@ -73,20 +73,20 @@ export const getUserMaps = authedQuery({
     // we want all the links that a user could be added too
     const mapUsers = await ctx.db
       .query("map_users")
-      .withIndex("by_user_id", (q) => q.eq("user_id", args.userId))
+      .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
       .collect();
 
     const combinedMaps = await Promise.all(
       mapUsers
         .filter((mu) => !mu.isArchived)
         .map(async (mapUser) => {
-          const map = await ctx.db.get(mapUser.map_id);
+          const map = await ctx.db.get(mapUser.mapId);
           if (map?.isArchived) return null;
           return {
             ...map,
             ...mapUser,
             _id: mapUser._id,
-            map_id: mapUser.map_id,
+            mapId: mapUser.mapId,
           } as UserMap;
         })
     );
@@ -98,7 +98,7 @@ const createMapSchema = z.object({
   userId: zid("users"),
   users: mapUserSchema
     .pick({
-      user_id: true,
+      userId: true,
       permission: true,
     })
     .array()
@@ -122,7 +122,7 @@ export const createMapFunction = async (
     const mapId = await ctx.db.insert("maps", {
       ...map,
       title: uppercaseFirstLetter(map.title),
-      owner_id: args.userId,
+      ownerId: args.userId,
       mapTypeId: map.mapTypeId ?? "hybrid",
       isArchived: false,
     });
@@ -130,9 +130,9 @@ export const createMapFunction = async (
     const userPromise =
       users?.map((user) =>
         createMapUser(ctx, {
-          user_id: user.user_id,
+          userId: user.userId,
           permission: user.permission,
-          map_id: mapId,
+          mapId: mapId,
         })
       ) ?? [];
 
@@ -140,16 +140,16 @@ export const createMapFunction = async (
       ...userPromise,
       // we always want to create the owner
       createMapUser(ctx, {
-        user_id: args.userId,
+        userId: args.userId,
         permission: "owner",
-        map_id: mapId,
+        mapId: mapId,
       }),
       // create a default collection for the map (skip logging for default collection)
       createCollectionFunction(
         ctx,
         {
           collection: {
-            map_id: mapId,
+            mapId: mapId,
             title: "Default Collection",
             icon: "Folder",
           },
@@ -272,8 +272,8 @@ export const duplicateMap = authedMutation({
     // Check if user has permission to duplicate this map
     const mapUser = await ctx.db
       .query("map_users")
-      .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
-      .filter((q) => q.eq(q.field("user_id"), ctx.user._id))
+      .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId))
+      .filter((q) => q.eq(q.field("userId"), ctx.user._id))
       .first();
 
     // Allow duplication if:
@@ -282,7 +282,7 @@ export const duplicateMap = authedMutation({
     // 3. Map is public (anyone can duplicate public maps)
     if (
       !mapUser &&
-      originalMap.owner_id !== ctx.user._id &&
+      originalMap.ownerId !== ctx.user._id &&
       originalMap.visibility !== "public"
     ) {
       throw new Error("You don't have permission to duplicate this map");
@@ -299,7 +299,7 @@ export const duplicateMap = authedMutation({
     const newMapId = await ctx.db.insert("maps", {
       ...mapFields,
       title: `Copy of ${originalMap.title}`,
-      owner_id: ctx.user._id,
+      ownerId: ctx.user._id,
       updatedAt: new Date().toISOString(),
       isArchived: false,
     });
@@ -307,9 +307,9 @@ export const duplicateMap = authedMutation({
     try {
       // Create map user for the new owner
       await createMapUser(ctx, {
-        user_id: ctx.user._id,
+        userId: ctx.user._id,
         permission: "owner",
-        map_id: newMapId,
+        mapId: newMapId,
       });
 
       // Fetch all related data in parallel
@@ -324,15 +324,15 @@ export const duplicateMap = authedMutation({
       ] = await Promise.all([
         ctx.db
           .query("collections")
-          .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+          .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId))
           .collect(),
         ctx.db
           .query("markers")
-          .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+          .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId))
           .collect(),
         ctx.db
           .query("collection_links")
-          .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+          .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId))
           .collect(),
         ctx.db
           .query("paths")
@@ -340,15 +340,15 @@ export const duplicateMap = authedMutation({
           .collect(),
         ctx.db
           .query("labels")
-          .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+          .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId))
           .collect(),
         ctx.db
           .query("routes")
-          .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+          .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId))
           .collect(),
         ctx.db
           .query("route_stops")
-          .withIndex("by_map_id", (q) => q.eq("map_id", args.mapId))
+          .withIndex("by_map_id", (q) => q.eq("mapId", args.mapId))
           .collect(),
       ]);
 
@@ -366,10 +366,10 @@ export const duplicateMap = authedMutation({
       const newCollectionIds = await Promise.all(
         collections.map((collection) =>
           ctx.db.insert("collections", {
-            map_id: newMapId,
+            mapId: newMapId,
             title: collection.title,
             description: collection.description,
-            created_by: ctx.user._id,
+            createdBy: ctx.user._id,
             icon: collection.icon,
             color: collection.color,
             updatedAt: new Date().toISOString(),
@@ -390,11 +390,11 @@ export const duplicateMap = authedMutation({
             note: marker.note,
             lat: marker.lat,
             lng: marker.lng,
-            created_by: ctx.user._id,
+            createdBy: ctx.user._id,
             icon: marker.icon,
             color: marker.color,
-            place_id: marker.place_id,
-            map_id: newMapId,
+            placeId: marker.placeId,
+            mapId: newMapId,
             updatedAt: new Date().toISOString(),
             isArchived: false,
           })
@@ -409,11 +409,11 @@ export const duplicateMap = authedMutation({
       const newRouteIds = await Promise.all(
         routes.map((route) =>
           ctx.db.insert("routes", {
-            map_id: newMapId,
+            mapId: newMapId,
             name: route.name,
             description: route.description,
-            travel_type: route.travel_type,
-            user_id: ctx.user._id,
+            travelType: route.travelType,
+            userId: ctx.user._id,
             updatedAt: new Date().toISOString(),
             isArchived: false,
           })
@@ -441,12 +441,12 @@ export const duplicateMap = authedMutation({
         ),
         ...labels.map((label) =>
           ctx.db.insert("labels", {
-            map_id: newMapId,
+            mapId: newMapId,
             title: label.title,
             description: label.description,
             icon: label.icon,
             color: label.color,
-            created_by: ctx.user._id,
+            createdBy: ctx.user._id,
             updatedAt: new Date().toISOString(),
             isArchived: false,
           })
@@ -457,14 +457,14 @@ export const duplicateMap = authedMutation({
       await Promise.all([
         ...collectionLinks
           .map((link) => {
-            const newCollectionId = collectionIdMap.get(link.collection_id);
-            const newMarkerId = markerIdMap.get(link.marker_id);
+            const newCollectionId = collectionIdMap.get(link.collectionId);
+            const newMarkerId = markerIdMap.get(link.markerId);
             if (newCollectionId && newMarkerId) {
               return ctx.db.insert("collection_links", {
-                collection_id: newCollectionId,
-                marker_id: newMarkerId,
-                map_id: newMapId,
-                user_id: ctx.user._id,
+                collectionId: newCollectionId,
+                markerId: newMarkerId,
+                mapId: newMapId,
+                userId: ctx.user._id,
                 isArchived: false,
               });
             }
@@ -473,17 +473,17 @@ export const duplicateMap = authedMutation({
           .filter((p): p is NonNullable<typeof p> => p !== null),
         ...routeStops
           .map((stop) => {
-            const newRouteId = routeIdMap.get(stop.route_id);
-            const newMarkerId = markerIdMap.get(stop.marker_id);
+            const newRouteId = routeIdMap.get(stop.routeId);
+            const newMarkerId = markerIdMap.get(stop.markerId);
             if (newRouteId && newMarkerId) {
               return ctx.db.insert("route_stops", {
-                map_id: newMapId,
-                route_id: newRouteId,
-                marker_id: newMarkerId,
-                user_id: ctx.user._id,
+                mapId: newMapId,
+                routeId: newRouteId,
+                markerId: newMarkerId,
+                userId: ctx.user._id,
                 lat: stop.lat,
                 lng: stop.lng,
-                stop_order: stop.stop_order,
+                stopOrder: stop.stopOrder,
                 updatedAt: new Date().toISOString(),
                 isArchived: false,
               });
